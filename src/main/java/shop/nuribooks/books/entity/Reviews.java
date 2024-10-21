@@ -34,8 +34,9 @@ public class Reviews {
 	private String content;
 
 	@ColumnDefault("0")
-	@Column(nullable = false, columnDefinition = "tinyint(1)")
-	private int score; //평점 1-5점
+	@Column(nullable = false)
+	//@Column(nullable = false, columnDefinition = "tinyint(1)")
+	private byte score; //평점 1-5점
 
 	@NotNull
 	private LocalDateTime createdAt;

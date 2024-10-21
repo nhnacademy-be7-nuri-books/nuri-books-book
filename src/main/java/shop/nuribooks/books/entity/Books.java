@@ -2,6 +2,7 @@ package shop.nuribooks.books.entity;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDate;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -10,6 +11,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -29,6 +32,14 @@ public class Books {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@ManyToOne
+	@JoinColumn(name = "book_state_id", nullable = false)
+	private BookStates stateId;
+
+	@ManyToOne
+	@JoinColumn(name = "publisher_id", nullable = false)
+	private Publishers publisherId;
+
 	@Column(nullable = false, length = 50)
 	private String title;
 
@@ -38,7 +49,7 @@ public class Books {
 	private String detailImageUrl;
 
 	@NotNull
-	private Date publicationDate;
+	private LocalDate publicationDate;
 
 	@NotNull
 	private BigDecimal price;
@@ -56,19 +67,20 @@ public class Books {
 	private String isbn;
 
 	@ColumnDefault("false")
-	@Column(nullable = false, columnDefinition = "tinyint(1)")
+	@Column(nullable = false)
+	//@Column(nullable = false, columnDefinition = "tinyint(1)")
 	private boolean isPackageable;
 
 	@NotNull
-	@ColumnDefault("0")
-	private int likeCount;
+	//@ColumnDefault("0")
+	private int likeCount = 0;
 
 	@NotNull
-	@ColumnDefault("0")
-	private int stock;
+	//@ColumnDefault("0")
+	private int stock = 0;
 
 	@NotNull
-	@ColumnDefault("0")
-	private Long viewCount;
+	//@ColumnDefault("0")
+	private Long viewCount = 0L;
 }
 
