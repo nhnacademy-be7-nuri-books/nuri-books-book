@@ -27,7 +27,8 @@ public class BooksController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "Book registration successful"),
 		@ApiResponse(responseCode = "400", description = "Invalid request data"),
-		@ApiResponse(responseCode = "404", description = "Book state or publisher not found")
+		@ApiResponse(responseCode = "404", description = "Book state or publisher not found"),
+		@ApiResponse(responseCode = "409", description = "ISBN already exists"),
 	})
 	@PostMapping
 	public ResponseEntity<BooksRegisterResDto> registerBooks(@Valid @RequestBody BooksRegisterReqDto reqDto){
