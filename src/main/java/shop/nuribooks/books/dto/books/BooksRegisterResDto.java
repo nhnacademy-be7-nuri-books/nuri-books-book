@@ -2,14 +2,11 @@ package shop.nuribooks.books.dto.books;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import lombok.Builder;
+import lombok.Getter;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
+@Getter
+@Builder
 public class BooksRegisterResDto {
 	private Long id;
 	private Long stateId;

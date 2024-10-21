@@ -53,17 +53,18 @@ public class BooksControllerTest {
 			10
 		);
 
-		BooksRegisterResDto resDto = new BooksRegisterResDto(
-			1L,
-			1L,
-			1L,
-			"책 제목",
-			"thumbnail.jpg",
-			LocalDate.parse("2024-10-21"),
-			BigDecimal.valueOf(10000),
-			0,
-			"책 설명",
-			10);
+		BooksRegisterResDto resDto = BooksRegisterResDto.builder()
+			.id(1L)
+			.stateId(1L)
+			.publisherId(1L)
+			.title("책 제목")
+			.thumbnailImageUrl("thumbnail.jpg")
+			.publicationDate(LocalDate.parse("2024-10-21"))
+			.price(BigDecimal.valueOf(10000))
+			.discountRate(0)
+			.description("책 설명")
+			.stock(10)
+			.build();
 
 		when(booksService.registerBook(any(BooksRegisterReqDto.class))).thenReturn(resDto);
 
@@ -79,7 +80,7 @@ public class BooksControllerTest {
 	public void registerBooks_ShouldReturnBadRequest_WhenRequestIsInvalid() throws Exception {
 		BooksRegisterReqDto reqDto = new BooksRegisterReqDto(
 			null,
-			null,
+			(Long) null,
 			"",
 			null,
 			null,
@@ -93,7 +94,8 @@ public class BooksControllerTest {
 			-1
 		);
 
-		when(booksService.registerBook(any(BooksRegisterReqDto.class))).thenThrow(new BadRequestException("잘못된 요청 데이터입니다."));
+		when(booksService.registerBook(any(BooksRegisterReqDto.class)))
+			.thenThrow(new BadRequestException("잘못된 요청 데이터입니다."));
 
 		mockMvc.perform(post("/api/books")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -119,7 +121,8 @@ public class BooksControllerTest {
 			10
 		);
 
-		when(booksService.registerBook(any(BooksRegisterReqDto.class))).thenThrow(new ResourceNotFoundException("해당 id를 찾지 못했습니다."));
+		when(booksService.registerBook(any(BooksRegisterReqDto.class)))
+			.thenThrow(new ResourceNotFoundException("해당 id를 찾지 못했습니다."));
 
 		mockMvc.perform(post("/api/books")
 				.contentType(MediaType.APPLICATION_JSON)

@@ -1,7 +1,6 @@
 package shop.nuribooks.books.entity;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.time.LocalDate;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -14,8 +13,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +27,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 @Table(name = "books")
 public class Books {
 
@@ -55,6 +58,8 @@ public class Books {
 	private BigDecimal price;
 
 	@NotNull
+	@Min(0)
+	@Max(100)
 	private int discountRate;
 
 	@NotNull
@@ -66,23 +71,23 @@ public class Books {
 	@Column(nullable = false, length = 20)
 	private String isbn;
 
+	//TODO: Profile 어노테이션을 사용 OR 운영환경 설정 시 mysql 셋팅 후 주석 해제
 	@ColumnDefault("false")
 	@Column(nullable = false)
-
-	//TODO: Profile 어노테이션을 사용 OR 운영환경 설정 시 mysql 셋팅 후 주석 해제
-	//@Column(nullable = false, columnDefinition = "tinyint(1)")
+	//@Column(nullable = false, columnDefinition = "tinyint(1) default 0")
 	private boolean isPackageable;
 
 	@NotNull
 	//@ColumnDefault("0")
-	private int likeCount = 0;
+	private int likeCount;
+
+	@NotNull
+	@Min(0)
+	//@ColumnDefault("0")
+	private int stock;
 
 	@NotNull
 	//@ColumnDefault("0")
-	private int stock = 0;
-
-	@NotNull
-	//@ColumnDefault("0")
-	private Long viewCount = 0L;
+	private Long viewCount;
 }
 

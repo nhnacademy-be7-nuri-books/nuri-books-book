@@ -22,6 +22,7 @@ import shop.nuribooks.books.entity.Books;
 import shop.nuribooks.books.entity.Publishers;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
+import shop.nuribooks.books.exception.books.DuplicateIsbnException;
 import shop.nuribooks.books.repository.books.BookStatesRepository;
 import shop.nuribooks.books.repository.books.BooksRepository;
 import shop.nuribooks.books.repository.books.PublishersRepository;
@@ -73,6 +74,7 @@ public class BooksServiceImplTest {
 
 		when(bookStatesRepository.findById(1L)).thenReturn(Optional.of(bookStates));
 		when(publishersRepository.findById(1L)).thenReturn(Optional.of(mockPublisher));
+		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(false);
 		when(booksRepository.save(any(Books.class))).thenAnswer(invocation -> {
 			Books book = invocation.getArgument(0);
 			book.setId(1L);
@@ -111,16 +113,40 @@ public class BooksServiceImplTest {
 	}
 
 	@Test
+	public void registerBook_ShouldThrowDuplicateIsbnException_WhenIsbnAlreadyExists() {
+		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(true);
+
+		assertThrows(DuplicateIsbnException.class, () -> booksService.registerBook(reqDto));
+
+		verify(booksRepository, times(1)).existsByIsbn(reqDto.getIsbn());
+	}
+
+	@Test
 	public void registerBook_ShouldSaveBook_WhenBookStateAndPublisherFound() {
 		Publishers mockPublisher = new Publishers(1L, "Publisher Name");
 
 		when(bookStatesRepository.findById(1L)).thenReturn(Optional.of(bookStates));
 		when(publishersRepository.findById(1L)).thenReturn(Optional.of(mockPublisher));
+		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(false);
 
-		Books mockBook = new Books(null, bookStates, mockPublisher, "Book Title",
-			"thumbnail.jpg", "detail.jpg", LocalDate.now(), BigDecimal.valueOf(20000),
-			10, "Book Description", "Book Contents", "1234567890123",
-			true, 0, 100, 0L);
+		Books mockBook = Books.builder()
+			.id(null)
+			.stateId(bookStates)
+			.publisherId(mockPublisher)
+			.title("Book Title")
+			.thumbnailImageUrl("thumbnail.jpg")
+			.detailImageUrl("detail.jpg")
+			.publicationDate(LocalDate.now())
+			.price(BigDecimal.valueOf(20000))
+			.discountRate(10)
+			.description("Book Description")
+			.contents("Book Contents")
+			.isbn("1234567890123")
+			.isPackageable(true)
+			.likeCount(0)
+			.stock(100)
+			.viewCount(0L)
+			.build();
 
 		when(booksRepository.save(any(Books.class))).thenReturn(mockBook);
 

@@ -9,7 +9,9 @@ import shop.nuribooks.books.entity.BookStates;
 import shop.nuribooks.books.entity.Books;
 import shop.nuribooks.books.entity.Publishers;
 import shop.nuribooks.books.exception.BadRequestException;
-import shop.nuribooks.books.exception.ResourceNotFoundException;
+import shop.nuribooks.books.exception.books.BookStatesIdNotFoundException;
+import shop.nuribooks.books.exception.books.DuplicateIsbnException;
+import shop.nuribooks.books.exception.books.PublisherIdNotFoundException;
 import shop.nuribooks.books.repository.books.BookStatesRepository;
 import shop.nuribooks.books.repository.books.BooksRepository;
 import shop.nuribooks.books.repository.books.PublishersRepository;
@@ -28,44 +30,47 @@ public class BooksServiceImpl implements BooksService {
 			throw new BadRequestException("요청 본문이 비어있습니다.");
 		}
 
+		if(booksRepository.existsByIsbn(reqDto.getIsbn())){
+			throw new DuplicateIsbnException(reqDto.getIsbn());
+		}
+
 		BookStates bookState = bookStatesRepository.findById(reqDto.getStateId())
-			.orElseThrow(() -> new ResourceNotFoundException("ID: {stateId}에 해당하는 도서 상태를 찾을 수 없습니다."));
+			.orElseThrow(() -> new BookStatesIdNotFoundException(reqDto.getStateId()));
 
 		Publishers publisher = publishersRepository.findById(reqDto.getPublisherId())
-			.orElseThrow(() -> new ResourceNotFoundException("ID: {stateId}에 해당하는 출판사 id를 찾을 수 없습니다."));
+			.orElseThrow(() -> new PublisherIdNotFoundException(reqDto.getPublisherId()));
 
-		Books books = new Books(
-			null,
-			bookState,
-			publisher,
-			reqDto.getTitle(),
-			reqDto.getThumbnailImageUrl(),
-			reqDto.getDetailImageUrl(),
-			reqDto.getPublicationDate(),
-			reqDto.getPrice(),
-			reqDto.getDiscountRate(),
-			reqDto.getDescription(),
-			reqDto.getContents(),
-			reqDto.getIsbn(),
-			reqDto.isPackageable(),
-			0,
-			reqDto.getStock(),
-			0L
-		);
+		Books books = Books.builder()
+			.stateId(bookState)
+			.publisherId(publisher)
+			.title(reqDto.getTitle())
+			.thumbnailImageUrl(reqDto.getThumbnailImageUrl())
+			.detailImageUrl(reqDto.getDetailImageUrl())
+			.publicationDate(reqDto.getPublicationDate())
+			.price(reqDto.getPrice())
+			.discountRate(reqDto.getDiscountRate())
+			.description(reqDto.getDescription())
+			.contents(reqDto.getContents())
+			.isbn(reqDto.getIsbn())
+			.isPackageable(reqDto.isPackageable())
+			.likeCount(0)
+			.stock(reqDto.getStock())
+			.viewCount(0L)
+			.build();
 
 		booksRepository.save(books);
 
-		return new BooksRegisterResDto(
-			books.getId(),
-			books.getStateId().getId(),
-			books.getPublisherId().getId(),
-			books.getTitle(),
-			books.getThumbnailImageUrl(),
-			books.getPublicationDate(),
-			books.getPrice(),
-			books.getDiscountRate(),
-			books.getDescription(),
-			books.getStock()
-		);
+		return BooksRegisterResDto.builder()
+			.id(books.getId())
+			.stateId(books.getStateId().getId())
+			.publisherId(books.getPublisherId().getId())
+			.title(books.getTitle())
+			.thumbnailImageUrl(books.getThumbnailImageUrl())
+			.publicationDate(books.getPublicationDate())
+			.price(books.getPrice())
+			.discountRate(books.getDiscountRate())
+			.description(books.getDescription())
+			.stock(books.getStock())
+			.build();
 	}
 }
