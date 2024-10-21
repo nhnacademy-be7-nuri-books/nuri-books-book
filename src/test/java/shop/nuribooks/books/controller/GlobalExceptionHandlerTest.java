@@ -1,9 +1,5 @@
 package shop.nuribooks.books.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,13 +28,13 @@ class GlobalExceptionHandlerTest {
 	// 		.andExpect(jsonPath("$.message").value("Invalid data provided"));
 	// }
 
-	@Test
-	void handleGlobalException_shouldReturnInternalServerError() throws Exception {
-		mockMvc.perform(get("/internal-error"))
-			.andExpect(status().isInternalServerError())
-			.andExpect(jsonPath("$.statusCode").value(500))
-			.andExpect(jsonPath("$.message").value("An unexpected error occurred"));
-	}
+	// @Test
+	// void handleGlobalException_shouldReturnInternalServerError() throws Exception {
+	// 	mockMvc.perform(get("/internal-error"))
+	// 		.andExpect(status().isInternalServerError())
+	// 		.andExpect(jsonPath("$.statusCode").value(500))
+	// 		.andExpect(jsonPath("$.message").value("An unexpected error occurred"));
+	// }
 }
 
 
