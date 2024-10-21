@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.books.BooksRegisterReqDto;
 import shop.nuribooks.books.dto.books.BooksRegisterResDto;
@@ -29,7 +30,7 @@ public class BooksController {
 		@ApiResponse(responseCode = "404", description = "Book state or publisher not found")
 	})
 	@PostMapping
-	public ResponseEntity<BooksRegisterResDto> registerBooks(@Validated @RequestBody BooksRegisterReqDto reqDto){
+	public ResponseEntity<BooksRegisterResDto> registerBooks(@Valid @RequestBody BooksRegisterReqDto reqDto){
 		BooksRegisterResDto resDto = booksService.registerBook(reqDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
 	}

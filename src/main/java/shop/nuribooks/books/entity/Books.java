@@ -68,6 +68,8 @@ public class Books {
 
 	@ColumnDefault("false")
 	@Column(nullable = false)
+
+	//TODO: Profile 어노테이션을 사용 OR 운영환경 설정 시 mysql 셋팅 후 주석 해제
 	//@Column(nullable = false, columnDefinition = "tinyint(1)")
 	private boolean isPackageable;
 
