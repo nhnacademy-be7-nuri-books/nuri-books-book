@@ -21,24 +21,26 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 
 	@Override
 	public void registerContributorRole(ContributorRoleReq req) {
+		ContributorRoleEnum roleEnum;
+
 		try {
-			ContributorRoleEnum roleEnum = ContributorRoleEnum.valueOf(req.getName().toUpperCase());
+			 roleEnum = ContributorRoleEnum.valueOf(req.getName().toUpperCase());
 
-			if (contributorRolesRepository.findByName(roleEnum).isPresent()) {
-				throw new DuplicateEntityException(
-					"Contributor role '" + req.getName() + "' already exists."
-				);
-			}
-
-			ContributorRole savedRole = new ContributorRole();
-			savedRole.setName(roleEnum);
-
-			contributorRolesRepository.save(savedRole);
 		} catch (IllegalArgumentException e) {
 			String errorMessage = "Invalid contributor role name: " + req.getName();
 			throw new InvalidContributorRoleException(errorMessage, e);
 
 		}
+
+		if (contributorRolesRepository.existsByContributorRoleEnum(roleEnum)) {
+			throw new DuplicateEntityException(
+				"Contributor role '" + req.getName() + "' already exists."
+			);
+		}
+
+		ContributorRole savedRole = new ContributorRole();
+		savedRole.setName(roleEnum);
+		contributorRolesRepository.save(savedRole);
 
 	}
 
@@ -51,27 +53,26 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 	public void updateContributorRole(String roleName, ContributorRoleReq req) {
 		String updatedRoleName = req.getName().toUpperCase();
 
-		// 기존 역할 이름 조회
 		ContributorRole existedRole = contributorRolesRepository.findByName(ContributorRoleEnum.valueOf(roleName.toUpperCase()))
 			.orElseThrow(() -> new ContributorRoleNotFoundException("ContributorRole not found"));
 
+		ContributorRoleEnum newRoleEnum;
 		try {
-			// 수정할 역할 이름
-			ContributorRoleEnum newRoleEnum = ContributorRoleEnum.valueOf(updatedRoleName);
+			newRoleEnum = ContributorRoleEnum.valueOf(updatedRoleName);
 
-			// 중복 확인
-			if (contributorRolesRepository.findByName(newRoleEnum).isPresent() && !existedRole.getName().equals(newRoleEnum)) {
-				throw new DuplicateEntityException(
-					"Contributor role '" + updatedRoleName + "' already exists."
-				);
-			}
-
-			existedRole.setName(newRoleEnum);
-			contributorRolesRepository.save(existedRole);
 		} catch (IllegalArgumentException e) {
 			String errorMessage = "Invalid contributor role name: " + req.getName();
 			throw new InvalidContributorRoleException(errorMessage, e);
 		}
+
+		if (contributorRolesRepository.existsByContributorRoleEnum(newRoleEnum)) {
+			throw new DuplicateEntityException(
+				"Contributor role '" + updatedRoleName + "' already exists."
+			);
+		}
+
+		existedRole.setName(newRoleEnum);
+		contributorRolesRepository.save(existedRole);
 
 	}
 

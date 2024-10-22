@@ -1,4 +1,4 @@
-package shop.nuribooks.books.dto.contributorrole;
+package shop.nuribooks.books.dto.contributor.role;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor
-public class ContributorRoleRes {
+public class ContributorRoleResDto {
 	private String name;
 }
 

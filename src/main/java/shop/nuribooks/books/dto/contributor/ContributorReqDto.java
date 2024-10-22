@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContributorReq {
+public class ContributorReqDto {
 	@Length(min = 1, max = 50)
 	@NotNull(message = "Name cannot be null")
 	private String name;

@@ -9,5 +9,6 @@ import shop.nuribooks.books.entity.book.ContributorRoleEnum;
 
 public interface ContributorRoleRepository extends JpaRepository<ContributorRole, Long> {
 	Optional<ContributorRole> findByName(ContributorRoleEnum name);
+	boolean existsByContributorRoleEnum(ContributorRoleEnum contributorRoleEnum);
 
 }
