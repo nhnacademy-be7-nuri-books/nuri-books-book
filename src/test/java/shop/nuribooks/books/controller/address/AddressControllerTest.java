@@ -61,7 +61,7 @@ class AddressControllerTest {
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
-                .address("103호")
+                .addressDetail("103호")
                 .isDefault(true)
                 .build();
 
@@ -75,6 +75,27 @@ class AddressControllerTest {
         // then
     }
 
+    @DisplayName("주소 생성 시 올바르지 않은 필드 입력시 예외가 발생한다.")
+    @Test
+    void addAddressWithBadRequest() throws Exception {
+        // given
+        AddressCreateRequest request = AddressCreateRequest.builder()
+                .memberId(null)
+                .name("test")
+                .address("장말로")
+                .addressDetail("103호")
+                .isDefault(true)
+                .build();
+
+        // when
+        mockMvc.perform(post("/api/member/{memberId}/address", 1L)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest());
+        // then
+    }
+
     @DisplayName("회원의 주소를 조회한다.")
     @Test
     void addressList() throws Exception {
@@ -83,7 +104,7 @@ class AddressControllerTest {
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
-                .address("103호")
+                .addressDetail("103호")
                 .isDefault(true)
                 .build();
 
@@ -91,7 +112,7 @@ class AddressControllerTest {
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
-                .address("103호")
+                .addressDetail("103호")
                 .isDefault(true)
                 .build();
         addressRepository.saveAll(List.of(address1, address2));
@@ -111,7 +132,7 @@ class AddressControllerTest {
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
-                .address("103호")
+                .addressDetail("103호")
                 .isDefault(true)
                 .build();
         Address saved = addressRepository.save(address);
@@ -130,7 +151,7 @@ class AddressControllerTest {
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
-                .address("103호")
+                .addressDetail("103호")
                 .isDefault(true)
                 .build();
 
@@ -141,7 +162,7 @@ class AddressControllerTest {
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
-                .address("103호")
+                .addressDetail("103호")
                 .isDefault(false)
                 .build();
         // when // then

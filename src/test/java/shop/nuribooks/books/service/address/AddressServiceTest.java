@@ -40,7 +40,7 @@ class AddressServiceTest {
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
-                .address("103호")
+                .addressDetail("103호")
                 .isDefault(true)
                 .build();
         // when
@@ -58,7 +58,7 @@ class AddressServiceTest {
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
-                .address("103호")
+                .addressDetail("103호")
                 .isDefault(true)
                 .build();
         AddressResponse response = addressService.addAddress(request);
@@ -78,7 +78,7 @@ class AddressServiceTest {
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
-                .address("103호")
+                .addressDetail("103호")
                 .isDefault(true)
                 .build();
 
@@ -98,7 +98,7 @@ class AddressServiceTest {
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
-                .address("103호")
+                .addressDetail("103호")
                 .isDefault(true)
                 .build();
 
@@ -109,7 +109,7 @@ class AddressServiceTest {
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
-                .address("103호")
+                .addressDetail("103호")
                 .isDefault(false)
                 .build();
         // when
