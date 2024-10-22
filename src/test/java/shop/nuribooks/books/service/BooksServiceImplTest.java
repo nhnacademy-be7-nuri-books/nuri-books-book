@@ -14,36 +14,36 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import shop.nuribooks.books.dto.books.BooksRegisterReqDto;
-import shop.nuribooks.books.dto.books.BooksRegisterResDto;
+import shop.nuribooks.books.dto.book.BookRegisterReq;
+import shop.nuribooks.books.dto.book.BookRegisterRes;
 import shop.nuribooks.books.entity.BookStates;
 import shop.nuribooks.books.entity.BookStatesEnum;
 import shop.nuribooks.books.entity.Books;
 import shop.nuribooks.books.entity.Publishers;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
-import shop.nuribooks.books.exception.books.DuplicateIsbnException;
-import shop.nuribooks.books.repository.books.BookStatesRepository;
-import shop.nuribooks.books.repository.books.BooksRepository;
-import shop.nuribooks.books.repository.books.PublishersRepository;
-import shop.nuribooks.books.service.books.impl.BooksServiceImpl;
+import shop.nuribooks.books.exception.book.DuplicateIsbnException;
+import shop.nuribooks.books.repository.book.BookStateRepository;
+import shop.nuribooks.books.repository.book.BookRepository;
+import shop.nuribooks.books.repository.book.PublisherRepository;
+import shop.nuribooks.books.service.book.impl.BookServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class BooksServiceImplTest {
 
 	@InjectMocks
-	private BooksServiceImpl booksService;
+	private BookServiceImpl booksService;
 
 	@Mock
-	private BooksRepository booksRepository;
+	private BookRepository booksRepository;
 
 	@Mock
-	private BookStatesRepository bookStatesRepository;
+	private BookStateRepository bookStatesRepository;
 
 	@Mock
-	private PublishersRepository publishersRepository;
+	private PublisherRepository publishersRepository;
 
-	private BooksRegisterReqDto reqDto;
+	private BookRegisterReq reqDto;
 
 	private BookStates bookStates;
 
@@ -51,7 +51,7 @@ public class BooksServiceImplTest {
 	public void setUp() {
 		bookStates = new BookStates(1L, BookStatesEnum.InStock);
 
-		reqDto = new BooksRegisterReqDto(
+		reqDto = new BookRegisterReq(
 			1L,
 			1L,
 			"Book Title",
@@ -81,7 +81,7 @@ public class BooksServiceImplTest {
 			return book;
 		});
 
-		BooksRegisterResDto result = booksService.registerBook(reqDto);
+		BookRegisterRes result = booksService.registerBook(reqDto);
 
 		assertNotNull(result);
 		assertEquals(1L, result.getId());
@@ -150,7 +150,7 @@ public class BooksServiceImplTest {
 
 		when(booksRepository.save(any(Books.class))).thenReturn(mockBook);
 
-		BooksRegisterResDto result = booksService.registerBook(reqDto);
+		BookRegisterRes result = booksService.registerBook(reqDto);
 
 		assertNotNull(result);
 		assertEquals("Book Title", result.getTitle());
