@@ -89,7 +89,7 @@ public class MemberController {
 	 * MemberUpdateReq의 모든 필드 즉, <br>
 	 * name, password, phoneNumber에 대해서 검증 후 userId를 통해 수정 진행
 	 */
-	@PatchMapping("/api/member/{userId}")
+	@PostMapping("/api/member/{userId}")
 	public ResponseEntity<ResponseMessage> memberUpdate(
 		@PathVariable String userId, @RequestBody @Valid MemberUpdateReq request, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {

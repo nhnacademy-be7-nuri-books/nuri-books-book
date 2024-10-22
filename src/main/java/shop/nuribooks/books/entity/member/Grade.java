@@ -18,7 +18,7 @@ public class Grade {
 	private Integer id;
 
 	/**
-	 * STANDARD, ROYAL, GOLD, PLATINUM
+	 * STANDARD, GOLD, PLATINUM, ROYAL
 	 */
 	@NotBlank
 	private String name;
