@@ -10,10 +10,10 @@ import shop.nuribooks.books.entity.Books;
 import shop.nuribooks.books.entity.Publishers;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.book.BookStatesIdNotFoundException;
-import shop.nuribooks.books.exception.book.DuplicateIsbnException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
-import shop.nuribooks.books.repository.book.BookStateRepository;
+import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.repository.book.BookRepository;
+import shop.nuribooks.books.repository.book.BookStateRepository;
 import shop.nuribooks.books.repository.book.PublisherRepository;
 import shop.nuribooks.books.service.book.BookService;
 
@@ -26,12 +26,12 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public BookRegisterRes registerBook(BookRegisterReq reqDto) {
-		if(reqDto == null){
+		if (reqDto == null) {
 			throw new BadRequestException("요청 본문이 비어있습니다.");
 		}
 
-		if(booksRepository.existsByIsbn(reqDto.getIsbn())){
-			throw new DuplicateIsbnException(reqDto.getIsbn());
+		if (booksRepository.existsByIsbn(reqDto.getIsbn())) {
+			throw new ResourceAlreadyExistIsbnException(reqDto.getIsbn());
 		}
 
 		BookStates bookState = bookStatesRepository.findById(reqDto.getStateId())
