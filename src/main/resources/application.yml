@@ -1,0 +1,30 @@
+#spring:
+#  application:
+#    name: member
+#  datasource:
+#    url: jdbc:mysql://133.186.241.167:3306/project_be7_nuribooks_dev
+#    username: be7_nuribooks
+#    password: '@f3hgB7jc@KvWJQZ'
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#  jpa:
+#    hibernate:
+#      ddl-auto: validate
+#  lifecycle:
+#    timeout-per-shutdown-phase: 30s
+#
+#server:
+#  port: 8083
+
+#eureka:
+#  client:
+#    fetch-registry: true
+#    register-with-eureka: true
+#    service-url:
+#      defaultZone: http://admin:1234@localhost:8761/eureka
+#    registry-fetch-interval-seconds: 15
+#  instance:
+#    prefer-ip-address: true
+
+#logging:
+#  level:
+#    root: debug
