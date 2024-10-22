@@ -16,28 +16,28 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.controller.books.BooksController;
-import shop.nuribooks.books.dto.books.BooksRegisterReqDto;
-import shop.nuribooks.books.dto.books.BooksRegisterResDto;
+import shop.nuribooks.books.controller.book.BookController;
+import shop.nuribooks.books.dto.book.BookRegisterReq;
+import shop.nuribooks.books.dto.book.BookRegisterRes;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
-import shop.nuribooks.books.service.books.BooksService;
+import shop.nuribooks.books.service.book.BookService;
 
-@WebMvcTest(BooksController.class)
+@WebMvcTest(BookController.class)
 public class BooksControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockBean
-	private BooksService booksService;
+	private BookService booksService;
 
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	@Test
 	public void registerBooks_ShouldReturnCreated_WhenRequestIsValid() throws Exception {
-		BooksRegisterReqDto reqDto = new BooksRegisterReqDto(
+		BookRegisterReq reqDto = new BookRegisterReq(
 			1L,
 			1L,
 			"책 제목",
@@ -53,7 +53,7 @@ public class BooksControllerTest {
 			10
 		);
 
-		BooksRegisterResDto resDto = BooksRegisterResDto.builder()
+		BookRegisterRes resDto = BookRegisterRes.builder()
 			.id(1L)
 			.stateId(1L)
 			.publisherId(1L)
@@ -66,7 +66,7 @@ public class BooksControllerTest {
 			.stock(10)
 			.build();
 
-		when(booksService.registerBook(any(BooksRegisterReqDto.class))).thenReturn(resDto);
+		when(booksService.registerBook(any(BookRegisterReq.class))).thenReturn(resDto);
 
 		mockMvc.perform(post("/api/books")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +78,7 @@ public class BooksControllerTest {
 
 	@Test
 	public void registerBooks_ShouldReturnBadRequest_WhenRequestIsInvalid() throws Exception {
-		BooksRegisterReqDto reqDto = new BooksRegisterReqDto(
+		BookRegisterReq reqDto = new BookRegisterReq(
 			null,
 			(Long) null,
 			"",
@@ -94,7 +94,7 @@ public class BooksControllerTest {
 			-1
 		);
 
-		when(booksService.registerBook(any(BooksRegisterReqDto.class)))
+		when(booksService.registerBook(any(BookRegisterReq.class)))
 			.thenThrow(new BadRequestException("잘못된 요청 데이터입니다."));
 
 		mockMvc.perform(post("/api/books")
@@ -105,7 +105,7 @@ public class BooksControllerTest {
 
 	@Test
 	public void registerBooks_ShouldReturnNotFound_WhenBookStateOrPublisherNotFound() throws Exception {
-		BooksRegisterReqDto reqDto = new BooksRegisterReqDto(
+		BookRegisterReq reqDto = new BookRegisterReq(
 			9999L,
 			9999L,
 			"책 제목",
@@ -121,7 +121,7 @@ public class BooksControllerTest {
 			10
 		);
 
-		when(booksService.registerBook(any(BooksRegisterReqDto.class)))
+		when(booksService.registerBook(any(BookRegisterReq.class)))
 			.thenThrow(new ResourceNotFoundException("해당 id를 찾지 못했습니다."));
 
 		mockMvc.perform(post("/api/books")

@@ -1,0 +1,15 @@
+### 기여자 등록
+POST localhost:8083/api/contributors
+Content-Type:application/json
+
+{
+  "name": "test"
+}
+
+### 기여자 역할 등록
+POST localhost:8083/api/contributors/roles
+Content-Type:application/json
+
+{
+  "name": "author"
+}
