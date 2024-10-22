@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.member.request.MemberCreateReq;
-import shop.nuribooks.books.dto.member.request.MemberResignReq;
+import shop.nuribooks.books.dto.member.request.MemberWithdrawReq;
 import shop.nuribooks.books.entity.member.Customer;
 import shop.nuribooks.books.entity.member.Member;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
@@ -84,10 +84,11 @@ public class MemberService {
 	 * MemberResignReq로 아이디와 비밀번호를 받아서 확인 <br>
 	 * 아이디로 member 존재 여부 먼저 확인하고, <br>
 	 * member가 존재한다면 member의 PK인 id와 비밀번호 두 가지 값으로 customer 존재 여부 확인 <br>
-	 * customer까지 존재한다면 마지막으로 member의 status를 INACTIVE로 변경
+	 * customer까지 존재한다면 마지막으로 member의 status를 INACTIVE로, <br>
+	 * 탈퇴 일시인 withdrawnAt을 현재 시간으로 변경
 	 */
 	@Transactional
-	public void withdrawMember(MemberResignReq request) {
+	public void withdrawMember(MemberWithdrawReq request) {
 		if (!memberRepository.existsByUserId(request.getUserId())) {
 			throw new UserIdNotFoundException("존재하지 않는 아이디입니다.");
 		}
@@ -100,5 +101,6 @@ public class MemberService {
 		}
 
 		findMember.changeStatus(INACTIVE);
+		findMember.changeWithdrawnAt(LocalDateTime.now());
 	}
 }

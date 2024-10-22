@@ -8,14 +8,14 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class Authority {
+public class Status {
 
 	@Id
-	@Column(name = "authority_id")
+	@Column(name = "status_id")
 	private Integer id;
 
 	/**
-	 * ADMIN, MEMBER, SELLER
+	 * ACTIVE, INACTIVE, WITHDRAWN
 	 */
 	@NotBlank
 	private String name;

@@ -15,7 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.member.ResponseMessage;
 import shop.nuribooks.books.dto.member.request.MemberCreateReq;
-import shop.nuribooks.books.dto.member.request.MemberResignReq;
+import shop.nuribooks.books.dto.member.request.MemberUpdateReq;
+import shop.nuribooks.books.dto.member.request.MemberWithdrawReq;
 import shop.nuribooks.books.service.member.MemberService;
 
 @RestController
@@ -65,12 +66,12 @@ public class MemberController {
 
 	/**
 	 * 아이디와 비밀번호로 회원 탈퇴 <br>
-	 * MemberResignReq의 모든 필드 즉, <br>
+	 * MemberWithdrawReq의 모든 필드 즉, <br>
 	 * userId와 password에 대해서 검증 후 회원 탈퇴 진행
 	 */
 	@PatchMapping("/api/member/status")
 	public ResponseEntity<ResponseMessage> memberWithdraw(
-		@RequestBody @Valid MemberResignReq request, BindingResult bindingResult) {
+		@RequestBody @Valid MemberWithdrawReq request, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			String errorMessage = bindingResult.getFieldErrors().getFirst().getDefaultMessage();
 
@@ -81,4 +82,8 @@ public class MemberController {
 		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),
 			"탈퇴가 성공적으로 완료되었습니다. 귀하의 앞날에 무궁한 발전이 있기를 진심으로 기원하겠습니다."));
 	}
+
+	// @PatchMapping("/api/member/{userId}")
+	// public ResponseEntity<ResponseMessage> memberUpdate(
+	// 	@RequestBody @Valid MemberUpdateReq request, BindingResult bindingResult)
 }

@@ -1,5 +1,6 @@
 package shop.nuribooks.books.entity.member;
 
+import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.FetchType.*;
 
 import java.math.BigDecimal;
@@ -8,6 +9,8 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -31,22 +34,37 @@ public class Member {
 	@Id
 	private Long id;
 
+	/**
+	 * MapsId 애노테이션은 @id로 지정한 컬럼에 @OneToOne 이나 @ManyToOne 관계를 매핑시킨다.
+	 */
 	@OneToOne(fetch = LAZY)
-	@MapsId // @MapsId는 @id로 지정한 컬럼에 @OneToOne 이나 @ManyToOne 관계를 매핑시키는 역할
+	@MapsId
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
+	/**
+	 * ADMIN, MEMBER, SELLER
+	 */
 	@NotNull
+	@Enumerated(STRING)
 	private AuthorityEnum authority;
 
+	/**
+	 * STANDARD, GOLD, PLATINUM, ROYAL
+	 */
 	@NotNull
+	@Enumerated(STRING)
 	private GradeEnum grade;
 
+	/**
+	 * ACTIVE, INACTIVE, WITHDRAWN
+	 */
 	@NotNull
+	@Enumerated(STRING)
 	private StatusEnum status;
 
 	@NotBlank
-	@Size(max = 20)
+	@Size(min = 8, max = 20)
 	private String userId;
 
 	@NotNull
@@ -63,9 +81,15 @@ public class Member {
 	@NotNull
 	private BigDecimal totalPaymentAmount;
 
+	/**
+	 * 마지막 로그인 일시
+	 */
 	private LocalDateTime latestLoginAt;
 
-	private LocalDateTime resignedAt;
+	/**
+	 * 탈퇴 일시
+	 */
+	private LocalDateTime withdrawnAt;
 
 	public Member(Customer customer, AuthorityEnum authority, GradeEnum grade, StatusEnum status, String userId,
 		LocalDate birthday, LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
@@ -82,5 +106,9 @@ public class Member {
 
 	public void changeStatus(StatusEnum status) {
 		this.status = status;
+	}
+
+	public void changeWithdrawnAt(LocalDateTime withdrawnAt) {
+		this.withdrawnAt = withdrawnAt;
 	}
 }

@@ -11,18 +11,22 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@NotNull
 public class Grade {
 
 	@Id
 	@Column(name = "grade_id")
 	private Integer id;
 
+	/**
+	 * STANDARD, ROYAL, GOLD, PLATINUM
+	 */
 	@NotBlank
-	private String name; // STANDARD, ROYAL, GOLD, PLATINUM
+	private String name;
 
+	@NotNull
 	private Integer pointRate;
 
+	@NotNull
 	@Column(precision = 10, scale = 2)
 	private BigDecimal requirement;
 }
