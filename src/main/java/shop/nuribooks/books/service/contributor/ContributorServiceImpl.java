@@ -1,14 +1,10 @@
 package shop.nuribooks.books.service.contributor;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributor.ContributorReq;
-import shop.nuribooks.books.entity.Books;
-import shop.nuribooks.books.entity.Contributors;
-import shop.nuribooks.books.exception.contributor.ContributorNotFoundException;
+import shop.nuribooks.books.entity.book.Contributors;
 import shop.nuribooks.books.repository.contributor.ContributorRepository;
 
 @Service

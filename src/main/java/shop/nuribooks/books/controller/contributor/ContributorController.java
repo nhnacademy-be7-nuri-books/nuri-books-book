@@ -11,7 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributor.ContributorReq;
 import shop.nuribooks.books.dto.contributor.ContributorRes;
-import shop.nuribooks.books.entity.Contributors;
+import shop.nuribooks.books.entity.book.Contributors;
 import shop.nuribooks.books.service.contributor.ContributorService;
 
 @RestController

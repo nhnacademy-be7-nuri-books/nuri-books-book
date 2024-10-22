@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import shop.nuribooks.books.dto.book.BookRegisterReq;
 import shop.nuribooks.books.dto.book.BookRegisterRes;
 import shop.nuribooks.books.entity.BookStates;
-import shop.nuribooks.books.entity.BookStatesEnum;
+import shop.nuribooks.books.entity.book.BookStatesEnum;
 import shop.nuribooks.books.entity.Books;
 import shop.nuribooks.books.entity.Publishers;
 import shop.nuribooks.books.exception.BadRequestException;

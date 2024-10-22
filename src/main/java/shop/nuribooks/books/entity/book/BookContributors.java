@@ -1,4 +1,4 @@
-package shop.nuribooks.books.entity;
+package shop.nuribooks.books.entity.book;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +11,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.nuribooks.books.entity.Books;
+import shop.nuribooks.books.entity.book.ContributorRoles;
+import shop.nuribooks.books.entity.book.Contributors;
 
 @Entity
 @AllArgsConstructor

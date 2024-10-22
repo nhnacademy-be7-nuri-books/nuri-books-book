@@ -16,3 +16,11 @@ Content-Type:application/json
 
 ### 기여자 역할 조회
 GET localhost:8083/api/contributors/roles
+
+### 기여자 역할 수정
+PUT localhost:8083/api/contributors/roles/author
+Content-Type:application/json
+
+{
+  "name": "coAuthor"
+}

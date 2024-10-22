@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.nuribooks.books.entity.book.BookStatesEnum;
 
 @Entity
 @AllArgsConstructor
