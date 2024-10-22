@@ -1,31 +1,31 @@
-package shop.nuribooks.books.service.books.impl;
+package shop.nuribooks.books.service.book.impl;
 
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.books.BooksRegisterReqDto;
-import shop.nuribooks.books.dto.books.BooksRegisterResDto;
+import shop.nuribooks.books.dto.book.BookRegisterReq;
+import shop.nuribooks.books.dto.book.BookRegisterRes;
 import shop.nuribooks.books.entity.BookStates;
 import shop.nuribooks.books.entity.Books;
 import shop.nuribooks.books.entity.Publishers;
 import shop.nuribooks.books.exception.BadRequestException;
-import shop.nuribooks.books.exception.books.BookStatesIdNotFoundException;
-import shop.nuribooks.books.exception.books.DuplicateIsbnException;
-import shop.nuribooks.books.exception.books.PublisherIdNotFoundException;
-import shop.nuribooks.books.repository.books.BookStatesRepository;
-import shop.nuribooks.books.repository.books.BooksRepository;
-import shop.nuribooks.books.repository.books.PublishersRepository;
-import shop.nuribooks.books.service.books.BooksService;
+import shop.nuribooks.books.exception.book.BookStatesIdNotFoundException;
+import shop.nuribooks.books.exception.book.DuplicateIsbnException;
+import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
+import shop.nuribooks.books.repository.book.BookStateRepository;
+import shop.nuribooks.books.repository.book.BookRepository;
+import shop.nuribooks.books.repository.book.PublisherRepository;
+import shop.nuribooks.books.service.book.BookService;
 
 @RequiredArgsConstructor
 @Service
-public class BooksServiceImpl implements BooksService {
-	private final BooksRepository booksRepository;
-	private final BookStatesRepository bookStatesRepository;
-	private final PublishersRepository publishersRepository;
+public class BookServiceImpl implements BookService {
+	private final BookRepository booksRepository;
+	private final BookStateRepository bookStatesRepository;
+	private final PublisherRepository publishersRepository;
 
 	@Override
-	public BooksRegisterResDto registerBook(BooksRegisterReqDto reqDto) {
+	public BookRegisterRes registerBook(BookRegisterReq reqDto) {
 		if(reqDto == null){
 			throw new BadRequestException("요청 본문이 비어있습니다.");
 		}
@@ -60,7 +60,7 @@ public class BooksServiceImpl implements BooksService {
 
 		booksRepository.save(books);
 
-		return BooksRegisterResDto.builder()
+		return BookRegisterRes.builder()
 			.id(books.getId())
 			.stateId(books.getStateId().getId())
 			.publisherId(books.getPublisherId().getId())

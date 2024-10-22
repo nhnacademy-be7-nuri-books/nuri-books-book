@@ -1,4 +1,4 @@
-package shop.nuribooks.books.exception.books;
+package shop.nuribooks.books.exception.book;
 
 import shop.nuribooks.books.exception.ResourceNotFoundException;
 
