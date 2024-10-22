@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributor.ContributorReq;
 import shop.nuribooks.books.entity.book.Contributor;
+import shop.nuribooks.books.exception.contributor.ContributorNotFoundException;
 import shop.nuribooks.books.repository.contributor.ContributorRepository;
 
 @Service
@@ -21,4 +22,14 @@ public class ContributorServiceImpl implements ContributorService {
 		return contributorRepository.save(savedContributor);
 
 	}
+
+	@Override
+	public Contributor updateContributor(Long contributorId, ContributorReq req) {
+		Contributor contributor = contributorRepository.findById(contributorId)
+			.orElseThrow(() -> new ContributorNotFoundException("Contributor with name '" + req.getName() + "' not found."));
+
+		contributor.setName(req.getName());
+		return contributorRepository.save(contributor);
+	}
+
 }

@@ -6,4 +6,5 @@ import shop.nuribooks.books.entity.book.Contributor;
 public interface ContributorService {
 	Contributor registerContributor(ContributorReq req);
 
+	Contributor updateContributor(Long contributorId, ContributorReq req);
 }

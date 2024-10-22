@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributorrole.ContributorRoleReq;
 import shop.nuribooks.books.entity.book.ContributorRole;
 import shop.nuribooks.books.entity.book.ContributorRoleEnum;
-import shop.nuribooks.books.exception.contributor.DuplicateContributorRoleException;
+import shop.nuribooks.books.exception.contributor.DuplicateEntityException;
 import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
 import shop.nuribooks.books.repository.contributorrole.ContributorRoleRepository;
 
@@ -25,7 +25,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 			ContributorRoleEnum roleEnum = ContributorRoleEnum.valueOf(req.getName().toUpperCase());
 
 			if (contributorRolesRepository.findByName(roleEnum).isPresent()) {
-				throw new DuplicateContributorRoleException(
+				throw new DuplicateEntityException(
 					"Contributor role '" + req.getName() + "' already exists."
 				);
 			}
@@ -61,7 +61,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 
 			// 중복 확인
 			if (contributorRolesRepository.findByName(newRoleEnum).isPresent() && !existedRole.getName().equals(newRoleEnum)) {
-				throw new DuplicateContributorRoleException(
+				throw new DuplicateEntityException(
 					"Contributor role '" + updatedRoleName + "' already exists."
 				);
 			}

@@ -9,5 +9,9 @@ public class ContributorRes {
 	private Long id;
 	private String name;
 
+	public ContributorRes(String name) {
+		this.name = name;
+	}
+
 }
 
