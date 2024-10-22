@@ -1,5 +1,5 @@
 package shop.nuribooks.books.entity.book;
 
-public enum BookStatesEnum {
+public enum BookStateEnum {
 	SOLDOUT, INSTOCK, OUTOFPRINT, DISCONTINUED, PREORDER;
 }

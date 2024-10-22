@@ -12,8 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import shop.nuribooks.books.entity.Books;
-import shop.nuribooks.books.entity.book.ContributorRoles;
-import shop.nuribooks.books.entity.book.Contributors;
 
 @Entity
 @AllArgsConstructor
@@ -21,7 +19,7 @@ import shop.nuribooks.books.entity.book.Contributors;
 @Getter
 @Setter
 @Table(name = "book_contributors")
-public class BookContributors {
+public class BookContributor {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,9 +31,9 @@ public class BookContributors {
 
 	@ManyToOne
 	@JoinColumn(name = "contributor_id")
-	private Contributors contributors;
+	private Contributor contributor;
 
 	@ManyToOne
 	@JoinColumn(name = "contributor_role_id")
-	private ContributorRoles contributorRoles;
+	private ContributorRole contributorRole;
 }
