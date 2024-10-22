@@ -1,4 +1,4 @@
-package shop.nuribooks.books.dto.book;
+package shop.nuribooks.books.dto.book.request;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class BookRegisterReq {
 	@NotNull
-	private Long stateId;
+	private Integer stateId;
 
 	@NotNull
 	private Long publisherId;

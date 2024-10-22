@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.nuribooks.books.entity.book.Book;
 
 @Entity
 @AllArgsConstructor
@@ -26,7 +27,7 @@ public class BookContributors {
 
 	@ManyToOne
 	@JoinColumn(name = "book_id")
-	private Books books;
+	private Book books;
 
 	@ManyToOne
 	@JoinColumn(name = "contributor_id")

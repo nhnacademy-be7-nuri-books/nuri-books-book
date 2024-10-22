@@ -9,7 +9,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import shop.nuribooks.books.dto.errordto.response.ErrorResDto;
 import shop.nuribooks.books.exception.BadRequestException;
-import shop.nuribooks.books.exception.DuplicateException;
+import shop.nuribooks.books.exception.IsAlreadyExistsException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
 
 @RestControllerAdvice
@@ -40,8 +40,8 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
 	}
 
-	@ExceptionHandler(DuplicateException.class)
-	public ResponseEntity<ErrorResDto> handleDuplicateException(DuplicateException ex, WebRequest request) {
+	@ExceptionHandler(IsAlreadyExistsException.class)
+	public ResponseEntity<ErrorResDto> handleIsAlreadyExistsException(IsAlreadyExistsException ex, WebRequest request) {
 		return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
 	}
 

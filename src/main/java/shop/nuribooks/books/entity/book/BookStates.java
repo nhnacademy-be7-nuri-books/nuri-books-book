@@ -1,4 +1,4 @@
-package shop.nuribooks.books.entity;
+package shop.nuribooks.books.entity.book;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.nuribooks.books.entity.book.enums.BookStatesEnum;
 
 @Entity
 @AllArgsConstructor
@@ -22,7 +23,7 @@ import lombok.Setter;
 public class BookStates {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Integer id;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)

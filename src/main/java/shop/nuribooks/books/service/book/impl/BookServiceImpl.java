@@ -3,14 +3,14 @@ package shop.nuribooks.books.service.book.impl;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.book.BookRegisterReq;
-import shop.nuribooks.books.dto.book.BookRegisterRes;
-import shop.nuribooks.books.entity.BookStates;
-import shop.nuribooks.books.entity.Books;
+import shop.nuribooks.books.dto.book.request.BookRegisterReq;
+import shop.nuribooks.books.dto.book.response.BookRegisterRes;
+import shop.nuribooks.books.entity.book.BookStates;
+import shop.nuribooks.books.entity.book.Book;
 import shop.nuribooks.books.entity.Publishers;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.book.BookStatesIdNotFoundException;
-import shop.nuribooks.books.exception.book.DuplicateIsbnException;
+import shop.nuribooks.books.exception.book.IsAlreadyExistsIsbnException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
 import shop.nuribooks.books.repository.book.BookStateRepository;
 import shop.nuribooks.books.repository.book.BookRepository;
@@ -31,7 +31,7 @@ public class BookServiceImpl implements BookService {
 		}
 
 		if(booksRepository.existsByIsbn(reqDto.getIsbn())){
-			throw new DuplicateIsbnException(reqDto.getIsbn());
+			throw new IsAlreadyExistsIsbnException(reqDto.getIsbn());
 		}
 
 		BookStates bookState = bookStatesRepository.findById(reqDto.getStateId())
@@ -40,7 +40,7 @@ public class BookServiceImpl implements BookService {
 		Publishers publisher = publishersRepository.findById(reqDto.getPublisherId())
 			.orElseThrow(() -> new PublisherIdNotFoundException(reqDto.getPublisherId()));
 
-		Books books = Books.builder()
+		Book books = Book.builder()
 			.stateId(bookState)
 			.publisherId(publisher)
 			.title(reqDto.getTitle())

@@ -17,14 +17,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.controller.book.BookController;
-import shop.nuribooks.books.dto.book.BookRegisterReq;
-import shop.nuribooks.books.dto.book.BookRegisterRes;
+import shop.nuribooks.books.dto.book.request.BookRegisterReq;
+import shop.nuribooks.books.dto.book.response.BookRegisterRes;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
 import shop.nuribooks.books.service.book.BookService;
 
 @WebMvcTest(BookController.class)
-public class BooksControllerTest {
+public class BookControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -38,7 +38,7 @@ public class BooksControllerTest {
 	@Test
 	public void registerBooks_ShouldReturnCreated_WhenRequestIsValid() throws Exception {
 		BookRegisterReq reqDto = new BookRegisterReq(
-			1L,
+			1,
 			1L,
 			"책 제목",
 			"thumbnail.jpg",
@@ -55,7 +55,7 @@ public class BooksControllerTest {
 
 		BookRegisterRes resDto = BookRegisterRes.builder()
 			.id(1L)
-			.stateId(1L)
+			.stateId(1)
 			.publisherId(1L)
 			.title("책 제목")
 			.thumbnailImageUrl("thumbnail.jpg")
@@ -79,8 +79,8 @@ public class BooksControllerTest {
 	@Test
 	public void registerBooks_ShouldReturnBadRequest_WhenRequestIsInvalid() throws Exception {
 		BookRegisterReq reqDto = new BookRegisterReq(
+			0,
 			null,
-			(Long) null,
 			"",
 			null,
 			null,
@@ -106,7 +106,7 @@ public class BooksControllerTest {
 	@Test
 	public void registerBooks_ShouldReturnNotFound_WhenBookStateOrPublisherNotFound() throws Exception {
 		BookRegisterReq reqDto = new BookRegisterReq(
-			9999L,
+			9999,
 			9999L,
 			"책 제목",
 			"thumbnail.jpg",

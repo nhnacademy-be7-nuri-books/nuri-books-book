@@ -1,4 +1,4 @@
-package shop.nuribooks.books.entity;
+package shop.nuribooks.books.entity.book;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,6 +21,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.nuribooks.books.entity.Publishers;
 
 @Entity
 @AllArgsConstructor
@@ -29,7 +30,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @Table(name = "books")
-public class Books {
+public class Book {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

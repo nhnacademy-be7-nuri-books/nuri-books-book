@@ -1,7 +1,10 @@
 package shop.nuribooks.books.controller.book;
 
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,8 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.book.BookRegisterReq;
-import shop.nuribooks.books.dto.book.BookRegisterRes;
+import shop.nuribooks.books.dto.book.request.BookRegisterReq;
+import shop.nuribooks.books.dto.book.response.BookRegisterRes;
 import shop.nuribooks.books.service.book.BookService;
 
 @RequestMapping("/api/books")
@@ -30,7 +33,15 @@ public class BookController {
 		@ApiResponse(responseCode = "409", description = "ISBN already exists"),
 	})
 	@PostMapping
-	public ResponseEntity<BookRegisterRes> registerBooks(@Valid @RequestBody BookRegisterReq reqDto){
+	public ResponseEntity<BookRegisterRes> registerBooks(@Valid @RequestBody BookRegisterReq reqDto, BindingResult bindingResult) throws
+		NoSuchMethodException, MethodArgumentNotValidException {
+		if(bindingResult.hasErrors()){
+			MethodParameter methodParameter = new MethodParameter(
+				this.getClass().getMethod("registerBooks", BookRegisterReq.class, BindingResult.class),0
+			);
+			throw new MethodArgumentNotValidException(methodParameter, bindingResult);
+		}
+
 		BookRegisterRes resDto = booksService.registerBook(reqDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
 	}

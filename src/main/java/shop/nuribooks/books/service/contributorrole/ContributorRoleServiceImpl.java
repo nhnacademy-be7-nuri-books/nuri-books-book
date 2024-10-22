@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributorrole.ContributorRoleReq;
 import shop.nuribooks.books.entity.ContributorRoles;
-import shop.nuribooks.books.entity.ContributorRolesEnum;
+import shop.nuribooks.books.entity.book.enums.ContributorRolesEnum;
 import shop.nuribooks.books.repository.contributorrole.ContributorRoleRepository;
 
 @Service
