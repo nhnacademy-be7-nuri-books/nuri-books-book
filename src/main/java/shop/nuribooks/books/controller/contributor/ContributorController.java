@@ -11,19 +11,20 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributor.ContributorReq;
 import shop.nuribooks.books.dto.contributor.ContributorRes;
+import shop.nuribooks.books.entity.Contributors;
 import shop.nuribooks.books.service.contributor.ContributorService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/contributors")
 public class ContributorController {
 
 	private final ContributorService contributorService;
 
-	@PostMapping("/contributors")
-	public ResponseEntity<ContributorRes> registerContributor(
-		@Valid @RequestBody ContributorReq request) {
-		contributorService.registerContributor(request);
-		return ResponseEntity.status(HttpStatus.OK).body(new ContributorRes(request.getName()));
-	}
+	@PostMapping
+	public ResponseEntity<ContributorRes> registerContributor(@Valid @RequestBody ContributorReq request) {
+		Contributors savedContributor = contributorService.registerContributor(request);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(new ContributorRes(savedContributor.getId(), savedContributor.getName()));	}
+
 }

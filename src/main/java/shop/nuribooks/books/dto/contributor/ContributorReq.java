@@ -1,14 +1,19 @@
 package shop.nuribooks.books.dto.contributor;
 
-import jakarta.persistence.Column;
+import org.hibernate.validator.constraints.Length;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ContributorReq {
-	@Column(length = 50, nullable = false)
+	@Length(min = 1, max = 50)
+	@NotNull(message = "Name cannot be null")
 	private String name;
 }

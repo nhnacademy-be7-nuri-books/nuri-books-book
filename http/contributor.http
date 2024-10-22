@@ -13,3 +13,6 @@ Content-Type:application/json
 {
   "name": "author"
 }
+
+### 기여자 역할 조회
+GET localhost:8083/api/contributors/roles

@@ -49,7 +49,7 @@ public class BooksServiceImplTest {
 
 	@BeforeEach
 	public void setUp() {
-		bookStates = new BookStates(1L, BookStatesEnum.InStock);
+		bookStates = new BookStates(1L, BookStatesEnum.INSTOCK);
 
 		reqDto = new BookRegisterReq(
 			1L,
