@@ -14,14 +14,6 @@ import shop.nuribooks.books.exception.ResourceNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-	private ResponseEntity<ErrorRes> buildErrorResponse(HttpStatus status, String message, WebRequest request) {
-		ErrorRes errorResponse = new ErrorRes(
-			status.value(),
-			message,
-			request.getDescription(false)
-		);
-		return new ResponseEntity<>(errorResponse, status);
-	}
 
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ErrorRes> handleResourceNotFoundException(ResourceNotFoundException ex,
@@ -50,5 +42,13 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request);
 	}
 
-}
+	private ResponseEntity<ErrorRes> buildErrorResponse(HttpStatus status, String message, WebRequest request) {
+		ErrorRes errorResponse = new ErrorRes(
+			status.value(),
+			message,
+			request.getDescription(false)
+		);
+		return new ResponseEntity<>(errorResponse, status);
+	}
 
+}
