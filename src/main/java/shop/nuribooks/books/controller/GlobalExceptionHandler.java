@@ -11,8 +11,6 @@ import shop.nuribooks.books.dto.errordto.response.ErrorRes;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
-import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
-import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -52,15 +50,5 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request);
 	}
 
-	@ExceptionHandler(CategoryAlreadyExistException.class)
-	public ResponseEntity<ErrorRes> handleCategoryAlreadyExistException(CategoryAlreadyExistException ex,
-		WebRequest request) {
-		return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
-	}
-
-	@ExceptionHandler(CategoryNotFoundException.class)
-	public ResponseEntity<ErrorRes> handleCategoryNotFoundException(CategoryNotFoundException ex, WebRequest request) {
-		return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
-	}
-
 }
+
