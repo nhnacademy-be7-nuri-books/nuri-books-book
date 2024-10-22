@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributorrole.ContributorRoleReq;
@@ -30,6 +33,11 @@ public class ContributorRoleController {
 
 	private final ContributorRoleService contributorRoleService;
 
+	@Operation(summary = "Register a new contributor role", description = "Register a new role for a contributor.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "registered successfully"),
+		@ApiResponse(responseCode = "400", description = "Invalid request data")
+	})
 	@PostMapping
 	public ResponseEntity<ContributorRoleRes> registerContributorRole(
 		@Valid @RequestBody ContributorRoleReq request, BindingResult bindingResult) {
@@ -44,12 +52,22 @@ public class ContributorRoleController {
 		return ResponseEntity.status(HttpStatus.OK).body(new ContributorRoleRes(request.getName()));
 	}
 
+	@Operation(summary = "Get all contributor roles", description = "Retrieve all available contributor roles.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "got successfully")
+	})
 	@GetMapping
 	public ResponseEntity<List<ContributorRole>> getContributorRole() {
 		List<ContributorRole> contributorRoles = contributorRoleService.getContributorRoles();
 		return ResponseEntity.status(HttpStatus.OK).body(contributorRoles);
 	}
 
+	@Operation(summary = "Update a contributor role", description = "Update the name of a specific contributor role.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "updated successfully"),
+		@ApiResponse(responseCode = "400", description = "Invalid request data"),
+		@ApiResponse(responseCode = "404", description = "Contributor role not found")
+	})
 	@PutMapping("/{roleName}")
 	public ResponseEntity<ContributorRoleRes> updateContributorRole(@PathVariable String roleName,
 		@Valid @RequestBody ContributorRoleReq request, BindingResult bindingResult) {
@@ -63,6 +81,12 @@ public class ContributorRoleController {
 		contributorRoleService.updateContributorRole(roleName, request);
 		return ResponseEntity.status(HttpStatus.OK).body(new ContributorRoleRes(request.getName()));
 	}
+
+	@Operation(summary = "Delete a contributor role", description = "Remove a specific contributor role.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "deleted successfully"),
+		@ApiResponse(responseCode = "404", description = "Contributor role not found")
+	})
 
 	@DeleteMapping("{roleName}")
 	public ResponseEntity<HttpStatus> deleteContributorRole(@PathVariable String roleName) {

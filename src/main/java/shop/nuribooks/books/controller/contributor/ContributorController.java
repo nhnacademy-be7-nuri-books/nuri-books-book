@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributor.ContributorReq;
@@ -24,15 +27,25 @@ public class ContributorController {
 
 	private final ContributorService contributorService;
 
+	@Operation(summary = "Register a new contributor",
+		description = "This endpoint allows you to register a new contributor.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "registered successfully"),
+		@ApiResponse(responseCode = "400", description = "Invalid request data"),
+		@ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+
 	@PostMapping
-	public ResponseEntity<ContributorRes> registerContributor(@Valid @RequestBody ContributorReq request, BindingResult bindingResult) {
-		if(bindingResult.hasErrors()) {
+	public ResponseEntity<ContributorRes> registerContributor(@Valid @RequestBody ContributorReq request,
+		BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
 			FieldError fieldError = bindingResult.getFieldError();
 			String message = (fieldError != null) ? fieldError.getDefaultMessage() : "Invalid contributor role data";
 			throw new InvalidContributorException(message);
 		}
 		Contributor savedContributor = contributorService.registerContributor(request);
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(new ContributorRes(savedContributor.getId(), savedContributor.getName()));	}
+			.body(new ContributorRes(savedContributor.getId(), savedContributor.getName()));
+	}
 
 }
