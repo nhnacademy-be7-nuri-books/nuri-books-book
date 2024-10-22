@@ -1,6 +1,9 @@
 package shop.nuribooks.books.service.member;
 
 import static java.math.BigDecimal.*;
+import static shop.nuribooks.books.entity.member.AuthorityEnum.*;
+import static shop.nuribooks.books.entity.member.GradeEnum.*;
+import static shop.nuribooks.books.entity.member.StatusEnum.*;
 
 import java.time.LocalDateTime;
 
@@ -10,10 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.member.request.MemberCreateReq;
-import shop.nuribooks.books.dto.member.request.MemberRemoveReq;
-import shop.nuribooks.books.entity.member.AuthorityEnum;
+import shop.nuribooks.books.dto.member.request.MemberResignReq;
 import shop.nuribooks.books.entity.member.Customer;
-import shop.nuribooks.books.entity.member.GradeEnum;
 import shop.nuribooks.books.entity.member.Member;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.InvalidPasswordException;
@@ -21,7 +22,6 @@ import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
 import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.repository.member.CustomerRepository;
 import shop.nuribooks.books.repository.member.MemberRepository;
-import shop.nuribooks.books.repository.member.ResignedMemberRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +30,6 @@ public class MemberService {
 
 	private final CustomerRepository customerRepository;
 	private final MemberRepository memberRepository;
-	private final ResignedMemberRepository resignedMemberRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	/**
@@ -39,13 +38,13 @@ public class MemberService {
 	 * @throws EmailAlreadyExistsException 이미 존재하는 이메일입니다.
 	 * @throws UserIdAlreadyExistsException 이미 존재하는 아이디입니다.
 	 * @param request
-	 * MemberCreateRequest로 name, userId, password, phoneNumber, email, birthday를 받는다. <br>
+	 * MemberCreateReq로 name, userId, password, phoneNumber, email, birthday를 받는다. <br>
 	 * 생성일자(createdAt)는 현재 시간, point와 totalPaymentAmount는 0으로 초기화 <br>
-	 * 권한은 MEMBER, 등급은 STANDARD로 초기화 <br>
+	 * 권한은 MEMBER, 등급은 STANDARD, 상태는 ACTIVE로 초기화 <br>
 	 * password는 BCryptPasswordEncoder로 해싱
 	 */
 	@Transactional
-	public void memberCreate(MemberCreateReq request) {
+	public void createMember(MemberCreateReq request) {
 		if (customerRepository.existsByEmail(request.getEmail())) {
 			throw new EmailAlreadyExistsException("이미 존재하는 이메일입니다.");
 		}
@@ -62,7 +61,7 @@ public class MemberService {
 		Customer savedCustomer = customerRepository.save(newCustomer);
 
 		Member newMember = new Member(
-			savedCustomer, AuthorityEnum.MEMBER, GradeEnum.STANDARD, request.getUserId(),
+			savedCustomer, MEMBER, STANDARD, ACTIVE, request.getUserId(),
 			request.getBirthday(), LocalDateTime.now(), ZERO, ZERO);
 
 		memberRepository.save(newMember);
@@ -73,17 +72,33 @@ public class MemberService {
 	 * @param userId
 	 * @return 존재 여부 반환
 	 */
-	public boolean isMemberExist(String userId) {
+	public boolean doesMemberExist(String userId) {
 		return memberRepository.existsByUserId(userId);
 	}
 
-	public void memberRemove(MemberRemoveReq request) {
+	/**
+	 * 아이디와 비밀번호로 회원 검증 후 회원을 휴면 상태로 전환 <br>
+	 * @throws UserIdNotFoundException 존재하지 않는 아이디입니다.
+	 * @throws InvalidPasswordException 비밀번호가 일치하지 않습니다.
+	 * @param request
+	 * MemberResignReq로 아이디와 비밀번호를 받아서 확인 <br>
+	 * 아이디로 member 존재 여부 먼저 확인하고, <br>
+	 * member가 존재한다면 member의 PK인 id와 비밀번호 두 가지 값으로 customer 존재 여부 확인 <br>
+	 * customer까지 존재한다면 마지막으로 member의 status를 INACTIVE로 변경
+	 */
+	@Transactional
+	public void withdrawMember(MemberResignReq request) {
 		if (!memberRepository.existsByUserId(request.getUserId())) {
 			throw new UserIdNotFoundException("존재하지 않는 아이디입니다.");
 		}
-		if (!customerRepository.existsByPassword(bCryptPasswordEncoder.encode(request.getPassword()))) {
+
+		Member findMember = memberRepository.findByUserId(request.getUserId());
+
+		if (!customerRepository.existsByIdAndPassword(
+			findMember.getId(), bCryptPasswordEncoder.encode(request.getPassword()))) {
 			throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
 		}
 
+		findMember.changeStatus(INACTIVE);
 	}
 }

@@ -34,7 +34,6 @@ public class Member {
 	@OneToOne(fetch = LAZY)
 	@MapsId // @MapsId는 @id로 지정한 컬럼에 @OneToOne 이나 @ManyToOne 관계를 매핑시키는 역할
 	@JoinColumn(name = "customer_id")
-	@Column(name = "member_id")
 	private Customer customer;
 
 	@NotNull
@@ -42,6 +41,9 @@ public class Member {
 
 	@NotNull
 	private GradeEnum grade;
+
+	@NotNull
+	private StatusEnum status;
 
 	@NotBlank
 	@Size(max = 20)
@@ -65,15 +67,20 @@ public class Member {
 
 	private LocalDateTime resignedAt;
 
-	public Member(Customer customer, AuthorityEnum authority, GradeEnum grade, String userId, LocalDate birthday,
-		LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
+	public Member(Customer customer, AuthorityEnum authority, GradeEnum grade, StatusEnum status, String userId,
+		LocalDate birthday, LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
 		this.customer = customer;
 		this.authority = authority;
 		this.grade = grade;
+		this.status = status;
 		this.userId = userId;
 		this.birthday = birthday;
 		this.createdAt = createdAt;
 		this.point = point;
 		this.totalPaymentAmount = totalPaymentAmount;
+	}
+
+	public void changeStatus(StatusEnum status) {
+		this.status = status;
 	}
 }
