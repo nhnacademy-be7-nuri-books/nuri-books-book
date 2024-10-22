@@ -3,6 +3,7 @@ package shop.nuribooks.books.service.address;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,9 +28,9 @@ class AddressServiceTest {
         addressRepository.deleteAllInBatch();
     }
 
-    @DisplayName("회원의 주소 생성")
+    @DisplayName("회원의 주소를 생성한다.")
     @Test
-    void createAddress() {
+    void addAddress() {
         // given
         AddressCreateRequest request = AddressCreateRequest.builder()
                 .memberId(1L)
@@ -39,10 +40,30 @@ class AddressServiceTest {
                 .isDefault(true)
                 .build();
         // when
-        AddressResponse response = addressService.createAddress(request);
+        AddressResponse response = addressService.addAddress(request);
 
         // then
         assertThat(response.getName()).isEqualTo("test");
+    }
+
+    @DisplayName("회원의 주소 리스트를 조회한다.")
+    @Test
+    void findAddressesByMemberId() {
+        // given
+        AddressCreateRequest request = AddressCreateRequest.builder()
+                .memberId(1L)
+                .name("test")
+                .address("장말로")
+                .address("103호")
+                .isDefault(true)
+                .build();
+        AddressResponse response = addressService.addAddress(request);
+
+        // when
+        List<AddressResponse> addressesByMemberId = addressService.findAddressesByMemberId(response.getMemberId());
+
+        // then
+        assertThat(addressesByMemberId).hasSize(1);
     }
 
 }
