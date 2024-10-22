@@ -14,6 +14,11 @@ Content-Type:application/json
   "name": "test1"
 }
 
+### 기여자 삭제
+DELETE localhost:8083/api/contributors/1
+Content-Type:application/json
+
+
 
 ### 기여자 역할 등록
 POST localhost:8083/api/contributors/roles

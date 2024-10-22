@@ -2,6 +2,7 @@ package shop.nuribooks.books.service.contributor;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributor.ContributorReq;
 import shop.nuribooks.books.entity.book.Contributor;
@@ -30,6 +31,13 @@ public class ContributorServiceImpl implements ContributorService {
 
 		contributor.setName(req.getName());
 		return contributorRepository.save(contributor);
+	}
+
+	@Override
+	public void deleteContributor(Long contributorId) {
+		Contributor contributor = contributorRepository.findById(contributorId)
+			.orElseThrow(() -> new EntityNotFoundException("not found"));
+		contributorRepository.delete(contributor);
 	}
 
 }

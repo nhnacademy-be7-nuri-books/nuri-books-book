@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -50,11 +51,32 @@ public class ContributorController {
 			.body(new ContributorRes(savedContributor.getId(), savedContributor.getName()));
 	}
 
+	@Operation(summary = "Update an existing contributor",
+		description = "This endpoint allows you to update the details of an existing contributor.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Contributor updated successfully"),
+		@ApiResponse(responseCode = "400", description = "Invalid request data"),
+		@ApiResponse(responseCode = "404", description = "Contributor not found"),
+		@ApiResponse(responseCode = "500", description = "Internal server error")
+	})
 	@PutMapping("/{contributorId}")
 	public ResponseEntity<ContributorRes> updateContributor(@PathVariable Long contributorId,
 		@Valid @RequestBody ContributorReq request) {
 		Contributor contributor = contributorService.updateContributor(contributorId, request);
 		return ResponseEntity.status(HttpStatus.OK).body(new ContributorRes(contributor.getId(), contributor.getName()));
+	}
+
+	@Operation(summary = "Delete a contributor",
+		description = "This endpoint allows you to delete an existing contributor by their ID.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "204", description = "Contributor deleted successfully"),
+		@ApiResponse(responseCode = "404", description = "Contributor not found"),
+		@ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	@DeleteMapping("{contributorId}")
+	public ResponseEntity<HttpStatus> deleteContributor(@PathVariable Long contributorId) {
+		contributorService.deleteContributor(contributorId);
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 }

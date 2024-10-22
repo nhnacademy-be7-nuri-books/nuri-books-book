@@ -7,4 +7,7 @@ public interface ContributorService {
 	Contributor registerContributor(ContributorReq req);
 
 	Contributor updateContributor(Long contributorId, ContributorReq req);
+
+	void deleteContributor(Long contributorId);
+
 }
