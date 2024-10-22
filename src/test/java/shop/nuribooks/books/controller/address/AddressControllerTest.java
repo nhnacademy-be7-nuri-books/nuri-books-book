@@ -2,12 +2,14 @@ package shop.nuribooks.books.controller.address;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +25,9 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import shop.nuribooks.books.dto.address.requset.AddressCreateRequest;
+import shop.nuribooks.books.dto.address.requset.AddressEditRequest;
 import shop.nuribooks.books.entity.address.Address;
+import shop.nuribooks.books.exception.address.AddressNotFoundException;
 import shop.nuribooks.books.repository.address.AddressRepository;
 import shop.nuribooks.books.service.address.AddressService;
 
@@ -116,5 +120,36 @@ class AddressControllerTest {
         mockMvc.perform(delete("/api/member/{memberId}/address/{addressId}", 1L, saved.getId()))
                 .andExpect(status().isOk());
         // then
+    }
+
+    @DisplayName("회원의 등록된 주소를 수정한다.")
+    @Test
+    void addressModify() throws Exception{
+        // given
+        Address address = Address.builder()
+                .memberId(1L)
+                .name("test")
+                .address("장말로")
+                .address("103호")
+                .isDefault(true)
+                .build();
+
+        Address saved = addressRepository.save(address);
+
+        AddressEditRequest addressEditRequest = AddressEditRequest.builder()
+                .id(saved.getId())
+                .memberId(1L)
+                .name("test")
+                .address("장말로")
+                .address("103호")
+                .isDefault(false)
+                .build();
+        // when // then
+        mockMvc.perform(patch("/api/member/{memberId}/address/{addressId}", 1L, saved.getId())
+                        .content(objectMapper.writeValueAsString(addressEditRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(jsonPath("$.default").value(false))
+                .andExpect(status().isOk());
     }
 }

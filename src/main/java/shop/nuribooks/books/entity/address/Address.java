@@ -38,4 +38,20 @@ public class Address {
         this.addressDetail = addressDetail;
         this.isDefault = isDefault;
     }
+
+    public AddressEditor.AddressEditorBuilder toEditor() {
+        return AddressEditor.builder()
+                .name(name)
+                .address(address)
+                .addressDetail(addressDetail)
+                .isDefault(isDefault);
+
+    }
+
+    public void edit(AddressEditor addressEditor) {
+        name = addressEditor.getName();
+        address = addressEditor.getAddress();
+        addressDetail = addressEditor.getAddressDetail();
+        isDefault = addressEditor.isDefault();
+    }
 }

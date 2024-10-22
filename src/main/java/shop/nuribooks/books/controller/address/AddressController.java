@@ -34,12 +34,13 @@ public class AddressController {
         return ResponseEntity.ok(addressesByMemberId);
     }
 
-//    @PatchMapping("/api/member/{memberId}/address/{addressId}")
-//    public ResponseEntity<AddressResponse> addressModify(@PathVariable Long memberId,
-//                                                         @PathVariable Long addressId,
-//                                                         @RequestBody AddressEditRequest request) {
-//        addressService.modifyAddress(request)
-//    }
+    @PatchMapping("/api/member/{memberId}/address/{addressId}")
+    public ResponseEntity<AddressResponse> addressModify(@PathVariable Long memberId,
+                                                         @PathVariable Long addressId,
+                                                         @RequestBody AddressEditRequest request) {
+        AddressResponse addressResponse = addressService.modifyAddress(request);
+        return ResponseEntity.ok(addressResponse);
+    }
 
     @DeleteMapping("/api/member/{memberId}/address/{addressId}")
     public void addressRemove(@PathVariable Long memberId,

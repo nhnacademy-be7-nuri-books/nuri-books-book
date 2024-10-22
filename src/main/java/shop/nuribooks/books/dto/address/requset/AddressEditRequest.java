@@ -28,5 +28,14 @@ public class AddressEditRequest {
 
     private boolean isDefault;
 
+    @Builder
+    private AddressEditRequest(Long id, Long memberId, String name, String address, String addressDetail, boolean isDefault) {
+        this.id = id;
+        this.memberId = memberId;
+        this.name = name;
+        this.address = address;
+        this.addressDetail = addressDetail;
+        this.isDefault = isDefault;
+    }
 
 }

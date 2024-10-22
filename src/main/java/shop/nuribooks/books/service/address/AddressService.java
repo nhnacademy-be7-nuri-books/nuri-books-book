@@ -9,6 +9,8 @@ import shop.nuribooks.books.dto.address.requset.AddressCreateRequest;
 import shop.nuribooks.books.dto.address.requset.AddressEditRequest;
 import shop.nuribooks.books.dto.address.response.AddressResponse;
 import shop.nuribooks.books.entity.address.Address;
+import shop.nuribooks.books.entity.address.AddressEditor;
+import shop.nuribooks.books.entity.address.AddressEditor.AddressEditorBuilder;
 import shop.nuribooks.books.exception.address.AddressNotFoundException;
 import shop.nuribooks.books.repository.address.AddressRepository;
 
@@ -39,13 +41,25 @@ public class AddressService {
         addressRepository.delete(address);
     }
 
-//    @Transactional
-//    public AddressResponse modifyAddress(AddressEditRequest request) {
-//        Address address = addressRepository.findById(request.getId())
-//                .orElseThrow(() -> new AddressNotFoundException("주소를 찾을 수 없습니다."));
-//        address.
-//        return AddressResponse.of(saved);
-//    }
+    @Transactional
+    public AddressResponse modifyAddress(AddressEditRequest request) {
+        Address address = addressRepository.findById(request.getId())
+                .orElseThrow(() -> new AddressNotFoundException("주소를 찾을 수 없습니다."));
+
+        AddressEditor addressEditor = getAddressEditor(request, address);
+        address.edit(addressEditor);
+        return AddressResponse.of(address);
+    }
+
+    private static AddressEditor getAddressEditor(AddressEditRequest request, Address address) {
+        AddressEditorBuilder addressEditorBuilder = address.toEditor();
+        return addressEditorBuilder
+                .name(request.getName())
+                .address(request.getAddress())
+                .addressDetail(request.getAddressDetail())
+                .isDefault(request.isDefault())
+                .build();
+    }
 
 
 }
