@@ -24,3 +24,6 @@ Content-Type:application/json
 {
   "name": "coAuthor"
 }
+
+### 기여자 역할 삭제
+DELETE localhost:8083/api/contributors/roles/author

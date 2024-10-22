@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import shop.nuribooks.books.entity.book.BookStatesEnum;
+import shop.nuribooks.books.entity.book.BookStateEnum;
 
 @Entity
 @AllArgsConstructor
@@ -27,5 +27,5 @@ public class BookStates {
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	private BookStatesEnum detail;
+	private BookStateEnum detail;
 }

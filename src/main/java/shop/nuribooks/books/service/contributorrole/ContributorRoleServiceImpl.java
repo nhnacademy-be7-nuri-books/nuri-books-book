@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributorrole.ContributorRoleReq;
-import shop.nuribooks.books.entity.book.ContributorRoles;
-import shop.nuribooks.books.entity.book.ContributorRolesEnum;
+import shop.nuribooks.books.entity.book.ContributorRole;
+import shop.nuribooks.books.entity.book.ContributorRoleEnum;
 import shop.nuribooks.books.exception.contributor.DuplicateContributorRoleException;
 import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
 import shop.nuribooks.books.repository.contributorrole.ContributorRoleRepository;
@@ -22,7 +22,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 	@Override
 	public void registerContributorRole(ContributorRoleReq req) {
 		try {
-			ContributorRolesEnum roleEnum = ContributorRolesEnum.valueOf(req.getName().toUpperCase());
+			ContributorRoleEnum roleEnum = ContributorRoleEnum.valueOf(req.getName().toUpperCase());
 
 			if (contributorRolesRepository.findByName(roleEnum).isPresent()) {
 				throw new DuplicateContributorRoleException(
@@ -30,7 +30,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 				);
 			}
 
-			ContributorRoles savedRole = new ContributorRoles();
+			ContributorRole savedRole = new ContributorRole();
 			savedRole.setName(roleEnum);
 
 			contributorRolesRepository.save(savedRole);
@@ -43,7 +43,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 	}
 
 	@Override
-	public List<ContributorRoles> getContributorRoles() {
+	public List<ContributorRole> getContributorRoles() {
 		return contributorRolesRepository.findAll().stream().toList();
 	}
 
@@ -52,12 +52,12 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 		String updatedRoleName = req.getName().toUpperCase();
 
 		// 기존 역할 이름 조회
-		ContributorRoles existedRole = contributorRolesRepository.findByName(ContributorRolesEnum.valueOf(roleName.toUpperCase()))
+		ContributorRole existedRole = contributorRolesRepository.findByName(ContributorRoleEnum.valueOf(roleName.toUpperCase()))
 			.orElseThrow(() -> new EntityNotFoundException("ContributorRole not found"));
 
 		try {
 			// 수정할 역할 이름
-			ContributorRolesEnum newRoleEnum = ContributorRolesEnum.valueOf(updatedRoleName);
+			ContributorRoleEnum newRoleEnum = ContributorRoleEnum.valueOf(updatedRoleName);
 
 			// 중복 확인
 			if (contributorRolesRepository.findByName(newRoleEnum).isPresent() && !existedRole.getName().equals(newRoleEnum)) {
@@ -71,6 +71,21 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 		} catch (IllegalArgumentException e) {
 			String errorMessage = "Invalid contributor role name: " + req.getName();
 			throw new InvalidContributorRoleException(errorMessage, e);
+		}
+
+	}
+
+	@Override
+	public void deleteContributorRole(String roleName) {
+		try {
+			ContributorRoleEnum roleEnum = ContributorRoleEnum.valueOf(roleName.toUpperCase());
+
+			ContributorRole roles = contributorRolesRepository.findByName(roleEnum)
+				.orElseThrow(() -> new EntityNotFoundException("Contributor role '" + roleName + "' not found"));
+
+			contributorRolesRepository.delete(roles);
+		} catch (IllegalArgumentException e) {
+			throw new InvalidContributorRoleException("Invalid contributor role name: " + roleName, e);
 		}
 
 	}

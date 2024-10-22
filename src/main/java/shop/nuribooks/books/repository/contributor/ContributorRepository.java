@@ -2,8 +2,8 @@ package shop.nuribooks.books.repository.contributor;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import shop.nuribooks.books.entity.book.Contributors;
+import shop.nuribooks.books.entity.book.Contributor;
 
-public interface ContributorRepository extends JpaRepository<Contributors, Long> {
+public interface ContributorRepository extends JpaRepository<Contributor, Long> {
 }
 

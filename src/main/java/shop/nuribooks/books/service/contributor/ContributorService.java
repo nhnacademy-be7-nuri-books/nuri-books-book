@@ -1,9 +1,9 @@
 package shop.nuribooks.books.service.contributor;
 
 import shop.nuribooks.books.dto.contributor.ContributorReq;
-import shop.nuribooks.books.entity.book.Contributors;
+import shop.nuribooks.books.entity.book.Contributor;
 
 public interface ContributorService {
-	Contributors registerContributor(ContributorReq req);
+	Contributor registerContributor(ContributorReq req);
 
 }
