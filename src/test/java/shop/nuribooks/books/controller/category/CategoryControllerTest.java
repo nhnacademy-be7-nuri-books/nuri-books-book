@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.nuribooks.books.controller.GlobalExceptionHandler;
 import shop.nuribooks.books.dto.category.request.CategoryRegisterReq;
 import shop.nuribooks.books.dto.category.response.CategoryRegisterRes;
-import shop.nuribooks.books.entity.Category;
+import shop.nuribooks.books.entity.book.category.Category;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 import shop.nuribooks.books.service.category.CategoryService;

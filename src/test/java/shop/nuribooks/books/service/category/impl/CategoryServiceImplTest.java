@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import shop.nuribooks.books.dto.category.request.CategoryRegisterReq;
-import shop.nuribooks.books.entity.Category;
+import shop.nuribooks.books.entity.book.category.Category;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 import shop.nuribooks.books.repository.category.CategoryRepository;
