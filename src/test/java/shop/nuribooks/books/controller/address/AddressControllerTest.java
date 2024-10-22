@@ -1,5 +1,6 @@
 package shop.nuribooks.books.controller.address;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -94,6 +95,25 @@ class AddressControllerTest {
         // when
         mockMvc.perform(get("/api/member/{memberId}/address", 1L))
                 .andExpect(jsonPath("$.*", Matchers.hasSize(2)))
+                .andExpect(status().isOk());
+        // then
+    }
+
+    @DisplayName("회원의 주소를 삭제한다.")
+    @Test
+    void addressRemove() throws Exception {
+        // given
+        Address address = Address.builder()
+                .memberId(1L)
+                .name("test")
+                .address("장말로")
+                .address("103호")
+                .isDefault(true)
+                .build();
+        Address saved = addressRepository.save(address);
+
+        // when
+        mockMvc.perform(delete("/api/member/{memberId}/address/{addressId}", 1L, saved.getId()))
                 .andExpect(status().isOk());
         // then
     }

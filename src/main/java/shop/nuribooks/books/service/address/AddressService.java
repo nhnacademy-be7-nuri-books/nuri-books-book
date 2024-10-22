@@ -1,11 +1,15 @@
 package shop.nuribooks.books.service.address;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import shop.nuribooks.books.dto.address.requset.AddressCreateRequest;
+import shop.nuribooks.books.dto.address.requset.AddressEditRequest;
 import shop.nuribooks.books.dto.address.response.AddressResponse;
 import shop.nuribooks.books.entity.address.Address;
+import shop.nuribooks.books.exception.address.AddressNotFoundException;
 import shop.nuribooks.books.repository.address.AddressRepository;
 
 @RequiredArgsConstructor
@@ -28,6 +32,20 @@ public class AddressService {
                 .map(AddressResponse::of)
                 .toList();
     }
+
+    public void removeAddress(Long addressId) {
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new AddressNotFoundException("주소를 찾을 수 없습니다."));
+        addressRepository.delete(address);
+    }
+
+//    @Transactional
+//    public AddressResponse modifyAddress(AddressEditRequest request) {
+//        Address address = addressRepository.findById(request.getId())
+//                .orElseThrow(() -> new AddressNotFoundException("주소를 찾을 수 없습니다."));
+//        address.
+//        return AddressResponse.of(saved);
+//    }
 
 
 }

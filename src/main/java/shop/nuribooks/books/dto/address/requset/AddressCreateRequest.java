@@ -40,6 +40,7 @@ public class AddressCreateRequest {
                 .name(name)
                 .address(address)
                 .addressDetail(addressDetail)
+                .isDefault(isDefault)
                 .build();
     }
 

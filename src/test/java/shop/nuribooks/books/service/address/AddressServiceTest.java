@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import shop.nuribooks.books.dto.address.requset.AddressCreateRequest;
 import shop.nuribooks.books.dto.address.response.AddressResponse;
+import shop.nuribooks.books.entity.address.Address;
 import shop.nuribooks.books.repository.address.AddressRepository;
 
 @SpringBootTest
@@ -64,6 +65,26 @@ class AddressServiceTest {
 
         // then
         assertThat(addressesByMemberId).hasSize(1);
+    }
+
+    @DisplayName("회원의 등록된 주소를 삭제한다.")
+    @Test
+    void removeAddress() {
+        // given
+        Address address = Address.builder()
+                .memberId(1L)
+                .name("test")
+                .address("장말로")
+                .address("103호")
+                .isDefault(true)
+                .build();
+
+        Address saved = addressRepository.save(address);
+        // when
+        addressService.removeAddress(saved.getId());
+
+        // then
+        Assertions.assertThat(addressRepository.count()).isEqualTo(0);
     }
 
 }
