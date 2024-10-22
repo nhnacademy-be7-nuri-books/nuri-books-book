@@ -77,13 +77,30 @@ public class MemberController {
 
 			return ResponseEntity.status(BAD_REQUEST).body(new ResponseMessage(BAD_REQUEST.value(), errorMessage));
 		}
+
 		memberService.withdrawMember(request);
 
 		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),
 			"탈퇴가 성공적으로 완료되었습니다. 귀하의 앞날에 무궁한 발전이 있기를 진심으로 기원하겠습니다."));
 	}
 
-	// @PatchMapping("/api/member/{userId}")
-	// public ResponseEntity<ResponseMessage> memberUpdate(
-	// 	@RequestBody @Valid MemberUpdateReq request, BindingResult bindingResult)
+	/**
+	 * 로그인 상태의 사용자 정보 수정 <br>
+	 * MemberUpdateReq의 모든 필드 즉, <br>
+	 * name, password, phoneNumber에 대해서 검증 후 userId를 통해 수정 진행
+	 */
+	@PatchMapping("/api/member/{userId}")
+	public ResponseEntity<ResponseMessage> memberUpdate(
+		@PathVariable String userId, @RequestBody @Valid MemberUpdateReq request, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			String errorMessage = bindingResult.getFieldErrors().getFirst().getDefaultMessage();
+
+			return ResponseEntity.status(BAD_REQUEST).body(new ResponseMessage(BAD_REQUEST.value(), errorMessage));
+		}
+
+		memberService.updateMember(userId, request);
+
+		return ResponseEntity.status(OK)
+			.body(new ResponseMessage(OK.value(), "회원 수정이 성공적으로 완료되었습니다."));
+	}
 }

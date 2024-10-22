@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.member.request.MemberCreateReq;
+import shop.nuribooks.books.dto.member.request.MemberUpdateReq;
 import shop.nuribooks.books.dto.member.request.MemberWithdrawReq;
 import shop.nuribooks.books.entity.member.Customer;
 import shop.nuribooks.books.entity.member.Member;
@@ -33,6 +34,7 @@ public class MemberService {
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	/**
+	 * 회원가입 <br>
 	 * 고객(customer) 생성 후 customerRepository에 저장 <br>
 	 * 그 후, 회원(member) 생성 후 memberRepository에 저장
 	 * @throws EmailAlreadyExistsException 이미 존재하는 이메일입니다.
@@ -68,15 +70,7 @@ public class MemberService {
 	}
 
 	/**
-	 * 입력받은 아이디로 회원 존재 여부 확인
-	 * @param userId
-	 * @return 존재 여부 반환
-	 */
-	public boolean doesMemberExist(String userId) {
-		return memberRepository.existsByUserId(userId);
-	}
-
-	/**
+	 * 회원탈퇴 <br>
 	 * 아이디와 비밀번호로 회원 검증 후 회원을 휴면 상태로 전환 <br>
 	 * @throws UserIdNotFoundException 존재하지 않는 아이디입니다.
 	 * @throws InvalidPasswordException 비밀번호가 일치하지 않습니다.
@@ -102,5 +96,42 @@ public class MemberService {
 
 		findMember.changeStatus(INACTIVE);
 		findMember.changeWithdrawnAt(LocalDateTime.now());
+	}
+
+	/**
+	 * 회원 정보 수정 <br>
+	 * 변경 가능한 정보는 name, password, phoneNumber
+	 * @param userId 아이디
+	 * @param request
+	 * MemberUpdateReq로 수정하고 싶은 이름과 비밀번호, 전화번호를 받음 <br>
+	 * 로그인 상태의 사용자만이 회원 정보를 수정할 수 있기 때문에 <br>
+	 * 입력받은 userId의 member가 반드시 존재하는 상황이다. <br>
+	 * 그러므로 userId를 통해 customerRepository에서 해당 customer를 찾고 정보 수정을 진행 <br>
+	 * 입력받은 각각의 이름, 비밀번호, 전화번호가 해당 customer의 정보와 동일하면 아무 작업도 하지 않고, <br>
+	 * 다른 경우에만 change 메서드를 통해 수정 진행
+	 */
+	@Transactional
+	public void updateMember(String userId, MemberUpdateReq request) {
+		Member findMember = memberRepository.findByUserId(userId);
+		Customer findCustomer = customerRepository.findById(findMember.getId()).get();
+
+		if (!request.getName().equals(findCustomer.getName())) {
+			findCustomer.changeName(request.getName());
+		}
+		if (!bCryptPasswordEncoder.encode(request.getPassword()).equals(findCustomer.getPassword())) {
+			findCustomer.changePassword(bCryptPasswordEncoder.encode(request.getPassword()));
+		}
+		if (!request.getPhoneNumber().equals(findCustomer.getPhoneNumber())) {
+			findCustomer.changePhoneNumber(request.getPhoneNumber());
+		}
+	}
+
+	/**
+	 * 입력받은 아이디로 회원 존재 여부 확인
+	 * @param userId 아이디
+	 * @return 존재 여부 반환
+	 */
+	public boolean doesMemberExist(String userId) {
+		return memberRepository.existsByUserId(userId);
 	}
 }

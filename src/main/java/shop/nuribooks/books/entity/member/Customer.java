@@ -28,6 +28,9 @@ public class Customer {
 	@NotBlank
 	private String name;
 
+	/**
+	 * BCryptPasswordEncoder로 해싱한 비밀번호
+	 */
 	@NotBlank
 	private String password;
 
@@ -43,5 +46,17 @@ public class Customer {
 		this.password = password;
 		this.phoneNumber = phoneNumber;
 		this.email = email;
+	}
+
+	public void changeName(String name) {
+		this.name = name;
+	}
+
+	public void changePassword(String encryptedPassword) {
+		this.password = encryptedPassword;
+	}
+
+	public void changePhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 }
