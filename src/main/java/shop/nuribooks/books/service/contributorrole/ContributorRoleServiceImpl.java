@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributorrole.ContributorRoleReq;
 import shop.nuribooks.books.entity.book.ContributorRole;
 import shop.nuribooks.books.entity.book.ContributorRoleEnum;
+import shop.nuribooks.books.exception.contributor.ContributorRoleNotFoundException;
 import shop.nuribooks.books.exception.contributor.DuplicateEntityException;
 import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
 import shop.nuribooks.books.repository.contributorrole.ContributorRoleRepository;
@@ -53,7 +53,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 
 		// 기존 역할 이름 조회
 		ContributorRole existedRole = contributorRolesRepository.findByName(ContributorRoleEnum.valueOf(roleName.toUpperCase()))
-			.orElseThrow(() -> new EntityNotFoundException("ContributorRole not found"));
+			.orElseThrow(() -> new ContributorRoleNotFoundException("ContributorRole not found"));
 
 		try {
 			// 수정할 역할 이름
@@ -81,7 +81,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 			ContributorRoleEnum roleEnum = ContributorRoleEnum.valueOf(roleName.toUpperCase());
 
 			ContributorRole roles = contributorRolesRepository.findByName(roleEnum)
-				.orElseThrow(() -> new EntityNotFoundException("Contributor role '" + roleName + "' not found"));
+				.orElseThrow(() -> new ContributorRoleNotFoundException("Contributor role '" + roleName + "' not found"));
 
 			contributorRolesRepository.delete(roles);
 		} catch (IllegalArgumentException e) {

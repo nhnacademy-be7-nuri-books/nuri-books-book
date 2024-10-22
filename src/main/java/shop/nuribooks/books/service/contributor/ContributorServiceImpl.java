@@ -34,9 +34,16 @@ public class ContributorServiceImpl implements ContributorService {
 	}
 
 	@Override
+	public Contributor getContributor(Long contributorId) {
+		Contributor contributor = contributorRepository.findById(contributorId)
+			.orElseThrow(() -> new ContributorNotFoundException("not found"));
+		return contributor;
+	}
+
+	@Override
 	public void deleteContributor(Long contributorId) {
 		Contributor contributor = contributorRepository.findById(contributorId)
-			.orElseThrow(() -> new EntityNotFoundException("not found"));
+			.orElseThrow(() -> new ContributorNotFoundException("not found"));
 		contributorRepository.delete(contributor);
 	}
 

@@ -8,6 +8,8 @@ public interface ContributorService {
 
 	Contributor updateContributor(Long contributorId, ContributorReq req);
 
+	Contributor getContributor(Long contributorId);
+
 	void deleteContributor(Long contributorId);
 
 }
