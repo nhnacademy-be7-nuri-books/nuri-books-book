@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,11 +15,9 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import shop.nuribooks.books.dto.address.requset.AddressCreateRequest;
+import shop.nuribooks.books.dto.address.requset.AddressRegisterRequest;
 import shop.nuribooks.books.dto.address.requset.AddressEditRequest;
-import shop.nuribooks.books.dto.address.response.AddressErrorResponse;
 import shop.nuribooks.books.dto.address.response.AddressResponse;
 import shop.nuribooks.books.service.address.AddressService;
 
@@ -39,8 +36,8 @@ public class AddressController {
     }
 
     @PostMapping("/api/member/{memberId}/address")
-    public ResponseEntity<AddressResponse> addressAdd(@PathVariable Long memberId,
-                                                      @Valid @RequestBody AddressCreateRequest request) {
+    public ResponseEntity<AddressResponse> addressRegister(@PathVariable Long memberId,
+                                                      @Valid @RequestBody AddressRegisterRequest request) {
         AddressResponse response = addressService.addAddress(request);
         return ResponseEntity.ok(response);
     }

@@ -1,17 +1,15 @@
 package shop.nuribooks.books.service.address;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
-import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import shop.nuribooks.books.dto.address.requset.AddressCreateRequest;
+import shop.nuribooks.books.dto.address.requset.AddressRegisterRequest;
 import shop.nuribooks.books.dto.address.requset.AddressEditRequest;
 import shop.nuribooks.books.dto.address.response.AddressResponse;
 import shop.nuribooks.books.entity.address.Address;
@@ -36,7 +34,7 @@ class AddressServiceTest {
     @Test
     void addAddress() {
         // given
-        AddressCreateRequest request = AddressCreateRequest.builder()
+        AddressRegisterRequest request = AddressRegisterRequest.builder()
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
@@ -54,7 +52,7 @@ class AddressServiceTest {
     @Test
     void findAddressesByMemberId() {
         // given
-        AddressCreateRequest request = AddressCreateRequest.builder()
+        AddressRegisterRequest request = AddressRegisterRequest.builder()
                 .memberId(1L)
                 .name("test")
                 .address("장말로")

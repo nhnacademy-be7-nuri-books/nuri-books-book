@@ -9,7 +9,7 @@ import shop.nuribooks.books.entity.address.Address;
 
 @Getter
 @NoArgsConstructor
-public class AddressCreateRequest {
+public class AddressRegisterRequest {
 
     @NotNull
     private Long memberId;
@@ -26,7 +26,7 @@ public class AddressCreateRequest {
     private boolean isDefault;
 
     @Builder
-    private AddressCreateRequest(Long memberId, String name, String address, String addressDetail, boolean isDefault) {
+    private AddressRegisterRequest(Long memberId, String name, String address, String addressDetail, boolean isDefault) {
         this.memberId = memberId;
         this.name = name;
         this.address = address;
@@ -40,7 +40,6 @@ public class AddressCreateRequest {
                 .name(name)
                 .address(address)
                 .addressDetail(addressDetail)
-                .isDefault(isDefault)
                 .build();
     }
 

@@ -9,25 +9,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import shop.nuribooks.books.dto.address.requset.AddressCreateRequest;
+import shop.nuribooks.books.dto.address.requset.AddressRegisterRequest;
 import shop.nuribooks.books.dto.address.requset.AddressEditRequest;
 import shop.nuribooks.books.entity.address.Address;
-import shop.nuribooks.books.exception.address.AddressNotFoundException;
 import shop.nuribooks.books.repository.address.AddressRepository;
 import shop.nuribooks.books.service.address.AddressService;
 
@@ -55,9 +48,9 @@ class AddressControllerTest {
 
     @DisplayName("회원의 주소를 등록한다.")
     @Test
-    void addAddress() throws Exception {
+    void registerAddress() throws Exception {
         // given
-        AddressCreateRequest request = AddressCreateRequest.builder()
+        AddressRegisterRequest request = AddressRegisterRequest.builder()
                 .memberId(1L)
                 .name("test")
                 .address("장말로")
@@ -77,9 +70,9 @@ class AddressControllerTest {
 
     @DisplayName("주소 생성 시 올바르지 않은 필드 입력시 예외가 발생한다.")
     @Test
-    void addAddressWithBadRequest() throws Exception {
+    void registerAddressWithBadRequest() throws Exception {
         // given
-        AddressCreateRequest request = AddressCreateRequest.builder()
+        AddressRegisterRequest request = AddressRegisterRequest.builder()
                 .memberId(null)
                 .name("test")
                 .address("장말로")

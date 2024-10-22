@@ -1,11 +1,10 @@
 package shop.nuribooks.books.service.address;
 
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.nuribooks.books.dto.address.requset.AddressCreateRequest;
+import shop.nuribooks.books.dto.address.requset.AddressRegisterRequest;
 import shop.nuribooks.books.dto.address.requset.AddressEditRequest;
 import shop.nuribooks.books.dto.address.response.AddressResponse;
 import shop.nuribooks.books.entity.address.Address;
@@ -20,7 +19,7 @@ public class AddressService {
 
     private final AddressRepository addressRepository;
 
-    public AddressResponse addAddress(AddressCreateRequest request) {
+    public AddressResponse registerAddress(AddressRegisterRequest request) {
         //TODO: 회원 주소가 10개 넘어가는 경우 예외처리
         Address address = request.toEntity();
         Address saved = addressRepository.save(address);
