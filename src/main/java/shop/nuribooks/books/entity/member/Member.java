@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -34,7 +35,7 @@ public class Member {
 	@OneToOne(fetch = LAZY)
 	@MapsId // @MapsId는 @id로 지정한 컬럼에 @OneToOne 이나 @ManyToOne 관계를 매핑시키는 역할
 	@JoinColumn(name = "customer_id")
-	@Column(name = "member_id")
+	@PrimaryKeyJoinColumn
 	private Customer customer;
 
 	@NotNull
