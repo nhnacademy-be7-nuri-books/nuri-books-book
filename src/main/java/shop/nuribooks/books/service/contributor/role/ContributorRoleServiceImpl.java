@@ -1,17 +1,17 @@
-package shop.nuribooks.books.service.contributorrole;
+package shop.nuribooks.books.service.contributor.role;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.contributorrole.ContributorRoleReq;
+import shop.nuribooks.books.dto.contributor.role.ContributorRoleReqDto;
 import shop.nuribooks.books.entity.book.ContributorRole;
 import shop.nuribooks.books.entity.book.ContributorRoleEnum;
 import shop.nuribooks.books.exception.contributor.ContributorRoleNotFoundException;
 import shop.nuribooks.books.exception.contributor.DuplicateEntityException;
 import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
-import shop.nuribooks.books.repository.contributorrole.ContributorRoleRepository;
+import shop.nuribooks.books.repository.contributor.role.ContributorRoleRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -20,11 +20,11 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 	private final ContributorRoleRepository contributorRolesRepository;
 
 	@Override
-	public void registerContributorRole(ContributorRoleReq req) {
+	public void registerContributorRole(ContributorRoleReqDto req) {
 		ContributorRoleEnum roleEnum;
 
 		try {
-			 roleEnum = ContributorRoleEnum.valueOf(req.getName().toUpperCase());
+			roleEnum = ContributorRoleEnum.valueOf(req.getName().toUpperCase());
 
 		} catch (IllegalArgumentException e) {
 			String errorMessage = "Invalid contributor role name: " + req.getName();
@@ -32,10 +32,8 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 
 		}
 
-		if (contributorRolesRepository.existsByContributorRoleEnum(roleEnum)) {
-			throw new DuplicateEntityException(
-				"Contributor role '" + req.getName() + "' already exists."
-			);
+		if (contributorRolesRepository.existsByName(roleEnum)) {
+			throw new DuplicateEntityException("이미 존재하는 역할입니다.");
 		}
 
 		ContributorRole savedRole = new ContributorRole();
@@ -50,25 +48,24 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 	}
 
 	@Override
-	public void updateContributorRole(String roleName, ContributorRoleReq req) {
+	public void updateContributorRole(String roleName, ContributorRoleReqDto req) {
 		String updatedRoleName = req.getName().toUpperCase();
 
-		ContributorRole existedRole = contributorRolesRepository.findByName(ContributorRoleEnum.valueOf(roleName.toUpperCase()))
-			.orElseThrow(() -> new ContributorRoleNotFoundException("ContributorRole not found"));
+		ContributorRole existedRole = contributorRolesRepository.findByName(
+				ContributorRoleEnum.valueOf(roleName.toUpperCase()))
+			.orElseThrow(() -> new ContributorRoleNotFoundException("역할이 존재하지 않습니다."));
 
 		ContributorRoleEnum newRoleEnum;
 		try {
 			newRoleEnum = ContributorRoleEnum.valueOf(updatedRoleName);
 
 		} catch (IllegalArgumentException e) {
-			String errorMessage = "Invalid contributor role name: " + req.getName();
+			String errorMessage = "잘못된 형식입니다. :" + req.getName();
 			throw new InvalidContributorRoleException(errorMessage, e);
 		}
 
-		if (contributorRolesRepository.existsByContributorRoleEnum(newRoleEnum)) {
-			throw new DuplicateEntityException(
-				"Contributor role '" + updatedRoleName + "' already exists."
-			);
+		if (contributorRolesRepository.existsByName(newRoleEnum)) {
+			throw new DuplicateEntityException("이미 존재하는 역할입니다.");
 		}
 
 		existedRole.setName(newRoleEnum);
@@ -82,11 +79,12 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 			ContributorRoleEnum roleEnum = ContributorRoleEnum.valueOf(roleName.toUpperCase());
 
 			ContributorRole roles = contributorRolesRepository.findByName(roleEnum)
-				.orElseThrow(() -> new ContributorRoleNotFoundException("Contributor role '" + roleName + "' not found"));
+				.orElseThrow(
+					() -> new ContributorRoleNotFoundException("역할이 존재하지 않습니다."));
 
 			contributorRolesRepository.delete(roles);
 		} catch (IllegalArgumentException e) {
-			throw new InvalidContributorRoleException("Invalid contributor role name: " + roleName, e);
+			throw new InvalidContributorRoleException("잘못된 형식입니다. :" + roleName, e);
 		}
 
 	}

@@ -1,4 +1,4 @@
-package shop.nuribooks.books.repository.contributorrole;
+package shop.nuribooks.books.repository.contributor.role;
 
 import java.util.Optional;
 
@@ -9,6 +9,6 @@ import shop.nuribooks.books.entity.book.ContributorRoleEnum;
 
 public interface ContributorRoleRepository extends JpaRepository<ContributorRole, Long> {
 	Optional<ContributorRole> findByName(ContributorRoleEnum name);
-	boolean existsByContributorRoleEnum(ContributorRoleEnum contributorRoleEnum);
 
+	boolean existsByName(ContributorRoleEnum name);
 }
