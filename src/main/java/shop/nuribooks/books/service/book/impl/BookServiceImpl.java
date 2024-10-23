@@ -5,15 +5,15 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.book.BookRegisterReq;
 import shop.nuribooks.books.dto.book.BookRegisterRes;
-import shop.nuribooks.books.entity.BookStates;
-import shop.nuribooks.books.entity.Books;
-import shop.nuribooks.books.entity.Publishers;
+import shop.nuribooks.books.entity.book.Book;
+import shop.nuribooks.books.entity.book.BookState;
+import shop.nuribooks.books.entity.book.Publisher;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.book.BookStatesIdNotFoundException;
 import shop.nuribooks.books.exception.book.DuplicateIsbnException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
-import shop.nuribooks.books.repository.book.BookStateRepository;
 import shop.nuribooks.books.repository.book.BookRepository;
+import shop.nuribooks.books.repository.book.BookStateRepository;
 import shop.nuribooks.books.repository.book.PublisherRepository;
 import shop.nuribooks.books.service.book.BookService;
 
@@ -26,21 +26,21 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public BookRegisterRes registerBook(BookRegisterReq reqDto) {
-		if(reqDto == null){
+		if (reqDto == null) {
 			throw new BadRequestException("요청 본문이 비어있습니다.");
 		}
 
-		if(booksRepository.existsByIsbn(reqDto.getIsbn())){
+		if (booksRepository.existsByIsbn(reqDto.getIsbn())) {
 			throw new DuplicateIsbnException(reqDto.getIsbn());
 		}
 
-		BookStates bookState = bookStatesRepository.findById(reqDto.getStateId())
+		BookState bookState = bookStatesRepository.findById(reqDto.getStateId())
 			.orElseThrow(() -> new BookStatesIdNotFoundException(reqDto.getStateId()));
 
-		Publishers publisher = publishersRepository.findById(reqDto.getPublisherId())
+		Publisher publisher = publishersRepository.findById(reqDto.getPublisherId())
 			.orElseThrow(() -> new PublisherIdNotFoundException(reqDto.getPublisherId()));
 
-		Books books = Books.builder()
+		Book books = Book.builder()
 			.stateId(bookState)
 			.publisherId(publisher)
 			.title(reqDto.getTitle())

@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import shop.nuribooks.books.dto.category.request.CategoryRegisterReqDto;
-import shop.nuribooks.books.entity.Category;
+import shop.nuribooks.books.entity.book.Category;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
 import shop.nuribooks.books.repository.CategoryRepository;
 import shop.nuribooks.books.service.category.CategoryService;

@@ -30,7 +30,7 @@ public class BookController {
 		@ApiResponse(responseCode = "409", description = "ISBN already exists"),
 	})
 	@PostMapping
-	public ResponseEntity<BookRegisterRes> registerBooks(@Valid @RequestBody BookRegisterReq reqDto){
+	public ResponseEntity<BookRegisterRes> registerBooks(@Valid @RequestBody BookRegisterReq reqDto) {
 		BookRegisterRes resDto = booksService.registerBook(reqDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
 	}
