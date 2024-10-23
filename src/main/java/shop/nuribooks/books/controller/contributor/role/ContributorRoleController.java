@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributor.role.ContributorRoleRequest;
 import shop.nuribooks.books.dto.contributor.role.ContributorRoleResponse;
 import shop.nuribooks.books.entity.book.ContributorRole;
-import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
 import shop.nuribooks.books.service.contributor.role.ContributorRoleService;
 
 @RestController
@@ -40,14 +37,7 @@ public class ContributorRoleController {
 	})
 	@PostMapping
 	public ResponseEntity<ContributorRoleResponse> registerContributorRole(
-		@Valid @RequestBody ContributorRoleRequest request, BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			FieldError fieldError = bindingResult.getFieldError();
-			String message = (fieldError != null) ? fieldError.getDefaultMessage() : "Invalid contributor role data";
-			throw new InvalidContributorRoleException(message);
-		}
-
+		@Valid @RequestBody ContributorRoleRequest request) {
 		contributorRoleService.registerContributorRole(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(new ContributorRoleResponse(request.getName()));
 	}
@@ -70,13 +60,7 @@ public class ContributorRoleController {
 	})
 	@PutMapping("/{roleName}")
 	public ResponseEntity<ContributorRoleResponse> updateContributorRole(@PathVariable String roleName,
-		@Valid @RequestBody ContributorRoleRequest request, BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			FieldError fieldError = bindingResult.getFieldError();
-			String message = (fieldError != null) ? fieldError.getDefaultMessage() : "Invalid contributor role data";
-			throw new InvalidContributorRoleException(message);
-		}
+		@Valid @RequestBody ContributorRoleRequest request) {
 
 		contributorRoleService.updateContributorRole(roleName, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(new ContributorRoleResponse(request.getName()));
