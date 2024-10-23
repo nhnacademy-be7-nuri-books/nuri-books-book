@@ -7,7 +7,6 @@ import static shop.nuribooks.books.entity.member.StatusEnum.*;
 
 import java.time.LocalDateTime;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +30,6 @@ public class MemberService {
 
 	private final CustomerRepository customerRepository;
 	private final MemberRepository memberRepository;
-	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	/**
 	 * 회원가입 <br>
@@ -56,7 +54,7 @@ public class MemberService {
 
 		Customer newCustomer = new Customer(
 			request.getName(),
-			bCryptPasswordEncoder.encode(request.getPassword()),
+			request.getPassword(),
 			request.getPhoneNumber(),
 			request.getEmail());
 
@@ -90,7 +88,7 @@ public class MemberService {
 		Member findMember = memberRepository.findByUserId(request.getUserId());
 
 		if (!customerRepository.existsByIdAndPassword(
-			findMember.getId(), bCryptPasswordEncoder.encode(request.getPassword()))) {
+			findMember.getId(), request.getPassword())) {
 			throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
 		}
 
@@ -118,8 +116,8 @@ public class MemberService {
 		if (!request.getName().equals(findCustomer.getName())) {
 			findCustomer.changeName(request.getName());
 		}
-		if (!bCryptPasswordEncoder.encode(request.getPassword()).equals(findCustomer.getPassword())) {
-			findCustomer.changePassword(bCryptPasswordEncoder.encode(request.getPassword()));
+		if (!request.getPassword().equals(findCustomer.getPassword())) {
+			findCustomer.changePassword(request.getPassword());
 		}
 		if (!request.getPhoneNumber().equals(findCustomer.getPhoneNumber())) {
 			findCustomer.changePhoneNumber(request.getPhoneNumber());

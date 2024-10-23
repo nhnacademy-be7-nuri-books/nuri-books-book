@@ -1,6 +1,8 @@
 package shop.nuribooks.books.exception.member;
 
-public class UserIdNotFoundException extends RuntimeException {
+import shop.nuribooks.books.exception.ResourceNotFoundException;
+
+public class UserIdNotFoundException extends ResourceNotFoundException {
 	public UserIdNotFoundException(String message) {
 		super(message);
 	}

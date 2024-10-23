@@ -12,7 +12,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import shop.nuribooks.books.entity.member.Customer;
 import shop.nuribooks.books.entity.member.Member;
@@ -26,12 +25,9 @@ class MemberRepositoryTest {
 	@Autowired
 	private CustomerRepository customerRepository;
 
-	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
-
 	@DisplayName("입력된 id로 회원 존재 여부 확인")
 	@Test
-	public void existsByUserId() throws Exception {
+	public void existsByUserId() {
 		//given
 		Customer customer = customer();
 		Customer savedCustomer = customerRepository.save(customer);
@@ -56,7 +52,7 @@ class MemberRepositoryTest {
 			.point(ZERO)
 			.totalPaymentAmount(ZERO)
 			.latestLoginAt(null)
-			.resignedAt(null)
+			.withdrawnAt(null)
 			.build();
 	}
 
@@ -64,7 +60,7 @@ class MemberRepositoryTest {
 		return Customer.builder()
 			.id(null)
 			.name("nuri")
-			.password(bCryptPasswordEncoder.encode("abc123"))
+			.password("abc123")
 			.phoneNumber("042-8282-8282")
 			.email("nhnacademy@nuriBooks.com")
 			.build();

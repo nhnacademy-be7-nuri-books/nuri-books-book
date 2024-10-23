@@ -1,6 +1,8 @@
 package shop.nuribooks.books.exception.member;
 
-public class EmailAlreadyExistsException extends RuntimeException {
+import shop.nuribooks.books.exception.DuplicateException;
+
+public class EmailAlreadyExistsException extends DuplicateException {
 	public EmailAlreadyExistsException(String message) {
 		super(message);
 	}

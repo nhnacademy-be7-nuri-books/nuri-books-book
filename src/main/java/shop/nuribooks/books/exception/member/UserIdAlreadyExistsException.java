@@ -1,6 +1,8 @@
 package shop.nuribooks.books.exception.member;
 
-public class UserIdAlreadyExistsException extends RuntimeException {
+import shop.nuribooks.books.exception.DuplicateException;
+
+public class UserIdAlreadyExistsException extends DuplicateException {
 	public UserIdAlreadyExistsException(String message) {
 		super(message);
 	}

@@ -9,9 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import shop.nuribooks.books.dto.member.request.MemberCreateReq;
 import shop.nuribooks.books.entity.member.Customer;
@@ -30,18 +28,13 @@ class MemberServiceTest {
 	@Mock
 	private MemberRepository memberRepository;
 
-	@Spy
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
-
 	@DisplayName("회원가입")
 	@Test
 	void memberCreate() {
 		// given
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		MemberCreateReq request = memberCreateRequest();
-		String encryptedPassword = encoder.encode(request.getPassword());
 
-		doReturn(new Customer(1L, request.getName(), encryptedPassword, request.getPhoneNumber(), request.getEmail()))
+		doReturn(new Customer(1L, request.getName(), request.getPassword(), request.getPhoneNumber(), request.getEmail()))
 			.when(customerRepository)
 			.save(any(Customer.class));
 
