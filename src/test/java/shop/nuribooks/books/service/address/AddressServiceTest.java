@@ -42,7 +42,7 @@ class AddressServiceTest {
                 .isDefault(true)
                 .build();
         // when
-        AddressResponse response = addressService.addAddress(request);
+        AddressResponse response = addressService.registerAddress(request);
 
         // then
         assertThat(response.getName()).isEqualTo("test");
@@ -59,7 +59,7 @@ class AddressServiceTest {
                 .addressDetail("103호")
                 .isDefault(true)
                 .build();
-        AddressResponse response = addressService.addAddress(request);
+        AddressResponse response = addressService.registerAddress(request);
 
         // when
         List<AddressResponse> addressesByMemberId = addressService.findAddressesByMemberId(response.getMemberId());
