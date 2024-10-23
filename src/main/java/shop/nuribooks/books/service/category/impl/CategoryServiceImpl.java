@@ -1,9 +1,12 @@
 package shop.nuribooks.books.service.category.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import shop.nuribooks.books.dto.category.CategoryRequest;
+import shop.nuribooks.books.dto.category.CategoryResponse;
 import shop.nuribooks.books.entity.book.Category;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
@@ -80,5 +83,15 @@ public class CategoryServiceImpl implements CategoryService {
 			.parentCategory(parentCategory)
 			.build();
 		return categoryRepository.save(category);
+	}
+
+	@Override
+	public List<CategoryResponse> getAllCategory() {
+		return List.of();
+	}
+
+	@Override
+	public CategoryResponse getCategoryById(Long categoryId) {
+		return null;
 	}
 }
