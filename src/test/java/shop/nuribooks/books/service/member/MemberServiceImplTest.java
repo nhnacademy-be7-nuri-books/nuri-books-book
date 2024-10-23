@@ -11,16 +11,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import shop.nuribooks.books.dto.member.request.MemberCreateReq;
+import shop.nuribooks.books.dto.member.request.MemberCreateRequest;
 import shop.nuribooks.books.entity.member.Customer;
 import shop.nuribooks.books.repository.member.CustomerRepository;
 import shop.nuribooks.books.repository.member.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
-class MemberServiceTest {
+class MemberServiceImplTest {
 
 	@InjectMocks
-	private MemberService memberService;
+	private MemberServiceImpl memberServiceImpl;
 
 	@Mock
 	private CustomerRepository customerRepository;
@@ -32,7 +32,7 @@ class MemberServiceTest {
 	@Test
 	void memberCreate() {
 		// given
-		MemberCreateReq request = memberCreateRequest();
+		MemberCreateRequest request = memberCreateRequest();
 
 		doReturn(new Customer(1L, request.getName(), request.getPassword(), request.getPhoneNumber(), request.getEmail()))
 			.when(customerRepository)
@@ -47,8 +47,8 @@ class MemberServiceTest {
 		// then
 	}
 
-	private MemberCreateReq memberCreateRequest() {
-		return MemberCreateReq.builder()
+	private MemberCreateRequest memberCreateRequest() {
+		return MemberCreateRequest.builder()
 			.name("boho")
 			.userId("nuri95")
 			.password("abc123")

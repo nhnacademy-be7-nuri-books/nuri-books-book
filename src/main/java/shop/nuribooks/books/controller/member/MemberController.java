@@ -3,7 +3,6 @@ package shop.nuribooks.books.controller.member;
 import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,32 +13,27 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.member.ResponseMessage;
-import shop.nuribooks.books.dto.member.request.MemberCreateReq;
-import shop.nuribooks.books.dto.member.request.MemberUpdateReq;
-import shop.nuribooks.books.dto.member.request.MemberWithdrawReq;
-import shop.nuribooks.books.service.member.MemberService;
+import shop.nuribooks.books.dto.member.request.MemberCreateRequest;
+import shop.nuribooks.books.dto.member.request.MemberUpdateRequest;
+import shop.nuribooks.books.dto.member.request.MemberWithdrawRequest;
+import shop.nuribooks.books.service.member.MemberServiceImpl;
 
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
 
-	private final MemberService memberService;
+	private final MemberServiceImpl memberServiceImpl;
 
 	/**
-	 * 회원가입 <br>
+	 * 회원등록 <br>
 	 * MemberCreateReq의 모든 필드 즉, <br>
 	 * name, userId, password, phoneNumber, email, birthday에 대해서 검증 후 회원가입 진행
 	 */
 	@PostMapping("/api/member")
 	public ResponseEntity<ResponseMessage> memberCreate(
-		@RequestBody @Valid MemberCreateReq request, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().getFirst().getDefaultMessage();
+		@RequestBody @Valid MemberCreateRequest request) {
 
-			return ResponseEntity.status(BAD_REQUEST).body(new ResponseMessage(BAD_REQUEST.value(), errorMessage));
-		}
-
-		memberService.createMember(request);
+		memberServiceImpl.createMember(request);
 
 		return ResponseEntity.status(CREATED)
 			.body(new ResponseMessage(CREATED.value(), "회원가입이 성공적으로 완료되었습니다!"));
@@ -56,7 +50,7 @@ public class MemberController {
 				.body(new ResponseMessage(BAD_REQUEST.value(), "아이디는 반드시 8자 이상 20자 이하로 입력해야 합니다."));
 		}
 
-		if (memberService.doesMemberExist(userId)) {
+		if (memberServiceImpl.doesMemberExist(userId)) {
 			return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(), "존재하는 회원입니다."));
 		}
 
@@ -71,14 +65,9 @@ public class MemberController {
 	 */
 	@PatchMapping("/api/member/status")
 	public ResponseEntity<ResponseMessage> memberWithdraw(
-		@RequestBody @Valid MemberWithdrawReq request, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().getFirst().getDefaultMessage();
+		@RequestBody @Valid MemberWithdrawRequest request) {
 
-			return ResponseEntity.status(BAD_REQUEST).body(new ResponseMessage(BAD_REQUEST.value(), errorMessage));
-		}
-
-		memberService.withdrawMember(request);
+		memberServiceImpl.withdrawMember(request);
 
 		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),
 			"탈퇴가 성공적으로 완료되었습니다. 귀하의 앞날에 무궁한 발전이 있기를 진심으로 기원하겠습니다."));
@@ -91,14 +80,9 @@ public class MemberController {
 	 */
 	@PostMapping("/api/member/{userId}")
 	public ResponseEntity<ResponseMessage> memberUpdate(
-		@PathVariable String userId, @RequestBody @Valid MemberUpdateReq request, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().getFirst().getDefaultMessage();
+		@PathVariable String userId, @RequestBody @Valid MemberUpdateRequest request) {
 
-			return ResponseEntity.status(BAD_REQUEST).body(new ResponseMessage(BAD_REQUEST.value(), errorMessage));
-		}
-
-		memberService.updateMember(userId, request);
+		memberServiceImpl.updateMember(userId, request);
 
 		return ResponseEntity.status(OK)
 			.body(new ResponseMessage(OK.value(), "회원 수정이 성공적으로 완료되었습니다."));
