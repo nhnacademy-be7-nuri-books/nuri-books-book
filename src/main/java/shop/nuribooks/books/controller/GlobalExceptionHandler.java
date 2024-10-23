@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import shop.nuribooks.books.dto.errordto.response.ErrorRes;
+import shop.nuribooks.books.dto.error.ErrorRes;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
