@@ -1,14 +1,14 @@
 package shop.nuribooks.books.service.contributor;
 
-import shop.nuribooks.books.dto.contributor.ContributorReq;
-import shop.nuribooks.books.entity.book.Contributor;
+import shop.nuribooks.books.dto.contributor.ContributorReqDto;
+import shop.nuribooks.books.dto.contributor.ContributorResDto;
 
 public interface ContributorService {
-	Contributor registerContributor(ContributorReq req);
+	ContributorResDto registerContributor(ContributorReqDto req);
 
-	Contributor updateContributor(Long contributorId, ContributorReq req);
+	ContributorResDto updateContributor(Long contributorId, ContributorReqDto req);
 
-	Contributor getContributor(Long contributorId);
+	ContributorResDto getContributor(Long contributorId);
 
 	void deleteContributor(Long contributorId);
 
