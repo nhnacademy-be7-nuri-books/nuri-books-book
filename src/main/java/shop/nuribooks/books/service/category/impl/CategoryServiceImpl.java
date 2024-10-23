@@ -3,7 +3,7 @@ package shop.nuribooks.books.service.category.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import shop.nuribooks.books.dto.category.request.CategoryRegisterReq;
+import shop.nuribooks.books.dto.category.request.CategoryRequest;
 import shop.nuribooks.books.entity.book.category.Category;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 */
 	@Override
 	@Transactional
-	public Category registerMainCategory(CategoryRegisterReq dto) {
+	public Category registerMainCategory(CategoryRequest dto) {
 		boolean isDuplicate = categoryRepository.existsByNameAndParentCategoryIsNull(dto.name());
 		if (isDuplicate) {
 			throw new CategoryAlreadyExistException(
@@ -60,7 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 */
 	@Override
 	@Transactional
-	public Category registerSubCategory(CategoryRegisterReq dto, Long parentCategoryId) {
+	public Category registerSubCategory(CategoryRequest dto, Long parentCategoryId) {
 		Category parentCategory = categoryRepository.findById(parentCategoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(
 				"Parent category not found with ID: " + parentCategoryId));

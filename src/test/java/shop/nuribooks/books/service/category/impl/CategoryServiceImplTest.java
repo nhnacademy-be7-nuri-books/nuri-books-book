@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import shop.nuribooks.books.dto.category.request.CategoryRegisterReq;
+import shop.nuribooks.books.dto.category.request.CategoryRequest;
 import shop.nuribooks.books.entity.book.category.Category;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
@@ -39,7 +39,7 @@ class CategoryServiceImplTest {
 	@Test
 	void registerMainCategory_whenCategoryDoesNotExist_thenCategoryIsSaved() {
 		// given
-		CategoryRegisterReq dto = new CategoryRegisterReq("여행");
+		CategoryRequest dto = new CategoryRequest("여행");
 		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(false);
 		when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -59,7 +59,7 @@ class CategoryServiceImplTest {
 	@Test
 	void registerMainCategory_whenCategoryExists_thenThrowsException() {
 		// given
-		CategoryRegisterReq dto = new CategoryRegisterReq("여행");
+		CategoryRequest dto = new CategoryRequest("여행");
 		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(true);
 
 		// when & then
@@ -76,7 +76,7 @@ class CategoryServiceImplTest {
 		// given
 		Long parentCategoryId = 1L;
 		Category parentCategory = Category.builder().name("여행").level(0).build();
-		CategoryRegisterReq dto = new CategoryRegisterReq("국내 여행");
+		CategoryRequest dto = new CategoryRequest("국내 여행");
 		when(categoryRepository.findById(parentCategoryId)).thenReturn(Optional.of(parentCategory));
 		when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -98,7 +98,7 @@ class CategoryServiceImplTest {
 	void registerSubCategory_whenParentCategoryDoesNotExist_thenThrowsException() {
 		// given
 		Long parentCategoryId = 1L;
-		CategoryRegisterReq dto = new CategoryRegisterReq("국내 여행");
+		CategoryRequest dto = new CategoryRequest("국내 여행");
 		when(categoryRepository.findById(parentCategoryId)).thenReturn(Optional.empty());
 
 		// when & then
@@ -117,7 +117,7 @@ class CategoryServiceImplTest {
 		Category parentCategory = Category.builder().name("여행").level(0).build();
 		Category subCategory = Category.builder().name("국내 여행").level(1).parentCategory(parentCategory).build();
 		parentCategory.getSubCategory().add(subCategory);
-		CategoryRegisterReq dto = new CategoryRegisterReq("국내 여행");
+		CategoryRequest dto = new CategoryRequest("국내 여행");
 		when(categoryRepository.findById(parentCategoryId)).thenReturn(Optional.of(parentCategory));
 
 		// when & then

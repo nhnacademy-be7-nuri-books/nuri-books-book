@@ -1,6 +1,6 @@
 package shop.nuribooks.books.service.category;
 
-import shop.nuribooks.books.dto.category.request.CategoryRegisterReq;
+import shop.nuribooks.books.dto.category.request.CategoryRequest;
 import shop.nuribooks.books.entity.book.category.Category;
 
 /**
@@ -13,7 +13,7 @@ public interface CategoryService {
 	 * @param dto 카테고리 등록 요청 DTO
 	 * @return 등록된 카테고리 엔티티
 	 */
-	Category registerMainCategory(CategoryRegisterReq dto);
+	Category registerMainCategory(CategoryRequest dto);
 
 	/**
 	 * 기존 대분류 아래에 새로운 하위 분류 카테고리를 등록합니다.
@@ -22,5 +22,5 @@ public interface CategoryService {
 	 * @param parentCategoryId 부모 카테고리의 ID
 	 * @return 등록된 하위 카테고리 엔티티
 	 */
-	Category registerSubCategory(CategoryRegisterReq dto, Long parentCategoryId);
+	Category registerSubCategory(CategoryRequest dto, Long parentCategoryId);
 }

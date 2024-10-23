@@ -17,8 +17,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.controller.GlobalExceptionHandler;
-import shop.nuribooks.books.dto.category.request.CategoryRegisterReq;
-import shop.nuribooks.books.dto.category.response.CategoryRegisterRes;
+import shop.nuribooks.books.dto.category.request.CategoryRequest;
+import shop.nuribooks.books.dto.category.response.CategoryResponse;
 import shop.nuribooks.books.entity.book.category.Category;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
@@ -53,10 +53,10 @@ class CategoryControllerTest {
 	@Test
 	void registerMainCategory_whenValidRequest_thenReturnsCreated() throws Exception {
 		// given
-		CategoryRegisterReq dto = new CategoryRegisterReq("여행");
+		CategoryRequest dto = new CategoryRequest("여행");
 		Category category = Category.builder().name("여행").level(0).build();
-		CategoryRegisterRes response = new CategoryRegisterRes(category);
-		when(categoryService.registerMainCategory(any(CategoryRegisterReq.class))).thenReturn(category);
+		CategoryResponse response = new CategoryResponse(category);
+		when(categoryService.registerMainCategory(any(CategoryRequest.class))).thenReturn(category);
 
 		// when & then
 		mockMvc.perform(post("/api/categories")
@@ -73,11 +73,11 @@ class CategoryControllerTest {
 	void registerSubCategory_whenValidRequest_thenReturnsCreated() throws Exception {
 		// given
 		Long parentCategoryId = 1L;
-		CategoryRegisterReq dto = new CategoryRegisterReq("국내 여행");
+		CategoryRequest dto = new CategoryRequest("국내 여행");
 		Category parentCategory = Category.builder().name("여행").level(0).build();
 		Category subCategory = Category.builder().name("국내 여행").level(1).parentCategory(parentCategory).build();
-		CategoryRegisterRes response = new CategoryRegisterRes(subCategory);
-		when(categoryService.registerSubCategory(any(CategoryRegisterReq.class), eq(parentCategoryId))).thenReturn(
+		CategoryResponse response = new CategoryResponse(subCategory);
+		when(categoryService.registerSubCategory(any(CategoryRequest.class), eq(parentCategoryId))).thenReturn(
 			subCategory);
 
 		// when & then
@@ -94,9 +94,9 @@ class CategoryControllerTest {
 	@Test
 	void registerMainCategory_whenCategoryAlreadyExists_thenThrowsException() throws Exception {
 		// given
-		CategoryRegisterReq dto = new CategoryRegisterReq("여행");
+		CategoryRequest dto = new CategoryRequest("여행");
 		doThrow(new CategoryAlreadyExistException("Top-level category with name '여행' already exists.")).when(
-			categoryService).registerMainCategory(any(CategoryRegisterReq.class));
+			categoryService).registerMainCategory(any(CategoryRequest.class));
 
 		// when & then
 		mockMvc.perform(post("/api/categories")
@@ -113,9 +113,9 @@ class CategoryControllerTest {
 	void registerSubCategory_whenParentCategoryNotFound_thenThrowsException() throws Exception {
 		// given
 		Long parentCategoryId = 1L;
-		CategoryRegisterReq dto = new CategoryRegisterReq("국내 여행");
+		CategoryRequest dto = new CategoryRequest("국내 여행");
 		doThrow(new CategoryNotFoundException("Parent category not found with ID: " + parentCategoryId)).when(
-			categoryService).registerSubCategory(any(CategoryRegisterReq.class), eq(parentCategoryId));
+			categoryService).registerSubCategory(any(CategoryRequest.class), eq(parentCategoryId));
 
 		// when & then
 		mockMvc.perform(post("/api/categories/{categoryId}", parentCategoryId)
@@ -132,10 +132,10 @@ class CategoryControllerTest {
 	void registerSubCategory_whenSubCategoryAlreadyExists_thenThrowsException() throws Exception {
 		// given
 		Long parentCategoryId = 1L;
-		CategoryRegisterReq dto = new CategoryRegisterReq("국내 여행");
+		CategoryRequest dto = new CategoryRequest("국내 여행");
 		doThrow(new CategoryAlreadyExistException(
 			"Category with name '국내 여행' already exists under parent category with ID: " + parentCategoryId)).when(
-			categoryService).registerSubCategory(any(CategoryRegisterReq.class), eq(parentCategoryId));
+			categoryService).registerSubCategory(any(CategoryRequest.class), eq(parentCategoryId));
 
 		// when & then
 		mockMvc.perform(post("/api/categories/{categoryId}", parentCategoryId)

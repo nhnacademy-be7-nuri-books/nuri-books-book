@@ -12,8 +12,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import shop.nuribooks.books.dto.category.request.CategoryRegisterReq;
-import shop.nuribooks.books.dto.category.response.CategoryRegisterRes;
+import shop.nuribooks.books.dto.category.request.CategoryRequest;
+import shop.nuribooks.books.dto.category.response.CategoryResponse;
 import shop.nuribooks.books.service.category.CategoryService;
 
 /**
@@ -27,7 +27,6 @@ public class CategoryController {
 	/**
 	 * CategoryController의 생성자.
 	 *
-	 * @param categoryServiceImpl 카테고리 서비스 구현체
 	 */
 	private final CategoryService categoryService;
 
@@ -37,7 +36,7 @@ public class CategoryController {
 
 	/**
 	 * 새로운 대분류를 등록합니다.
-	 *
+	 * @author janghyun
 	 * @param dto 카테고리 등록 세부 정보를 포함한 요청 본문
 	 * @return 생성된 카테고리 정보를 담은 ResponseEntity
 	 */
@@ -48,16 +47,16 @@ public class CategoryController {
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	@PostMapping
-	public ResponseEntity<CategoryRegisterRes> registerMainCategory(@Valid @RequestBody CategoryRegisterReq dto) {
-		CategoryRegisterRes categoryRegisterRes = new CategoryRegisterRes(
+	public ResponseEntity<CategoryResponse> registerMainCategory(@Valid @RequestBody CategoryRequest dto) {
+		CategoryResponse categoryResponse = new CategoryResponse(
 			categoryService.registerMainCategory(dto));
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(categoryRegisterRes);
+			.body(categoryResponse);
 	}
 
 	/**
 	 * 기존 대분류 아래에 새로운 하위 분류를 등록합니다.
-	 *
+	 * @author janghyun
 	 * @param dto 하위 분류 등록 세부 정보를 포함한 요청 본문
 	 * @param categoryId 하위 분류가 등록될 대분류의 ID
 	 * @return 생성된 하위 분류 정보를 담은 ResponseEntity
@@ -70,11 +69,11 @@ public class CategoryController {
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	@PostMapping("/{categoryId}")
-	public ResponseEntity<CategoryRegisterRes> registerSubCategory(@Valid @RequestBody CategoryRegisterReq dto,
+	public ResponseEntity<CategoryResponse> registerSubCategory(@Valid @RequestBody CategoryRequest dto,
 		@PathVariable Long categoryId) {
-		CategoryRegisterRes categoryRegisterRes = new CategoryRegisterRes(
+		CategoryResponse categoryResponse = new CategoryResponse(
 			categoryService.registerSubCategory(dto, categoryId));
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(categoryRegisterRes);
+			.body(categoryResponse);
 	}
 }
