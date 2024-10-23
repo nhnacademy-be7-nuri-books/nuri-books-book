@@ -1,8 +1,8 @@
 package shop.nuribooks.books.exception.member;
 
-import shop.nuribooks.books.exception.DuplicateException;
+import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 
-public class UserIdAlreadyExistsException extends DuplicateException {
+public class UserIdAlreadyExistsException extends ResourceAlreadyExistException {
 	public UserIdAlreadyExistsException(String message) {
 		super(message);
 	}

@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,15 +15,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import shop.nuribooks.books.dto.book.BookRegisterReq;
 import shop.nuribooks.books.dto.book.BookRegisterRes;
-import shop.nuribooks.books.entity.BookStates;
-import shop.nuribooks.books.entity.BookStatesEnum;
-import shop.nuribooks.books.entity.Books;
-import shop.nuribooks.books.entity.Publishers;
+import shop.nuribooks.books.entity.book.Book;
+import shop.nuribooks.books.entity.book.BookState;
+import shop.nuribooks.books.entity.book.Publisher;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
-import shop.nuribooks.books.exception.book.DuplicateIsbnException;
-import shop.nuribooks.books.repository.book.BookStateRepository;
+import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.repository.book.BookRepository;
+import shop.nuribooks.books.repository.book.BookStateRepository;
 import shop.nuribooks.books.repository.book.PublisherRepository;
 import shop.nuribooks.books.service.book.impl.BookServiceImpl;
 
@@ -45,38 +43,38 @@ public class BooksServiceImplTest {
 
 	private BookRegisterReq reqDto;
 
-	private BookStates bookStates;
+	private BookState bookStates;
 
-	@BeforeEach
-	public void setUp() {
-		bookStates = new BookStates(1L, BookStatesEnum.InStock);
-
-		reqDto = new BookRegisterReq(
-			1L,
-			1L,
-			"Book Title",
-			"thumbnail.jpg",
-			"detail.jpg",
-			LocalDate.now(),
-			BigDecimal.valueOf(20000),
-			10,
-			"Book Description",
-			"Book Contents",
-			"1234567890123",
-			true,
-			100
-		);
-	}
+	// @BeforeEach
+	// public void setUp() {
+	// 	bookStates = new BookState(1L, BookStateEnum.InStock);
+	//
+	// 	reqDto = new BookRegisterReq(
+	// 		1L,
+	// 		1L,
+	// 		"Book Title",
+	// 		"thumbnail.jpg",
+	// 		"detail.jpg",
+	// 		LocalDate.now(),
+	// 		BigDecimal.valueOf(20000),
+	// 		10,
+	// 		"Book Description",
+	// 		"Book Contents",
+	// 		"1234567890123",
+	// 		true,
+	// 		100
+	// 	);
+	// }
 
 	@Test
 	public void registerBook_ShouldReturnResponse_WhenValidRequest() {
-		Publishers mockPublisher = new Publishers(1L, "Publisher Name");
+		Publisher mockPublisher = new Publisher(1L, "Publisher Name");
 
 		when(bookStatesRepository.findById(1L)).thenReturn(Optional.of(bookStates));
 		when(publishersRepository.findById(1L)).thenReturn(Optional.of(mockPublisher));
 		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(false);
-		when(booksRepository.save(any(Books.class))).thenAnswer(invocation -> {
-			Books book = invocation.getArgument(0);
+		when(booksRepository.save(any(Book.class))).thenAnswer(invocation -> {
+			Book book = invocation.getArgument(0);
 			book.setId(1L);
 			return book;
 		});
@@ -86,7 +84,7 @@ public class BooksServiceImplTest {
 		assertNotNull(result);
 		assertEquals(1L, result.getId());
 		assertEquals("Book Title", result.getTitle());
-		verify(booksRepository, times(1)).save(any(Books.class));
+		verify(booksRepository, times(1)).save(any(Book.class));
 	}
 
 	@Test
@@ -116,20 +114,20 @@ public class BooksServiceImplTest {
 	public void registerBook_ShouldThrowDuplicateIsbnException_WhenIsbnAlreadyExists() {
 		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(true);
 
-		assertThrows(DuplicateIsbnException.class, () -> booksService.registerBook(reqDto));
+		assertThrows(ResourceAlreadyExistIsbnException.class, () -> booksService.registerBook(reqDto));
 
 		verify(booksRepository, times(1)).existsByIsbn(reqDto.getIsbn());
 	}
 
 	@Test
 	public void registerBook_ShouldSaveBook_WhenBookStateAndPublisherFound() {
-		Publishers mockPublisher = new Publishers(1L, "Publisher Name");
+		Publisher mockPublisher = new Publisher(1L, "Publisher Name");
 
 		when(bookStatesRepository.findById(1L)).thenReturn(Optional.of(bookStates));
 		when(publishersRepository.findById(1L)).thenReturn(Optional.of(mockPublisher));
 		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(false);
 
-		Books mockBook = Books.builder()
+		Book mockBook = Book.builder()
 			.id(null)
 			.stateId(bookStates)
 			.publisherId(mockPublisher)
@@ -148,12 +146,12 @@ public class BooksServiceImplTest {
 			.viewCount(0L)
 			.build();
 
-		when(booksRepository.save(any(Books.class))).thenReturn(mockBook);
+		when(booksRepository.save(any(Book.class))).thenReturn(mockBook);
 
 		BookRegisterRes result = booksService.registerBook(reqDto);
 
 		assertNotNull(result);
 		assertEquals("Book Title", result.getTitle());
-		verify(booksRepository, times(1)).save(any(Books.class));
+		verify(booksRepository, times(1)).save(any(Book.class));
 	}
 }

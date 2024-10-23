@@ -80,7 +80,7 @@ public class BooksControllerTest {
 	public void registerBooks_ShouldReturnBadRequest_WhenRequestIsInvalid() throws Exception {
 		BookRegisterReq reqDto = new BookRegisterReq(
 			null,
-			(Long) null,
+			(Long)null,
 			"",
 			null,
 			null,
