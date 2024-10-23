@@ -93,6 +93,7 @@ class AddressControllerTest {
     @Test
     void addressList() throws Exception {
         // given
+
         Address address1 = Address.builder()
                 .memberId(1L)
                 .name("test")

@@ -38,7 +38,7 @@ public class AddressController {
     @PostMapping("/api/member/{memberId}/address")
     public ResponseEntity<AddressResponse> addressRegister(@PathVariable Long memberId,
                                                       @Valid @RequestBody AddressRegisterRequest request) {
-        AddressResponse response = addressService.addAddress(request);
+        AddressResponse response = addressService.registerAddress(request);
         return ResponseEntity.ok(response);
     }
 
