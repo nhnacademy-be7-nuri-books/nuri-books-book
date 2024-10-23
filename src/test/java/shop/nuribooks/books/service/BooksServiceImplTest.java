@@ -49,6 +49,7 @@ public class BooksServiceImplTest {
 
 	@BeforeEach
 	public void setUp() {
+
 		bookStates = new BookState(1L, BookStateEnum.INSTOCK);
 
 		reqDto = new BookRegisterReq(
