@@ -2,8 +2,6 @@ package shop.nuribooks.books.controller.contributor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,10 +16,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.contributor.ContributorReq;
-import shop.nuribooks.books.dto.contributor.ContributorRes;
-import shop.nuribooks.books.entity.book.Contributor;
-import shop.nuribooks.books.exception.contributor.InvalidContributorException;
+import shop.nuribooks.books.dto.contributor.ContributorReqDto;
+import shop.nuribooks.books.dto.contributor.ContributorResDto;
 import shop.nuribooks.books.service.contributor.ContributorService;
 
 @RestController
@@ -40,16 +36,9 @@ public class ContributorController {
 	})
 
 	@PostMapping
-	public ResponseEntity<ContributorRes> registerContributor(@Valid @RequestBody ContributorReq request,
-		BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			FieldError fieldError = bindingResult.getFieldError();
-			String message = (fieldError != null) ? fieldError.getDefaultMessage() : "Invalid contributor role data";
-			throw new InvalidContributorException(message);
-		}
-		Contributor savedContributor = contributorService.registerContributor(request);
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(new ContributorRes(savedContributor.getId(), savedContributor.getName()));
+	public ResponseEntity<ContributorResDto> registerContributor(@Valid @RequestBody ContributorReqDto request) {
+		ContributorResDto resDto = contributorService.registerContributor(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
 	}
 
 	@Operation(summary = "Update an existing contributor",
@@ -61,10 +50,10 @@ public class ContributorController {
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@PutMapping("/{contributorId}")
-	public ResponseEntity<ContributorRes> updateContributor(@PathVariable Long contributorId,
-		@Valid @RequestBody ContributorReq request) {
-		Contributor contributor = contributorService.updateContributor(contributorId, request);
-		return ResponseEntity.status(HttpStatus.OK).body(new ContributorRes(contributor.getId(), contributor.getName()));
+	public ResponseEntity<ContributorResDto> updateContributor(@PathVariable Long contributorId,
+		@Valid @RequestBody ContributorReqDto request) {
+		ContributorResDto resDto = contributorService.updateContributor(contributorId, request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
 	}
 
 	@Operation(summary = "Get a contributor by ID",
@@ -73,10 +62,10 @@ public class ContributorController {
 		@ApiResponse(responseCode = "200", description = "Contributor found successfully")
 	})
 	@GetMapping("/{contributorId}")
-	public ResponseEntity<ContributorRes> getContributor(
+	public ResponseEntity<ContributorResDto> getContributor(
 		@PathVariable Long contributorId) {
-		Contributor contributor = contributorService.getContributor(contributorId);
-		return ResponseEntity.status(HttpStatus.OK).body(new ContributorRes(contributor.getId(), contributor.getName()));
+		ContributorResDto resDto = contributorService.getContributor(contributorId);
+		return ResponseEntity.status(HttpStatus.OK).body(resDto);
 	}
 
 	@Operation(summary = "Delete a contributor",

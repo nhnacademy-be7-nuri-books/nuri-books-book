@@ -1,4 +1,22 @@
-import static org.junit.jupiter.api.Assertions.*;
+package shop.nuribooks.books.service.contributor;
+
+import org.junit.jupiter.api.Test;
+
 class ContributorServiceImplTest {
-  
+
+	@Test
+	void registerContributor() {
+	}
+
+	@Test
+	void updateContributor() {
+	}
+
+	@Test
+	void getContributor() {
+	}
+
+	@Test
+	void deleteContributor() {
+	}
 }

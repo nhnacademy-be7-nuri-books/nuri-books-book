@@ -1,4 +1,4 @@
-package shop.nuribooks.books.controller.contributorrole;
+package shop.nuribooks.books.controller.contributor.role;
 
 import java.util.List;
 

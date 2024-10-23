@@ -1,4 +1,4 @@
-package shop.nuribooks.books.entity;
+package shop.nuribooks.books.entity.book;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "review_images")
-public class ReviewImages {
+public class ReviewImage {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

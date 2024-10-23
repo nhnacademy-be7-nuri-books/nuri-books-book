@@ -1,4 +1,4 @@
-package shop.nuribooks.books.entity;
+package shop.nuribooks.books.entity.book;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +22,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "reviews")
-public class Reviews {
+public class Review {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
