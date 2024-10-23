@@ -16,8 +16,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.contributor.ContributorReqDto;
-import shop.nuribooks.books.dto.contributor.ContributorResDto;
+import shop.nuribooks.books.dto.contributor.ContributorRequest;
+import shop.nuribooks.books.dto.contributor.ContributorResponse;
 import shop.nuribooks.books.service.contributor.ContributorService;
 
 @RestController
@@ -36,8 +36,8 @@ public class ContributorController {
 	})
 
 	@PostMapping
-	public ResponseEntity<ContributorResDto> registerContributor(@Valid @RequestBody ContributorReqDto request) {
-		ContributorResDto resDto = contributorService.registerContributor(request);
+	public ResponseEntity<ContributorResponse> registerContributor(@Valid @RequestBody ContributorRequest request) {
+		ContributorResponse resDto = contributorService.registerContributor(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
 	}
 
@@ -50,9 +50,9 @@ public class ContributorController {
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@PutMapping("/{contributorId}")
-	public ResponseEntity<ContributorResDto> updateContributor(@PathVariable Long contributorId,
-		@Valid @RequestBody ContributorReqDto request) {
-		ContributorResDto resDto = contributorService.updateContributor(contributorId, request);
+	public ResponseEntity<ContributorResponse> updateContributor(@PathVariable Long contributorId,
+		@Valid @RequestBody ContributorRequest request) {
+		ContributorResponse resDto = contributorService.updateContributor(contributorId, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
 	}
 
@@ -62,9 +62,9 @@ public class ContributorController {
 		@ApiResponse(responseCode = "200", description = "Contributor found successfully")
 	})
 	@GetMapping("/{contributorId}")
-	public ResponseEntity<ContributorResDto> getContributor(
+	public ResponseEntity<ContributorResponse> getContributor(
 		@PathVariable Long contributorId) {
-		ContributorResDto resDto = contributorService.getContributor(contributorId);
+		ContributorResponse resDto = contributorService.getContributor(contributorId);
 		return ResponseEntity.status(HttpStatus.OK).body(resDto);
 	}
 

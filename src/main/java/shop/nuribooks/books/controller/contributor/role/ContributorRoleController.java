@@ -20,8 +20,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.contributor.role.ContributorRoleReqDto;
-import shop.nuribooks.books.dto.contributor.role.ContributorRoleResDto;
+import shop.nuribooks.books.dto.contributor.role.ContributorRoleRequest;
+import shop.nuribooks.books.dto.contributor.role.ContributorRoleResponse;
 import shop.nuribooks.books.entity.book.ContributorRole;
 import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
 import shop.nuribooks.books.service.contributor.role.ContributorRoleService;
@@ -39,8 +39,8 @@ public class ContributorRoleController {
 		@ApiResponse(responseCode = "400", description = "Invalid request data")
 	})
 	@PostMapping
-	public ResponseEntity<ContributorRoleResDto> registerContributorRole(
-		@Valid @RequestBody ContributorRoleReqDto request, BindingResult bindingResult) {
+	public ResponseEntity<ContributorRoleResponse> registerContributorRole(
+		@Valid @RequestBody ContributorRoleRequest request, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
 			FieldError fieldError = bindingResult.getFieldError();
@@ -49,7 +49,7 @@ public class ContributorRoleController {
 		}
 
 		contributorRoleService.registerContributorRole(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(new ContributorRoleResDto(request.getName()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(new ContributorRoleResponse(request.getName()));
 	}
 
 	@Operation(summary = "Get all contributor roles", description = "Retrieve all available contributor roles.")
@@ -69,8 +69,8 @@ public class ContributorRoleController {
 		@ApiResponse(responseCode = "404", description = "Contributor role not found")
 	})
 	@PutMapping("/{roleName}")
-	public ResponseEntity<ContributorRoleResDto> updateContributorRole(@PathVariable String roleName,
-		@Valid @RequestBody ContributorRoleReqDto request, BindingResult bindingResult) {
+	public ResponseEntity<ContributorRoleResponse> updateContributorRole(@PathVariable String roleName,
+		@Valid @RequestBody ContributorRoleRequest request, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
 			FieldError fieldError = bindingResult.getFieldError();
@@ -79,7 +79,7 @@ public class ContributorRoleController {
 		}
 
 		contributorRoleService.updateContributorRole(roleName, request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(new ContributorRoleResDto(request.getName()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(new ContributorRoleResponse(request.getName()));
 	}
 
 	@Operation(summary = "Delete a contributor role", description = "Remove a specific contributor role.")

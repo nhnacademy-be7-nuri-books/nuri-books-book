@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ContributorResDto {
+public class ContributorResponse {
 	private Long id;
 	private String name;
 
-	public ContributorResDto(String name) {
+	public ContributorResponse(String name) {
 		this.name = name;
 	}
 

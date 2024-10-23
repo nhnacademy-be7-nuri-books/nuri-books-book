@@ -1,19 +1,13 @@
 package shop.nuribooks.books.dto.contributor.role;
 
-import org.hibernate.validator.constraints.Length;
-
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @AllArgsConstructor
+@Getter
 @NoArgsConstructor
-public class ContributorRoleReqDto {
-
-	@NotNull
-	@Length(min = 1, max = 50)
+public class ContributorRoleResponse {
 	private String name;
 }
 

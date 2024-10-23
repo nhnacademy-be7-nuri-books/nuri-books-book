@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.contributor.role.ContributorRoleReqDto;
+import shop.nuribooks.books.dto.contributor.role.ContributorRoleRequest;
 import shop.nuribooks.books.entity.book.ContributorRole;
 import shop.nuribooks.books.entity.book.ContributorRoleEnum;
 import shop.nuribooks.books.exception.contributor.ContributorRoleNotFoundException;
@@ -20,7 +20,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 	private final ContributorRoleRepository contributorRolesRepository;
 
 	@Override
-	public void registerContributorRole(ContributorRoleReqDto req) {
+	public void registerContributorRole(ContributorRoleRequest req) {
 		ContributorRoleEnum roleEnum;
 
 		try {
@@ -48,7 +48,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 	}
 
 	@Override
-	public void updateContributorRole(String roleName, ContributorRoleReqDto req) {
+	public void updateContributorRole(String roleName, ContributorRoleRequest req) {
 		String updatedRoleName = req.getName().toUpperCase();
 
 		ContributorRole existedRole = contributorRolesRepository.findByName(
