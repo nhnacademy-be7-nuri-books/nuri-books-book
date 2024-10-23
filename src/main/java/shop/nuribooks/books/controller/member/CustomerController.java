@@ -23,4 +23,6 @@ public class CustomerController {
 	// 	customerServiceImpl.createCustomer(request);
 	// }
 
+	// git 작동 확인 목적 수정
+
 }
