@@ -49,5 +49,4 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResDto> handleGlobalException(Exception ex, WebRequest request) {
 		return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request);
 	}
-
 }
