@@ -1,4 +1,4 @@
-package shop.nuribooks.books.repository;
+package shop.nuribooks.books.repository.category;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

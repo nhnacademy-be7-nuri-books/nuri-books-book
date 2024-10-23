@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,16 +30,18 @@ public class Category {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@NotNull
 	@Column(length = 30, nullable = false)
 	private String name;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "parent_categories_id")
+	@JoinColumn(name = "parent_category_id")
 	private Category parentCategory;
 
 	@OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
 	private List<Category> subCategory = new ArrayList<>();
 
+	@NotNull
 	private Integer level;
 
 	@Builder

@@ -1,8 +1,8 @@
 package shop.nuribooks.books.exception.contributor;
 
-import shop.nuribooks.books.exception.DuplicateException;
+import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 
-public class DuplicateEntityException extends DuplicateException {
+public class DuplicateEntityException extends ResourceAlreadyExistException {
 	public DuplicateEntityException(String message) {
 		super(message);
 	}

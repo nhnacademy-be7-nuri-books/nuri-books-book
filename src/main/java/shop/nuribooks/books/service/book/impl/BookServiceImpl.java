@@ -10,8 +10,8 @@ import shop.nuribooks.books.entity.book.BookState;
 import shop.nuribooks.books.entity.book.Publisher;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.book.BookStatesIdNotFoundException;
-import shop.nuribooks.books.exception.book.DuplicateIsbnException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
+import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.repository.book.BookRepository;
 import shop.nuribooks.books.repository.book.BookStateRepository;
 import shop.nuribooks.books.repository.book.PublisherRepository;
@@ -31,7 +31,7 @@ public class BookServiceImpl implements BookService {
 		}
 
 		if (booksRepository.existsByIsbn(reqDto.getIsbn())) {
-			throw new DuplicateIsbnException(reqDto.getIsbn());
+			throw new ResourceAlreadyExistIsbnException(reqDto.getIsbn());
 		}
 
 		BookState bookState = bookStatesRepository.findById(reqDto.getStateId())

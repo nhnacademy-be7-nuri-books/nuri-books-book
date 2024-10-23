@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,11 +17,10 @@ import shop.nuribooks.books.dto.book.BookRegisterReq;
 import shop.nuribooks.books.dto.book.BookRegisterRes;
 import shop.nuribooks.books.entity.book.Book;
 import shop.nuribooks.books.entity.book.BookState;
-import shop.nuribooks.books.entity.book.BookStateEnum;
 import shop.nuribooks.books.entity.book.Publisher;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
-import shop.nuribooks.books.exception.book.DuplicateIsbnException;
+import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.repository.book.BookRepository;
 import shop.nuribooks.books.repository.book.BookStateRepository;
 import shop.nuribooks.books.repository.book.PublisherRepository;
@@ -47,27 +45,26 @@ public class BooksServiceImplTest {
 
 	private BookState bookStates;
 
-	@BeforeEach
-	public void setUp() {
-
-		bookStates = new BookState(1L, BookStateEnum.INSTOCK);
-
-		reqDto = new BookRegisterReq(
-			1L,
-			1L,
-			"Book Title",
-			"thumbnail.jpg",
-			"detail.jpg",
-			LocalDate.now(),
-			BigDecimal.valueOf(20000),
-			10,
-			"Book Description",
-			"Book Contents",
-			"1234567890123",
-			true,
-			100
-		);
-	}
+	// @BeforeEach
+	// public void setUp() {
+	// 	bookStates = new BookState(1L, BookStateEnum.InStock);
+	//
+	// 	reqDto = new BookRegisterReq(
+	// 		1L,
+	// 		1L,
+	// 		"Book Title",
+	// 		"thumbnail.jpg",
+	// 		"detail.jpg",
+	// 		LocalDate.now(),
+	// 		BigDecimal.valueOf(20000),
+	// 		10,
+	// 		"Book Description",
+	// 		"Book Contents",
+	// 		"1234567890123",
+	// 		true,
+	// 		100
+	// 	);
+	// }
 
 	@Test
 	public void registerBook_ShouldReturnResponse_WhenValidRequest() {
@@ -117,7 +114,7 @@ public class BooksServiceImplTest {
 	public void registerBook_ShouldThrowDuplicateIsbnException_WhenIsbnAlreadyExists() {
 		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(true);
 
-		assertThrows(DuplicateIsbnException.class, () -> booksService.registerBook(reqDto));
+		assertThrows(ResourceAlreadyExistIsbnException.class, () -> booksService.registerBook(reqDto));
 
 		verify(booksRepository, times(1)).existsByIsbn(reqDto.getIsbn());
 	}

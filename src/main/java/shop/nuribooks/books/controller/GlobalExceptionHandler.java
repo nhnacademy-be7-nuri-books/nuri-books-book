@@ -7,15 +7,44 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import shop.nuribooks.books.dto.errordto.response.ErrorResDto;
+import shop.nuribooks.books.dto.error.ErrorResponse;
 import shop.nuribooks.books.exception.BadRequestException;
-import shop.nuribooks.books.exception.DuplicateException;
+import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-	private ResponseEntity<ErrorResDto> buildErrorResponse(HttpStatus status, String message, WebRequest request) {
-		ErrorResDto errorResponse = new ErrorResDto(
+
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex,
+		WebRequest request) {
+		return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+	}
+
+	@ExceptionHandler(BadRequestException.class)
+	public ResponseEntity<ErrorResponse> handleInvalidDataException(BadRequestException ex, WebRequest request) {
+		return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+	}
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex,
+		WebRequest request) {
+		return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+	}
+
+	@ExceptionHandler(ResourceAlreadyExistException.class)
+	public ResponseEntity<ErrorResponse> handleDuplicateException(ResourceAlreadyExistException ex,
+		WebRequest request) {
+		return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request) {
+		return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request);
+	}
+
+	private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, WebRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(
 			status.value(),
 			message,
 			request.getDescription(false)
@@ -23,30 +52,4 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errorResponse, status);
 	}
 
-	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<ErrorResDto> handleResourceNotFoundException(ResourceNotFoundException ex,
-		WebRequest request) {
-		return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
-	}
-
-	@ExceptionHandler(BadRequestException.class)
-	public ResponseEntity<ErrorResDto> handleInvalidDataException(BadRequestException ex, WebRequest request) {
-		return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
-	}
-
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ErrorResDto> handleValidationException(MethodArgumentNotValidException ex,
-		WebRequest request) {
-		return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
-	}
-
-	@ExceptionHandler(DuplicateException.class)
-	public ResponseEntity<ErrorResDto> handleDuplicateException(DuplicateException ex, WebRequest request) {
-		return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
-	}
-
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ErrorResDto> handleGlobalException(Exception ex, WebRequest request) {
-		return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request);
-	}
 }
