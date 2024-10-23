@@ -1,5 +1,7 @@
 package shop.nuribooks.books.repository.member;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,21 @@ class CustomerRepositoryTest {
 		boolean exists = customerRepository.existsByEmail(savedCustomer.getEmail());
 
 		//then
-		Assertions.assertThat(exists).isTrue();
+		assertThat(exists).isTrue();
+	}
+
+	@DisplayName("고객 아이디와 비밀번호로 존재 여부 확인")
+	@Test
+	public void existsByIdAndPassword() {
+	    //given
+		Customer customer = customer();
+		Customer savedCustomer = customerRepository.save(customer);
+
+	    //when
+		boolean exists = customerRepository.existsByIdAndPassword(savedCustomer.getId(), savedCustomer.getPassword());
+
+		//then
+		assertThat(exists).isTrue();
 	}
 
 	private Customer customer() {

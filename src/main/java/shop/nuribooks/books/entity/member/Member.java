@@ -103,11 +103,8 @@ public class Member {
 		this.totalPaymentAmount = totalPaymentAmount;
 	}
 
-	public void changeStatus(StatusEnum status) {
+	public void changeToWithdrawn(StatusEnum status, LocalDateTime withdrawnAt) {
 		this.status = status;
-	}
-
-	public void changeWithdrawnAt(LocalDateTime withdrawnAt) {
 		this.withdrawnAt = withdrawnAt;
 	}
 }

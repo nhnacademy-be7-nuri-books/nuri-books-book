@@ -106,8 +106,7 @@ public class MemberServiceImpl implements MemberService {
 			throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
 		}
 
-		findMember.changeStatus(INACTIVE);
-		findMember.changeWithdrawnAt(LocalDateTime.now());
+		findMember.changeToWithdrawn(INACTIVE, LocalDateTime.now());
 	}
 
 	/**
