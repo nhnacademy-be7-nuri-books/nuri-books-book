@@ -19,6 +19,7 @@ import shop.nuribooks.books.dto.member.response.MemberRegisterResponse;
 import shop.nuribooks.books.dto.member.response.MemberUpdateResponse;
 import shop.nuribooks.books.entity.member.Customer;
 import shop.nuribooks.books.entity.member.Member;
+import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.InvalidPasswordException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
@@ -98,7 +99,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 
 		Member findMember = memberRepository.findByUserId(request.getUserId())
-			.orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다."));
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
 		if (!customerRepository.existsByIdAndPassword(
 			findMember.getId(), request.getPassword())) {
@@ -123,10 +124,10 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	public MemberUpdateResponse updateMember(String userId, MemberUpdateRequest request) {
 		Member findMember = memberRepository.findByUserId(userId)
-			.orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다."));
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
 		Customer findCustomer = customerRepository.findById(findMember.getId())
-			.orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다."));
+			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
 
 		findCustomer.changeCustomerInformation(
 			request.getName(), request.getPassword(), request.getPhoneNumber());
