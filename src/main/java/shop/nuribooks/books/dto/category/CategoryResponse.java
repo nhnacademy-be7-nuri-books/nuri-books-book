@@ -1,4 +1,4 @@
-package shop.nuribooks.books.dto.category.response;
+package shop.nuribooks.books.dto.category;
 
 import java.util.Map;
 import java.util.stream.Collectors;

@@ -17,8 +17,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.controller.GlobalExceptionHandler;
-import shop.nuribooks.books.dto.category.request.CategoryRequest;
-import shop.nuribooks.books.dto.category.response.CategoryResponse;
+import shop.nuribooks.books.dto.category.CategoryRequest;
+import shop.nuribooks.books.dto.category.CategoryResponse;
 import shop.nuribooks.books.entity.book.category.Category;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;

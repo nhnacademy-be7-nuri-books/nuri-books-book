@@ -3,7 +3,7 @@ package shop.nuribooks.books.service.category.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import shop.nuribooks.books.dto.category.request.CategoryRequest;
+import shop.nuribooks.books.dto.category.CategoryRequest;
 import shop.nuribooks.books.entity.book.category.Category;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;

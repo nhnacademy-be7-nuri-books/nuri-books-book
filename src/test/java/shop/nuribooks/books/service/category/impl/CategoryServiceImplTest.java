@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import shop.nuribooks.books.dto.category.request.CategoryRequest;
+import shop.nuribooks.books.dto.category.CategoryRequest;
 import shop.nuribooks.books.entity.book.category.Category;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;

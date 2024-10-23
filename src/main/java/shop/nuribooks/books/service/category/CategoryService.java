@@ -1,6 +1,6 @@
 package shop.nuribooks.books.service.category;
 
-import shop.nuribooks.books.dto.category.request.CategoryRequest;
+import shop.nuribooks.books.dto.category.CategoryRequest;
 import shop.nuribooks.books.entity.book.category.Category;
 
 /**
