@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import shop.nuribooks.books.dto.category.CategoriesDto;
-import shop.nuribooks.books.entity.Category;
+import shop.nuribooks.books.entity.book.Category;
 
 public record CategoryRegisterResDto(Long id,
 									 String name,

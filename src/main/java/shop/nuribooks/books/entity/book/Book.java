@@ -1,4 +1,4 @@
-package shop.nuribooks.books.entity;
+package shop.nuribooks.books.entity.book;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,7 +29,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @Table(name = "books")
-public class Books {
+public class Book {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,11 +37,11 @@ public class Books {
 
 	@ManyToOne
 	@JoinColumn(name = "book_state_id", nullable = false)
-	private BookStates stateId;
+	private BookState stateId;
 
 	@ManyToOne
 	@JoinColumn(name = "publisher_id", nullable = false)
-	private Publishers publisherId;
+	private Publisher publisherId;
 
 	@Column(nullable = false, length = 50)
 	private String title;

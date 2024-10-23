@@ -1,12 +1,11 @@
-package shop.nuribooks.books.entity;
+package shop.nuribooks.books.entity.book;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,22 +16,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "book_contributors")
-public class BookContributors {
-
+@Table(name = "review_images")
+public class ReviewImage {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "book_id")
-	private Books books;
-
-	@ManyToOne
-	@JoinColumn(name = "contributor_id")
-	private Contributors contributors;
-
-	@ManyToOne
-	@JoinColumn(name = "contributor_role_id")
-	private ContributorRoles contributorRoles;
+	@NotNull
+	private String imageUrl;
 }

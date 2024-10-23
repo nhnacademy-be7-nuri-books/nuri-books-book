@@ -5,8 +5,13 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ContributorRes {
+public class ContributorResponse {
+	private Long id;
 	private String name;
+
+	public ContributorResponse(String name) {
+		this.name = name;
+	}
 
 }
 
