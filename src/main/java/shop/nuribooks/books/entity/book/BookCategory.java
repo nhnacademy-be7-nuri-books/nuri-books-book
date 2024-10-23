@@ -1,4 +1,4 @@
-package shop.nuribooks.books.entity.book.category;
+package shop.nuribooks.books.entity.book;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

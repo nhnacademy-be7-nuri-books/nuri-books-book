@@ -1,7 +1,7 @@
 package shop.nuribooks.books.service.category;
 
 import shop.nuribooks.books.dto.category.CategoryRequest;
-import shop.nuribooks.books.entity.book.category.Category;
+import shop.nuribooks.books.entity.book.Category;
 
 /**
  * 카테고리 관련 서비스 인터페이스.

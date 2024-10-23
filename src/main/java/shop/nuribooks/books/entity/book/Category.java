@@ -1,4 +1,4 @@
-package shop.nuribooks.books.entity.book.category;
+package shop.nuribooks.books.entity.book;
 
 import java.util.ArrayList;
 import java.util.List;
