@@ -11,7 +11,6 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shop.nuribooks.books.entity.Books;
 
 @Entity
 @AllArgsConstructor
