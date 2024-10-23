@@ -38,8 +38,8 @@ public class ContributorRoleController {
 	@PostMapping
 	public ResponseEntity<ContributorRoleResponse> registerContributorRole(
 		@Valid @RequestBody ContributorRoleRequest request) {
-		contributorRoleService.registerContributorRole(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(new ContributorRoleResponse(request.getName()));
+		ContributorRoleResponse response = contributorRoleService.registerContributorRole(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@Operation(summary = "Get all contributor roles", description = "Retrieve all available contributor roles.")
@@ -61,9 +61,8 @@ public class ContributorRoleController {
 	@PutMapping("/{roleName}")
 	public ResponseEntity<ContributorRoleResponse> updateContributorRole(@PathVariable String roleName,
 		@Valid @RequestBody ContributorRoleRequest request) {
-
-		contributorRoleService.updateContributorRole(roleName, request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(new ContributorRoleResponse(request.getName()));
+		ContributorRoleResponse response = contributorRoleService.updateContributorRole(roleName, request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@Operation(summary = "Delete a contributor role", description = "Remove a specific contributor role.")

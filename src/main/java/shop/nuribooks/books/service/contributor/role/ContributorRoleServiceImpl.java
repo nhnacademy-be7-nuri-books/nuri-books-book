@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.contributor.role.ContributorRoleRequest;
+import shop.nuribooks.books.dto.contributor.role.ContributorRoleResponse;
 import shop.nuribooks.books.entity.book.ContributorRole;
 import shop.nuribooks.books.entity.book.ContributorRoleEnum;
 import shop.nuribooks.books.exception.contributor.ContributorRoleNotFoundException;
@@ -20,7 +21,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 	private final ContributorRoleRepository contributorRolesRepository;
 
 	@Override
-	public void registerContributorRole(ContributorRoleRequest req) {
+	public ContributorRoleResponse registerContributorRole(ContributorRoleRequest req) {
 		ContributorRoleEnum roleEnum;
 
 		try {
@@ -39,6 +40,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 		ContributorRole savedRole = new ContributorRole();
 		savedRole.setName(roleEnum);
 		contributorRolesRepository.save(savedRole);
+		return new ContributorRoleResponse(savedRole.getName().name());
 
 	}
 
@@ -48,7 +50,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 	}
 
 	@Override
-	public void updateContributorRole(String roleName, ContributorRoleRequest req) {
+	public ContributorRoleResponse updateContributorRole(String roleName, ContributorRoleRequest req) {
 		String updatedRoleName = req.getName().toUpperCase();
 
 		ContributorRole existedRole = contributorRolesRepository.findByName(
@@ -70,6 +72,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 
 		existedRole.setName(newRoleEnum);
 		contributorRolesRepository.save(existedRole);
+		return new ContributorRoleResponse(existedRole.getName().name());
 
 	}
 
