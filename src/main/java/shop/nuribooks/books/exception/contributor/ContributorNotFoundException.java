@@ -1,12 +1,10 @@
 package shop.nuribooks.books.exception.contributor;
 
-public class ContributorNotFoundException extends RuntimeException{
+import shop.nuribooks.books.exception.ResourceNotFoundException;
+
+public class ContributorNotFoundException extends ResourceNotFoundException {
 	public ContributorNotFoundException(String message) {
 		super(message);
-	}
-
-	public ContributorNotFoundException(String message, Throwable cause) {
-		super(message, cause);
 	}
 
 }

@@ -1,13 +1,10 @@
 package shop.nuribooks.books.exception.contributor;
 
-public class DuplicateEntityException extends RuntimeException{
+import shop.nuribooks.books.exception.DuplicateException;
+
+public class DuplicateEntityException extends DuplicateException {
 	public DuplicateEntityException(String message) {
 		super(message);
 	}
-
-	public DuplicateEntityException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
 
 }

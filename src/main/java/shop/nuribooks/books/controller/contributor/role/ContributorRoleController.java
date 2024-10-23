@@ -20,11 +20,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.contributorrole.ContributorRoleReq;
-import shop.nuribooks.books.dto.contributorrole.ContributorRoleRes;
+import shop.nuribooks.books.dto.contributor.role.ContributorRoleReqDto;
+import shop.nuribooks.books.dto.contributor.role.ContributorRoleResDto;
 import shop.nuribooks.books.entity.book.ContributorRole;
 import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
-import shop.nuribooks.books.service.contributorrole.ContributorRoleService;
+import shop.nuribooks.books.service.contributor.role.ContributorRoleService;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,17 +39,17 @@ public class ContributorRoleController {
 		@ApiResponse(responseCode = "400", description = "Invalid request data")
 	})
 	@PostMapping
-	public ResponseEntity<ContributorRoleRes> registerContributorRole(
-		@Valid @RequestBody ContributorRoleReq request, BindingResult bindingResult) {
+	public ResponseEntity<ContributorRoleResDto> registerContributorRole(
+		@Valid @RequestBody ContributorRoleReqDto request, BindingResult bindingResult) {
 
-		if(bindingResult.hasErrors()) {
+		if (bindingResult.hasErrors()) {
 			FieldError fieldError = bindingResult.getFieldError();
 			String message = (fieldError != null) ? fieldError.getDefaultMessage() : "Invalid contributor role data";
 			throw new InvalidContributorRoleException(message);
 		}
 
 		contributorRoleService.registerContributorRole(request);
-		return ResponseEntity.status(HttpStatus.OK).body(new ContributorRoleRes(request.getName()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(new ContributorRoleResDto(request.getName()));
 	}
 
 	@Operation(summary = "Get all contributor roles", description = "Retrieve all available contributor roles.")
@@ -69,17 +69,17 @@ public class ContributorRoleController {
 		@ApiResponse(responseCode = "404", description = "Contributor role not found")
 	})
 	@PutMapping("/{roleName}")
-	public ResponseEntity<ContributorRoleRes> updateContributorRole(@PathVariable String roleName,
-		@Valid @RequestBody ContributorRoleReq request, BindingResult bindingResult) {
+	public ResponseEntity<ContributorRoleResDto> updateContributorRole(@PathVariable String roleName,
+		@Valid @RequestBody ContributorRoleReqDto request, BindingResult bindingResult) {
 
-		if(bindingResult.hasErrors()) {
+		if (bindingResult.hasErrors()) {
 			FieldError fieldError = bindingResult.getFieldError();
 			String message = (fieldError != null) ? fieldError.getDefaultMessage() : "Invalid contributor role data";
 			throw new InvalidContributorRoleException(message);
 		}
 
 		contributorRoleService.updateContributorRole(roleName, request);
-		return ResponseEntity.status(HttpStatus.OK).body(new ContributorRoleRes(request.getName()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(new ContributorRoleResDto(request.getName()));
 	}
 
 	@Operation(summary = "Delete a contributor role", description = "Remove a specific contributor role.")
