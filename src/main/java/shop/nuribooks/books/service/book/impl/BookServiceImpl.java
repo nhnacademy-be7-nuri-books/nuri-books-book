@@ -41,6 +41,7 @@ public class BookServiceImpl implements BookService {
 			.orElseThrow(() -> new PublisherIdNotFoundException(reqDto.getPublisherId()));
 
 		Book books = Book.builder()
+			.id(0L)
 			.stateId(bookState)
 			.publisherId(publisher)
 			.title(reqDto.getTitle())

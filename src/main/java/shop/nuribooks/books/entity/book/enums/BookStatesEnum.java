@@ -15,6 +15,6 @@ public enum BookStatesEnum {
 
 	@Override
 	public String toString(){
-		return koreanName + "(" + this.name() + ")";
+		return koreanName;
 	}
 }

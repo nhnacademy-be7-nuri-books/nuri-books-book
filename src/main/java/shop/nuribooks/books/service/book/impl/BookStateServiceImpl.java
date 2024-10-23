@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.book.request.BookStateReq;
 import shop.nuribooks.books.dto.common.ResponseMessage;
 import shop.nuribooks.books.entity.book.BookStates;
-import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.book.IsAlreadyExistsBookStateException;
 import shop.nuribooks.books.repository.book.BookStateRepository;
 import shop.nuribooks.books.service.book.BookStateService;
@@ -19,10 +18,6 @@ public class BookStateServiceImpl implements BookStateService {
 
 	@Override
 	public ResponseMessage registerState(BookStateReq bookStateReq) {
-		if(bookStateReq == null){
-			throw new BadRequestException("요청 본문이 비어있습니다.");
-		}
-
 		if(bookStateRepository.existsBookStatesByDetail(bookStateReq.getDetail())){
 			throw new IsAlreadyExistsBookStateException(bookStateReq.getDetail());
 		}

@@ -27,7 +27,6 @@ import shop.nuribooks.books.entity.Publishers;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 @Builder
 @Table(name = "books")
 public class Book {
