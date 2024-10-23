@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.member.ResponseMessage;
-import shop.nuribooks.books.dto.member.request.MemberCreateRequest;
+import shop.nuribooks.books.dto.member.request.MemberRegisterRequest;
 import shop.nuribooks.books.dto.member.request.MemberUpdateRequest;
 import shop.nuribooks.books.dto.member.request.MemberWithdrawRequest;
 import shop.nuribooks.books.service.member.MemberServiceImpl;
@@ -30,10 +30,10 @@ public class MemberController {
 	 * name, userId, password, phoneNumber, email, birthday에 대해서 검증 후 회원가입 진행
 	 */
 	@PostMapping("/api/member")
-	public ResponseEntity<ResponseMessage> memberCreate(
-		@RequestBody @Valid MemberCreateRequest request) {
+	public ResponseEntity<ResponseMessage> memberRegister(
+		@RequestBody @Valid MemberRegisterRequest request) {
 
-		memberServiceImpl.createMember(request);
+		memberServiceImpl.registerMember(request);
 
 		return ResponseEntity.status(CREATED)
 			.body(new ResponseMessage(CREATED.value(), "회원가입이 성공적으로 완료되었습니다!"));

@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class MemberCreateRequest {
+public class MemberRegisterRequest {
 
 	@NotBlank(message = "이름은 반드시 입력해야 합니다.")
 	private String name;

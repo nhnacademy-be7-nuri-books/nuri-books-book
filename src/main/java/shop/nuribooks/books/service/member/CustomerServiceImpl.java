@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.member.request.CustomerCreateRequest;
-import shop.nuribooks.books.dto.member.response.CustomerCreateResponse;
+import shop.nuribooks.books.dto.member.request.CustomerRegisterRequest;
+import shop.nuribooks.books.dto.member.response.CustomerRegisterResponse;
 import shop.nuribooks.books.entity.member.Customer;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.repository.member.CustomerRepository;
@@ -25,7 +25,7 @@ public class CustomerServiceImpl implements CustomerService {
 	 * CustomerCreateRequest로 이름, 비밀번호, 전화번호, 이메일을 받는다.
 	 * @return customer 등록 후 입력한 이름, 전화번호, 이메일을 그대로 CustomerCreateResponse에 담아서 반환
 	 */
-	public CustomerCreateResponse createCustomer(CustomerCreateRequest request) {
+	public CustomerRegisterResponse createCustomer(CustomerRegisterRequest request) {
 		if (customerRepository.existsByEmail(request.getEmail())) {
 			throw new EmailAlreadyExistsException("이미 존재하는 이메일입니다.");
 		}
@@ -39,7 +39,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 		Customer savedCustomer = customerRepository.save(customer);
 
-		return new CustomerCreateResponse(
+		return new CustomerRegisterResponse(
 			savedCustomer.getName(), savedCustomer.getPhoneNumber(), savedCustomer.getEmail());
 	}
 }

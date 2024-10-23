@@ -3,7 +3,7 @@ package shop.nuribooks.books.dto.member.response;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class CustomerCreateResponse {
+public class CustomerRegisterResponse {
 
 	private String name;
 	private String phoneNumber;

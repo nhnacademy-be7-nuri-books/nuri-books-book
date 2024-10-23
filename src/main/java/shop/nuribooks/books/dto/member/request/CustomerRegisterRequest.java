@@ -1,13 +1,11 @@
 package shop.nuribooks.books.dto.member.request;
 
-import java.time.LocalDate;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class CustomerCreateRequest {
+public class CustomerRegisterRequest {
 
 	@NotBlank(message = "이름은 반드시 입력해야 합니다.")
 	private String name;

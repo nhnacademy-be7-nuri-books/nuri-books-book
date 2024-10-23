@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.member.request.MemberCreateRequest;
+import shop.nuribooks.books.dto.member.request.MemberRegisterRequest;
 import shop.nuribooks.books.dto.member.request.MemberUpdateRequest;
 import shop.nuribooks.books.dto.member.request.MemberWithdrawRequest;
 import shop.nuribooks.books.entity.member.Customer;
@@ -44,7 +44,7 @@ public class MemberServiceImpl implements MemberService {
 	 * password는 BCryptPasswordEncoder로 해싱
 	 */
 	@Transactional
-	public void createMember(MemberCreateRequest request) {
+	public void registerMember(MemberRegisterRequest request) {
 		if (customerRepository.existsByEmail(request.getEmail())) {
 			throw new EmailAlreadyExistsException("이미 존재하는 이메일입니다.");
 		}

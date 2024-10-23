@@ -1,12 +1,12 @@
 package shop.nuribooks.books.service.member;
 
-import shop.nuribooks.books.dto.member.request.CustomerCreateRequest;
-import shop.nuribooks.books.dto.member.response.CustomerCreateResponse;
+import shop.nuribooks.books.dto.member.request.CustomerRegisterRequest;
+import shop.nuribooks.books.dto.member.response.CustomerRegisterResponse;
 
 public interface CustomerService {
 
 	/**
 	 * 비회원 저장
 	 */
-	CustomerCreateResponse createCustomer(CustomerCreateRequest request);
+	CustomerRegisterResponse createCustomer(CustomerRegisterRequest request);
 }

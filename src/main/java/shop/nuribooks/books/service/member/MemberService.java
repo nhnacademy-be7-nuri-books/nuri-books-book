@@ -1,6 +1,6 @@
 package shop.nuribooks.books.service.member;
 
-import shop.nuribooks.books.dto.member.request.MemberCreateRequest;
+import shop.nuribooks.books.dto.member.request.MemberRegisterRequest;
 import shop.nuribooks.books.dto.member.request.MemberUpdateRequest;
 import shop.nuribooks.books.dto.member.request.MemberWithdrawRequest;
 
@@ -9,7 +9,7 @@ public interface MemberService {
 	/**
 	 * 회원등록
 	 */
-	void createMember(MemberCreateRequest request);
+	void registerMember(MemberRegisterRequest request);
 
 	/**
 	 * 회원탈퇴
