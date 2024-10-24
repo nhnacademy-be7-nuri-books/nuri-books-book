@@ -139,7 +139,7 @@ public class CategoryController {
 		@Parameter(description = "업데이트할 카테고리의 ID", required = true)
 		@PathVariable Long categoryId) {
 
-		return ResponseEntity.ok(categoryService.updateCategory(dto, categoryId));
+		return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.updateCategory(dto, categoryId));
 	}
 
 }
