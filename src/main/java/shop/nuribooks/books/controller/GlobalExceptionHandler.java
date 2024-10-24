@@ -2,6 +2,7 @@ package shop.nuribooks.books.controller;
 
 import java.util.stream.Collectors;
 
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -32,7 +33,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex,
 		WebRequest request) {
 		String errorMessage = ex.getBindingResult().getFieldErrors().stream()
-			.map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+			.map(DefaultMessageSourceResolvable::getDefaultMessage)
 			.collect(Collectors.joining(", "));
 		return buildErrorResponse(HttpStatus.BAD_REQUEST, errorMessage, request);
 	}
