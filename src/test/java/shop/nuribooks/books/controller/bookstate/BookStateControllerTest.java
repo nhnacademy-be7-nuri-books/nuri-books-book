@@ -35,13 +35,13 @@ public class BookStateControllerTest {
 
 	@Test
 	public void registerBookState_ShouldReturnCreated_WhenRequestIsValid() throws Exception {
-		String adminId = "admin123"; // 예시 adminId
+		String adminId = "admin123";
 		BookStateRequest bookStateReq = new BookStateRequest("재고있음");
 
 		doNothing().when(bookStateService).registerState(eq(adminId), any(BookStateRequest.class));
 
 		mockMvc.perform(post("/api/book-state")
-				.header("X-USER-ID", adminId) // adminId를 헤더에 추가
+				.header("X-USER-ID", adminId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(bookStateReq)))
 			.andExpect(status().isCreated())
@@ -51,11 +51,11 @@ public class BookStateControllerTest {
 
 	@Test
 	public void registerBookState_ShouldReturnBadRequest_WhenRequestIsInvalid() throws Exception {
-		String adminId = "admin123"; // 예시 adminId
+		String adminId = "admin123";
 		BookStateRequest bookStateReq = new BookStateRequest(null);
 
 		mockMvc.perform(post("/api/book-state")
-				.header("X-USER-ID", adminId) // adminId를 헤더에 추가
+				.header("X-USER-ID", adminId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(bookStateReq)))
 			.andExpect(status().isBadRequest())
@@ -89,7 +89,6 @@ public class BookStateControllerTest {
 			new BookStateResponse(3, "매진")
 		);
 
-		// Mocking 서비스의 getAllBooks() 메서드
 		when(bookStateService.getAllBooks()).thenReturn(bookStates);
 
 		mockMvc.perform(get("/api/book-state"))
@@ -101,7 +100,6 @@ public class BookStateControllerTest {
 
 	@Test
 	public void getBookState_ShouldReturnEmptyList_WhenNoStatesExist() throws Exception {
-		// Mocking 서비스의 getAllBooks() 메서드
 		when(bookStateService.getAllBooks()).thenReturn(List.of());
 
 		mockMvc.perform(get("/api/book-state"))

@@ -12,7 +12,6 @@ import shop.nuribooks.books.dto.bookstate.BookStateResponse;
 import shop.nuribooks.books.entity.book.Book;
 import shop.nuribooks.books.entity.book.BookEditor;
 import shop.nuribooks.books.entity.book.BookState;
-import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 import shop.nuribooks.books.exception.bookstate.BookStateDetailAlreadyExistException;
 import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
 import shop.nuribooks.books.repository.book.BookRepository;
