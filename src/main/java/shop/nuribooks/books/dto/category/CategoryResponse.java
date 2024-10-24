@@ -8,7 +8,7 @@ import shop.nuribooks.books.entity.book.Category;
 /**
  * 카테고리 등록 응답을 나타내는 DTO 클래스.
  */
-public record CategoryResponse(Long id, String name, String parentCategoryName, Integer level,
+public record CategoryResponse(Long id, String name, String parentCategoryName,
                                List<CategoryResponse> children) {
 
 	/**
@@ -20,7 +20,6 @@ public record CategoryResponse(Long id, String name, String parentCategoryName, 
 		this(entity.getId(),
 			entity.getName(),
 			(entity.getParentCategory() == null) ? "대분류" : entity.getParentCategory().getName(),
-			entity.getLevel(),
 			(entity.getSubCategory() == null) ? null :
 				entity.getSubCategory().stream()
 					.map(CategoryResponse::new)

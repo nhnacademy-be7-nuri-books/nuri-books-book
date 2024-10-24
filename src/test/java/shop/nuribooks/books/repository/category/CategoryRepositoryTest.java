@@ -34,7 +34,6 @@ class CategoryRepositoryTest {
 		// given
 		Category category = Category.builder()
 			.name("여행")
-			.level(0)
 			.build();
 
 		// when
@@ -45,7 +44,6 @@ class CategoryRepositoryTest {
 		assertThat(savedCategory.getId()).isEqualTo(1L);
 		assertThat(savedCategory.getId()).isNotNull(); // 저장 후 ID가 생성되었는지 확인
 		assertThat(savedCategory.getName()).isEqualTo("여행");
-		assertThat(savedCategory.getLevel()).isEqualTo(0);
 	}
 
 	@Test
@@ -56,7 +54,6 @@ class CategoryRepositoryTest {
 
 		Category subCategory = Category.builder()
 			.name("국내 여행")
-			.level(1)
 			.parentCategory(parentCategory)
 			.build();
 
@@ -67,7 +64,6 @@ class CategoryRepositoryTest {
 		assertThat(savedSubCategory).isNotNull();
 		assertThat(savedSubCategory.getId()).isNotNull(); // 저장 후 ID가 생성되었는지 확인
 		assertThat(savedSubCategory.getName()).isEqualTo("국내 여행");
-		assertThat(savedSubCategory.getLevel()).isEqualTo(1);
 		assertThat(savedSubCategory.getParentCategory()).isEqualTo(parentCategory);
 	}
 

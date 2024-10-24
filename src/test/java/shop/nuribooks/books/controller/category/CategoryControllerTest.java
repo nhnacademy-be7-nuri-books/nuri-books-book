@@ -56,7 +56,7 @@ class CategoryControllerTest {
 	void registerMainCategory_whenValidRequest_thenReturnsCreated() throws Exception {
 		// given
 		CategoryRequest dto = new CategoryRequest("여행");
-		Category category = Category.builder().name("여행").level(0).build();
+		Category category = Category.builder().name("여행").build();
 		CategoryResponse response = new CategoryResponse(category);
 		when(categoryService.registerMainCategory(any(CategoryRequest.class))).thenReturn(category);
 
@@ -76,8 +76,8 @@ class CategoryControllerTest {
 		// given
 		Long parentCategoryId = 1L;
 		CategoryRequest dto = new CategoryRequest("국내 여행");
-		Category parentCategory = Category.builder().name("여행").level(0).build();
-		Category subCategory = Category.builder().name("국내 여행").level(1).parentCategory(parentCategory).build();
+		Category parentCategory = Category.builder().name("여행").build();
+		Category subCategory = Category.builder().name("국내 여행").parentCategory(parentCategory).build();
 		CategoryResponse response = new CategoryResponse(subCategory);
 		when(categoryService.registerSubCategory(any(CategoryRequest.class), eq(parentCategoryId))).thenReturn(
 			subCategory);
@@ -155,8 +155,8 @@ class CategoryControllerTest {
 	void getAllCategories_whenCalled_thenReturnsOk() throws Exception {
 		// given
 		List<CategoryResponse> categories = List.of(
-			new CategoryResponse(Category.builder().name("여행").level(0).build()),
-			new CategoryResponse(Category.builder().name("국내 여행").level(1).build())
+			new CategoryResponse(Category.builder().name("여행").build()),
+			new CategoryResponse(Category.builder().name("국내 여행").build())
 		);
 		when(categoryService.getAllCategory()).thenReturn(categories);
 
@@ -176,7 +176,7 @@ class CategoryControllerTest {
 	void getCategoryById_whenValidId_thenReturnsOk() throws Exception {
 		// given
 		Long categoryId = 1L;
-		Category category = Category.builder().name("여행").level(0).build();
+		Category category = Category.builder().name("여행").build();
 		CategoryResponse response = new CategoryResponse(category);
 		when(categoryService.getCategoryById(categoryId)).thenReturn(response);
 

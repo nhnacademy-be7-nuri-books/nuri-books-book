@@ -47,7 +47,6 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 		Category category = Category.builder()
 			.name(dto.name())
-			.level(0)
 			.build();
 		return categoryRepository.save(category);
 	}
@@ -76,7 +75,6 @@ public class CategoryServiceImpl implements CategoryService {
 
 		Category category = Category.builder()
 			.name(dto.name())
-			.level(parentCategory.getLevel() + 1)
 			.parentCategory(parentCategory)
 			.build();
 		return categoryRepository.save(category);

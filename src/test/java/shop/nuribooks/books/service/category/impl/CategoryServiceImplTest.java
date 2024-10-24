@@ -1,6 +1,7 @@
 package shop.nuribooks.books.service.category.impl;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
@@ -51,7 +52,6 @@ class CategoryServiceImplTest {
 		// then
 		assertThat(category).isNotNull();
 		assertThat(category.getName()).isEqualTo("여행");
-		assertThat(category.getLevel()).isEqualTo(0);
 		verify(categoryRepository, times(1)).save(any(Category.class));
 	}
 
@@ -77,7 +77,7 @@ class CategoryServiceImplTest {
 	void registerSubCategory_whenParentCategoryExists_thenSubCategoryIsSaved() {
 		// given
 		Long parentCategoryId = 1L;
-		Category parentCategory = Category.builder().name("여행").level(0).build();
+		Category parentCategory = Category.builder().name("여행").build();
 		CategoryRequest dto = new CategoryRequest("국내 여행");
 		when(categoryRepository.findById(parentCategoryId)).thenReturn(Optional.of(parentCategory));
 		when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -88,7 +88,6 @@ class CategoryServiceImplTest {
 		// then
 		assertThat(subCategory).isNotNull();
 		assertThat(subCategory.getName()).isEqualTo("국내 여행");
-		assertThat(subCategory.getLevel()).isEqualTo(1);
 		assertThat(subCategory.getParentCategory()).isEqualTo(parentCategory);
 		verify(categoryRepository, times(1)).save(any(Category.class));
 	}
@@ -116,8 +115,8 @@ class CategoryServiceImplTest {
 	void registerSubCategory_whenSubCategoryExists_thenThrowsException() {
 		// given
 		Long parentCategoryId = 1L;
-		Category parentCategory = Category.builder().name("여행").level(0).build();
-		Category subCategory = Category.builder().name("국내 여행").level(1).parentCategory(parentCategory).build();
+		Category parentCategory = Category.builder().name("여행").build();
+		Category subCategory = Category.builder().name("국내 여행").parentCategory(parentCategory).build();
 		parentCategory.getSubCategory().add(subCategory);
 		CategoryRequest dto = new CategoryRequest("국내 여행");
 		when(categoryRepository.findById(parentCategoryId)).thenReturn(Optional.of(parentCategory));
@@ -134,8 +133,8 @@ class CategoryServiceImplTest {
 	@Test
 	void getAllCategory_whenCategoriesExist_thenReturnsCategoryList() {
 		// given
-		Category category1 = Category.builder().name("여행").level(0).build();
-		Category category2 = Category.builder().name("문화").level(0).build();
+		Category category1 = Category.builder().name("여행").build();
+		Category category2 = Category.builder().name("문화").build();
 		List<Category> categories = List.of(category1, category2);
 		when(categoryRepository.findAllByParentCategoryIsNull()).thenReturn(categories);
 
@@ -156,7 +155,7 @@ class CategoryServiceImplTest {
 	void getCategoryById_whenCategoryExists_thenReturnsCategory() {
 		// given
 		Long categoryId = 1L;
-		Category category = Category.builder().name("여행").level(0).build();
+		Category category = Category.builder().name("여행").build();
 		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
 		// when
@@ -182,6 +181,27 @@ class CategoryServiceImplTest {
 			.isInstanceOf(CategoryNotFoundException.class)
 			.hasMessageContaining("입력한 카테고리ID는 999 존재하지 않습니다.");
 		verify(categoryRepository, times(1)).findById(categoryId);
+	}
+
+	@Test
+	void updateCategory_ShouldUpdateCategorySuccessfully() {
+		// Given
+		Long categoryId = 1L;
+		CategoryRequest dto = new CategoryRequest("Updated Category Name");
+		Category existingCategory = new Category("Old Category Name", null);
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
+		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(false);
+		when(categoryRepository.save(any(Category.class))).thenReturn(existingCategory);
+
+		// When
+		CategoryResponse result = categoryService.updateCategory(dto, categoryId);
+
+		// Then
+		assertNotNull(result);
+		assertEquals("Updated Category Name", result.name());
+		verify(categoryRepository).findById(categoryId);
+		verify(categoryRepository).save(existingCategory);
 	}
 
 }
