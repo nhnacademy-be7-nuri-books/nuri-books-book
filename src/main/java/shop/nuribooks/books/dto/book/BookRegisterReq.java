@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class BookRegisterReq {
 	@NotNull
-	private Long stateId;
+	private Integer stateId;
 
 	@NotNull
 	private Long publisherId;
