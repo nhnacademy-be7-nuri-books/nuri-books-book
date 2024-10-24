@@ -1,4 +1,4 @@
-package shop.nuribooks.books.service;
+package shop.nuribooks.books.service.book;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

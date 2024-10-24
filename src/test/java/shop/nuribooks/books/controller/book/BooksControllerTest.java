@@ -1,4 +1,4 @@
-package shop.nuribooks.books.controller;
+package shop.nuribooks.books.controller.book;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.controller.book.BookController;
 import shop.nuribooks.books.dto.book.BookRegisterRequest;
 import shop.nuribooks.books.dto.book.BookRegisterResponse;
 import shop.nuribooks.books.exception.BadRequestException;
