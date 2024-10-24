@@ -23,7 +23,7 @@ public class BookStateController {
 	@PostMapping
 	public ResponseEntity<ResponseMessage> registerBookState(@Valid @RequestBody BookStateRequest bookStateReq) {
 		bookStateService.registerState(bookStateReq);
-		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서상태가 등록되었습니다.");
+		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서상태 등록 성공");
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
 	}
 }
