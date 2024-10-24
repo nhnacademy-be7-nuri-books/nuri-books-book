@@ -1,7 +1,10 @@
 package shop.nuribooks.books.controller.category;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -76,4 +79,30 @@ public class CategoryController {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(categoryResponse);
 	}
+
+	/**
+	 * 모든 카테고리를 조회합니다.
+	 *
+	 * @author janghyun
+	 * @return 모든 카테고리의 응답 리스트
+	 */
+	@GetMapping
+	public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+		List<CategoryResponse> categoryResponseList = categoryService.getAllCategory();
+		return ResponseEntity.ok(categoryResponseList);
+	}
+
+	/**
+	 * 주어진 ID에 해당하는 카테고리를 조회합니다.
+	 *
+	 * @author janghyun
+	 * @param categoryId 조회할 카테고리의 ID
+	 * @return 조회된 카테고리의 응답 객체와 그 하위 카테고리
+	 */
+	@GetMapping("/{categoryId}")
+	public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long categoryId) {
+		CategoryResponse categoryResponse = categoryService.getCategoryById(categoryId);
+		return ResponseEntity.ok(categoryResponse);
+	}
+
 }
