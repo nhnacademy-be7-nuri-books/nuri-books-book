@@ -31,6 +31,6 @@ public class PublisherServiceImpl implements PublisherService {
 		}
 		Publisher publisher = request.toEntity();
 		Publisher saved = publisherRepository.save(publisher);
-		return new PublisherResponse(saved.getName());
+		return PublisherResponse.of(saved);
 	}
 }
