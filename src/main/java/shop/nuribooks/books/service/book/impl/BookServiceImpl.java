@@ -14,7 +14,7 @@ import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.repository.book.BookRepository;
 import shop.nuribooks.books.repository.book.BookStateRepository;
-import shop.nuribooks.books.repository.book.PublisherRepository;
+import shop.nuribooks.books.repository.publisher.PublisherRepository;
 import shop.nuribooks.books.service.book.BookService;
 
 @RequiredArgsConstructor

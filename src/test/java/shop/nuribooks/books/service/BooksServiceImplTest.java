@@ -23,7 +23,7 @@ import shop.nuribooks.books.exception.ResourceNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.repository.book.BookRepository;
 import shop.nuribooks.books.repository.book.BookStateRepository;
-import shop.nuribooks.books.repository.book.PublisherRepository;
+import shop.nuribooks.books.repository.publisher.PublisherRepository;
 import shop.nuribooks.books.service.book.impl.BookServiceImpl;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,0 +1,7 @@
+### 출판사 등록
+POST localhost:8083/api/publishers
+Content-Type:application/json
+
+{
+  "name": "test"
+}
