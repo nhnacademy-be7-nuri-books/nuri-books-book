@@ -20,6 +20,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.annotation.PostConstruct;
 import shop.nuribooks.books.dto.member.request.MemberRegisterRequest;
+import shop.nuribooks.books.dto.member.response.MemberCheckResponse;
 import shop.nuribooks.books.dto.member.response.MemberRegisterResponse;
 import shop.nuribooks.books.service.member.MemberService;
 
@@ -63,6 +64,25 @@ class MemberControllerTest {
 			.andExpect(jsonPath("birthday").value(response.getBirthday().toString()));
 	}
 
+	@DisplayName("아이디로 회원 이름, 비밀번호, 권한 조회")
+	@Test
+	void memberCheck() throws Exception {
+		//given
+		MemberCheckResponse response = memberCheckResponse();
+		String requestUserId = "nuribooks";
+
+		when(memberService.checkMember(requestUserId)).thenReturn(response);
+
+		//when
+		ResultActions result = mockMvc.perform(get("/api/member/{userId}", requestUserId));
+
+		//then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("name").value(response.getName()))
+			.andExpect(jsonPath("password").value(response.getPassword()))
+			.andExpect(jsonPath("authority").value(response.getAuthority()));
+	}
+
 	private MemberRegisterRequest memberRegisterRequest() {
 		return MemberRegisterRequest.builder()
 			.name("boho")
@@ -81,6 +101,14 @@ class MemberControllerTest {
 			.phoneNumber("042-8282-8282")
 			.email("nhnacademy@nuriBooks.com")
 			.birthday(LocalDate.of(1988, 8, 12))
+			.build();
+	}
+
+	private MemberCheckResponse memberCheckResponse() {
+		return MemberCheckResponse.builder()
+			.name("boho")
+			.password("abc123")
+			.authority("ROLE_MEMBER")
 			.build();
 	}
 

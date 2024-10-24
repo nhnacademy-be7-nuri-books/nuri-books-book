@@ -2,13 +2,7 @@ package shop.nuribooks.books.controller.member;
 
 import static org.springframework.http.HttpStatus.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,7 +45,7 @@ public class MemberController {
 	}
 
 	/**
-	 * 아이디로 회원 등록 여부 확인 <br>
+	 * 아이디로 회원 조회 <br>
 	 * pathVariable로 입력된 userId 길이 검사 후 회원 확인 진행 <br>
 	 * 회원이 존재하면 이름, 비밀번호, 권한을 MemberCheckResponse에 담아서 반환 <br>
 	 * 회원이 존재하지 않는다면 이름, 비밀번호, 권한이 모두 null인 MemberCheckResponse를 반환
@@ -97,16 +91,4 @@ public class MemberController {
 		return ResponseEntity.status(OK).body(response);
 	}
 
-	/**
-	 * Valid 검증이 실패하면 MethodArgumentNotValidException 발생 <br>
-	 * 이 예외에서 모든 오류를 받아 각 오류의 필드명을 key, 오류 메시지를 value로 Map에 담아 반환한다.
-	 */
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException e) {
-		Map<String, String> errors = new HashMap<>();
-		e.getBindingResult().getAllErrors()
-			.forEach(error -> errors.put(((FieldError) error).getField(), error.getDefaultMessage()));
-
-		return ResponseEntity.status(BAD_REQUEST).body(errors);
-	}
 }
