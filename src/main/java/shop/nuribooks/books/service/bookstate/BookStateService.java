@@ -10,4 +10,5 @@ public interface BookStateService {
 	void registerState(String adminId, BookStateRequest bookStateRequest);
 	List<BookStateResponse> getAllBooks();
 	void updateState(Integer id, BookStateRequest bookStateRequest);
+	void deleteState(Integer id);
 }

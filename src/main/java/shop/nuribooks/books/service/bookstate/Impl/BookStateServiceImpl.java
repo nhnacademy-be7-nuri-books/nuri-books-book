@@ -56,6 +56,19 @@ public class BookStateServiceImpl implements BookStateService {
 		bookStateRepository.save(bookState);
 
 		//TODO: 도서등록 api 완료 후 도서의 도서상태도 변경되도록 로직 작성 필요
+
 	}
+
+	@Transactional
+	@Override
+	public void deleteState(Integer id) {
+		if (!bookStateRepository.existsById(id)) {
+			throw new BookStateIdNotFoundException();
+		}
+		bookStateRepository.deleteById(id);
+
+		//TODO: 도서등록 api 완료 후 도서의 도서상태도 null로 변경되도록 로직 작성 필요
+	}
+
 
 }
