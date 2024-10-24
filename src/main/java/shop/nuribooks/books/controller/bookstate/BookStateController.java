@@ -47,9 +47,8 @@ public class BookStateController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ResponseMessage> getBookState() {
-		bookStateService.getAllBooks();
-		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.OK.value(), "도서상태 조회 성공");
-		return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+	public ResponseEntity<List<BookStateResponse>> getBookState() {
+		List<BookStateResponse> bookStateResponses = bookStateService.getAllBooks();
+		return ResponseEntity.ok(bookStateResponses);
 	}
 }
