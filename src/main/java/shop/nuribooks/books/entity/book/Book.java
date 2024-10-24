@@ -16,18 +16,17 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.jackson.Jacksonized;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Setter
-@Builder
 @Table(name = "books")
 public class Book {
 
@@ -89,5 +88,28 @@ public class Book {
 	@NotNull
 	//@ColumnDefault("0")
 	private Long viewCount;
+
+	@Builder
+	@Jacksonized
+	private Book(BookState stateId, Publisher publisherId, String title, String thumbnailImageUrl,
+		String detailImageUrl, LocalDate publicationDate, BigDecimal price, int discountRate,
+		String description, String contents, String isbn, boolean isPackageable, int stock,
+		int likeCount, Long viewCount) {
+		this.stateId = stateId;
+		this.publisherId = publisherId;
+		this.title = title;
+		this.thumbnailImageUrl = thumbnailImageUrl;
+		this.detailImageUrl = detailImageUrl;
+		this.publicationDate = publicationDate;
+		this.price = price;
+		this.discountRate = discountRate;
+		this.description = description;
+		this.contents = contents;
+		this.isbn = isbn;
+		this.isPackageable = isPackageable;
+		this.stock = stock;
+		this.likeCount = likeCount;
+		this.viewCount = viewCount;
+	}
 }
 
