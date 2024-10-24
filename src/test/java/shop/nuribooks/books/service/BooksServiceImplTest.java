@@ -22,7 +22,7 @@ import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.repository.book.BookRepository;
-import shop.nuribooks.books.repository.book.BookStateRepository;
+import shop.nuribooks.books.repository.bookstate.BookStateRepository;
 import shop.nuribooks.books.repository.publisher.PublisherRepository;
 import shop.nuribooks.books.service.book.impl.BookServiceImpl;
 

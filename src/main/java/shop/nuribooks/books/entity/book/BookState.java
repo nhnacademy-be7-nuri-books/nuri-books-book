@@ -22,7 +22,7 @@ import lombok.Setter;
 public class BookState {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Integer id;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)

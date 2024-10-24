@@ -1,4 +1,4 @@
-package shop.nuribooks.books.repository.book;
+package shop.nuribooks.books.repository.bookstate;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
