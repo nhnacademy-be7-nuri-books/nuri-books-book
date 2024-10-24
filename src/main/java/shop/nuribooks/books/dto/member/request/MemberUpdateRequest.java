@@ -1,9 +1,13 @@
 package shop.nuribooks.books.dto.member.request;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
+@AllArgsConstructor
 public class MemberUpdateRequest {
 
 	@NotBlank(message = "이름은 반드시 입력해야 합니다.")

@@ -29,7 +29,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("입력된 id로 회원 존재 여부 확인")
 	@Test
-	public void existsByUserId() {
+	void existsByUserId() {
 		//given
 		Customer customer = customer();
 		Customer savedCustomer = customerRepository.save(customer);
@@ -45,7 +45,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("입력된 id로 회원 조회")
 	@Test
-	public void findByUserId() {
+	void findByUserId() {
 	    //given
 		Customer customer = customer();
 		Customer savedCustomer = customerRepository.save(customer);
@@ -63,7 +63,7 @@ class MemberRepositoryTest {
 
 	private Member member(Customer savedCustomer) {
 		return Member.builder()
-			.customer(savedCustomer)
+			.customer_id(savedCustomer)
 			.authority(MEMBER)
 			.grade(STANDARD)
 			.status(ACTIVE)

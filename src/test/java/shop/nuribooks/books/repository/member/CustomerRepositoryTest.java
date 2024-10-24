@@ -32,7 +32,7 @@ class CustomerRepositoryTest {
 
 	@DisplayName("고객 아이디와 비밀번호로 존재 여부 확인")
 	@Test
-	public void existsByIdAndPassword() {
+	void existsByIdAndPassword() {
 	    //given
 		Customer customer = customer();
 		Customer savedCustomer = customerRepository.save(customer);

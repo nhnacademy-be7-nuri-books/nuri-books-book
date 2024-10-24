@@ -22,7 +22,6 @@ public class Customer {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "customer_id")
 	private Long id;
 
 	@NotBlank

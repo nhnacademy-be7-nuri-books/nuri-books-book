@@ -49,6 +49,7 @@ public class CustomerController {
 	 * @param request CustomerUpdateRequest에 이름과 전화번호를 담아서 요청
 	 * @return 비회원 정보 수정에 성공하면 이름과 전화번호를 CustomerUpdateRequest에 담아서 반환
 	 */
+	@Deprecated
 	@PostMapping("/api/member/customer/{customerId}")
 	public ResponseEntity<CustomerUpdateResponse> customerUpdate(
 		@PathVariable Long customerId, @RequestBody @Valid CustomerUpdateRequest request) {

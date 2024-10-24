@@ -2,6 +2,7 @@ package shop.nuribooks.books.entity.member;
 
 import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.FetchType.*;
+import static shop.nuribooks.books.entity.member.StatusEnum.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -38,8 +39,8 @@ public class Member {
 	 */
 	@OneToOne(fetch = LAZY)
 	@MapsId
-	@JoinColumn(name = "customer_id")
-	private Customer customer;
+	@JoinColumn(name = "id")
+	private Customer customer_id;
 
 	/**
 	 * ADMIN, MEMBER, SELLER
@@ -92,7 +93,7 @@ public class Member {
 
 	public Member(Customer customer, AuthorityEnum authority, GradeEnum grade, StatusEnum status, String userId,
 		LocalDate birthday, LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
-		this.customer = customer;
+		this.customer_id = customer;
 		this.authority = authority;
 		this.grade = grade;
 		this.status = status;
@@ -103,8 +104,8 @@ public class Member {
 		this.totalPaymentAmount = totalPaymentAmount;
 	}
 
-	public void changeToWithdrawn(StatusEnum status, LocalDateTime withdrawnAt) {
-		this.status = status;
-		this.withdrawnAt = withdrawnAt;
+	public void changeToWithdrawn() {
+		this.status = INACTIVE;
+		this.withdrawnAt = LocalDateTime.now();
 	}
 }

@@ -1,5 +1,7 @@
 package shop.nuribooks.books.dto.member.response;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,5 +16,5 @@ public class MemberCheckResponse {
 
 	private String name;
 	private String password;
-	private AuthorityEnum authority;
+	private String authority; // "ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SELLER"
 }

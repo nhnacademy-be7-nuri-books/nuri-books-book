@@ -14,7 +14,6 @@ import lombok.Getter;
 public class Grade {
 
 	@Id
-	@Column(name = "grade_id")
 	private Integer id;
 
 	/**
