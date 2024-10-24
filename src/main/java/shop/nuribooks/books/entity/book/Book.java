@@ -109,5 +109,13 @@ public class Book {
 		this.likeCount = likeCount;
 		this.viewCount = viewCount;
 	}
+
+	public BookEditor.BookEditorBuilder toEditor() {
+		return BookEditor.builder().stateId(this.stateId);
+	}
+
+	public void edit(BookEditor editor) {
+		this.stateId = editor.getStateId();
+	}
 }
 

@@ -10,10 +10,12 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.bookstate.BookStateRequest;
 import shop.nuribooks.books.dto.bookstate.BookStateResponse;
 import shop.nuribooks.books.entity.book.Book;
+import shop.nuribooks.books.entity.book.BookEditor;
 import shop.nuribooks.books.entity.book.BookState;
 import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 import shop.nuribooks.books.exception.bookstate.BookStateDetailAlreadyExistException;
 import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
+import shop.nuribooks.books.repository.book.BookRepository;
 import shop.nuribooks.books.repository.bookstate.BookStateRepository;
 import shop.nuribooks.books.service.bookstate.BookStateService;
 
@@ -22,6 +24,9 @@ import shop.nuribooks.books.service.bookstate.BookStateService;
 public class BookStateServiceImpl implements BookStateService {
 
 	private final BookStateRepository bookStateRepository;
+	private final BookRepository bookRepository;
+
+	public static final Integer DEFAULT_STATE_ID = 1;
 
 	@Override
 	public void registerState(String adminId, BookStateRequest bookStateRequest) {
@@ -54,19 +59,27 @@ public class BookStateServiceImpl implements BookStateService {
 		bookState.updateDetail(bookStateRequest.detail());
 
 		bookStateRepository.save(bookState);
-
-		//TODO: 도서등록 api 완료 후 도서의 도서상태도 변경되도록 로직 작성 필요
-
 	}
 
 	@Transactional
 	@Override
 	public void deleteState(Integer id) {
-		if (!bookStateRepository.existsById(id)) {
-			throw new BookStateIdNotFoundException();
-		}
-		bookStateRepository.deleteById(id);
+		BookState defaultState = bookStateRepository.findById(DEFAULT_STATE_ID)
+			.orElseThrow(BookStateIdNotFoundException::new);
 
-		//TODO: 도서등록 api 완료 후 도서의 도서상태도 null로 변경되도록 로직 작성 필요
+		BookState bookState = bookStateRepository.findById(id)
+			.orElseThrow(BookStateIdNotFoundException::new);
+
+		List<Book> books = bookRepository.findByStateId(bookState);
+
+		for (Book book : books) {
+			BookEditor bookEditor = BookEditor.builder()
+				.stateId(defaultState)
+				.build();
+			book.edit(bookEditor);
+		}
+
+		bookRepository.saveAll(books);
+		bookStateRepository.deleteById(id);
 	}
 }
