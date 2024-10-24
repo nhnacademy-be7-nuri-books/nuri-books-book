@@ -38,7 +38,7 @@ public class BooksControllerTest {
 	@Test
 	public void registerBooks_ShouldReturnCreated_WhenRequestIsValid() throws Exception {
 		BookRegisterReq reqDto = new BookRegisterReq(
-			1L,
+			1,
 			1L,
 			"책 제목",
 			"thumbnail.jpg",
@@ -55,7 +55,7 @@ public class BooksControllerTest {
 
 		BookRegisterRes resDto = BookRegisterRes.builder()
 			.id(1L)
-			.stateId(1L)
+			.stateId(1)
 			.publisherId(1L)
 			.title("책 제목")
 			.thumbnailImageUrl("thumbnail.jpg")
@@ -106,7 +106,7 @@ public class BooksControllerTest {
 	@Test
 	public void registerBooks_ShouldReturnNotFound_WhenBookStateOrPublisherNotFound() throws Exception {
 		BookRegisterReq reqDto = new BookRegisterReq(
-			9999L,
+			9999,
 			9999L,
 			"책 제목",
 			"thumbnail.jpg",
