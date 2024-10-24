@@ -1,9 +1,14 @@
 package shop.nuribooks.books.dto.member.request;
 
+import static com.fasterxml.jackson.annotation.JsonFormat.Shape.*;
+
 import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +34,8 @@ public class MemberRegisterRequest {
 	@Email(message = "유효한 이메일 형식으로 입력해야 합니다.")
 	private String email;
 
-	@NotBlank(message = "생일은 반드시 입력해야 합니다.")
+	@NotNull(message = "생일은 반드시 입력해야 합니다.")
+	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	private LocalDate birthday;
 
 }

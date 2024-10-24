@@ -26,13 +26,13 @@ import shop.nuribooks.books.dto.member.response.MemberCheckResponse;
 import shop.nuribooks.books.dto.member.response.MemberRegisterResponse;
 import shop.nuribooks.books.dto.member.response.MemberUpdateResponse;
 import shop.nuribooks.books.exception.member.InvalidUserIdException;
-import shop.nuribooks.books.service.member.MemberServiceImpl;
+import shop.nuribooks.books.service.member.MemberService;
 
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
 
-	private final MemberServiceImpl memberServiceImpl;
+	private final MemberService memberService;
 
 	/**
 	 * 회원등록 <br>
@@ -45,7 +45,7 @@ public class MemberController {
 	public ResponseEntity<MemberRegisterResponse> memberRegister(
 		@RequestBody @Valid MemberRegisterRequest request) {
 
-		MemberRegisterResponse response = memberServiceImpl.registerMember(request);
+		MemberRegisterResponse response = memberService.registerMember(request);
 
 		return ResponseEntity.status(CREATED).body(response);
 	}
@@ -62,7 +62,7 @@ public class MemberController {
 			throw new InvalidUserIdException("아이디는 반드시 8자 이상 20자 이하로 입력해야 합니다.");
 		}
 
-		MemberCheckResponse response = memberServiceImpl.checkMember(userId);
+		MemberCheckResponse response = memberService.checkMember(userId);
 
 		return ResponseEntity.status(OK).body(response);
 	}
@@ -76,7 +76,7 @@ public class MemberController {
 	public ResponseEntity<ResponseMessage> memberWithdraw(
 		@RequestBody @Valid MemberWithdrawRequest request) {
 
-		memberServiceImpl.withdrawMember(request);
+		memberService.withdrawMember(request);
 
 		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),
 			"탈퇴가 성공적으로 완료되었습니다. 귀하의 앞날에 무궁한 발전이 있기를 진심으로 기원하겠습니다."));
@@ -92,7 +92,7 @@ public class MemberController {
 	public ResponseEntity<MemberUpdateResponse> memberUpdate(
 		@PathVariable String userId, @RequestBody @Valid MemberUpdateRequest request) {
 
-		MemberUpdateResponse response = memberServiceImpl.updateMember(userId, request);
+		MemberUpdateResponse response = memberService.updateMember(userId, request);
 
 		return ResponseEntity.status(OK).body(response);
 	}
