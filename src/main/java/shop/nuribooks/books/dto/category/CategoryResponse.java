@@ -26,5 +26,4 @@ public record CategoryResponse(Long id, String name, String parentCategoryName, 
 					.map(CategoryResponse::new)
 					.collect(Collectors.toList()));
 	}
-
 }

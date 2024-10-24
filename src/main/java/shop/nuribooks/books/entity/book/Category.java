@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @AllArgsConstructor
@@ -33,6 +34,7 @@ public class Category {
 	private Long id;
 
 	@NotNull
+	@Setter
 	@Column(length = 30, nullable = false)
 	private String name;
 

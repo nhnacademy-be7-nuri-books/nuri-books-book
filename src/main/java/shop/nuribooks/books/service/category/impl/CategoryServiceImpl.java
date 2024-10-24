@@ -102,6 +102,7 @@ public class CategoryServiceImpl implements CategoryService {
 	/**
 	 * 주어진 ID에 해당하는 카테고리를 조회하여 반환합니다.
 	 * 카테고리가 존재하지 않을 경우 CategoryNotFoundException을 발생시킵니다.
+	 *
 	 * @author janghyun
 	 * @param categoryId 조회할 카테고리의 ID
 	 * @return 조회된 카테고리의 응답 객체
@@ -112,6 +113,26 @@ public class CategoryServiceImpl implements CategoryService {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
 		return new CategoryResponse(category);
+	}
+
+	/**
+	 * 주어진 ID에 해당하는 카테고리를 업데이트합니다.
+	 * 카테고리가 존재하지 않을 경우 CategoryNotFoundException을 발생시킵니다.
+	 *
+	 * @author janghyun
+	 * @param dto 업데이트할 카테고리의 정보가 담긴 객체
+	 * @param categoryId 업데이트할 카테고리의 ID
+	 * @return 업데이트된 카테고리의 응답 객체
+	 * @throws CategoryNotFoundException 주어진 ID에 해당하는 카테고리가 존재하지 않을 경우
+	 */
+	@Override
+	public CategoryResponse updateCategory(CategoryRequest dto, Long categoryId) {
+		Category category = categoryRepository.findById(categoryId)
+			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
+		category.setName(dto.name());
+
+		return new CategoryResponse(categoryRepository.save(category));
 	}
 
 }

@@ -41,4 +41,13 @@ public interface CategoryService {
 	 * @return 조회된 카테고리의 응답 DTO
 	 */
 	CategoryResponse getCategoryById(Long categoryId);
+
+	/**
+	 * 특정 카테고리를 업데이트합니다.
+	 *
+	 * @param dto 업데이트할 카테고리의 정보
+	 * @param categoryId 업데이트할 카테고리의 ID
+	 * @return 업데이트된 카테고리의 응답 DTO
+	 */
+	CategoryResponse updateCategory(CategoryRequest dto, Long categoryId);
 }
