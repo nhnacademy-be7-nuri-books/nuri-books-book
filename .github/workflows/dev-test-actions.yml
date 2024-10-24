@@ -3,8 +3,8 @@ on:
   pull_request:
     types: [ opened, reopened ]
   push:
-    branches:
-      - "!main"
+    branches-ignore:
+      - main
 
 jobs:
   dev-test:
@@ -20,4 +20,10 @@ jobs:
           cache: maven
 
       - name: test with Maven
-        run: mvn -B test --file pom.xml
+        run: mvn -B test jacoco:report --file pom.xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jacoco-report
+          path: target/site/jacoco
