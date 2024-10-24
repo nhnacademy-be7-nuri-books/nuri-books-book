@@ -1,6 +1,5 @@
 package shop.nuribooks.books.exception.bookstate;
 
-import shop.nuribooks.books.entity.book.BookStateEnum;
 import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 
 public class BookStateDetailAlreadyExistException extends ResourceAlreadyExistException {

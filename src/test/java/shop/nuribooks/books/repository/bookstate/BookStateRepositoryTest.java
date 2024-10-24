@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import shop.nuribooks.books.entity.book.BookState;
-import shop.nuribooks.books.entity.book.BookStateEnum;
 
 @DataJpaTest
 public class BookStateRepositoryTest {

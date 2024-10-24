@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.dto.bookstate.BookStateRequest;
-import shop.nuribooks.books.entity.book.BookStateEnum;
 import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 import shop.nuribooks.books.service.bookstate.BookStateService;
 
