@@ -16,7 +16,7 @@ public class BookStateServiceImpl implements BookStateService {
 	private final BookStateRepository bookStateRepository;
 
 	@Override
-	public void registerState(BookStateRequest bookStateRequest) {
+	public void registerState(String adminId, BookStateRequest bookStateRequest) {
 		if(bookStateRepository.existsBookStatesByDetail(bookStateRequest.detail())){
 			throw new ResourceAlreadyExistException("입력한 도서상태명" + bookStateRequest.detail() + "이 이미 존재합니다");
 		}

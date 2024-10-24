@@ -37,9 +37,11 @@ public class BookStateServiceTest {
 
 	@Test
 	public void registerState_ShouldSaveBookState_WhenRequestIsValid() {
+		String admin = "admin";
+
 		when(bookStateRepository.existsBookStatesByDetail(bookStateRequest.detail())).thenReturn(false);
 
-		bookStateService.registerState(bookStateRequest);
+		bookStateService.registerState(admin, bookStateRequest);
 		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서상태 등록 성공");
 
 		assertEquals(HttpStatus.CREATED.value(), responseMessage.getStatusCode());
@@ -50,10 +52,12 @@ public class BookStateServiceTest {
 
 	@Test
 	public void registerState_ShouldThrowException_WhenStateAlreadyExists() {
+		String admin = "admin";
+
 		when(bookStateRepository.existsBookStatesByDetail(bookStateRequest.detail())).thenReturn(true);
 
 		ResourceAlreadyExistException thrown = assertThrows(ResourceAlreadyExistException.class, () -> {
-			bookStateService.registerState(bookStateRequest);
+			bookStateService.registerState(admin, bookStateRequest);
 		});
 		assertTrue(thrown.getMessage().contains(bookStateRequest.detail().toString()));
 	}

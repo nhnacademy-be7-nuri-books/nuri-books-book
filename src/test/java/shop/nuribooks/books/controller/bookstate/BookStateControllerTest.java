@@ -32,11 +32,13 @@ public class BookStateControllerTest {
 
 	@Test
 	public void registerBookState_ShouldReturnCreated_WhenRequestIsValid() throws Exception {
+		String adminId = "admin123"; // 예시 adminId
 		BookStateRequest bookStateReq = new BookStateRequest(BookStateEnum.INSTOCK);
 
-		doNothing().when(bookStateService).registerState(any(BookStateRequest.class));
+		doNothing().when(bookStateService).registerState(eq(adminId), any(BookStateRequest.class));
 
 		mockMvc.perform(post("/api/book-state")
+				.header("X-USER-ID", adminId) // adminId를 헤더에 추가
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(bookStateReq)))
 			.andExpect(status().isCreated())
@@ -46,9 +48,11 @@ public class BookStateControllerTest {
 
 	@Test
 	public void registerBookState_ShouldReturnBadRequest_WhenRequestIsInvalid() throws Exception {
+		String adminId = "admin123"; // 예시 adminId
 		BookStateRequest bookStateReq = new BookStateRequest(null);
 
 		mockMvc.perform(post("/api/book-state")
+				.header("X-USER-ID", adminId) // adminId를 헤더에 추가
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(bookStateReq)))
 			.andExpect(status().isBadRequest())
@@ -58,12 +62,14 @@ public class BookStateControllerTest {
 
 	@Test
 	public void registerBookState_ShouldReturnConflict_WhenStateAlreadyExists() throws Exception {
+		String adminId = "admin123"; // 예시 adminId
 		BookStateRequest bookStateReq = new BookStateRequest(BookStateEnum.INSTOCK);
 
 		doThrow(new ResourceAlreadyExistException("입력한 도서상태명 " + bookStateReq.detail() + " 이 이미 존재합니다."))
-			.when(bookStateService).registerState(any(BookStateRequest.class));
+			.when(bookStateService).registerState(eq(adminId), any(BookStateRequest.class));
 
 		mockMvc.perform(post("/api/book-state")
+				.header("X-USER-ID", adminId) // adminId를 헤더에 추가
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(bookStateReq)))
 			.andExpect(status().isConflict())

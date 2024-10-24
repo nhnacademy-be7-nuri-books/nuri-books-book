@@ -4,5 +4,5 @@ import shop.nuribooks.books.dto.bookstate.BookStateRequest;
 import shop.nuribooks.books.dto.member.ResponseMessage;
 
 public interface BookStateService {
-	void registerState(BookStateRequest bookStateRequest);
+	void registerState(String adminId, BookStateRequest bookStateRequest);
 }
