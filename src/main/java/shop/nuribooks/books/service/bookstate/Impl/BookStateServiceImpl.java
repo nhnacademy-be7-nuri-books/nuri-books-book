@@ -54,6 +54,8 @@ public class BookStateServiceImpl implements BookStateService {
 		bookState.updateDetail(bookStateRequest.detail());
 
 		bookStateRepository.save(bookState);
+
+		//TODO: 도서등록 api 완료 후 도서의 도서상태도 변경되도록 로직 작성 필요
 	}
 
 }
