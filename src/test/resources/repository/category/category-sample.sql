@@ -5,7 +5,7 @@ VALUES (0, '여행'),
        (0, '스포츠'),
        (0, '과학');
 
-INSERT INTO categories (level, name, parent_id)
+INSERT INTO categories (level, name, parent_category_id)
 VALUES (1, '국내 여행', 1),
        (1, '해외 여행', 1),
        (1, '한식', 2),

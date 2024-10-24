@@ -93,7 +93,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 */
 	@Override
 	public List<CategoryResponse> getAllCategory() {
-		List<Category> categoryList = categoryRepository.findAllByParentCategoryIsNull();
+		List<Category> categoryList = categoryRepository.findAllTopCategoriesWithChildren();
 		List<CategoryResponse> categoryResponseList = new ArrayList<>();
 		for (Category category : categoryList) {
 			categoryResponseList.add(new CategoryResponse(category));
