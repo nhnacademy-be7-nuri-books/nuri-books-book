@@ -1,9 +1,13 @@
 package shop.nuribooks.books.service.bookstate.Impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.bookstate.BookStateRequest;
+import shop.nuribooks.books.dto.bookstate.BookStateResponse;
 import shop.nuribooks.books.entity.book.BookState;
 import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 import shop.nuribooks.books.exception.bookstate.BookStateDetailAlreadyExistException;
@@ -24,5 +28,13 @@ public class BookStateServiceImpl implements BookStateService {
 
 		BookState bookState = BookState.of(bookStateRequest.detail());
 		bookStateRepository.save(bookState);
+	}
+
+	@Override
+	public List<BookStateResponse> getAllBooks() {
+		List<BookState> bookStateList = bookStateRepository.findAll();
+
+		return bookStateList.stream().map(bookState -> new BookStateResponse(bookState.getId(), bookState.getDetail()))
+			.collect(Collectors.toList());
 	}
 }

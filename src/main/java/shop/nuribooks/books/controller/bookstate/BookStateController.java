@@ -24,6 +24,7 @@ public class BookStateController {
 
 	private final BookStateService bookStateService;
 
+	//TODO : X-USER-ID 필요없을듯하여 추후 삭제 예정
 	@Operation(summary = "도서 상태 등록", description = "관리자가 새로운 도서 상태를 등록합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "도서 상태 등록 성공"),

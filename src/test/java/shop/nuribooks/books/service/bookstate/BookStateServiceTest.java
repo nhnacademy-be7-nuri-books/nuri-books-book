@@ -59,6 +59,6 @@ public class BookStateServiceTest {
 		ResourceAlreadyExistException thrown = assertThrows(ResourceAlreadyExistException.class, () -> {
 			bookStateService.registerState(admin, bookStateRequest);
 		});
-		assertTrue(thrown.getMessage().contains(bookStateRequest.detail().toString()));
+		assertTrue(thrown.getMessage().contains(bookStateRequest.detail()));
 	}
 }
