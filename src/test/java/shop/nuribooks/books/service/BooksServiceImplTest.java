@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,10 +20,11 @@ import shop.nuribooks.books.entity.book.Book;
 import shop.nuribooks.books.entity.book.BookState;
 import shop.nuribooks.books.entity.book.Publisher;
 import shop.nuribooks.books.exception.BadRequestException;
-import shop.nuribooks.books.exception.ResourceNotFoundException;
+import shop.nuribooks.books.exception.book.BookStatesIdNotFoundException;
+import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.repository.book.BookRepository;
-import shop.nuribooks.books.repository.bookstate.BookStateRepositoryTest;
+import shop.nuribooks.books.repository.bookstate.BookStateRepository;
 import shop.nuribooks.books.repository.publisher.PublisherRepository;
 import shop.nuribooks.books.service.book.impl.BookServiceImpl;
 
@@ -36,54 +38,54 @@ public class BooksServiceImplTest {
 	private BookRepository booksRepository;
 
 	@Mock
-	private BookStateRepositoryTest bookStatesRepository;
+	private BookStateRepository bookStatesRepository;
 
 	@Mock
 	private PublisherRepository publishersRepository;
 
 	private BookRegisterRequest reqDto;
 
-	private BookState bookStates;
+	private BookState bookState;
+	private Publisher publisher;
 
-	// @BeforeEach
-	// public void setUp() {
-	// 	bookStates = new BookState(1L, BookStateEnum.InStock);
-	//
-	// 	reqDto = new BookRegisterReq(
-	// 		1L,
-	// 		1L,
-	// 		"Book Title",
-	// 		"thumbnail.jpg",
-	// 		"detail.jpg",
-	// 		LocalDate.now(),
-	// 		BigDecimal.valueOf(20000),
-	// 		10,
-	// 		"Book Description",
-	// 		"Book Contents",
-	// 		"1234567890123",
-	// 		true,
-	// 		100
-	// 	);
-	// }
+	@BeforeEach
+	public void setUp() {
+		bookState = BookState.builder()
+			.detail("InStock") // ID 없이 detail만 설정
+			.build();
+		publisher = new Publisher(1L, "Publisher Name");
+
+		reqDto = new BookRegisterRequest(
+			1, // stateId
+			1L, // publisherId
+			"Book Title",
+			"thumbnail.jpg",
+			"detail.jpg",
+			LocalDate.now(),
+			BigDecimal.valueOf(20000),
+			10,
+			"Book Description",
+			"Book Contents",
+			"1234567890123",
+			true,
+			100
+		);
+	}
 
 	@Test
 	public void registerBook_ShouldReturnResponse_WhenValidRequest() {
-		Publisher mockPublisher = new Publisher(1L, "Publisher Name");
-
-		//when(bookStatesRepository.findById(1)).thenReturn(Optional.of(bookStates));
-		when(publishersRepository.findById(1L)).thenReturn(Optional.of(mockPublisher));
-		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(false);
+		when(bookStatesRepository.findById(1)).thenReturn(Optional.of(bookState));
+		when(publishersRepository.findById(1L)).thenReturn(Optional.of(publisher));
+		when(booksRepository.existsByIsbn(reqDto.isbn())).thenReturn(false);
 		when(booksRepository.save(any(Book.class))).thenAnswer(invocation -> {
 			Book book = invocation.getArgument(0);
-			book.setId(1L);
-			return book;
+			return book; // ID 자동 생성
 		});
 
 		BookRegisterResponse result = booksService.registerBook(reqDto);
 
 		assertNotNull(result);
-		assertEquals(1L, result.getId());
-		assertEquals("Book Title", result.getTitle());
+		assertEquals("Book Title", result.title());
 		verify(booksRepository, times(1)).save(any(Book.class));
 	}
 
@@ -93,44 +95,39 @@ public class BooksServiceImplTest {
 	}
 
 	@Test
-	public void registerBook_ShouldThrowResourceNotFoundException_WhenBookStateNotFound() {
-		//when(bookStatesRepository.findById(1L)).thenReturn(Optional.empty());
+	public void registerBook_ShouldThrowBookStateIdNotFoundException_WhenBookStateNotFound() {
+		when(bookStatesRepository.findById(1)).thenReturn(Optional.empty());
 
-		assertThrows(ResourceNotFoundException.class, () -> booksService.registerBook(reqDto));
-		//verify(bookStatesRepository, times(1)).findById(1L);
+		assertThrows(BookStatesIdNotFoundException.class, () -> booksService.registerBook(reqDto));
+		verify(bookStatesRepository, times(1)).findById(1);
 	}
 
 	@Test
-	public void registerBook_ShouldThrowResourceNotFoundException_WhenPublisherNotFound() {
-		//when(bookStatesRepository.findById(1L)).thenReturn(Optional.of(bookStates));
+	public void registerBook_ShouldThrowPublisherIdNotFoundException_WhenPublisherNotFound() {
+		when(bookStatesRepository.findById(1)).thenReturn(Optional.of(bookState));
 		when(publishersRepository.findById(1L)).thenReturn(Optional.empty());
 
-		assertThrows(ResourceNotFoundException.class, () -> booksService.registerBook(reqDto));
-		//verify(bookStatesRepository, times(1)).findById(1L);
+		assertThrows(PublisherIdNotFoundException.class, () -> booksService.registerBook(reqDto));
 		verify(publishersRepository, times(1)).findById(1L);
 	}
 
 	@Test
-	public void registerBook_ShouldThrowDuplicateIsbnException_WhenIsbnAlreadyExists() {
-		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(true);
+	public void registerBook_ShouldThrowResourceAlreadyExistIsbnException_WhenIsbnAlreadyExists() {
+		when(booksRepository.existsByIsbn(reqDto.isbn())).thenReturn(true);
 
 		assertThrows(ResourceAlreadyExistIsbnException.class, () -> booksService.registerBook(reqDto));
-
-		verify(booksRepository, times(1)).existsByIsbn(reqDto.getIsbn());
+		verify(booksRepository, times(1)).existsByIsbn(reqDto.isbn());
 	}
 
 	@Test
 	public void registerBook_ShouldSaveBook_WhenBookStateAndPublisherFound() {
-		Publisher mockPublisher = new Publisher(1L, "Publisher Name");
-
-		//when(bookStatesRepository.findById(1L)).thenReturn(Optional.of(bookStates));
-		when(publishersRepository.findById(1L)).thenReturn(Optional.of(mockPublisher));
-		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(false);
+		when(bookStatesRepository.findById(1)).thenReturn(Optional.of(bookState));
+		when(publishersRepository.findById(1L)).thenReturn(Optional.of(publisher));
+		when(booksRepository.existsByIsbn(reqDto.isbn())).thenReturn(false);
 
 		Book mockBook = Book.builder()
-			.id(null)
-			.stateId(bookStates)
-			.publisherId(mockPublisher)
+			.stateId(bookState)
+			.publisherId(publisher)
 			.title("Book Title")
 			.thumbnailImageUrl("thumbnail.jpg")
 			.detailImageUrl("detail.jpg")
@@ -151,7 +148,7 @@ public class BooksServiceImplTest {
 		BookRegisterResponse result = booksService.registerBook(reqDto);
 
 		assertNotNull(result);
-		assertEquals("Book Title", result.getTitle());
+		assertEquals("Book Title", result.title());
 		verify(booksRepository, times(1)).save(any(Book.class));
 	}
 }

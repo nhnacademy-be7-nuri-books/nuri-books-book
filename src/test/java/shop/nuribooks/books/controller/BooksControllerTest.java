@@ -53,18 +53,18 @@ public class BooksControllerTest {
 			10
 		);
 
-		BookRegisterResponse resDto = BookRegisterResponse.builder()
-			.id(1L)
-			.stateId(1)
-			.publisherId(1L)
-			.title("책 제목")
-			.thumbnailImageUrl("thumbnail.jpg")
-			.publicationDate(LocalDate.parse("2024-10-21"))
-			.price(BigDecimal.valueOf(10000))
-			.discountRate(0)
-			.description("책 설명")
-			.stock(10)
-			.build();
+		BookRegisterResponse resDto = new BookRegisterResponse(
+			1L,
+			1,
+			1L,
+			"책 제목",
+			"thumbnail.jpg",
+			LocalDate.parse("2024-10-21"),
+			BigDecimal.valueOf(10000),
+			0,
+			"책 설명",
+			10
+		);
 
 		when(booksService.registerBook(any(BookRegisterRequest.class))).thenReturn(resDto);
 
@@ -75,6 +75,7 @@ public class BooksControllerTest {
 			.andExpect(jsonPath("$.id").value(1L))
 			.andExpect(jsonPath("$.title").value("책 제목"));
 	}
+
 
 	@Test
 	public void registerBooks_ShouldReturnBadRequest_WhenRequestIsInvalid() throws Exception {
