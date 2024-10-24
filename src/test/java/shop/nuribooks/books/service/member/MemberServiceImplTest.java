@@ -238,7 +238,7 @@ class MemberServiceImplTest {
 		assertThat(response.getAuthority()).isEqualTo("ROLE_" + existingMember.getAuthority());
 	}
 
-	@DisplayName("회원 이름, 비밀번호, 권한 조회 - 회원이 존재하지 않을 때")
+	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 회원이 존재하지 않을 때")
 	@Test
 	void checkMember_UserIdNotFound() {
 		//given
@@ -256,7 +256,7 @@ class MemberServiceImplTest {
 		assertNull(response.getAuthority());
 	}
 
-	@DisplayName("회원 이름, 비밀번호, 권한 조회 - 고객이 존재하지 않을 때")
+	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 고객이 존재하지 않을 때")
 	@Test
 	void checkMember_CustomerNotFound() {
 		//given
