@@ -4,18 +4,32 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
+import shop.nuribooks.books.entity.book.Book;
 
-@Getter
-@Builder
-public class BookRegisterRes {
-	private Long id;
-	private Integer stateId;
-	private Long publisherId;
-	private String title;
-	private String thumbnailImageUrl;
-	private LocalDate publicationDate;
-	private BigDecimal price;
-	private int discountRate;
-	private String description;
-	private int stock;
+public record BookRegisterRes(
+	Long id,
+	Integer stateId,
+	Long publisherId,
+	String title,
+	String thumbnailImageUrl,
+	LocalDate publicationDate,
+	BigDecimal price,
+	int discountRate,
+	String description,
+	int stock
+) {
+	public static BookRegisterRes of(Book book) {
+		return new BookRegisterRes(
+			book.getId(),
+			book.getStateId().getId(),
+			book.getPublisherId().getId(),
+			book.getTitle(),
+			book.getThumbnailImageUrl(),
+			book.getPublicationDate(),
+			book.getPrice(),
+			book.getDiscountRate(),
+			book.getDescription(),
+			book.getStock()
+		);
+	}
 }

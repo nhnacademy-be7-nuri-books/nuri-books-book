@@ -30,47 +30,36 @@ public class BookServiceImpl implements BookService {
 			throw new BadRequestException("요청 본문이 비어있습니다.");
 		}
 
-		if (booksRepository.existsByIsbn(reqDto.getIsbn())) {
-			throw new ResourceAlreadyExistIsbnException(reqDto.getIsbn());
+		if (booksRepository.existsByIsbn(reqDto.isbn())) {
+			throw new ResourceAlreadyExistIsbnException(reqDto.isbn());
 		}
 
-		BookState bookState = bookStatesRepository.findById(reqDto.getStateId())
-			.orElseThrow(() -> new BookStatesIdNotFoundException(reqDto.getStateId()));
+		BookState bookState = bookStatesRepository.findById(reqDto.stateId())
+			.orElseThrow(() -> new BookStatesIdNotFoundException(reqDto.stateId()));
 
-		Publisher publisher = publishersRepository.findById(reqDto.getPublisherId())
-			.orElseThrow(() -> new PublisherIdNotFoundException(reqDto.getPublisherId()));
+		Publisher publisher = publishersRepository.findById(reqDto.publisherId())
+			.orElseThrow(() -> new PublisherIdNotFoundException(reqDto.publisherId()));
 
-		Book books = Book.builder()
+		Book book = Book.builder()
 			.stateId(bookState)
 			.publisherId(publisher)
-			.title(reqDto.getTitle())
-			.thumbnailImageUrl(reqDto.getThumbnailImageUrl())
-			.detailImageUrl(reqDto.getDetailImageUrl())
-			.publicationDate(reqDto.getPublicationDate())
-			.price(reqDto.getPrice())
-			.discountRate(reqDto.getDiscountRate())
-			.description(reqDto.getDescription())
-			.contents(reqDto.getContents())
-			.isbn(reqDto.getIsbn())
+			.title(reqDto.title())
+			.thumbnailImageUrl(reqDto.thumbnailImageUrl())
+			.detailImageUrl(reqDto.detailImageUrl())
+			.publicationDate(reqDto.publicationDate())
+			.price(reqDto.price())
+			.discountRate(reqDto.discountRate())
+			.description(reqDto.description())
+			.contents(reqDto.contents())
+			.isbn(reqDto.isbn())
 			.isPackageable(reqDto.isPackageable())
 			.likeCount(0)
-			.stock(reqDto.getStock())
+			.stock(reqDto.stock())
 			.viewCount(0L)
 			.build();
 
-		booksRepository.save(books);
+		booksRepository.save(book);
 
-		return BookRegisterRes.builder()
-			.id(books.getId())
-			.stateId(books.getStateId().getId())
-			.publisherId(books.getPublisherId().getId())
-			.title(books.getTitle())
-			.thumbnailImageUrl(books.getThumbnailImageUrl())
-			.publicationDate(books.getPublicationDate())
-			.price(books.getPrice())
-			.discountRate(books.getDiscountRate())
-			.description(books.getDescription())
-			.stock(books.getStock())
-			.build();
+		return BookRegisterRes.of(book);
 	}
 }
