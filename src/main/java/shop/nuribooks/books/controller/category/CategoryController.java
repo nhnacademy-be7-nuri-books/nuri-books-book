@@ -86,6 +86,11 @@ public class CategoryController {
 	 * @author janghyun
 	 * @return 모든 카테고리의 응답 리스트
 	 */
+	@Operation(summary = "모든 카테고리 조회", description = "모든 카테고리를 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "성공적으로 모든 카테고리를 조회하였습니다.")
+	})
+
 	@GetMapping
 	public ResponseEntity<List<CategoryResponse>> getAllCategories() {
 		List<CategoryResponse> categoryResponseList = categoryService.getAllCategory();
@@ -99,6 +104,11 @@ public class CategoryController {
 	 * @param categoryId 조회할 카테고리의 ID
 	 * @return 조회된 카테고리의 응답 객체와 그 하위 카테고리
 	 */
+	@Operation(summary = "카테고리 조회", description = "주어진 ID에 해당하는 카테고리를 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "성공적으로 카테고리를 조회하였습니다."),
+		@ApiResponse(responseCode = "404", description = "해당 ID의 카테고리를 찾을 수 없습니다.")
+	})
 	@GetMapping("/{categoryId}")
 	public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long categoryId) {
 		CategoryResponse categoryResponse = categoryService.getCategoryById(categoryId);
