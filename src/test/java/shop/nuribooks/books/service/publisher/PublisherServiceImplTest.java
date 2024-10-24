@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import shop.nuribooks.books.dto.publisher.PublisherRequest;
 import shop.nuribooks.books.dto.publisher.PublisherResponse;
 import shop.nuribooks.books.entity.book.Publisher;
+import shop.nuribooks.books.exception.publisher.PublisherAlreadyExistsException;
 import shop.nuribooks.books.repository.publisher.PublisherRepository;
 
 @SpringBootTest
@@ -46,6 +47,24 @@ class PublisherServiceImplTest {
 		verify(publisherRepository).save(any(Publisher.class));
 	}
 
+	@DisplayName("출판사 등록 실패 - 중복")
+	@Test
+	void failed_registerPublisher() {
+		// given
+		PublisherRequest request = registerRequest();
+
+		when(publisherRepository.existsByName(request.name())).thenReturn(true);
+
+		//then
+		assertThatThrownBy(() -> publisherService.registerPublisher(request))
+			.isInstanceOf(PublisherAlreadyExistsException.class)
+			.hasMessageContaining("출판사가 이미 등록되어 있습니다.");
+
+		// 메서드 호출 여부 검증
+		verify(publisherRepository).existsByName(request.name());
+		verify(publisherRepository, never()).save(any(Publisher.class));
+	}
+
 	private PublisherRequest registerRequest() {
 		return PublisherRequest.builder()
 			.name("publisher1")
@@ -53,8 +72,8 @@ class PublisherServiceImplTest {
 	}
 
 	private Publisher savedPublisher() {
-		Publisher publisher = new Publisher();
-		publisher.setName("publisher1");
-		return publisher;
+		return Publisher.builder()
+			.name("publisher1")
+			.build();
 	}
 }

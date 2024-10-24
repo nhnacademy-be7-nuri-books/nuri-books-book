@@ -26,11 +26,10 @@ public class PublisherServiceImpl implements PublisherService {
 	 */
 	@Override
 	public PublisherResponse registerPublisher(PublisherRequest request) {
-		Publisher publisher = new Publisher();
 		if (publisherRepository.existsByName(request.name())) {
 			throw new PublisherAlreadyExistsException("출판사가 이미 등록되어 있습니다.");
 		}
-		publisher.setName(request.name());
+		Publisher publisher = request.toEntity();
 		Publisher saved = publisherRepository.save(publisher);
 		return new PublisherResponse(saved.getName());
 	}

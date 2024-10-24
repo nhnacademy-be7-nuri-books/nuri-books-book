@@ -6,16 +6,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 @Table(name = "publishers")
 public class Publisher {
 	@Id
@@ -24,4 +21,14 @@ public class Publisher {
 
 	@NotNull
 	private String name;
+
+	@Builder
+	public Publisher(String name) {
+		this.name = name;
+	}
+
+	public Publisher(Long id, String name) {
+		this.name = name;
+		this.id = id;
+	}
 }
