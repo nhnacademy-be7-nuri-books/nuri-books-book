@@ -63,7 +63,7 @@ class MemberRepositoryTest {
 
 	private Member member(Customer savedCustomer) {
 		return Member.builder()
-			.customer_id(savedCustomer)
+			.customer(savedCustomer)
 			.authority(MEMBER)
 			.grade(STANDARD)
 			.status(ACTIVE)

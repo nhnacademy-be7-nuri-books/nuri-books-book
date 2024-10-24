@@ -119,7 +119,6 @@ class MemberServiceImplTest {
 		Customer existingCustomer = customer();
 		Member existingMember = spy(member(existingCustomer));
 
-		when(memberRepository.existsByUserId(request.getUserId())).thenReturn(true);
 		when(memberRepository.findByUserId(request.getUserId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.getPassword())).thenReturn(true);
 
@@ -138,7 +137,7 @@ class MemberServiceImplTest {
 	    //given
 		MemberWithdrawRequest request = memberWithdrawRequest();
 
-		when(memberRepository.existsByUserId(request.getUserId())).thenReturn(false);
+		when(memberRepository.findByUserId(request.getUserId())).thenReturn(Optional.empty());
 
 	    //when / then
 		UserIdNotFoundException exception = assertThrows(UserIdNotFoundException.class,
@@ -155,7 +154,6 @@ class MemberServiceImplTest {
 		Customer existingCustomer = customer();
 		Member existingMember = member(existingCustomer);
 
-		when(memberRepository.existsByUserId(request.getUserId())).thenReturn(true);
 		when(memberRepository.findByUserId(request.getUserId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.getPassword()))
 			.thenReturn(false);
@@ -308,7 +306,7 @@ class MemberServiceImplTest {
 
 	private Member member(Customer savedCustomer) {
 		return Member.builder()
-			.customer_id(savedCustomer)
+			.customer(savedCustomer)
 			.authority(MEMBER)
 			.grade(STANDARD)
 			.status(ACTIVE)

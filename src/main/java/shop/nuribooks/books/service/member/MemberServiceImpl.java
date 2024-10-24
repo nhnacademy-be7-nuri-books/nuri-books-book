@@ -94,12 +94,8 @@ public class MemberServiceImpl implements MemberService {
 	 */
 	@Transactional
 	public void withdrawMember(MemberWithdrawRequest request) {
-		if (!memberRepository.existsByUserId(request.getUserId())) {
-			throw new UserIdNotFoundException("존재하지 않는 아이디입니다.");
-		}
-
 		Member findMember = memberRepository.findByUserId(request.getUserId())
-			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+			.orElseThrow(() -> new UserIdNotFoundException("존재하지 않는 아이디입니다."));
 
 		if (!customerRepository.existsByIdAndPassword(
 			findMember.getId(), request.getPassword())) {

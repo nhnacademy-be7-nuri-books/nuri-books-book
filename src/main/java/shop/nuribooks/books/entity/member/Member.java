@@ -40,7 +40,7 @@ public class Member {
 	@OneToOne(fetch = LAZY)
 	@MapsId
 	@JoinColumn(name = "id")
-	private Customer customer_id;
+	private Customer customer;
 
 	/**
 	 * ADMIN, MEMBER, SELLER
@@ -93,7 +93,7 @@ public class Member {
 
 	public Member(Customer customer, AuthorityEnum authority, GradeEnum grade, StatusEnum status, String userId,
 		LocalDate birthday, LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
-		this.customer_id = customer;
+		this.customer = customer;
 		this.authority = authority;
 		this.grade = grade;
 		this.status = status;

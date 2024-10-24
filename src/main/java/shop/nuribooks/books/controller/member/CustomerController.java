@@ -20,13 +20,13 @@ import shop.nuribooks.books.dto.member.request.CustomerRegisterRequest;
 import shop.nuribooks.books.dto.member.request.CustomerUpdateRequest;
 import shop.nuribooks.books.dto.member.response.CustomerRegisterResponse;
 import shop.nuribooks.books.dto.member.response.CustomerUpdateResponse;
-import shop.nuribooks.books.service.member.CustomerServiceImpl;
+import shop.nuribooks.books.service.member.CustomerService;
 
 @RestController
 @RequiredArgsConstructor
 public class CustomerController {
 
-	private final CustomerServiceImpl customerServiceImpl;
+	private final CustomerService customerService;
 
 	/**
 	 * 비회원 등록
@@ -38,7 +38,7 @@ public class CustomerController {
 	public ResponseEntity<CustomerRegisterResponse> customerRegister(
 		@RequestBody @Valid CustomerRegisterRequest request) {
 
-		CustomerRegisterResponse response = customerServiceImpl.registerCustomer(request);
+		CustomerRegisterResponse response = customerService.registerCustomer(request);
 
 		return ResponseEntity.status(CREATED).body(response);
 	}
@@ -54,22 +54,9 @@ public class CustomerController {
 	public ResponseEntity<CustomerUpdateResponse> customerUpdate(
 		@PathVariable Long customerId, @RequestBody @Valid CustomerUpdateRequest request) {
 
-		CustomerUpdateResponse response = customerServiceImpl.updateCustomer(customerId, request);
+		CustomerUpdateResponse response = customerService.updateCustomer(customerId, request);
 
 		return ResponseEntity.status(OK).body(response);
-	}
-
-	/**
-	 * Valid 검증이 실패하면 MethodArgumentNotValidException 발생 <br>
-	 * 이 예외에서 모든 오류를 받아 각 오류의 필드명을 key, 오류 메시지를 value로 Map에 담아 반환한다.
-	 */
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException e) {
-		Map<String, String> errors = new HashMap<>();
-		e.getBindingResult().getAllErrors()
-			.forEach(error -> errors.put(((FieldError) error).getField(), error.getDefaultMessage()));
-
-		return ResponseEntity.status(BAD_REQUEST).body(errors);
 	}
 }
 

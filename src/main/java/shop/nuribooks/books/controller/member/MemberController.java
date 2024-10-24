@@ -19,7 +19,6 @@ import shop.nuribooks.books.dto.member.request.MemberWithdrawRequest;
 import shop.nuribooks.books.dto.member.response.MemberCheckResponse;
 import shop.nuribooks.books.dto.member.response.MemberRegisterResponse;
 import shop.nuribooks.books.dto.member.response.MemberUpdateResponse;
-import shop.nuribooks.books.exception.member.InvalidUserIdException;
 import shop.nuribooks.books.service.member.MemberService;
 
 @RestController
@@ -52,9 +51,6 @@ public class MemberController {
 	 */
 	@GetMapping("/api/member/{userId}")
 	public ResponseEntity<MemberCheckResponse> memberCheck(@PathVariable String userId) {
-		if (userId.length() < 8 || userId.length() > 20) {
-			throw new InvalidUserIdException("아이디는 반드시 8자 이상 20자 이하로 입력해야 합니다.");
-		}
 
 		MemberCheckResponse response = memberService.checkMember(userId);
 
@@ -63,12 +59,12 @@ public class MemberController {
 
 	/**
 	 * 아이디와 비밀번호로 회원 탈퇴 <br>
-	 * MemberWithdrawReq의 모든 필드 즉, <br>
+	 * MemberWithdrawRequest의 모든 필드 즉, <br>
 	 * userId와 password에 대해서 검증 후 회원 탈퇴 진행
 	 */
 	@PatchMapping("/api/member/status")
 	public ResponseEntity<ResponseMessage> memberWithdraw(
-		@RequestBody @Valid MemberWithdrawRequest request) {
+		@RequestBody MemberWithdrawRequest request) {
 
 		memberService.withdrawMember(request);
 
@@ -77,7 +73,7 @@ public class MemberController {
 	}
 
 	/**
-	 * 로그인 상태의 사용자 정보 수정 <br>
+	 * 회원 정보 수정 <br>
 	 * MemberUpdateReq의 모든 필드 즉, <br>
 	 * name, password, phoneNumber에 대해서 검증 후 userId를 통해 수정 진행 <br>
 	 * MemberUpdateResponse에 변경한 이름과 전화번호 담아서 반환

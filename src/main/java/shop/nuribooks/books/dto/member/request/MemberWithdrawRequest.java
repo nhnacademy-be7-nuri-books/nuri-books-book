@@ -11,10 +11,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MemberWithdrawRequest {
 
-	@NotBlank(message = "아이디는 반드시 입력해야 합니다.")
-	@Size(min = 8, max = 20, message = "아이디는 반드시 8자 이상 20자 이하로 입력해야 합니다.")
 	private String userId;
-
-	@NotBlank(message = "비밀번호는 반드시 입력해야 합니다.")
 	private String password;
 }
