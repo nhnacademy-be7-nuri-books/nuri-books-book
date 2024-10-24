@@ -1,6 +1,5 @@
 package shop.nuribooks.books.controller.address;
 
-import static java.math.BigDecimal.ZERO;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -8,33 +7,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static shop.nuribooks.books.entity.member.AuthorityEnum.MEMBER;
-import static shop.nuribooks.books.entity.member.GradeEnum.STANDARD;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import shop.nuribooks.books.dto.address.requset.AddressRegisterRequest;
 import shop.nuribooks.books.dto.address.requset.AddressEditRequest;
 import shop.nuribooks.books.dto.address.response.AddressResponse;
-import shop.nuribooks.books.entity.address.Address;
-import shop.nuribooks.books.entity.member.Customer;
-import shop.nuribooks.books.entity.member.Member;
-import shop.nuribooks.books.entity.member.StatusEnum;
-import shop.nuribooks.books.repository.address.AddressRepository;
-import shop.nuribooks.books.service.address.AddressService;
+import shop.nuribooks.books.service.address.AddressServiceImpl;
 
 
 @WebMvcTest(controllers = AddressController.class)
@@ -47,7 +34,7 @@ class AddressControllerTest {
     ObjectMapper objectMapper;
 
     @MockBean
-    private AddressService addressService;
+    private AddressServiceImpl addressService;
 
     @DisplayName("회원의 주소를 등록한다.")
     @Test

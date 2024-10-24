@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,7 @@ import shop.nuribooks.books.repository.member.MemberRepository;
 class AddressServiceTest {
 
     @Autowired
-    private AddressService addressService;
+    private AddressServiceImpl addressService;
 
     @Autowired
     private AddressRepository addressRepository;

@@ -20,20 +20,13 @@ import shop.nuribooks.books.dto.address.requset.AddressRegisterRequest;
 import shop.nuribooks.books.dto.address.requset.AddressEditRequest;
 import shop.nuribooks.books.dto.address.response.AddressResponse;
 import shop.nuribooks.books.service.address.AddressService;
+import shop.nuribooks.books.service.address.AddressServiceImpl;
 
 @RestController
 @RequiredArgsConstructor
 public class AddressController {
 
     private final AddressService addressService;
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> exceptionHandler(MethodArgumentNotValidException e) {
-        Map<String, String> errors = new HashMap<>();
-        e.getBindingResult().getAllErrors()
-                .forEach(c -> errors.put(((FieldError) c).getField(), c.getDefaultMessage()));
-        return ResponseEntity.badRequest().body(errors);
-    }
 
     @PostMapping("/api/member/{memberId}/address")
     public ResponseEntity<AddressResponse> addressRegister(@PathVariable Long memberId,
