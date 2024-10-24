@@ -202,4 +202,58 @@ class CategoryControllerTest {
 			.andExpect(jsonPath("$.message").value("Category not found with ID: " + categoryId));
 	}
 
+	/**
+	 * 유효한 요청을 통해 카테고리를 업데이트할 때, HTTP 상태 코드 200(OK)을 반환하는지 테스트합니다.
+	 */
+	@Test
+	void updateCategory_whenValidRequest_thenReturnsOk() throws Exception {
+		// given
+		Long categoryId = 1L;
+		CategoryRequest dto = new CategoryRequest("여행 업데이트");
+		CategoryResponse response = new CategoryResponse(Category.builder().name("여행 업데이트").build());
+		when(categoryService.updateCategory(any(CategoryRequest.class), eq(categoryId))).thenReturn(response);
+
+		// when & then
+		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(dto)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.name").value("여행 업데이트"));
+	}
+
+	/**
+	 * 유효하지 않은 ID로 카테고리를 업데이트할 때, HTTP 상태 코드 404(Not Found)를 반환하는지 테스트합니다.
+	 */
+	@Test
+	void updateCategory_whenInvalidId_thenReturnsNotFound() throws Exception {
+		// given
+		Long categoryId = 999L;
+		CategoryRequest dto = new CategoryRequest("여행 업데이트");
+		doThrow(new CategoryNotFoundException("Category not found with ID: " + categoryId)).when(categoryService)
+			.updateCategory(any(CategoryRequest.class), eq(categoryId));
+
+		// when & then
+		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(dto)))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.message").value("Category not found with ID: " + categoryId));
+	}
+
+	/**
+	 * 잘못된 요청을 통해 카테고리를 업데이트할 때, HTTP 상태 코드 400(Bad Request)을 반환하는지 테스트합니다.
+	 */
+	@Test
+	void updateCategory_whenInvalidRequest_thenReturnsBadRequest() throws Exception {
+		// given
+		Long categoryId = 1L;
+		CategoryRequest dto = new CategoryRequest(""); // 빈 이름으로 잘못된 요청
+
+		// when & then
+		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(dto)))
+			.andExpect(status().isBadRequest());
+	}
+
 }
