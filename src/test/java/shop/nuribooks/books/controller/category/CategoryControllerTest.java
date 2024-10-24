@@ -97,7 +97,7 @@ class CategoryControllerTest {
 	void registerMainCategory_whenCategoryAlreadyExists_thenThrowsException() throws Exception {
 		// given
 		CategoryRequest dto = new CategoryRequest("여행");
-		doThrow(new CategoryAlreadyExistException("Top-level category with name '여행' already exists.")).when(
+		doThrow(new CategoryAlreadyExistException("여행")).when(
 			categoryService).registerMainCategory(any(CategoryRequest.class));
 
 		// when & then
@@ -105,7 +105,7 @@ class CategoryControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
 			.andExpect(status().isConflict())
-			.andExpect(jsonPath("$.message").value("Top-level category with name '여행' already exists."));
+			.andExpect(jsonPath("$.message").value("카테고리 이름 '여행' 가 이미 존재합니다"));
 	}
 
 	/**
@@ -135,8 +135,7 @@ class CategoryControllerTest {
 		// given
 		Long parentCategoryId = 1L;
 		CategoryRequest dto = new CategoryRequest("국내 여행");
-		doThrow(new CategoryAlreadyExistException(
-			"Category with name '국내 여행' already exists under parent category with ID: " + parentCategoryId)).when(
+		doThrow(new CategoryAlreadyExistException("국내 여행")).when(
 			categoryService).registerSubCategory(any(CategoryRequest.class), eq(parentCategoryId));
 
 		// when & then
@@ -144,8 +143,7 @@ class CategoryControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
 			.andExpect(status().isConflict())
-			.andExpect(jsonPath("$.message").value(
-				"Category with name '국내 여행' already exists under parent category with ID: " + parentCategoryId));
+			.andExpect(jsonPath("$.message").value("카테고리 이름 '국내 여행' 가 이미 존재합니다"));
 	}
 
 	/**

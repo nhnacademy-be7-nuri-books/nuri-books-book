@@ -67,7 +67,7 @@ class CategoryServiceImplTest {
 		// when & then
 		assertThatThrownBy(() -> categoryService.registerMainCategory(dto))
 			.isInstanceOf(CategoryAlreadyExistException.class)
-			.hasMessageContaining("카테고리 이름 '여행'가 이미 존재합니다.");
+			.hasMessageContaining("카테고리 이름 '여행' 가 이미 존재합니다");
 	}
 
 	/**
@@ -202,6 +202,54 @@ class CategoryServiceImplTest {
 		assertEquals("Updated Category Name", result.name());
 		verify(categoryRepository).findById(categoryId);
 		verify(categoryRepository).save(existingCategory);
+	}
+
+	@Test
+	void updateCategory_ShouldThrowCategoryNotFoundException() {
+		// Given
+		Long categoryId = 1L;
+		CategoryRequest dto = new CategoryRequest("Updated Category Name");
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+		// When & Then
+		assertThrows(CategoryNotFoundException.class, () -> categoryService.updateCategory(dto, categoryId));
+		verify(categoryRepository).findById(categoryId);
+		verify(categoryRepository, never()).save(any(Category.class));
+	}
+
+	@Test
+	void updateCategory_ShouldThrowCategoryAlreadyExistException_WhenParentCategoryIsNull() {
+		// Given
+		Long categoryId = 1L;
+		CategoryRequest dto = new CategoryRequest("Duplicate Category Name");
+		Category existingCategory = new Category("Old Category Name", null);
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
+		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(true);
+
+		// When & Then
+		assertThrows(CategoryAlreadyExistException.class, () -> categoryService.updateCategory(dto, categoryId));
+		verify(categoryRepository).findById(categoryId);
+		verify(categoryRepository, never()).save(any(Category.class));
+	}
+
+	@Test
+	void updateCategory_ShouldThrowCategoryAlreadyExistException_WhenSubCategoryExists() {
+		// Given
+		Long categoryId = 1L;
+		Category parentCategory = new Category("Parent Category", null);
+		Category existingCategory = new Category("Old Category Name", parentCategory);
+		CategoryRequest dto = new CategoryRequest("Duplicate SubCategory Name");
+		Category duplicateSubCategory = new Category("Duplicate SubCategory Name", parentCategory);
+		parentCategory.getSubCategory().add(duplicateSubCategory);
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
+
+		// When & Then
+		assertThrows(CategoryAlreadyExistException.class, () -> categoryService.updateCategory(dto, categoryId));
+		verify(categoryRepository).findById(categoryId);
+		verify(categoryRepository, never()).save(any(Category.class));
 	}
 
 }
