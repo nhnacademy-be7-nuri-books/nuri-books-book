@@ -9,7 +9,7 @@ import lombok.Getter;
 @Builder
 public class BookRegisterRes {
 	private Long id;
-	private Long stateId;
+	private Integer stateId;
 	private Long publisherId;
 	private String title;
 	private String thumbnailImageUrl;

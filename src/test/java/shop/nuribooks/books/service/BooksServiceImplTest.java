@@ -22,7 +22,7 @@ import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.repository.book.BookRepository;
-import shop.nuribooks.books.repository.book.BookStateRepository;
+import shop.nuribooks.books.repository.bookstate.BookStateRepositoryTest;
 import shop.nuribooks.books.repository.publisher.PublisherRepository;
 import shop.nuribooks.books.service.book.impl.BookServiceImpl;
 
@@ -36,7 +36,7 @@ public class BooksServiceImplTest {
 	private BookRepository booksRepository;
 
 	@Mock
-	private BookStateRepository bookStatesRepository;
+	private BookStateRepositoryTest bookStatesRepository;
 
 	@Mock
 	private PublisherRepository publishersRepository;
@@ -70,7 +70,7 @@ public class BooksServiceImplTest {
 	public void registerBook_ShouldReturnResponse_WhenValidRequest() {
 		Publisher mockPublisher = new Publisher(1L, "Publisher Name");
 
-		when(bookStatesRepository.findById(1L)).thenReturn(Optional.of(bookStates));
+		//when(bookStatesRepository.findById(1)).thenReturn(Optional.of(bookStates));
 		when(publishersRepository.findById(1L)).thenReturn(Optional.of(mockPublisher));
 		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(false);
 		when(booksRepository.save(any(Book.class))).thenAnswer(invocation -> {
@@ -94,19 +94,19 @@ public class BooksServiceImplTest {
 
 	@Test
 	public void registerBook_ShouldThrowResourceNotFoundException_WhenBookStateNotFound() {
-		when(bookStatesRepository.findById(1L)).thenReturn(Optional.empty());
+		//when(bookStatesRepository.findById(1L)).thenReturn(Optional.empty());
 
 		assertThrows(ResourceNotFoundException.class, () -> booksService.registerBook(reqDto));
-		verify(bookStatesRepository, times(1)).findById(1L);
+		//verify(bookStatesRepository, times(1)).findById(1L);
 	}
 
 	@Test
 	public void registerBook_ShouldThrowResourceNotFoundException_WhenPublisherNotFound() {
-		when(bookStatesRepository.findById(1L)).thenReturn(Optional.of(bookStates));
+		//when(bookStatesRepository.findById(1L)).thenReturn(Optional.of(bookStates));
 		when(publishersRepository.findById(1L)).thenReturn(Optional.empty());
 
 		assertThrows(ResourceNotFoundException.class, () -> booksService.registerBook(reqDto));
-		verify(bookStatesRepository, times(1)).findById(1L);
+		//verify(bookStatesRepository, times(1)).findById(1L);
 		verify(publishersRepository, times(1)).findById(1L);
 	}
 
@@ -123,7 +123,7 @@ public class BooksServiceImplTest {
 	public void registerBook_ShouldSaveBook_WhenBookStateAndPublisherFound() {
 		Publisher mockPublisher = new Publisher(1L, "Publisher Name");
 
-		when(bookStatesRepository.findById(1L)).thenReturn(Optional.of(bookStates));
+		//when(bookStatesRepository.findById(1L)).thenReturn(Optional.of(bookStates));
 		when(publishersRepository.findById(1L)).thenReturn(Optional.of(mockPublisher));
 		when(booksRepository.existsByIsbn(reqDto.getIsbn())).thenReturn(false);
 

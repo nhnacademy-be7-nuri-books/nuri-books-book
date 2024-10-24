@@ -14,17 +14,24 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 @Table(name = "book_states")
 public class BookState {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Integer id;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	private BookStateEnum detail;
+
+	private BookState(BookStateEnum detail) {
+		this.detail = detail;
+	}
+
+	public static BookState of(BookStateEnum detail) {
+		return new BookState(detail);
+	}
 }
+
