@@ -1,5 +1,6 @@
 package shop.nuribooks.books.service.category.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -87,11 +88,19 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	public List<CategoryResponse> getAllCategory() {
-		return List.of();
+		List<Category> categoryList = categoryRepository.findAllByParentCategoryIsNull();
+		List<CategoryResponse> categoryResponseList = new ArrayList<>();
+		for (Category category : categoryList) {
+			categoryResponseList.add(new CategoryResponse(category));
+		}
+		return categoryResponseList;
 	}
 
 	@Override
 	public CategoryResponse getCategoryById(Long categoryId) {
-		return null;
+		Category category = categoryRepository.findById(categoryId)
+			.orElseThrow(() -> new CategoryNotFoundException(
+				"category not found with ID: " + categoryId));
+		return new CategoryResponse(category);
 	}
 }
