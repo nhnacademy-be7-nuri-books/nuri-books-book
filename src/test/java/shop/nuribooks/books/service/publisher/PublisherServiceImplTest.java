@@ -124,6 +124,39 @@ class PublisherServiceImplTest {
 
 	}
 
+	@DisplayName("검색한 출판사 삭제 성공")
+	@Test
+	void deletePublisher() {
+		// given
+		String publisherName = "publisher1";
+		Publisher publisher = new Publisher(1L, publisherName);
+
+		when(publisherRepository.findByName(publisherName)).thenReturn(Optional.of(publisher));
+
+		// when
+		publisherService.deletePublisher(publisherName);
+
+		// then
+		verify(publisherRepository).findByName(publisherName);
+		verify(publisherRepository).delete(publisher);
+	}
+
+	@DisplayName("삭제할 출판사 조회 실패 - 존재하지 않음")
+	@Test
+	void failed_deletePublisher() {
+		// given
+		String publisherName = "unknownPublisher";
+
+		when(publisherRepository.findByName(publisherName)).thenReturn(Optional.empty());
+
+		// then
+		assertThatThrownBy(() -> publisherService.deletePublisher(publisherName)).isInstanceOf(
+			PublisherNotFoundException.class).hasMessageContaining("출판사가 존재하지 않습니다.");
+
+		verify(publisherRepository).findByName(publisherName);
+
+	}
+
 	private PublisherRequest registerRequest() {
 		return PublisherRequest.builder().name("publisher1").build();
 	}

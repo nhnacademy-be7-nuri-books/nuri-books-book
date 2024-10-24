@@ -65,4 +65,19 @@ public class PublisherServiceImpl implements PublisherService {
 			.orElseThrow(() -> new PublisherNotFoundException("출판사가 존재하지 않습니다."));
 		return PublisherResponse.of(publisher);
 	}
+
+	/**
+	 * deletePublisher : 출판사 정보 삭제
+	 * @author kyongmin
+	 *
+	 * @param name 이름으로 출판사 정보 삭제
+	 *             존재하지 않는 출판사일 경우 PublisherNotFoundException 발생
+	 */
+	@Override
+	public void deletePublisher(String name) {
+		Publisher publisher = publisherRepository.findByName(name)
+			.orElseThrow(() -> new PublisherNotFoundException("출판사가 존재하지 않습니다."));
+
+		publisherRepository.delete(publisher);
+	}
 }

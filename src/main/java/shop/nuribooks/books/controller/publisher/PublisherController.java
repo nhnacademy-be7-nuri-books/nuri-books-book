@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,6 +79,20 @@ public class PublisherController {
 	public ResponseEntity<PublisherResponse> getPublisher(@Valid @PathVariable String publisherName) {
 		PublisherResponse response = publisherService.getPublisher(publisherName);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
+
+	}
+
+	/**
+	 * 요청받은 이름에 해당하는 출판사 정보 삭제하는 controller
+	 * @author kyongmin
+	 *
+	 * @param publisherName 삭제할 출판사 이름
+	 * @return HttpStatus
+	 */
+	@DeleteMapping("/api/publishers/{publisherName}")
+	public ResponseEntity<HttpStatus> deletePublisher(@PathVariable String publisherName) {
+		publisherService.deletePublisher(publisherName);
+		return ResponseEntity.status(HttpStatus.OK).build();
 
 	}
 }
