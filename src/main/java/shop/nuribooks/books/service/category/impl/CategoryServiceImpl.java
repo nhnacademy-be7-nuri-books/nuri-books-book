@@ -44,7 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
 		boolean isDuplicate = categoryRepository.existsByNameAndParentCategoryIsNull(dto.name());
 		if (isDuplicate) {
 			throw new CategoryAlreadyExistException(
-				"Top-level category with name '" + dto.name() + "' already exists.");
+				"카테고리 이름 '" + dto.name() + "'가 이미 존재합니다.");
 		}
 		Category category = Category.builder()
 			.name(dto.name())
@@ -66,16 +66,14 @@ public class CategoryServiceImpl implements CategoryService {
 	@Transactional
 	public Category registerSubCategory(CategoryRequest dto, Long parentCategoryId) {
 		Category parentCategory = categoryRepository.findById(parentCategoryId)
-			.orElseThrow(() -> new CategoryNotFoundException(
-				"Parent category not found with ID: " + parentCategoryId));
+			.orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
 
 		boolean isDuplicate = parentCategory.getSubCategory().stream()
 			.anyMatch(subCategory -> subCategory.getName().equals(dto.name()));
 
 		if (isDuplicate) {
 			throw new CategoryAlreadyExistException(
-				"Category with name '" + dto.name() + "' already exists under parent category with ID: "
-					+ parentCategoryId);
+				"카테고리 이름 '" + dto.name() + "' 가 이미 존재합니다");
 		}
 
 		Category category = Category.builder()
@@ -93,7 +91,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 */
 	@Override
 	public List<CategoryResponse> getAllCategory() {
-		List<Category> categoryList = categoryRepository.findAllTopCategoriesWithChildren();
+		List<Category> categoryList = categoryRepository.findAllByParentCategoryIsNull();
 		List<CategoryResponse> categoryResponseList = new ArrayList<>();
 		for (Category category : categoryList) {
 			categoryResponseList.add(new CategoryResponse(category));
@@ -112,8 +110,7 @@ public class CategoryServiceImpl implements CategoryService {
 	@Override
 	public CategoryResponse getCategoryById(Long categoryId) {
 		Category category = categoryRepository.findById(categoryId)
-			.orElseThrow(() -> new CategoryNotFoundException(
-				"category not found with ID: " + categoryId));
+			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
 		return new CategoryResponse(category);
 	}
 

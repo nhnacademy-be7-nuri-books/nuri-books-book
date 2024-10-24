@@ -67,7 +67,7 @@ class CategoryServiceImplTest {
 		// when & then
 		assertThatThrownBy(() -> categoryService.registerMainCategory(dto))
 			.isInstanceOf(CategoryAlreadyExistException.class)
-			.hasMessageContaining("Top-level category with name '여행' already exists.");
+			.hasMessageContaining("카테고리 이름 '여행'가 이미 존재합니다.");
 	}
 
 	/**
@@ -106,7 +106,7 @@ class CategoryServiceImplTest {
 		// when & then
 		assertThatThrownBy(() -> categoryService.registerSubCategory(dto, parentCategoryId))
 			.isInstanceOf(CategoryNotFoundException.class)
-			.hasMessageContaining("Parent category not found with ID: " + parentCategoryId);
+			.hasMessageContaining("력한 카테고리ID는 1 존재하지 않습니다.");
 	}
 
 	/**
@@ -125,8 +125,7 @@ class CategoryServiceImplTest {
 		// when & then
 		assertThatThrownBy(() -> categoryService.registerSubCategory(dto, parentCategoryId))
 			.isInstanceOf(CategoryAlreadyExistException.class)
-			.hasMessageContaining(
-				"Category with name '국내 여행' already exists under parent category with ID: " + parentCategoryId);
+			.hasMessageContaining("카테고리 이름 '국내 여행' 가 이미 존재합니다");
 	}
 
 	/**
@@ -138,7 +137,7 @@ class CategoryServiceImplTest {
 		Category category1 = Category.builder().name("여행").level(0).build();
 		Category category2 = Category.builder().name("문화").level(0).build();
 		List<Category> categories = List.of(category1, category2);
-		when(categoryRepository.findAllTopCategoriesWithChildren()).thenReturn(categories);
+		when(categoryRepository.findAllByParentCategoryIsNull()).thenReturn(categories);
 
 		// when
 		List<CategoryResponse> categoryResponseList = categoryService.getAllCategory();
@@ -147,7 +146,7 @@ class CategoryServiceImplTest {
 		assertThat(categoryResponseList).hasSize(2);
 		assertThat(categoryResponseList.get(0).name()).isEqualTo("여행");
 		assertThat(categoryResponseList.get(1).name()).isEqualTo("문화");
-		verify(categoryRepository, times(1)).findAllTopCategoriesWithChildren();
+		verify(categoryRepository, times(1)).findAllByParentCategoryIsNull();
 	}
 
 	/**
@@ -181,7 +180,7 @@ class CategoryServiceImplTest {
 		// when & then
 		assertThatThrownBy(() -> categoryService.getCategoryById(categoryId))
 			.isInstanceOf(CategoryNotFoundException.class)
-			.hasMessageContaining("category not found with ID: " + categoryId);
+			.hasMessageContaining("입력한 카테고리ID는 999 존재하지 않습니다.");
 		verify(categoryRepository, times(1)).findById(categoryId);
 	}
 
