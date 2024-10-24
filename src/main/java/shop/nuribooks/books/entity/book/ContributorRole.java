@@ -1,6 +1,8 @@
 package shop.nuribooks.books.entity.book;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,5 +25,6 @@ public class ContributorRole {
 	private Long id;
 
 	@NotNull
+	@Enumerated(EnumType.STRING)
 	private ContributorRoleEnum name;
 }
