@@ -51,13 +51,13 @@ public class BooksServiceImplTest {
 	@BeforeEach
 	public void setUp() {
 		bookState = BookState.builder()
-			.detail("InStock") // ID 없이 detail만 설정
+			.detail("InStock")
 			.build();
 		publisher = new Publisher(1L, "Publisher Name");
 
 		reqDto = new BookRegisterRequest(
-			1, // stateId
-			1L, // publisherId
+			1,
+			1L,
 			"Book Title",
 			"thumbnail.jpg",
 			"detail.jpg",
@@ -79,7 +79,7 @@ public class BooksServiceImplTest {
 		when(booksRepository.existsByIsbn(reqDto.isbn())).thenReturn(false);
 		when(booksRepository.save(any(Book.class))).thenAnswer(invocation -> {
 			Book book = invocation.getArgument(0);
-			return book; // ID 자동 생성
+			return book;
 		});
 
 		BookRegisterResponse result = booksService.registerBook(reqDto);
