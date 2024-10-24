@@ -48,6 +48,10 @@ public class BookStateController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
 	}
 
+	@Operation(summary = "도서 상태 조회", description = "모든 도서 상태를 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "도서 상태 조회 성공"),
+	})
 	@GetMapping
 	public ResponseEntity<List<BookStateResponse>> getBookState() {
 		List<BookStateResponse> bookStateResponses = bookStateService.getAllBooks();
