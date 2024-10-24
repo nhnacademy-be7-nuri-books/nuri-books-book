@@ -10,18 +10,27 @@ import shop.nuribooks.books.dto.address.response.AddressResponse;
 import shop.nuribooks.books.entity.address.Address;
 import shop.nuribooks.books.entity.address.AddressEditor;
 import shop.nuribooks.books.entity.address.AddressEditor.AddressEditorBuilder;
+import shop.nuribooks.books.entity.member.Member;
 import shop.nuribooks.books.exception.address.AddressNotFoundException;
+import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.repository.address.AddressRepository;
+import shop.nuribooks.books.repository.member.MemberRepository;
 
 @RequiredArgsConstructor
 @Service
 public class AddressService {
 
+    private final MemberRepository memberRepository;
+
     private final AddressRepository addressRepository;
+
 
     public AddressResponse registerAddress(AddressRegisterRequest request) {
         //TODO: 회원 주소가 10개 넘어가는 경우 예외처리
-        Address address = request.toEntity();
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new UserIdNotFoundException("유저를 찾을 수 없습니다."));
+
+        Address address = request.toEntity(member);
         Address saved = addressRepository.save(address);
         return AddressResponse.of(saved);
     }

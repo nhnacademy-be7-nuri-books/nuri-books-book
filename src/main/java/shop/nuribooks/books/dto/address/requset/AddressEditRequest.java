@@ -14,9 +14,6 @@ public class AddressEditRequest {
     @NotNull
     private Long id;
 
-    @NotNull
-    private Long memberId;
-
     @NotBlank
     private String name;
 
@@ -29,9 +26,8 @@ public class AddressEditRequest {
     private boolean isDefault;
 
     @Builder
-    private AddressEditRequest(Long id, Long memberId, String name, String address, String addressDetail, boolean isDefault) {
+    private AddressEditRequest(Long id, String name, String address, String addressDetail, boolean isDefault) {
         this.id = id;
-        this.memberId = memberId;
         this.name = name;
         this.address = address;
         this.addressDetail = addressDetail;

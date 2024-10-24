@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.nuribooks.books.entity.address.Address;
+import shop.nuribooks.books.entity.member.Member;
 
 @Getter
 @NoArgsConstructor
@@ -34,9 +35,9 @@ public class AddressRegisterRequest {
         this.isDefault = isDefault;
     }
 
-    public Address toEntity() {
+    public Address toEntity(Member member) {
         return Address.builder()
-                .memberId(memberId)
+                .member(member)
                 .name(name)
                 .address(address)
                 .addressDetail(addressDetail)
