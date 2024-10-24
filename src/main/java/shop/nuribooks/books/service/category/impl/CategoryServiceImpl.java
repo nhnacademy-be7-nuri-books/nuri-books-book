@@ -126,6 +126,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 * @throws CategoryNotFoundException 주어진 ID에 해당하는 카테고리가 존재하지 않을 경우
 	 */
 	@Override
+	@Transactional
 	public CategoryResponse updateCategory(CategoryRequest dto, Long categoryId) {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
