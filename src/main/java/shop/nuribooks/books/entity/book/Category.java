@@ -3,6 +3,8 @@ package shop.nuribooks.books.entity.book;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,7 +40,8 @@ public class Category {
 	@JoinColumn(name = "parent_category_id")
 	private Category parentCategory;
 
-	@OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
+	@BatchSize(size = 100)
+	@OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Category> subCategory = new ArrayList<>();
 
 	@NotNull

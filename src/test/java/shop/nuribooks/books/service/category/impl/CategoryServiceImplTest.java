@@ -3,6 +3,7 @@ package shop.nuribooks.books.service.category.impl;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import shop.nuribooks.books.dto.category.CategoryRequest;
+import shop.nuribooks.books.dto.category.CategoryResponse;
 import shop.nuribooks.books.entity.book.Category;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
@@ -65,7 +67,7 @@ class CategoryServiceImplTest {
 		// when & then
 		assertThatThrownBy(() -> categoryService.registerMainCategory(dto))
 			.isInstanceOf(CategoryAlreadyExistException.class)
-			.hasMessageContaining("Top-level category with name '여행' already exists.");
+			.hasMessageContaining("카테고리 이름 '여행'가 이미 존재합니다.");
 	}
 
 	/**
@@ -104,7 +106,7 @@ class CategoryServiceImplTest {
 		// when & then
 		assertThatThrownBy(() -> categoryService.registerSubCategory(dto, parentCategoryId))
 			.isInstanceOf(CategoryNotFoundException.class)
-			.hasMessageContaining("Parent category not found with ID: " + parentCategoryId);
+			.hasMessageContaining("력한 카테고리ID는 1 존재하지 않습니다.");
 	}
 
 	/**
@@ -123,7 +125,63 @@ class CategoryServiceImplTest {
 		// when & then
 		assertThatThrownBy(() -> categoryService.registerSubCategory(dto, parentCategoryId))
 			.isInstanceOf(CategoryAlreadyExistException.class)
-			.hasMessageContaining(
-				"Category with name '국내 여행' already exists under parent category with ID: " + parentCategoryId);
+			.hasMessageContaining("카테고리 이름 '국내 여행' 가 이미 존재합니다");
 	}
+
+	/**
+	 * 상위 카테고리가 없는 모든 카테고리를 조회할 때, 올바르게 응답 리스트를 반환하는지 테스트합니다.
+	 */
+	@Test
+	void getAllCategory_whenCategoriesExist_thenReturnsCategoryList() {
+		// given
+		Category category1 = Category.builder().name("여행").level(0).build();
+		Category category2 = Category.builder().name("문화").level(0).build();
+		List<Category> categories = List.of(category1, category2);
+		when(categoryRepository.findAllByParentCategoryIsNull()).thenReturn(categories);
+
+		// when
+		List<CategoryResponse> categoryResponseList = categoryService.getAllCategory();
+
+		// then
+		assertThat(categoryResponseList).hasSize(2);
+		assertThat(categoryResponseList.get(0).name()).isEqualTo("여행");
+		assertThat(categoryResponseList.get(1).name()).isEqualTo("문화");
+		verify(categoryRepository, times(1)).findAllByParentCategoryIsNull();
+	}
+
+	/**
+	 * 주어진 ID에 해당하는 카테고리를 조회할 때, 올바른 카테고리를 반환하는지 테스트합니다.
+	 */
+	@Test
+	void getCategoryById_whenCategoryExists_thenReturnsCategory() {
+		// given
+		Long categoryId = 1L;
+		Category category = Category.builder().name("여행").level(0).build();
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+
+		// when
+		CategoryResponse categoryResponse = categoryService.getCategoryById(categoryId);
+
+		// then
+		assertThat(categoryResponse).isNotNull();
+		assertThat(categoryResponse.name()).isEqualTo("여행");
+		verify(categoryRepository, times(1)).findById(categoryId);
+	}
+
+	/**
+	 * 주어진 ID에 해당하는 카테고리를 찾을 수 없을 때, 예외가 발생하는지 테스트합니다.
+	 */
+	@Test
+	void getCategoryById_whenCategoryDoesNotExist_thenThrowsException() {
+		// given
+		Long categoryId = 999L;
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+		// when & then
+		assertThatThrownBy(() -> categoryService.getCategoryById(categoryId))
+			.isInstanceOf(CategoryNotFoundException.class)
+			.hasMessageContaining("입력한 카테고리ID는 999 존재하지 않습니다.");
+		verify(categoryRepository, times(1)).findById(categoryId);
+	}
+
 }
