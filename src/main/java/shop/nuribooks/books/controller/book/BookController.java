@@ -12,8 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.book.BookRegisterReq;
-import shop.nuribooks.books.dto.book.BookRegisterRes;
+import shop.nuribooks.books.dto.book.BookRegisterRequest;
+import shop.nuribooks.books.dto.book.BookRegisterResponse;
 import shop.nuribooks.books.service.book.BookService;
 
 @RequestMapping("/api/books")
@@ -30,8 +30,8 @@ public class BookController {
 		@ApiResponse(responseCode = "409", description = "ISBN already exists"),
 	})
 	@PostMapping
-	public ResponseEntity<BookRegisterRes> registerBooks(@Valid @RequestBody BookRegisterReq reqDto) {
-		BookRegisterRes resDto = booksService.registerBook(reqDto);
+	public ResponseEntity<BookRegisterResponse> registerBooks(@Valid @RequestBody BookRegisterRequest reqDto) {
+		BookRegisterResponse resDto = booksService.registerBook(reqDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
 	}
 }

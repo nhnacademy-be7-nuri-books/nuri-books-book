@@ -2,11 +2,10 @@ package shop.nuribooks.books.dto.book;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Builder;
-import lombok.Getter;
+
 import shop.nuribooks.books.entity.book.Book;
 
-public record BookRegisterRes(
+public record BookRegisterResponse(
 	Long id,
 	Integer stateId,
 	Long publisherId,
@@ -18,8 +17,8 @@ public record BookRegisterRes(
 	String description,
 	int stock
 ) {
-	public static BookRegisterRes of(Book book) {
-		return new BookRegisterRes(
+	public static BookRegisterResponse of(Book book) {
+		return new BookRegisterResponse(
 			book.getId(),
 			book.getStateId().getId(),
 			book.getPublisherId().getId(),

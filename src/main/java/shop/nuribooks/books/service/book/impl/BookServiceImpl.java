@@ -3,8 +3,8 @@ package shop.nuribooks.books.service.book.impl;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.dto.book.BookRegisterReq;
-import shop.nuribooks.books.dto.book.BookRegisterRes;
+import shop.nuribooks.books.dto.book.BookRegisterRequest;
+import shop.nuribooks.books.dto.book.BookRegisterResponse;
 import shop.nuribooks.books.entity.book.Book;
 import shop.nuribooks.books.entity.book.BookState;
 import shop.nuribooks.books.entity.book.Publisher;
@@ -25,7 +25,7 @@ public class BookServiceImpl implements BookService {
 	private final PublisherRepository publishersRepository;
 
 	@Override
-	public BookRegisterRes registerBook(BookRegisterReq reqDto) {
+	public BookRegisterResponse registerBook(BookRegisterRequest reqDto) {
 		if (reqDto == null) {
 			throw new BadRequestException("요청 본문이 비어있습니다.");
 		}
@@ -60,6 +60,6 @@ public class BookServiceImpl implements BookService {
 
 		booksRepository.save(book);
 
-		return BookRegisterRes.of(book);
+		return BookRegisterResponse.of(book);
 	}
 }

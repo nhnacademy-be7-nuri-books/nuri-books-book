@@ -13,8 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import shop.nuribooks.books.dto.book.BookRegisterReq;
-import shop.nuribooks.books.dto.book.BookRegisterRes;
+import shop.nuribooks.books.dto.book.BookRegisterRequest;
+import shop.nuribooks.books.dto.book.BookRegisterResponse;
 import shop.nuribooks.books.entity.book.Book;
 import shop.nuribooks.books.entity.book.BookState;
 import shop.nuribooks.books.entity.book.Publisher;
@@ -41,7 +41,7 @@ public class BooksServiceImplTest {
 	@Mock
 	private PublisherRepository publishersRepository;
 
-	private BookRegisterReq reqDto;
+	private BookRegisterRequest reqDto;
 
 	private BookState bookStates;
 
@@ -79,7 +79,7 @@ public class BooksServiceImplTest {
 			return book;
 		});
 
-		BookRegisterRes result = booksService.registerBook(reqDto);
+		BookRegisterResponse result = booksService.registerBook(reqDto);
 
 		assertNotNull(result);
 		assertEquals(1L, result.getId());
@@ -148,7 +148,7 @@ public class BooksServiceImplTest {
 
 		when(booksRepository.save(any(Book.class))).thenReturn(mockBook);
 
-		BookRegisterRes result = booksService.registerBook(reqDto);
+		BookRegisterResponse result = booksService.registerBook(reqDto);
 
 		assertNotNull(result);
 		assertEquals("Book Title", result.getTitle());
