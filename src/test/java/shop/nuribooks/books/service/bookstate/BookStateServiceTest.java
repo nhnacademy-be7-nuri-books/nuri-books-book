@@ -32,7 +32,7 @@ public class BookStateServiceTest {
 
 	@BeforeEach
 	public void setUp() {
-		bookStateRequest = new BookStateRequest(BookStateEnum.INSTOCK);
+		bookStateRequest = new BookStateRequest("재고있음");
 	}
 
 	@Test

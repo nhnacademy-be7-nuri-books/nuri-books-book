@@ -18,13 +18,13 @@ public class BookStateRepositoryTest {
 
 	@BeforeEach
 	public void setUp() {
-		BookState bookState = BookState.of(BookStateEnum.DISCONTINUED);
+		BookState bookState = BookState.of("절판");
 		bookStateRepository.save(bookState);
 	}
 
 	@Test
 	public void testExistsBookStatesByDetail_ShouldReturnTrue_WhenDetailExists() {
-		BookStateEnum detail = BookStateEnum.DISCONTINUED;
+		String detail = "절판";
 
 		boolean exist = bookStateRepository.existsBookStatesByDetail(detail);
 
@@ -33,7 +33,7 @@ public class BookStateRepositoryTest {
 
 	@Test
 	public void testExistsBookStatesByDetail_ShouldReturnFalse_WhenDetailDoesNotExist() {
-		BookStateEnum detail = BookStateEnum.INSTOCK;
+		String detail = "재고있음";
 
 		boolean exist = bookStateRepository.existsBookStatesByDetail(detail);
 

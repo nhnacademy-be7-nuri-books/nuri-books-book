@@ -6,5 +6,5 @@ import shop.nuribooks.books.entity.book.BookState;
 import shop.nuribooks.books.entity.book.BookStateEnum;
 
 public interface BookStateRepository extends JpaRepository<BookState, Integer> {
-	boolean existsBookStatesByDetail(BookStateEnum detail);
+	boolean existsBookStatesByDetail(String detail);
 }

@@ -23,14 +23,13 @@ public class BookState {
 	private Integer id;
 
 	@NotNull
-	@Enumerated(EnumType.STRING)
-	private BookStateEnum detail;
+	private String detail;
 
-	private BookState(BookStateEnum detail) {
+	private BookState(String detail) {
 		this.detail = detail;
 	}
 
-	public static BookState of(BookStateEnum detail) {
+	public static BookState of(String detail) {
 		return new BookState(detail);
 	}
 }
