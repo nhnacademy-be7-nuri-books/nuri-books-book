@@ -1,9 +1,13 @@
 package shop.nuribooks.books.service.category.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import shop.nuribooks.books.dto.category.CategoryRequest;
+import shop.nuribooks.books.dto.category.CategoryResponse;
 import shop.nuribooks.books.entity.book.Category;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
@@ -40,7 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
 		boolean isDuplicate = categoryRepository.existsByNameAndParentCategoryIsNull(dto.name());
 		if (isDuplicate) {
 			throw new CategoryAlreadyExistException(
-				"Top-level category with name '" + dto.name() + "' already exists.");
+				"카테고리 이름 '" + dto.name() + "'가 이미 존재합니다.");
 		}
 		Category category = Category.builder()
 			.name(dto.name())
@@ -51,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 	/**
 	 * 기존 대분류 아래에 새로운 하위 분류 카테고리를 등록합니다.
-	 *
+	 * @author janghyun
 	 * @param dto 하위 분류 등록 요청 DTO
 	 * @param parentCategoryId 부모 카테고리의 ID
 	 * @return 등록된 하위 카테고리 엔티티
@@ -62,16 +66,14 @@ public class CategoryServiceImpl implements CategoryService {
 	@Transactional
 	public Category registerSubCategory(CategoryRequest dto, Long parentCategoryId) {
 		Category parentCategory = categoryRepository.findById(parentCategoryId)
-			.orElseThrow(() -> new CategoryNotFoundException(
-				"Parent category not found with ID: " + parentCategoryId));
+			.orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
 
 		boolean isDuplicate = parentCategory.getSubCategory().stream()
 			.anyMatch(subCategory -> subCategory.getName().equals(dto.name()));
 
 		if (isDuplicate) {
 			throw new CategoryAlreadyExistException(
-				"Category with name '" + dto.name() + "' already exists under parent category with ID: "
-					+ parentCategoryId);
+				"카테고리 이름 '" + dto.name() + "' 가 이미 존재합니다");
 		}
 
 		Category category = Category.builder()
@@ -81,4 +83,35 @@ public class CategoryServiceImpl implements CategoryService {
 			.build();
 		return categoryRepository.save(category);
 	}
+
+	/**
+	 * 상위 카테고리가 없는 모든 카테고리를 조회하여 반환합니다.
+	 * @author janghyun
+	 * @return 상위 카테고리가 없는 모든 카테고리의 응답 리스트
+	 */
+	@Override
+	public List<CategoryResponse> getAllCategory() {
+		List<Category> categoryList = categoryRepository.findAllByParentCategoryIsNull();
+		List<CategoryResponse> categoryResponseList = new ArrayList<>();
+		for (Category category : categoryList) {
+			categoryResponseList.add(new CategoryResponse(category));
+		}
+		return categoryResponseList;
+	}
+
+	/**
+	 * 주어진 ID에 해당하는 카테고리를 조회하여 반환합니다.
+	 * 카테고리가 존재하지 않을 경우 CategoryNotFoundException을 발생시킵니다.
+	 * @author janghyun
+	 * @param categoryId 조회할 카테고리의 ID
+	 * @return 조회된 카테고리의 응답 객체
+	 * @throws CategoryNotFoundException 주어진 ID에 해당하는 카테고리가 존재하지 않을 경우
+	 */
+	@Override
+	public CategoryResponse getCategoryById(Long categoryId) {
+		Category category = categoryRepository.findById(categoryId)
+			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
+		return new CategoryResponse(category);
+	}
+
 }

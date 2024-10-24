@@ -1,6 +1,7 @@
 package shop.nuribooks.books.entity.book;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,15 +25,15 @@ public class BookContributor {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "book_id")
-	private Book books;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "book_id", nullable = false)
+	private Book book;
 
-	@ManyToOne
-	@JoinColumn(name = "contributor_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "contributor_id", nullable = false)
 	private Contributor contributor;
 
-	@ManyToOne
-	@JoinColumn(name = "contributor_role_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "contributor_role_id", nullable = false)
 	private ContributorRole contributorRole;
 }
