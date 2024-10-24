@@ -5,7 +5,7 @@ on:
       - "main"
 
 jobs:
-  dev-test:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -41,4 +41,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
-          script: "./startup.sh"
+          script: "./books/startup.sh"
