@@ -21,8 +21,7 @@ public class BookStateServiceImpl implements BookStateService {
 			throw new ResourceAlreadyExistException("입력한 도서상태명" + bookStateRequest.detail() + "이 이미 존재합니다");
 		}
 
-		BookState bookState = new BookState();
-		bookState.setDetail(bookStateRequest.detail());
+		BookState bookState = BookState.of(bookStateRequest.detail());
 		bookStateRepository.save(bookState);
 	}
 }
