@@ -43,8 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
 	public Category registerMainCategory(CategoryRequest dto) {
 		boolean isDuplicate = categoryRepository.existsByNameAndParentCategoryIsNull(dto.name());
 		if (isDuplicate) {
-			throw new CategoryAlreadyExistException(
-				"카테고리 이름 '" + dto.name() + "'가 이미 존재합니다.");
+			throw new CategoryAlreadyExistException(dto.name());
 		}
 		Category category = Category.builder()
 			.name(dto.name())
@@ -72,8 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
 			.anyMatch(subCategory -> subCategory.getName().equals(dto.name()));
 
 		if (isDuplicate) {
-			throw new CategoryAlreadyExistException(
-				"카테고리 이름 '" + dto.name() + "' 가 이미 존재합니다");
+			throw new CategoryAlreadyExistException(dto.name());
 		}
 
 		Category category = Category.builder()
@@ -131,9 +129,23 @@ public class CategoryServiceImpl implements CategoryService {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
+		Category parentCategory = category.getParentCategory();
+
+		if (parentCategory == null) {
+			if (categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())) {
+				throw new CategoryAlreadyExistException(dto.name());
+			}
+		} else {
+			if (parentCategory.getSubCategory().stream()
+				.anyMatch(subCategory -> subCategory.getName().equals(dto.name()))) {
+				throw new CategoryAlreadyExistException(dto.name());
+			}
+		}
+
 		category.setName(dto.name());
 
 		return new CategoryResponse(categoryRepository.save(category));
 	}
 
 }
+
