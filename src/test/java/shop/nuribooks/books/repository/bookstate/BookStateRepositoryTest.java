@@ -17,7 +17,7 @@ public class BookStateRepositoryTest {
 
 	@BeforeEach
 	public void setUp() {
-		BookState bookState = BookState.of("절판");
+		BookState bookState = BookState.builder().detail("절판").build();
 		bookStateRepository.save(bookState);
 	}
 

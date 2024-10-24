@@ -5,12 +5,15 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.bookstate.BookStateRequest;
 import shop.nuribooks.books.dto.bookstate.BookStateResponse;
+import shop.nuribooks.books.entity.book.Book;
 import shop.nuribooks.books.entity.book.BookState;
 import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 import shop.nuribooks.books.exception.bookstate.BookStateDetailAlreadyExistException;
+import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
 import shop.nuribooks.books.repository.bookstate.BookStateRepository;
 import shop.nuribooks.books.service.bookstate.BookStateService;
 
@@ -26,7 +29,7 @@ public class BookStateServiceImpl implements BookStateService {
 			throw new BookStateDetailAlreadyExistException(bookStateRequest.detail());
 		}
 
-		BookState bookState = BookState.of(bookStateRequest.detail());
+		BookState bookState = BookState.builder().detail(bookStateRequest.detail()).build();
 		bookStateRepository.save(bookState);
 	}
 
@@ -37,4 +40,20 @@ public class BookStateServiceImpl implements BookStateService {
 		return bookStateList.stream().map(bookState -> new BookStateResponse(bookState.getId(), bookState.getDetail()))
 			.collect(Collectors.toList());
 	}
+
+	@Transactional
+	@Override
+	public void updateState(Integer id, BookStateRequest bookStateRequest) {
+		BookState bookState = bookStateRepository.findById(id).
+			orElseThrow(BookStateIdNotFoundException::new);
+
+		if (bookStateRepository.existsBookStatesByDetail(bookStateRequest.detail())) {
+			throw new BookStateDetailAlreadyExistException(bookStateRequest.detail());
+		}
+
+		bookState.updateDetail(bookStateRequest.detail());
+
+		bookStateRepository.save(bookState);
+	}
+
 }

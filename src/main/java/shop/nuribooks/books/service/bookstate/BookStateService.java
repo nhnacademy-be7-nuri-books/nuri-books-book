@@ -9,4 +9,5 @@ import shop.nuribooks.books.dto.member.ResponseMessage;
 public interface BookStateService {
 	void registerState(String adminId, BookStateRequest bookStateRequest);
 	List<BookStateResponse> getAllBooks();
+	void updateState(Integer id, BookStateRequest bookStateRequest);
 }
