@@ -1,10 +1,10 @@
 package shop.nuribooks.books.member.member.service;
 
-import static java.math.BigDecimal.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -313,8 +313,8 @@ class MemberServiceImplTest {
 			.userId("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
-			.point(ZERO)
-			.totalPaymentAmount(ZERO)
+			.point(BigDecimal.ZERO)
+			.totalPaymentAmount(BigDecimal.ZERO)
 			.build();
 	}
 

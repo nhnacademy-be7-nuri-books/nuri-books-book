@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.exception.member.GradeAlreadyExistException;
@@ -21,6 +22,7 @@ import shop.nuribooks.books.member.grade.repository.GradeRepository;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class GradeServiceImpl implements GradeService {
 
 	private final GradeRepository gradeRepository;
@@ -31,6 +33,7 @@ public class GradeServiceImpl implements GradeService {
 	 * @return 입력받은 등급명이 이미 존재하면 예외를 반환하고, <br>
 	 * 등급 등록에 성공하면 입력 받았던 정보를 다시 GradeRegisterResponse에 담아서 반환
 	 */
+	@Transactional
 	public GradeRegisterResponse registerGrade(GradeRegisterRequest request) {
 		if (gradeRepository.existsByName(request.name())) {
 			throw new GradeAlreadyExistException("이미 존재하는 등급입니다.");
@@ -59,6 +62,7 @@ public class GradeServiceImpl implements GradeService {
 	 * @return 입력받은 등급명이 존재하지 않으면 예외를 반환하고, <br>
 	 * 존재하면 해당 등급의 정보를 입력받은 것으로 수정하고 그 내용을 GradeUpdateResponse에 담아서 반환
 	 */
+	@Transactional
 	public GradeUpdateResponse updateGrade(String name, GradeUpdateRequest request) {
 		Grade foundGrade = getGrade(name);
 
@@ -73,6 +77,7 @@ public class GradeServiceImpl implements GradeService {
 	 * 입력받은 등급명이 존재하지 않으면 예외를 반환하고, <br>
 	 * 존재하면 해당 등급을 삭제
 	 */
+	@Transactional
 	public void deleteGrade(String name) {
 		Grade foundGrade = getGrade(name);
 		gradeRepository.delete(foundGrade);

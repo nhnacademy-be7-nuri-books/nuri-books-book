@@ -1,16 +1,13 @@
 package shop.nuribooks.books.member.member.service;
 
-import static java.math.BigDecimal.*;
-import static shop.nuribooks.books.member.grade.entity.GradeEnum.*;
-import static shop.nuribooks.books.member.member.entity.AuthorityEnum.*;
-import static shop.nuribooks.books.member.member.entity.StatusEnum.*;
-
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.member.grade.entity.GradeEnum;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
@@ -18,6 +15,7 @@ import shop.nuribooks.books.member.member.dto.response.MemberCheckResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.member.entity.AuthorityEnum;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
@@ -26,6 +24,7 @@ import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
 import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
+import shop.nuribooks.books.member.member.entity.StatusEnum;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @Service
@@ -66,8 +65,8 @@ public class MemberServiceImpl implements MemberService {
 		Customer savedCustomer = customerRepository.save(newCustomer);
 
 		Member newMember = new Member(
-			savedCustomer, MEMBER, STANDARD, ACTIVE, request.getUserId(),
-			request.getBirthday(), LocalDateTime.now(), ZERO, ZERO);
+			savedCustomer, AuthorityEnum.MEMBER, GradeEnum.STANDARD, StatusEnum.ACTIVE, request.getUserId(),
+			request.getBirthday(), LocalDateTime.now(), BigDecimal.ZERO, BigDecimal.ZERO);
 
 		Member savedMember = memberRepository.save(newMember);
 
