@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @AllArgsConstructor
@@ -33,6 +34,7 @@ public class Category {
 	private Long id;
 
 	@NotNull
+	@Setter
 	@Column(length = 30, nullable = false)
 	private String name;
 
@@ -43,14 +45,10 @@ public class Category {
 	@BatchSize(size = 100)
 	@OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Category> subCategory = new ArrayList<>();
-
-	@NotNull
-	private Integer level;
-
+	
 	@Builder
-	public Category(String name, Integer level, Category parentCategory) {
+	public Category(String name, Category parentCategory) {
 		this.name = name;
-		this.level = level;
 		this.parentCategory = parentCategory;
 	}
 }

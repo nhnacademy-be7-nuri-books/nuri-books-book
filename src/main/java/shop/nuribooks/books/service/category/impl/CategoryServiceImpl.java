@@ -43,12 +43,10 @@ public class CategoryServiceImpl implements CategoryService {
 	public Category registerMainCategory(CategoryRequest dto) {
 		boolean isDuplicate = categoryRepository.existsByNameAndParentCategoryIsNull(dto.name());
 		if (isDuplicate) {
-			throw new CategoryAlreadyExistException(
-				"카테고리 이름 '" + dto.name() + "'가 이미 존재합니다.");
+			throw new CategoryAlreadyExistException(dto.name());
 		}
 		Category category = Category.builder()
 			.name(dto.name())
-			.level(0)
 			.build();
 		return categoryRepository.save(category);
 	}
@@ -72,13 +70,11 @@ public class CategoryServiceImpl implements CategoryService {
 			.anyMatch(subCategory -> subCategory.getName().equals(dto.name()));
 
 		if (isDuplicate) {
-			throw new CategoryAlreadyExistException(
-				"카테고리 이름 '" + dto.name() + "' 가 이미 존재합니다");
+			throw new CategoryAlreadyExistException(dto.name());
 		}
 
 		Category category = Category.builder()
 			.name(dto.name())
-			.level(parentCategory.getLevel() + 1)
 			.parentCategory(parentCategory)
 			.build();
 		return categoryRepository.save(category);
@@ -102,6 +98,7 @@ public class CategoryServiceImpl implements CategoryService {
 	/**
 	 * 주어진 ID에 해당하는 카테고리를 조회하여 반환합니다.
 	 * 카테고리가 존재하지 않을 경우 CategoryNotFoundException을 발생시킵니다.
+	 *
 	 * @author janghyun
 	 * @param categoryId 조회할 카테고리의 ID
 	 * @return 조회된 카테고리의 응답 객체
@@ -114,4 +111,39 @@ public class CategoryServiceImpl implements CategoryService {
 		return new CategoryResponse(category);
 	}
 
+	/**
+	 * 주어진 ID에 해당하는 카테고리를 업데이트합니다.
+	 * 카테고리가 존재하지 않을 경우 CategoryNotFoundException을 발생시킵니다.
+	 *
+	 * @author janghyun
+	 * @param dto 업데이트할 카테고리의 정보가 담긴 객체
+	 * @param categoryId 업데이트할 카테고리의 ID
+	 * @return 업데이트된 카테고리의 응답 객체
+	 * @throws CategoryNotFoundException 주어진 ID에 해당하는 카테고리가 존재하지 않을 경우
+	 */
+	@Override
+	@Transactional
+	public CategoryResponse updateCategory(CategoryRequest dto, Long categoryId) {
+		Category category = categoryRepository.findById(categoryId)
+			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
+		Category parentCategory = category.getParentCategory();
+
+		if (parentCategory == null) {
+			if (categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())) {
+				throw new CategoryAlreadyExistException(dto.name());
+			}
+		} else {
+			if (parentCategory.getSubCategory().stream()
+				.anyMatch(subCategory -> subCategory.getName().equals(dto.name()))) {
+				throw new CategoryAlreadyExistException(dto.name());
+			}
+		}
+
+		category.setName(dto.name());
+
+		return new CategoryResponse(categoryRepository.save(category));
+	}
+
 }
+
