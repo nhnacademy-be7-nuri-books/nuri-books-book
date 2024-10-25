@@ -217,7 +217,7 @@ class CategoryControllerTest {
 		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
-			.andExpect(status().isOk())
+			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.name").value("여행 업데이트"));
 	}
 

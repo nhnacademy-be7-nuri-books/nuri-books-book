@@ -6,5 +6,5 @@ import shop.nuribooks.books.member.authority.entity.AuthorityType;
 
 public interface AuthorityRepository extends JpaRepository<Authority, Long> {
 
-    boolean existsByName(AuthorityType authorityType);
+    boolean existsByAuthorityType(AuthorityType authorityType);
 }

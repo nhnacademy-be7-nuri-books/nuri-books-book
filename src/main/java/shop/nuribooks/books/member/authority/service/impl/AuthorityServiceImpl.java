@@ -21,7 +21,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 
     @Override
     public AuthorityResponse registerAuthority(AuthorityRegisterRequest request) {
-        if (authorityRepository.existsByName(request.authorityType())) {
+        if (authorityRepository.existsByAuthorityType(request.authorityType())) {
             throw new AuthorityAlreadyExistException(request.authorityType());
         }
 
