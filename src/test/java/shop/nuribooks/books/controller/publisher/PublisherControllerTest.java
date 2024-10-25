@@ -100,6 +100,20 @@ class PublisherControllerTest {
 		verify(publisherService).getPublisher(publisherName);
 	}
 
+	@DisplayName("출판사 삭제 성공")
+	@Test
+	void deletePublisher() throws Exception {
+		// given
+		String publisherName = "publisher1";
+
+		// when & then
+		mockMvc.perform(delete("/api/publishers/{publisherName}", publisherName)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+
+		verify(publisherService).deletePublisher(publisherName);
+	}
+
 	private PublisherRequest registerRequest() {
 		return PublisherRequest.builder().name("publisher1").build();
 	}
