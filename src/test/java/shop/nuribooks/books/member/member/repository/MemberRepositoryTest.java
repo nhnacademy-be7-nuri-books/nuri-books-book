@@ -2,6 +2,7 @@ package shop.nuribooks.books.member.member.repository;
 
 import static java.math.BigDecimal.*;
 import static org.assertj.core.api.Assertions.*;
+
 import static shop.nuribooks.books.member.member.entity.AuthorityEnum.*;
 import static shop.nuribooks.books.member.member.entity.GradeEnum.*;
 import static shop.nuribooks.books.member.member.entity.StatusEnum.*;
