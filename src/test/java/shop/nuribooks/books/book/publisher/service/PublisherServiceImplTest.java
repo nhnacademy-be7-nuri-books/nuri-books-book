@@ -156,7 +156,42 @@ class PublisherServiceImplTest {
 		verify(publisherRepository).findByName(publisherName);
 
 	}
+	@DisplayName("출판사 수정 성공")
+	@Test
+	void updatePublisher() {
+		// given
+		String publisherName = "publisher1";
+		Publisher publisher = new Publisher(1L, publisherName);
+		PublisherRequest editRequest = editPublisherRequest();
 
+		when(publisherRepository.findByName(publisherName)).thenReturn(Optional.of(publisher));
+
+		// when
+		PublisherResponse response = publisherService.updatePublisher(publisherName, editRequest);
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.name()).isEqualTo("publisher2");
+		verify(publisherRepository, times(1)).findByName(publisherName);
+
+	}
+
+	@DisplayName("출판사 수정 실패 - 존재하지 않음")
+	@Test
+	void failed_updatePublisher() {
+		// given
+		String publisherName = "unknownPublisher";
+		PublisherRequest editRequest = editPublisherRequest();
+
+		when(publisherRepository.findByName(publisherName)).thenReturn(Optional.empty());
+
+		// when & then
+		assertThatThrownBy(() -> publisherService.updatePublisher(publisherName, editRequest)
+		).isInstanceOf(PublisherNotFoundException.class)
+			.hasMessage("출판사가 존재하지 않습니다.");
+
+
+	}
 
 	private PublisherRequest registerRequest() {
 		return PublisherRequest.builder().name("publisher1").build();
@@ -164,6 +199,11 @@ class PublisherServiceImplTest {
 
 	private Publisher savedPublisher() {
 		return Publisher.builder().name("publisher1")
+			.build();
+	}
+
+	private PublisherRequest editPublisherRequest() {
+		return PublisherRequest.builder().name("publisher2")
 			.build();
 	}
 }
