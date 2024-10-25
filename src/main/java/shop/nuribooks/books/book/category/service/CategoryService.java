@@ -45,9 +45,18 @@ public interface CategoryService {
 	/**
 	 * 특정 카테고리를 업데이트합니다.
 	 *
+	 * @author janghyun
 	 * @param dto 업데이트할 카테고리의 정보
 	 * @param categoryId 업데이트할 카테고리의 ID
 	 * @return 업데이트된 카테고리의 응답 DTO
 	 */
 	CategoryResponse updateCategory(CategoryRequest dto, Long categoryId);
+
+	/**
+	 * 특정 카테고리를 삭제합니다.
+	 *
+	 * @author janghyun
+	 * @param categoryId 삭제할 카테고리의 ID
+	 */
+	void deleteCategory(Long categoryId);
 }
