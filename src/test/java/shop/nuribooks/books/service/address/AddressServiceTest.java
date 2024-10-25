@@ -1,41 +1,59 @@
 package shop.nuribooks.books.service.address;
 
+import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.*;
+import static shop.nuribooks.books.entity.member.AuthorityEnum.MEMBER;
+import static shop.nuribooks.books.entity.member.GradeEnum.STANDARD;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import shop.nuribooks.books.dto.address.requset.AddressRegisterRequest;
 import shop.nuribooks.books.dto.address.requset.AddressEditRequest;
 import shop.nuribooks.books.dto.address.response.AddressResponse;
 import shop.nuribooks.books.entity.address.Address;
+import shop.nuribooks.books.entity.member.Customer;
+import shop.nuribooks.books.entity.member.Member;
+import shop.nuribooks.books.entity.member.StatusEnum;
 import shop.nuribooks.books.exception.address.AddressNotFoundException;
 import shop.nuribooks.books.repository.address.AddressRepository;
+import shop.nuribooks.books.repository.member.CustomerRepository;
+import shop.nuribooks.books.repository.member.MemberRepository;
 
+@Transactional
 @SpringBootTest
 class AddressServiceTest {
 
     @Autowired
-    private AddressService addressService;
+    private AddressServiceImpl addressService;
 
     @Autowired
     private AddressRepository addressRepository;
 
-    @AfterEach
-    void tearDown() {
-        addressRepository.deleteAllInBatch();
-    }
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     @DisplayName("회원의 주소를 생성한다.")
     @Test
     void addAddress() {
         // given
+        Customer customer = createCustomer();
+        customerRepository.save(customer);
+
+        Member member = createMember(customer);
+        memberRepository.save(member);
+
         AddressRegisterRequest request = AddressRegisterRequest.builder()
-                .memberId(1L)
+                .memberId(member.getId())
                 .name("test")
                 .address("장말로")
                 .addressDetail("103호")
@@ -52,17 +70,17 @@ class AddressServiceTest {
     @Test
     void findAddressesByMemberId() {
         // given
-        AddressRegisterRequest request = AddressRegisterRequest.builder()
-                .memberId(1L)
-                .name("test")
-                .address("장말로")
-                .addressDetail("103호")
-                .isDefault(true)
-                .build();
-        AddressResponse response = addressService.registerAddress(request);
+        Customer customer = createCustomer();
+        customerRepository.save(customer);
+
+        Member member = createMember(customer);
+        memberRepository.save(member);
+
+        Address address = createAddress(member);
+        addressRepository.save(address);
 
         // when
-        List<AddressResponse> addressesByMemberId = addressService.findAddressesByMemberId(response.getMemberId());
+        List<AddressResponse> addressesByMemberId = addressService.findAddressesByMemberId(member.getId());
 
         // then
         assertThat(addressesByMemberId).hasSize(1);
@@ -72,13 +90,15 @@ class AddressServiceTest {
     @Test
     void removeAddress() {
         // given
-        Address address = Address.builder()
-                .memberId(1L)
-                .name("test")
-                .address("장말로")
-                .addressDetail("103호")
-                .isDefault(true)
-                .build();
+
+        Customer customer = createCustomer();
+        customerRepository.save(customer);
+
+        Member member = createMember(customer);
+        memberRepository.save(member);
+
+        Address address = createAddress(member);
+        addressRepository.save(address);
 
         Address saved = addressRepository.save(address);
         // when
@@ -92,19 +112,19 @@ class AddressServiceTest {
     @Test
     void modifyAddress() {
         // given
-        Address address = Address.builder()
-                .memberId(1L)
-                .name("test")
-                .address("장말로")
-                .addressDetail("103호")
-                .isDefault(true)
-                .build();
+        Customer customer = createCustomer();
+        customerRepository.save(customer);
+
+        Member member = createMember(customer);
+        memberRepository.save(member);
+
+        Address address = createAddress(member);
+        addressRepository.save(address);
 
         Address saved = addressRepository.save(address);
 
         AddressEditRequest addressEditRequest = AddressEditRequest.builder()
                 .id(saved.getId())
-                .memberId(1L)
                 .name("test")
                 .address("장말로")
                 .addressDetail("103호")
@@ -117,6 +137,41 @@ class AddressServiceTest {
         Address changedAddress = addressRepository.findById(saved.getId())
                 .orElseThrow(() -> new AddressNotFoundException("주소가 없습니다."));
         Assertions.assertThat(changedAddress.isDefault()).isFalse();
+    }
+
+    private Address createAddress(Member member) {
+        return Address.builder()
+                .member(member)
+                .name("test")
+                .address("장말로")
+                .addressDetail("103호")
+                .isDefault(true)
+                .build();
+    }
+
+    private Member createMember(Customer customer) {
+        return Member.builder()
+                .customer(customer)
+                .authority(MEMBER)
+                .grade(STANDARD)
+                .userId("nuriaaaaaa")
+                .status(StatusEnum.ACTIVE)
+                .birthday(LocalDate.of(1988, 8, 12))
+                .createdAt(LocalDateTime.now())
+                .point(ZERO)
+                .totalPaymentAmount(ZERO)
+                .latestLoginAt(null)
+                .withdrawnAt(null)
+                .build();
+    }
+
+    private Customer createCustomer() {
+        return Customer.builder()
+                .name("name")
+                .password("password")
+                .phoneNumber("042-8282-8282")
+                .email("nhnacademy@nuriBooks.com")
+                .build();
     }
 
 }

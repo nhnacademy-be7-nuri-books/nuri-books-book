@@ -1,64 +1,18 @@
 package shop.nuribooks.books.service.address;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import shop.nuribooks.books.dto.address.requset.AddressRegisterRequest;
 import shop.nuribooks.books.dto.address.requset.AddressEditRequest;
+import shop.nuribooks.books.dto.address.requset.AddressRegisterRequest;
 import shop.nuribooks.books.dto.address.response.AddressResponse;
-import shop.nuribooks.books.entity.address.Address;
-import shop.nuribooks.books.entity.address.AddressEditor;
-import shop.nuribooks.books.entity.address.AddressEditor.AddressEditorBuilder;
-import shop.nuribooks.books.exception.address.AddressNotFoundException;
-import shop.nuribooks.books.repository.address.AddressRepository;
 
-@RequiredArgsConstructor
-@Service
-public class AddressService {
+public interface AddressService {
 
-    private final AddressRepository addressRepository;
+    AddressResponse registerAddress(AddressRegisterRequest request);
 
-    public AddressResponse registerAddress(AddressRegisterRequest request) {
-        //TODO: 회원 주소가 10개 넘어가는 경우 예외처리
-        Address address = request.toEntity();
-        Address saved = addressRepository.save(address);
-        return AddressResponse.of(saved);
-    }
+    List<AddressResponse> findAddressesByMemberId(Long memberId);
 
-    public List<AddressResponse> findAddressesByMemberId(Long memberId) {
-        //TODO: 주소 없는 경우 예외처리
-        List<Address> addressesByMemberId = addressRepository.findAllByMemberId(memberId);
-        return addressesByMemberId.stream()
-                .map(AddressResponse::of)
-                .toList();
-    }
+    void removeAddress(Long addressId);
 
-    public void removeAddress(Long addressId) {
-        Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new AddressNotFoundException("주소를 찾을 수 없습니다."));
-        addressRepository.delete(address);
-    }
-
-    @Transactional
-    public AddressResponse modifyAddress(AddressEditRequest request) {
-        Address address = addressRepository.findById(request.getId())
-                .orElseThrow(() -> new AddressNotFoundException("주소를 찾을 수 없습니다."));
-
-        AddressEditor addressEditor = getAddressEditor(request, address);
-        address.edit(addressEditor);
-        return AddressResponse.of(address);
-    }
-
-    private static AddressEditor getAddressEditor(AddressEditRequest request, Address address) {
-        AddressEditorBuilder addressEditorBuilder = address.toEditor();
-        return addressEditorBuilder
-                .name(request.getName())
-                .address(request.getAddress())
-                .addressDetail(request.getAddressDetail())
-                .isDefault(request.isDefault())
-                .build();
-    }
-
+    AddressResponse modifyAddress(AddressEditRequest request);
 
 }

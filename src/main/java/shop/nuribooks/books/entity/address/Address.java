@@ -1,7 +1,7 @@
 package shop.nuribooks.books.entity.address;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.nuribooks.books.entity.member.Member;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,7 +21,8 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
 
     private String name;
 
@@ -31,8 +33,8 @@ public class Address {
     private boolean isDefault;
 
     @Builder
-    private Address(Long memberId, String name, String address, String addressDetail, boolean isDefault) {
-        this.memberId = memberId;
+    private Address(Member member, String name, String address, String addressDetail, boolean isDefault) {
+        this.member = member;
         this.name = name;
         this.address = address;
         this.addressDetail = addressDetail;
