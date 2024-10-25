@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import shop.nuribooks.books.common.message.ResponseMessage;
@@ -36,7 +37,7 @@ public class GradeController {
 	 * 등급 등록
 	 */
 	@PostMapping
-	public ResponseEntity<GradeRegisterResponse> gradeRegister(@RequestBody GradeRegisterRequest request) {
+	public ResponseEntity<GradeRegisterResponse> gradeRegister(@RequestBody @Valid GradeRegisterRequest request) {
 		GradeRegisterResponse response = gradeService.registerGrade(request);
 
 		return ResponseEntity.status(CREATED).body(response);
@@ -57,7 +58,7 @@ public class GradeController {
 	 */
 	@PatchMapping("/{name}")
 	public ResponseEntity<GradeUpdateResponse> gradeUpdate(
-		@PathVariable String name, @RequestBody GradeUpdateRequest request) {
+		@PathVariable String name, @RequestBody @Valid GradeUpdateRequest request) {
 		GradeUpdateResponse response = gradeService.updateGrade(name, request);
 
 		return ResponseEntity.status(OK).body(response);

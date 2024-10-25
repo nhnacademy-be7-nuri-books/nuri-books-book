@@ -9,5 +9,5 @@ public record GradeUpdateResponse(
 
 	String name,
 	Integer pointRate,
-	BigDecimal requirement)
-{}
+	BigDecimal requirement
+) {}
