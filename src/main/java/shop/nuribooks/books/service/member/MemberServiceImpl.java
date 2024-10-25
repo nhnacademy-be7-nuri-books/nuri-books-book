@@ -14,10 +14,15 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.dto.member.request.MemberRegisterRequest;
 import shop.nuribooks.books.dto.member.request.MemberUpdateRequest;
 import shop.nuribooks.books.dto.member.request.MemberWithdrawRequest;
+import shop.nuribooks.books.dto.member.response.MemberCheckResponse;
+import shop.nuribooks.books.dto.member.response.MemberRegisterResponse;
+import shop.nuribooks.books.dto.member.response.MemberUpdateResponse;
 import shop.nuribooks.books.entity.member.Customer;
 import shop.nuribooks.books.entity.member.Member;
+import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.InvalidPasswordException;
+import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
 import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.repository.member.CustomerRepository;
@@ -38,13 +43,13 @@ public class MemberServiceImpl implements MemberService {
 	 * @throws EmailAlreadyExistsException 이미 존재하는 이메일입니다.
 	 * @throws UserIdAlreadyExistsException 이미 존재하는 아이디입니다.
 	 * @param request
-	 * MemberCreateReq로 name, userId, password, phoneNumber, email, birthday를 받는다. <br>
+	 * MemberRegisterRequest로 name, userId, password, phoneNumber, email, birthday를 받는다. <br>
 	 * 생성일자(createdAt)는 현재 시간, point와 totalPaymentAmount는 0으로 초기화 <br>
 	 * 권한은 MEMBER, 등급은 STANDARD, 상태는 ACTIVE로 초기화 <br>
-	 * password는 BCryptPasswordEncoder로 해싱
+	 * @return MemberRegisterResponse에 이름, 유저 아이디, 전화번호, 이메일, 생일을 담아서 반환
 	 */
 	@Transactional
-	public void registerMember(MemberRegisterRequest request) {
+	public MemberRegisterResponse registerMember(MemberRegisterRequest request) {
 		if (customerRepository.existsByEmail(request.getEmail())) {
 			throw new EmailAlreadyExistsException("이미 존재하는 이메일입니다.");
 		}
@@ -64,7 +69,15 @@ public class MemberServiceImpl implements MemberService {
 			savedCustomer, MEMBER, STANDARD, ACTIVE, request.getUserId(),
 			request.getBirthday(), LocalDateTime.now(), ZERO, ZERO);
 
-		memberRepository.save(newMember);
+		Member savedMember = memberRepository.save(newMember);
+
+		return MemberRegisterResponse.builder()
+			.name(savedCustomer.getName())
+			.userId(savedMember.getUserId())
+			.phoneNumber(savedCustomer.getPhoneNumber())
+			.email(savedCustomer.getEmail())
+			.birthday(savedMember.getBirthday())
+			.build();
 	}
 
 	/**
@@ -81,55 +94,79 @@ public class MemberServiceImpl implements MemberService {
 	 */
 	@Transactional
 	public void withdrawMember(MemberWithdrawRequest request) {
-		if (!memberRepository.existsByUserId(request.getUserId())) {
-			throw new UserIdNotFoundException("존재하지 않는 아이디입니다.");
-		}
-
-		Member findMember = memberRepository.findByUserId(request.getUserId());
+		Member findMember = memberRepository.findByUserId(request.getUserId())
+			.orElseThrow(() -> new UserIdNotFoundException("존재하지 않는 아이디입니다."));
 
 		if (!customerRepository.existsByIdAndPassword(
 			findMember.getId(), request.getPassword())) {
 			throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
 		}
 
-		findMember.changeStatus(INACTIVE);
-		findMember.changeWithdrawnAt(LocalDateTime.now());
+		findMember.changeToWithdrawn();
 	}
 
 	/**
 	 * 회원 정보 수정 <br>
 	 * 변경 가능한 정보는 name, password, phoneNumber
-	 * @param userId 아이디
-	 * @param request
-	 * MemberUpdateReq로 수정하고 싶은 이름과 비밀번호, 전화번호를 받음 <br>
+	 * @param userId  아이디
+	 * @param request MemberUpdateRequest로 수정하고 싶은 이름과 비밀번호, 전화번호를 받음 <br>
 	 * 로그인 상태의 사용자만이 회원 정보를 수정할 수 있기 때문에 <br>
 	 * 입력받은 userId의 member가 반드시 존재하는 상황이다. <br>
 	 * 그러므로 userId를 통해 customerRepository에서 해당 customer를 찾고 정보 수정을 진행 <br>
-	 * 입력받은 각각의 이름, 비밀번호, 전화번호가 해당 customer의 정보와 동일하면 아무 작업도 하지 않고, <br>
-	 * 다른 경우에만 change 메서드를 통해 수정 진행
+	 * 입력받은 각각의 이름, 비밀번호, 전화번호로 customer의 정보 수정
+	 * @return MemberUpdateResponse에 변경한 이름과 전화번호 담아서 반환
 	 */
 	@Transactional
-	public void updateMember(String userId, MemberUpdateRequest request) {
-		Member findMember = memberRepository.findByUserId(userId);
-		Customer findCustomer = customerRepository.findById(findMember.getId()).get();
+	public MemberUpdateResponse updateMember(String userId, MemberUpdateRequest request) {
+		Member findMember = memberRepository.findByUserId(userId)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
-		if (!request.getName().equals(findCustomer.getName())) {
-			findCustomer.changeName(request.getName());
-		}
-		if (!request.getPassword().equals(findCustomer.getPassword())) {
-			findCustomer.changePassword(request.getPassword());
-		}
-		if (!request.getPhoneNumber().equals(findCustomer.getPhoneNumber())) {
-			findCustomer.changePhoneNumber(request.getPhoneNumber());
-		}
+		Customer findCustomer = customerRepository.findById(findMember.getId())
+			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
+
+		findCustomer.changeCustomerInformation(
+			request.getName(), request.getPassword(), request.getPhoneNumber());
+
+		return MemberUpdateResponse.builder()
+			.name(findCustomer.getName())
+			.phoneNumber(findCustomer.getPhoneNumber())
+			.build();
 	}
 
 	/**
-	 * 입력받은 아이디로 회원 존재 여부 확인
+	 * 입력받은 아이디로 회원의 이름, 비밀번호, 권한을 조회
 	 * @param userId 아이디
-	 * @return 존재 여부 반환
+	 * @return 회원이 존재하면 이름, 비밀번호, 권한을 MemberCheckResponse에 담아서 반환 <br>
+	 * 회원이 존재하지 않는다면 이름, 비밀번호, 권한이 모두 null인 MemberCheckResponse를 반환
 	 */
-	public boolean doesMemberExist(String userId) {
-		return memberRepository.existsByUserId(userId);
+	public MemberCheckResponse checkMember(String userId) {
+
+		Member findMember = memberRepository.findByUserId(userId)
+			.orElse(null);
+
+		if (findMember == null) {
+			return MemberCheckResponse.builder()
+				.name(null)
+				.password(null)
+				.authority(null)
+				.build();
+		}
+
+		Customer findCustomer = customerRepository.findById(findMember.getId())
+			.orElse(null);
+
+		if (findCustomer == null) {
+			return MemberCheckResponse.builder()
+				.name(null)
+				.password(null)
+				.authority(null)
+				.build();
+		}
+
+		return MemberCheckResponse.builder()
+			.name(findCustomer.getName())
+			.password(findCustomer.getPassword())
+			.authority("ROLE_" + findMember.getAuthority().name())
+			.build();
 	}
 }

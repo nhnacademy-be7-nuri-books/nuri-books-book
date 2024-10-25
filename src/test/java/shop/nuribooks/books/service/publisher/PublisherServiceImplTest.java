@@ -157,6 +157,7 @@ class PublisherServiceImplTest {
 
 	}
 
+
 	private PublisherRequest registerRequest() {
 		return PublisherRequest.builder().name("publisher1").build();
 	}

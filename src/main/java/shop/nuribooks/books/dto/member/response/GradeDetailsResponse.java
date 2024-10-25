@@ -1,13 +1,16 @@
 package shop.nuribooks.books.dto.member.response;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 @Builder
 @AllArgsConstructor
-public class CustomerRegisterResponse {
+class GradeDetailsResponse {
 
 	private String name;
-	private String phoneNumber;
-	private String email;
+	private Integer pointRate;
+	private BigDecimal requirement;
+
 }

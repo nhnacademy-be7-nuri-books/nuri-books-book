@@ -11,7 +11,6 @@ import lombok.Getter;
 public class Authority {
 
 	@Id
-	@Column(name = "authority_id")
 	private Integer id;
 
 	/**

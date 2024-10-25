@@ -6,6 +6,7 @@ import shop.nuribooks.books.dto.publisher.PublisherRequest;
 import shop.nuribooks.books.dto.publisher.PublisherResponse;
 
 public interface PublisherService {
+
 	PublisherResponse registerPublisher(PublisherRequest request);
 
 	List<PublisherResponse> getAllPublisher();
