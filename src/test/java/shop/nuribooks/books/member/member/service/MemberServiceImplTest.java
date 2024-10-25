@@ -4,6 +4,9 @@ import static java.math.BigDecimal.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static shop.nuribooks.books.member.member.entity.AuthorityEnum.*;
+import static shop.nuribooks.books.member.member.entity.GradeEnum.*;
+import static shop.nuribooks.books.member.member.entity.StatusEnum.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +19,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import shop.nuribooks.books.exception.member.CustomerNotFoundException;
+import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
+import shop.nuribooks.books.exception.member.InvalidPasswordException;
+import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
+import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
@@ -24,12 +33,6 @@ import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.member.entity.Customer;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.exception.member.CustomerNotFoundException;
-import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
-import shop.nuribooks.books.exception.member.InvalidPasswordException;
-import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
-import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.member.member.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -81,11 +84,11 @@ class MemberServiceImplTest {
 	@DisplayName("회원 등록 실패 - 중복된 이메일")
 	@Test
 	public void registerMember_EmailAlreadyExists() {
-	    //given
+		//given
 		MemberRegisterRequest request = memberCreateRequest();
 		when(customerRepository.existsByEmail(request.getEmail())).thenReturn(true);
 
-	    //when / then
+		//when / then
 		EmailAlreadyExistsException exception = assertThrows(EmailAlreadyExistsException.class,
 			() -> memberServiceImpl.registerMember(request));
 		assertThat(exception.getMessage()).isEqualTo("이미 존재하는 이메일입니다.");
@@ -95,7 +98,7 @@ class MemberServiceImplTest {
 	@DisplayName("회원 등록 실패 - 중복된 아이디")
 	@Test
 	void registerMember_UserIdAlreadyExists() {
-	    //given
+		//given
 		MemberRegisterRequest request = memberCreateRequest();
 
 		when(customerRepository.existsByEmail(request.getEmail())).thenReturn(false);
@@ -110,7 +113,7 @@ class MemberServiceImplTest {
 	@DisplayName("회원 탈퇴 성공")
 	@Test
 	void withdrawMember() {
-	    //given
+		//given
 		MemberWithdrawRequest request = memberWithdrawRequest();
 
 		Customer existingCustomer = customer();
@@ -122,7 +125,7 @@ class MemberServiceImplTest {
 		//when
 		memberServiceImpl.withdrawMember(request);
 
-	    //then
+		//then
 		verify(existingMember, times(1)).changeToWithdrawn(); // 메서드 호출 확인
 		assertThat(existingMember.getStatus()).isEqualTo(INACTIVE); // 상태가 INACTIVE로 변경되었는지 확인
 		assertThat(existingMember.getWithdrawnAt()).isNotNull(); // withdrawnAt이 현재 시간으로 설정되었는지 확인
@@ -131,12 +134,12 @@ class MemberServiceImplTest {
 	@DisplayName("회원 탈퇴 실패 - 존재하지 않는 아이디")
 	@Test
 	void withdrawMember_UserIdNotFound() {
-	    //given
+		//given
 		MemberWithdrawRequest request = memberWithdrawRequest();
 
 		when(memberRepository.findByUserId(request.getUserId())).thenReturn(Optional.empty());
 
-	    //when / then
+		//when / then
 		UserIdNotFoundException exception = assertThrows(UserIdNotFoundException.class,
 			() -> memberServiceImpl.withdrawMember(request));
 		assertThat(exception.getMessage()).isEqualTo("존재하지 않는 아이디입니다.");
@@ -164,7 +167,7 @@ class MemberServiceImplTest {
 	@DisplayName("회원 정보 수정 성공")
 	@Test
 	void updateMember() {
-	    //given
+		//given
 		MemberUpdateRequest request = memberUpdateRequest();
 		Customer existingCustomer = spy(customer());
 		Member existingMember = member(existingCustomer);
@@ -172,10 +175,10 @@ class MemberServiceImplTest {
 		when(memberRepository.findByUserId(existingMember.getUserId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.of(existingCustomer));
 
-	    //when
+		//when
 		MemberUpdateResponse response = memberServiceImpl.updateMember(existingMember.getUserId(), request);
 
-	    //then
+		//then
 		verify(existingCustomer, times(1))
 			.changeCustomerInformation(request.getName(), request.getPassword(), request.getPhoneNumber());
 		assertThat(response.getName()).isEqualTo(existingCustomer.getName());
@@ -185,13 +188,13 @@ class MemberServiceImplTest {
 	@DisplayName("회원 정보 수정 실패 - 존재하지 않는 회원")
 	@Test
 	void updateMember_MemberNotFound() {
-	    //given
+		//given
 		MemberUpdateRequest request = memberUpdateRequest();
 		String requestUserId = "nhnacademy";
 
 		when(memberRepository.findByUserId(requestUserId)).thenReturn(Optional.empty());
 
-	    //when / then
+		//when / then
 		MemberNotFoundException exception = assertThrows(MemberNotFoundException.class,
 			() -> memberServiceImpl.updateMember(requestUserId, request));
 		assertThat(exception.getMessage()).isEqualTo("존재하지 않는 회원입니다.");
@@ -219,14 +222,14 @@ class MemberServiceImplTest {
 	@DisplayName("회원 이름, 비밀번호, 권한 조회 성공")
 	@Test
 	void checkMember() {
-	    //given
+		//given
 		Customer existingCustomer = customer();
 		Member existingMember = member(existingCustomer);
 
 		when(memberRepository.findByUserId(existingMember.getUserId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.of(existingCustomer));
 
-	    //when
+		//when
 		MemberCheckResponse response = memberServiceImpl.checkMember(existingMember.getUserId());
 
 		//then
@@ -273,7 +276,6 @@ class MemberServiceImplTest {
 		assertNull(response.getPassword());
 		assertNull(response.getAuthority());
 	}
-
 
 	private MemberUpdateRequest memberUpdateRequest() {
 		return MemberUpdateRequest.builder()

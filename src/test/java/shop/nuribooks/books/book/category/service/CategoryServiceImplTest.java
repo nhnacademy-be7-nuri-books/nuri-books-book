@@ -16,10 +16,10 @@ import org.mockito.MockitoAnnotations;
 import shop.nuribooks.books.book.category.dto.CategoryRequest;
 import shop.nuribooks.books.book.category.dto.CategoryResponse;
 import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.impl.CategoryServiceImpl;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
-import shop.nuribooks.books.book.category.repository.CategoryRepository;
 
 /**
  * CategoryServiceImpl의 기능을 테스트하는 클래스.
@@ -251,6 +251,27 @@ class CategoryServiceImplTest {
 		assertThrows(CategoryAlreadyExistException.class, () -> categoryService.updateCategory(dto, categoryId));
 		verify(categoryRepository).findById(categoryId);
 		verify(categoryRepository, never()).save(any(Category.class));
+	}
+
+	@Test
+	void deleteCategory_Success() {
+		Long categoryId = 1L;
+		Category category = new Category();
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+
+		categoryService.deleteCategory(categoryId);
+
+		verify(categoryRepository).delete(category);
+	}
+
+	@Test
+	void deleteCategory_CategoryNotFound() {
+		Long categoryId = 1L;
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+		assertThrows(CategoryNotFoundException.class, () -> categoryService.deleteCategory(categoryId));
 	}
 
 }
