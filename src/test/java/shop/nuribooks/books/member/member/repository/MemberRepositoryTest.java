@@ -1,12 +1,8 @@
 package shop.nuribooks.books.member.member.repository;
 
-import static java.math.BigDecimal.*;
 import static org.assertj.core.api.Assertions.*;
 
-import static shop.nuribooks.books.member.member.entity.AuthorityEnum.*;
-import static shop.nuribooks.books.member.member.entity.GradeEnum.*;
-import static shop.nuribooks.books.member.member.entity.StatusEnum.*;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -75,8 +71,8 @@ class MemberRepositoryTest {
 			.userId("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
-			.point(ZERO)
-			.totalPaymentAmount(ZERO)
+			.point(BigDecimal.ZERO)
+			.totalPaymentAmount(BigDecimal.ZERO)
 			.latestLoginAt(null)
 			.withdrawnAt(null)
 			.build();
