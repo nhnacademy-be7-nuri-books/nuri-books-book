@@ -1,4 +1,4 @@
-package shop.nuribooks.books.member.member.entity;
+package shop.nuribooks.books.member.grade.entity;
 
 import java.math.BigDecimal;
 

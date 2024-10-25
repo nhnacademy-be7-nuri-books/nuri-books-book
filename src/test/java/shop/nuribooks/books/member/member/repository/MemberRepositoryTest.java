@@ -12,8 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import shop.nuribooks.books.member.member.entity.Customer;
+import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.customer.repository.CustomerRepository;
+import shop.nuribooks.books.member.grade.entity.GradeEnum;
+import shop.nuribooks.books.member.member.entity.AuthorityEnum;
 import shop.nuribooks.books.member.member.entity.Member;
+import shop.nuribooks.books.member.member.entity.StatusEnum;
 
 @DataJpaTest
 class MemberRepositoryTest {
@@ -61,9 +65,9 @@ class MemberRepositoryTest {
 	private Member member(Customer savedCustomer) {
 		return Member.builder()
 			.customer(savedCustomer)
-			.authority(MEMBER)
-			.grade(STANDARD)
-			.status(ACTIVE)
+			.authority(AuthorityEnum.MEMBER)
+			.grade(GradeEnum.STANDARD)
+			.status(StatusEnum.ACTIVE)
 			.userId("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())

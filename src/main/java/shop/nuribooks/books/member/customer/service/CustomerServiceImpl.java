@@ -1,17 +1,17 @@
-package shop.nuribooks.books.member.member.service;
+package shop.nuribooks.books.member.customer.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.member.member.dto.request.CustomerRegisterRequest;
-import shop.nuribooks.books.member.member.dto.request.CustomerUpdateRequest;
-import shop.nuribooks.books.member.member.dto.response.CustomerRegisterResponse;
-import shop.nuribooks.books.member.member.dto.response.CustomerUpdateResponse;
-import shop.nuribooks.books.member.member.entity.Customer;
+import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
+import shop.nuribooks.books.member.customer.dto.request.CustomerUpdateRequest;
+import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
+import shop.nuribooks.books.member.customer.dto.response.CustomerUpdateResponse;
+import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
-import shop.nuribooks.books.member.member.repository.CustomerRepository;
+import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 
 @Service
 @RequiredArgsConstructor

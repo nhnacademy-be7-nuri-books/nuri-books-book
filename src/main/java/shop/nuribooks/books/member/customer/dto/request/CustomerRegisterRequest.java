@@ -1,4 +1,4 @@
-package shop.nuribooks.books.member.member.dto.request;
+package shop.nuribooks.books.member.customer.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

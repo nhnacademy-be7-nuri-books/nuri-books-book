@@ -1,4 +1,4 @@
-package shop.nuribooks.books.member.member.entity;
+package shop.nuribooks.books.member.grade.entity;
 
 import java.math.BigDecimal;
 
@@ -7,10 +7,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Grade {
 
 	@Id
@@ -26,6 +32,12 @@ public class Grade {
 	private Integer pointRate;
 
 	@NotNull
-	@Column(precision = 10, scale = 2)
+	@Column(precision = 11, scale = 2)
 	private BigDecimal requirement;
+
+	public void changeGradeInformation(String name, Integer pointRate, BigDecimal requirement) {
+		this.name = name;
+		this.pointRate = pointRate;
+		this.requirement = requirement;
+	}
 }

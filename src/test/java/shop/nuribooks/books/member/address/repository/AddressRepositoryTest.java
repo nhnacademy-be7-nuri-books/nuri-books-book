@@ -3,7 +3,7 @@ package shop.nuribooks.books.member.address.repository;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.*;
 import static shop.nuribooks.books.member.member.entity.AuthorityEnum.MEMBER;
-import static shop.nuribooks.books.member.member.entity.GradeEnum.STANDARD;
+import static shop.nuribooks.books.member.grade.entity.GradeEnum.STANDARD;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import shop.nuribooks.books.member.address.entity.Address;
-import shop.nuribooks.books.member.member.entity.Customer;
+import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusEnum;
-import shop.nuribooks.books.member.member.repository.CustomerRepository;
+import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @DataJpaTest

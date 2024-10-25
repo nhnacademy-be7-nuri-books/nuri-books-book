@@ -16,13 +16,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import shop.nuribooks.books.member.grade.entity.GradeEnum;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberCheckResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
-import shop.nuribooks.books.member.member.entity.Customer;
+import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.member.entity.AuthorityEnum;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
@@ -30,7 +32,8 @@ import shop.nuribooks.books.exception.member.InvalidPasswordException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
 import shop.nuribooks.books.exception.member.UserIdNotFoundException;
-import shop.nuribooks.books.member.member.repository.CustomerRepository;
+import shop.nuribooks.books.member.customer.repository.CustomerRepository;
+import shop.nuribooks.books.member.member.entity.StatusEnum;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -124,7 +127,7 @@ class MemberServiceImplTest {
 
 	    //then
 		verify(existingMember, times(1)).changeToWithdrawn(); // 메서드 호출 확인
-		assertThat(existingMember.getStatus()).isEqualTo(INACTIVE); // 상태가 INACTIVE로 변경되었는지 확인
+		assertThat(existingMember.getStatus()).isEqualTo(StatusEnum.INACTIVE); // 상태가 INACTIVE로 변경되었는지 확인
 		assertThat(existingMember.getWithdrawnAt()).isNotNull(); // withdrawnAt이 현재 시간으로 설정되었는지 확인
 	}
 
@@ -304,9 +307,9 @@ class MemberServiceImplTest {
 	private Member member(Customer savedCustomer) {
 		return Member.builder()
 			.customer(savedCustomer)
-			.authority(MEMBER)
-			.grade(STANDARD)
-			.status(ACTIVE)
+			.authority(AuthorityEnum.MEMBER)
+			.grade(GradeEnum.STANDARD)
+			.status(StatusEnum.ACTIVE)
 			.userId("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())

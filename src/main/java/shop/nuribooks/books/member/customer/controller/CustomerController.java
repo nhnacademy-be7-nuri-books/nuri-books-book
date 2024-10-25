@@ -1,4 +1,4 @@
-package shop.nuribooks.books.member.member.controller;
+package shop.nuribooks.books.member.customer.controller;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.member.member.dto.request.CustomerRegisterRequest;
-import shop.nuribooks.books.member.member.dto.request.CustomerUpdateRequest;
-import shop.nuribooks.books.member.member.dto.response.CustomerRegisterResponse;
-import shop.nuribooks.books.member.member.dto.response.CustomerUpdateResponse;
-import shop.nuribooks.books.member.member.service.CustomerService;
+import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
+import shop.nuribooks.books.member.customer.dto.request.CustomerUpdateRequest;
+import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
+import shop.nuribooks.books.member.customer.dto.response.CustomerUpdateResponse;
+import shop.nuribooks.books.member.customer.service.CustomerService;
 
 @RestController
 @RequiredArgsConstructor
