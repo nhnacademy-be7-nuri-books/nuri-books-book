@@ -21,7 +21,6 @@ public class ResignedMember {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "resigned_member_id")
 	private Long id;
 
 	@Size(max = 20)

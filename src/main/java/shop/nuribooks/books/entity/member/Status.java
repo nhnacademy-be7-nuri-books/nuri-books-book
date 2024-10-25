@@ -11,7 +11,6 @@ import lombok.Getter;
 public class Status {
 
 	@Id
-	@Column(name = "status_id")
 	private Integer id;
 
 	/**

@@ -22,15 +22,11 @@ public class Customer {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "customer_id")
 	private Long id;
 
 	@NotBlank
 	private String name;
 
-	/**
-	 * BCryptPasswordEncoder로 해싱한 비밀번호
-	 */
 	@NotBlank
 	private String password;
 
@@ -48,15 +44,14 @@ public class Customer {
 		this.email = email;
 	}
 
-	public void changeName(String name) {
+	public void changeCustomerInformation(String name, String password, String phoneNumber) {
 		this.name = name;
+		this.password = password;
+		this.phoneNumber = phoneNumber;
 	}
 
-	public void changePassword(String encryptedPassword) {
-		this.password = encryptedPassword;
-	}
-
-	public void changePhoneNumber(String phoneNumber) {
+	public void changeCustomerInformation(String name, String phoneNumber) {
+		this.name = name;
 		this.phoneNumber = phoneNumber;
 	}
 }
