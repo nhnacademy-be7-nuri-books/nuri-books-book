@@ -1,6 +1,9 @@
 package shop.nuribooks.books.member.member.service;
 
 import static java.math.BigDecimal.*;
+import static shop.nuribooks.books.member.member.entity.AuthorityEnum.MEMBER;
+import static shop.nuribooks.books.member.member.entity.GradeEnum.STANDARD;
+import static shop.nuribooks.books.member.member.entity.StatusEnum.ACTIVE;
 
 import java.time.LocalDateTime;
 
