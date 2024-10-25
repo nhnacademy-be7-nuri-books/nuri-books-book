@@ -1,8 +1,8 @@
 package shop.nuribooks.books.service.book;
 
-import shop.nuribooks.books.dto.book.BookRegisterReq;
-import shop.nuribooks.books.dto.book.BookRegisterRes;
+import shop.nuribooks.books.dto.book.BookRegisterRequest;
+import shop.nuribooks.books.dto.book.BookRegisterResponse;
 
 public interface BookService {
-	BookRegisterRes registerBook(BookRegisterReq reqDto);
+	BookRegisterResponse registerBook(BookRegisterRequest reqDto);
 }

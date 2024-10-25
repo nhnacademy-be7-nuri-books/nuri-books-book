@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import shop.nuribooks.books.entity.book.BookState;
-import shop.nuribooks.books.entity.book.BookStateEnum;
 
 @DataJpaTest
 public class BookStateRepositoryTest {
@@ -18,13 +17,13 @@ public class BookStateRepositoryTest {
 
 	@BeforeEach
 	public void setUp() {
-		BookState bookState = BookState.of(BookStateEnum.DISCONTINUED);
+		BookState bookState = BookState.builder().detail("절판").build();
 		bookStateRepository.save(bookState);
 	}
 
 	@Test
 	public void testExistsBookStatesByDetail_ShouldReturnTrue_WhenDetailExists() {
-		BookStateEnum detail = BookStateEnum.DISCONTINUED;
+		String detail = "절판";
 
 		boolean exist = bookStateRepository.existsBookStatesByDetail(detail);
 
@@ -33,7 +32,7 @@ public class BookStateRepositoryTest {
 
 	@Test
 	public void testExistsBookStatesByDetail_ShouldReturnFalse_WhenDetailDoesNotExist() {
-		BookStateEnum detail = BookStateEnum.INSTOCK;
+		String detail = "재고있음";
 
 		boolean exist = bookStateRepository.existsBookStatesByDetail(detail);
 
