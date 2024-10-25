@@ -1,6 +1,7 @@
 package shop.nuribooks.books.member.member.service;
 
 import static java.math.BigDecimal.*;
+
 import static shop.nuribooks.books.member.member.entity.AuthorityEnum.MEMBER;
 import static shop.nuribooks.books.member.member.entity.GradeEnum.STANDARD;
 import static shop.nuribooks.books.member.member.entity.StatusEnum.ACTIVE;
@@ -11,6 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.exception.member.CustomerNotFoundException;
+import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
+import shop.nuribooks.books.exception.member.InvalidPasswordException;
+import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
+import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
@@ -19,12 +26,6 @@ import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.member.entity.Customer;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.exception.member.CustomerNotFoundException;
-import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
-import shop.nuribooks.books.exception.member.InvalidPasswordException;
-import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
-import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.member.member.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 

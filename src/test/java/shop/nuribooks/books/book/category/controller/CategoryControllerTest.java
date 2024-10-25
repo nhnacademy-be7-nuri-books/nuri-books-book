@@ -18,13 +18,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.common.advice.GlobalExceptionHandler;
 import shop.nuribooks.books.book.category.dto.CategoryRequest;
 import shop.nuribooks.books.book.category.dto.CategoryResponse;
 import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.service.CategoryService;
+import shop.nuribooks.books.common.advice.GlobalExceptionHandler;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
-import shop.nuribooks.books.book.category.service.CategoryService;
 
 /**
  * CategoryController의 기능을 테스트하는 클래스.
@@ -254,6 +254,43 @@ class CategoryControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
 			.andExpect(status().isBadRequest());
+	}
+
+	/**
+	 * 특정 카테고리를 삭제하는 테스트를 생성합니다.
+	 *
+	 * @author janghyun
+	 */
+	@Test
+	void deleteCategory_whenValidId_thenReturnsOk() throws Exception {
+		// given
+		Long categoryId = 1L;
+		doNothing().when(categoryService).deleteCategory(categoryId);
+
+		// when & then
+		mockMvc.perform(delete("/api/categories/{categoryId}", categoryId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.message").value("카테고리가 성공적으로 삭제 되었습니다."));
+	}
+
+	/**
+	 * 유효하지 않은 ID로 카테고리를 삭제할 때, HTTP 상태 코드 404(Not Found)를 반환하는지 테스트합니다.
+	 *
+	 * @author janghyun
+	 */
+	@Test
+	void deleteCategory_whenInvalidId_thenReturnsNotFound() throws Exception {
+		// given
+		Long categoryId = 999L;
+		doThrow(new CategoryNotFoundException("Category not found with ID: " + categoryId)).when(categoryService)
+			.deleteCategory(categoryId);
+
+		// when & then
+		mockMvc.perform(delete("/api/categories/{categoryId}", categoryId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.message").value("Category not found with ID: " + categoryId));
 	}
 
 }
