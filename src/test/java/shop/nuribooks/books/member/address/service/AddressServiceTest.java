@@ -2,7 +2,7 @@ package shop.nuribooks.books.member.address.service;
 
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.*;
-import static shop.nuribooks.books.member.member.entity.AuthorityEnum.MEMBER;
+import static shop.nuribooks.books.member.authority.entity.AuthorityEnum.MEMBER;
 import static shop.nuribooks.books.member.member.entity.GradeEnum.STANDARD;
 
 import java.time.LocalDate;
@@ -135,7 +135,7 @@ class AddressServiceTest {
 
         // then
         Address changedAddress = addressRepository.findById(saved.getId())
-                .orElseThrow(() -> new AddressNotFoundException("주소가 없습니다."));
+                .orElseThrow(AddressNotFoundException::new);
         Assertions.assertThat(changedAddress.isDefault()).isFalse();
     }
 

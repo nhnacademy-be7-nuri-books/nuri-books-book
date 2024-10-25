@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.nuribooks.books.member.authority.entity.AuthorityEnum;
 
 
 @Entity

@@ -45,14 +45,14 @@ public class AddressServiceImpl implements AddressService{
 
     public void removeAddress(Long addressId) {
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new AddressNotFoundException("주소를 찾을 수 없습니다."));
+                .orElseThrow(AddressNotFoundException::new);
         addressRepository.delete(address);
     }
 
     @Transactional
     public AddressResponse modifyAddress(AddressEditRequest request) {
         Address address = addressRepository.findById(request.getId())
-                .orElseThrow(() -> new AddressNotFoundException("주소를 찾을 수 없습니다."));
+                .orElseThrow(AddressNotFoundException::new);
 
         AddressEditor addressEditor = getAddressEditor(request, address);
         address.edit(addressEditor);
