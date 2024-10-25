@@ -1,14 +1,14 @@
 package shop.nuribooks.books.member.authority.dto.requset;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import shop.nuribooks.books.member.authority.entity.Authority;
-import shop.nuribooks.books.member.authority.entity.AuthorityEnum;
+import shop.nuribooks.books.member.authority.entity.AuthorityType;
 
-public record AuthorityRegisterRequest(@NotBlank AuthorityEnum authorityEnum) {
+public record AuthorityRegisterRequest(@NotNull AuthorityType authorityType) {
 
     public Authority toEntity() {
         return Authority.builder()
-                .name(authorityEnum)
+                .authorityType(authorityType)
                 .build();
     }
 }

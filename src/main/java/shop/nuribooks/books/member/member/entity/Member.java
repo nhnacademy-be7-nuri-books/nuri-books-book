@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shop.nuribooks.books.member.authority.entity.AuthorityEnum;
+import shop.nuribooks.books.member.authority.entity.AuthorityType;
 
 
 @Entity
@@ -48,7 +48,7 @@ public class Member {
 	 */
 	@NotNull
 	@Enumerated(STRING)
-	private AuthorityEnum authority;
+	private AuthorityType authority;
 
 	/**
 	 * STANDARD, GOLD, PLATINUM, ROYAL
@@ -92,8 +92,8 @@ public class Member {
 	 */
 	private LocalDateTime withdrawnAt;
 
-	public Member(Customer customer, AuthorityEnum authority, GradeEnum grade, StatusEnum status, String userId,
-		LocalDate birthday, LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
+	public Member(Customer customer, AuthorityType authority, GradeEnum grade, StatusEnum status, String userId,
+                  LocalDate birthday, LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
 		this.customer = customer;
 		this.authority = authority;
 		this.grade = grade;

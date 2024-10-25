@@ -15,7 +15,7 @@ import shop.nuribooks.books.member.authority.dto.requset.AuthorityEditRequest;
 import shop.nuribooks.books.member.authority.dto.requset.AuthorityRegisterRequest;
 import shop.nuribooks.books.member.authority.dto.response.AuthorityResponse;
 import shop.nuribooks.books.member.authority.entity.Authority;
-import shop.nuribooks.books.member.authority.entity.AuthorityEnum;
+import shop.nuribooks.books.member.authority.entity.AuthorityType;
 import shop.nuribooks.books.member.authority.repository.AuthorityRepository;
 
 @SpringBootTest
@@ -36,7 +36,7 @@ class AuthorityServiceImplTest {
     @Test
     void registerAuthority() {
         // given
-        AuthorityRegisterRequest authorityRegisterRequest = new AuthorityRegisterRequest(AuthorityEnum.MEMBER);
+        AuthorityRegisterRequest authorityRegisterRequest = new AuthorityRegisterRequest(AuthorityType.MEMBER);
 
         // when
         authorityService.registerAuthority(authorityRegisterRequest);
@@ -50,10 +50,10 @@ class AuthorityServiceImplTest {
     void registerAlreadyExistAuthority() {
         // given
         Authority member = Authority.builder()
-                .name(AuthorityEnum.MEMBER)
+                .authorityType(AuthorityType.MEMBER)
                 .build();
         authorityRepository.save(member);
-        AuthorityRegisterRequest authorityRegisterRequest = new AuthorityRegisterRequest(AuthorityEnum.MEMBER);
+        AuthorityRegisterRequest authorityRegisterRequest = new AuthorityRegisterRequest(AuthorityType.MEMBER);
 
         // when // then
         assertThatThrownBy(() -> authorityService.registerAuthority(authorityRegisterRequest))
@@ -65,11 +65,11 @@ class AuthorityServiceImplTest {
     void findAll() {
         // given
         Authority member = Authority.builder()
-                .name(AuthorityEnum.MEMBER)
+                .authorityType(AuthorityType.MEMBER)
                 .build();
 
         Authority admin = Authority.builder()
-                .name(AuthorityEnum.ADMIN)
+                .authorityType(AuthorityType.ADMIN)
                 .build();
 
         authorityRepository.saveAll(List.of(member, admin));
@@ -85,7 +85,7 @@ class AuthorityServiceImplTest {
     void removeAuthority() {
         // given
         Authority member = Authority.builder()
-                .name(AuthorityEnum.MEMBER)
+                .authorityType(AuthorityType.MEMBER)
                 .build();
         Authority saved = authorityRepository.save(member);
 
@@ -108,23 +108,23 @@ class AuthorityServiceImplTest {
     void modifyAddress() {
         // given
         Authority member = Authority.builder()
-                .name(AuthorityEnum.MEMBER)
+                .authorityType(AuthorityType.MEMBER)
                 .build();
         Authority saved = authorityRepository.save(member);
-        AuthorityEditRequest authorityEditRequest = new AuthorityEditRequest(saved.getId(), AuthorityEnum.ADMIN);
+        AuthorityEditRequest authorityEditRequest = new AuthorityEditRequest(AuthorityType.ADMIN);
 
         // when
-        AuthorityResponse changedAuthority = authorityService.modifyAddress(authorityEditRequest);
+        AuthorityResponse changedAuthority = authorityService.modifyAddress(saved.getId(), authorityEditRequest);
 
         // then
-        assertThat(changedAuthority.authorityEnum()).isEqualByComparingTo(AuthorityEnum.ADMIN);
+        assertThat(changedAuthority.authorityType()).isEqualByComparingTo(AuthorityType.ADMIN);
     }
 
     @DisplayName("없는 권한 수정시 예외가 발생한다.")
     @Test
     void modifyNotFoundAddress() {
-        AuthorityEditRequest authorityEditRequest = new AuthorityEditRequest(1L, AuthorityEnum.ADMIN);
-        assertThatThrownBy(() -> authorityService.modifyAddress(authorityEditRequest))
+        AuthorityEditRequest authorityEditRequest = new AuthorityEditRequest(AuthorityType.ADMIN);
+        assertThatThrownBy(() -> authorityService.modifyAddress(1L, authorityEditRequest))
                 .isInstanceOf(AuthorityNotFoundException.class);
     }
 }

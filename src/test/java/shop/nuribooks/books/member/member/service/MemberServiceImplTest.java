@@ -4,7 +4,7 @@ import static java.math.BigDecimal.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static shop.nuribooks.books.member.authority.entity.AuthorityEnum.MEMBER;
+import static shop.nuribooks.books.member.authority.entity.AuthorityType.MEMBER;
 import static shop.nuribooks.books.member.member.entity.GradeEnum.STANDARD;
 import static shop.nuribooks.books.member.member.entity.StatusEnum.ACTIVE;
 import static shop.nuribooks.books.member.member.entity.StatusEnum.INACTIVE;

@@ -6,7 +6,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,22 +17,22 @@ import shop.nuribooks.books.member.authority.dto.requset.AuthorityEditRequest;
 @Entity
 public class Authority {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	/**
-	 * ADMIN, MEMBER, SELLER
-	 */
-	@Enumerated(EnumType.STRING)
-	private AuthorityEnum name;
+    /**
+     * ADMIN, MEMBER, SELLER
+     */
+    @Enumerated(EnumType.STRING)
+    private AuthorityType authorityType;
 
-	@Builder
-	private Authority(AuthorityEnum name) {
-		this.name = name;
-	}
+    @Builder
+    private Authority(AuthorityType authorityType) {
+        this.authorityType = authorityType;
+    }
 
-	public void editAuthority(AuthorityEditRequest request){
-		this.name = request.authorityEnum();
-	}
+    public void editAuthority(AuthorityEditRequest request) {
+        this.authorityType = request.authorityType();
+    }
 }

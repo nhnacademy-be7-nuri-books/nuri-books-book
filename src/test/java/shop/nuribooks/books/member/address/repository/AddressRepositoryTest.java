@@ -2,7 +2,7 @@ package shop.nuribooks.books.member.address.repository;
 
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.*;
-import static shop.nuribooks.books.member.authority.entity.AuthorityEnum.MEMBER;
+import static shop.nuribooks.books.member.authority.entity.AuthorityType.MEMBER;
 import static shop.nuribooks.books.member.member.entity.GradeEnum.STANDARD;
 
 import java.time.LocalDate;

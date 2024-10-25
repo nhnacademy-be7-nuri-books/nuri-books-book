@@ -21,8 +21,8 @@ public class AuthorityServiceImpl implements AuthorityService {
 
     @Override
     public AuthorityResponse registerAuthority(AuthorityRegisterRequest request) {
-        if (authorityRepository.existsByName(request.authorityEnum())) {
-            throw new AuthorityAlreadyExistException(request.authorityEnum());
+        if (authorityRepository.existsByName(request.authorityType())) {
+            throw new AuthorityAlreadyExistException(request.authorityType());
         }
 
         Authority authority = request.toEntity();
@@ -47,9 +47,9 @@ public class AuthorityServiceImpl implements AuthorityService {
 
     @Transactional
     @Override
-    public AuthorityResponse modifyAddress(AuthorityEditRequest request) {
-        Authority authority = authorityRepository.findById(request.authorityId())
-                .orElseThrow(() -> new AuthorityNotFoundException(request.authorityId()));
+    public AuthorityResponse modifyAddress(Long authorityId, AuthorityEditRequest request) {
+        Authority authority = authorityRepository.findById(authorityId)
+                .orElseThrow(() -> new AuthorityNotFoundException(authorityId));
         authority.editAuthority(request);
         return AuthorityResponse.of(authority);
     }

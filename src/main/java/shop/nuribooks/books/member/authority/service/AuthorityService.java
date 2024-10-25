@@ -13,5 +13,5 @@ public interface AuthorityService {
 
     void removeAuthority(Long authorityId);
 
-    AuthorityResponse modifyAddress(AuthorityEditRequest request);
+    AuthorityResponse modifyAddress(Long authorityId, AuthorityEditRequest request);
 }
