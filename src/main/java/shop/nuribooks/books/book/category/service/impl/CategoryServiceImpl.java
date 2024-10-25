@@ -9,10 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.nuribooks.books.book.category.dto.CategoryRequest;
 import shop.nuribooks.books.book.category.dto.CategoryResponse;
 import shop.nuribooks.books.book.category.entitiy.Category;
-import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
-import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.CategoryService;
+import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
+import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
 /**
  * 카테고리 관련 작업을 처리하는 서비스 구현체.
@@ -143,6 +143,19 @@ public class CategoryServiceImpl implements CategoryService {
 		category.setName(dto.name());
 
 		return new CategoryResponse(categoryRepository.save(category));
+	}
+
+	/**
+	 * 특정 카테고리를 삭제합니다.
+	 *
+	 * @param categoryId 삭제할 카테고리의 ID
+	 * @author janghyun
+	 */
+	@Override
+	public void deleteCategory(Long categoryId) {
+		Category category = categoryRepository.findById(categoryId)
+			.orElseThrow(CategoryNotFoundException::new);
+		categoryRepository.delete(category);
 	}
 
 }
