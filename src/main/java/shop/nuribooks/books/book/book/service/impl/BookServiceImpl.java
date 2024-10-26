@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
+import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
@@ -61,5 +62,10 @@ public class BookServiceImpl implements BookService {
 		booksRepository.save(book);
 
 		return BookRegisterResponse.of(book);
+	}
+
+	@Override
+	public void updateBook(Long id, BookUpdateRequest bookUpdateReq) {
+
 	}
 }

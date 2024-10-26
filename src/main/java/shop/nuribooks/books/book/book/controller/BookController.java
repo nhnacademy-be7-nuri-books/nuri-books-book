@@ -2,7 +2,9 @@ package shop.nuribooks.books.book.book.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,13 +16,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
+import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.service.BookService;
+import shop.nuribooks.books.common.message.ResponseMessage;
 
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
 @RestController
 public class BookController {
-	private final BookService booksService;
+	private final BookService bookService;
 
 	@Operation(summary = "Register a new book", description = "This endpoint allows administrators to register a new book in the system.")
 	@ApiResponses(value = {
@@ -31,7 +35,15 @@ public class BookController {
 	})
 	@PostMapping
 	public ResponseEntity<BookRegisterResponse> registerBooks(@Valid @RequestBody BookRegisterRequest reqDto) {
-		BookRegisterResponse resDto = booksService.registerBook(reqDto);
+		BookRegisterResponse resDto = bookService.registerBook(reqDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<ResponseMessage> updateBook(@PathVariable Long id,
+		@Valid @RequestBody BookUpdateRequest bookUpdateReq) {
+		bookService.updateBook(id, bookUpdateReq);
+		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.OK.value(), "도서 수정 성공");
+		return ResponseEntity.ok(responseMessage);
 	}
 }

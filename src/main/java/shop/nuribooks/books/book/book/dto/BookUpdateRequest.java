@@ -8,10 +8,9 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
-public record BookRegisterRequest(
+public record BookUpdateRequest(
 	@NotNull Integer stateId,
 	@NotNull Long publisherId,
 	@NotNull @Size(min = 1, max = 50) String title,
@@ -24,5 +23,8 @@ public record BookRegisterRequest(
 	@NotBlank String contents,
 	@NotBlank String isbn,
 	boolean isPackageable,
-	@NotNull @Min(0) int stock
-) {}
+	@NotNull int likeCount,
+	@NotNull @Min(0) int stock,
+	@NotNull Long viewCount
+) {
+}
