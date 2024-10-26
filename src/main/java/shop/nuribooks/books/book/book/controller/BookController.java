@@ -39,6 +39,12 @@ public class BookController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
 	}
 
+	@Operation(summary = "Update book details", description = "This endpoint allows administrators to update an existing book's details by book ID.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Book updated successfully"),
+		@ApiResponse(responseCode = "400", description = "Invalid request data"),
+		@ApiResponse(responseCode = "404", description = "Book not found")
+	})
 	@PutMapping("/{bookId}")
 	public ResponseEntity<ResponseMessage> updateBook(@PathVariable Long bookId,
 		@Valid @RequestBody BookUpdateRequest bookUpdateReq) {
