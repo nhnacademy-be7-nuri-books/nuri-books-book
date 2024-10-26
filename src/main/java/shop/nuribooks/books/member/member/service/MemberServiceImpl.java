@@ -7,7 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.member.grade.entity.GradeEnum;
+import shop.nuribooks.books.exception.member.GradeNotFoundException;
+import shop.nuribooks.books.member.grade.entity.Grade;
+import shop.nuribooks.books.member.grade.repository.GradeRepository;
+import shop.nuribooks.books.member.member.dto.DtoMapper;
+import shop.nuribooks.books.member.member.dto.EntityMapper;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
@@ -34,6 +38,7 @@ public class MemberServiceImpl implements MemberService {
 
 	private final CustomerRepository customerRepository;
 	private final MemberRepository memberRepository;
+	private final GradeRepository gradeRepository;
 
 	/**
 	 * 회원등록 <br>
@@ -56,27 +61,24 @@ public class MemberServiceImpl implements MemberService {
 			throw new UserIdAlreadyExistsException("이미 존재하는 아이디입니다.");
 		}
 
-		Customer newCustomer = new Customer(
-			request.getName(),
-			request.getPassword(),
-			request.getPhoneNumber(),
-			request.getEmail());
-
+		Customer newCustomer = EntityMapper.toCustomerEntity(request);
 		Customer savedCustomer = customerRepository.save(newCustomer);
 
-		Member newMember = new Member(
-			savedCustomer, AuthorityEnum.MEMBER, GradeEnum.STANDARD, StatusEnum.ACTIVE, request.getUserId(),
-			request.getBirthday(), LocalDateTime.now(), BigDecimal.ZERO, BigDecimal.ZERO);
+		Member newMember = Member.builder()
+			.customer(savedCustomer)
+			.authority(AuthorityEnum.MEMBER)
+			.grade(standard())
+			.status(StatusEnum.ACTIVE)
+			.userId(request.getUserId())
+			.birthday(request.getBirthday())
+			.createdAt(LocalDateTime.now())
+			.point(BigDecimal.ZERO)
+			.totalPaymentAmount(BigDecimal.ZERO)
+			.build();
 
 		Member savedMember = memberRepository.save(newMember);
 
-		return MemberRegisterResponse.builder()
-			.name(savedCustomer.getName())
-			.userId(savedMember.getUserId())
-			.phoneNumber(savedCustomer.getPhoneNumber())
-			.email(savedCustomer.getEmail())
-			.birthday(savedMember.getBirthday())
-			.build();
+		return DtoMapper.toRegisterDto(savedCustomer, savedMember);
 	}
 
 	/**
@@ -126,10 +128,7 @@ public class MemberServiceImpl implements MemberService {
 		findCustomer.changeCustomerInformation(
 			request.getName(), request.getPassword(), request.getPhoneNumber());
 
-		return MemberUpdateResponse.builder()
-			.name(findCustomer.getName())
-			.phoneNumber(findCustomer.getPhoneNumber())
-			.build();
+		return DtoMapper.toUpdateDto(findCustomer);
 	}
 
 	/**
@@ -140,32 +139,18 @@ public class MemberServiceImpl implements MemberService {
 	 */
 	public MemberCheckResponse checkMember(String userId) {
 
-		Member findMember = memberRepository.findByUserId(userId)
-			.orElse(null);
+		return memberRepository.findByUserId(userId)
+			.flatMap(foundMember -> customerRepository.findById(foundMember.getId())
+				.map(foundCustomer -> DtoMapper.toCheckDto(foundCustomer, foundMember))
+			)
+			.orElseGet(DtoMapper::toNullDto);
+	}
 
-		if (findMember == null) {
-			return MemberCheckResponse.builder()
-				.name(null)
-				.password(null)
-				.authority(null)
-				.build();
-		}
-
-		Customer findCustomer = customerRepository.findById(findMember.getId())
-			.orElse(null);
-
-		if (findCustomer == null) {
-			return MemberCheckResponse.builder()
-				.name(null)
-				.password(null)
-				.authority(null)
-				.build();
-		}
-
-		return MemberCheckResponse.builder()
-			.name(findCustomer.getName())
-			.password(findCustomer.getPassword())
-			.authority("ROLE_" + findMember.getAuthority().name())
-			.build();
+	/**
+	 * STANDARD 등급을 가져오는 메서드
+	 */
+	private Grade standard() {
+		return gradeRepository.findByName("STANDARD")
+			.orElseThrow(() -> new GradeNotFoundException("STANDARD 등급이 존재하지 않습니다."));
 	}
 }

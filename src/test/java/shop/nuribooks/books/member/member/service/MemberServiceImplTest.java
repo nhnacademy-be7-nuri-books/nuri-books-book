@@ -16,7 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import shop.nuribooks.books.member.grade.entity.GradeEnum;
+import shop.nuribooks.books.member.grade.entity.Grade;
+import shop.nuribooks.books.member.grade.repository.GradeRepository;
+import shop.nuribooks.books.member.member.dto.EntityMapper;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
@@ -43,6 +45,9 @@ class MemberServiceImplTest {
 	private MemberServiceImpl memberServiceImpl;
 
 	@Mock
+	private GradeRepository gradeRepository;
+
+	@Mock
 	private CustomerRepository customerRepository;
 
 	@Mock
@@ -53,20 +58,17 @@ class MemberServiceImplTest {
 	void registerMember() {
 		// given
 		MemberRegisterRequest request = memberCreateRequest();
+		Grade standard = createGrade();
+		Customer savedCustomer = EntityMapper.toCustomerEntity(request);
+		Member savedMember = createMember(savedCustomer);
 
-		Customer savedCustomer = doReturn(Customer.builder()
-			.name(request.getName())
-			.password(request.getPassword())
-			.phoneNumber(request.getPhoneNumber())
-			.email(request.getEmail())
-			.build())
-
-			.when(customerRepository)
-			.save(any(Customer.class));
-
-		doReturn(member(savedCustomer))
-			.when(memberRepository)
-			.save(any(Member.class));
+		when(customerRepository.existsByEmail(request.getEmail())).thenReturn(false);
+		when(memberRepository.existsByUserId(request.getUserId())).thenReturn(false);
+		when(customerRepository.save(any(Customer.class)))
+			.thenReturn(savedCustomer);
+		when(gradeRepository.findByName("STANDARD")).thenReturn(Optional.of(standard));
+		when(memberRepository.save(any(Member.class)))
+			.thenReturn(savedMember);
 
 		// when
 		MemberRegisterResponse response = memberServiceImpl.registerMember(request);
@@ -116,8 +118,8 @@ class MemberServiceImplTest {
 	    //given
 		MemberWithdrawRequest request = memberWithdrawRequest();
 
-		Customer existingCustomer = customer();
-		Member existingMember = spy(member(existingCustomer));
+		Customer existingCustomer = createCustomer();
+		Member existingMember = spy(createMember(existingCustomer));
 
 		when(memberRepository.findByUserId(request.getUserId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.getPassword())).thenReturn(true);
@@ -151,8 +153,8 @@ class MemberServiceImplTest {
 		//given
 		MemberWithdrawRequest request = memberWithdrawRequest();
 
-		Customer existingCustomer = customer();
-		Member existingMember = member(existingCustomer);
+		Customer existingCustomer = createCustomer();
+		Member existingMember = createMember(existingCustomer);
 
 		when(memberRepository.findByUserId(request.getUserId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.getPassword()))
@@ -169,8 +171,8 @@ class MemberServiceImplTest {
 	void updateMember() {
 	    //given
 		MemberUpdateRequest request = memberUpdateRequest();
-		Customer existingCustomer = spy(customer());
-		Member existingMember = member(existingCustomer);
+		Customer existingCustomer = spy(createCustomer());
+		Member existingMember = createMember(existingCustomer);
 
 		when(memberRepository.findByUserId(existingMember.getUserId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.of(existingCustomer));
@@ -205,8 +207,8 @@ class MemberServiceImplTest {
 	void updateMember_CustomerNotFound() {
 		//given
 		MemberUpdateRequest request = memberUpdateRequest();
-		Customer existingCustomer = customer();
-		Member existingMember = member(existingCustomer);
+		Customer existingCustomer = createCustomer();
+		Member existingMember = createMember(existingCustomer);
 
 		String requestUserId = "nhnacademy";
 
@@ -223,8 +225,8 @@ class MemberServiceImplTest {
 	@Test
 	void checkMember() {
 	    //given
-		Customer existingCustomer = customer();
-		Member existingMember = member(existingCustomer);
+		Customer existingCustomer = createCustomer();
+		Member existingMember = createMember(existingCustomer);
 
 		when(memberRepository.findByUserId(existingMember.getUserId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.of(existingCustomer));
@@ -235,7 +237,7 @@ class MemberServiceImplTest {
 		//then
 		assertThat(response.getName()).isEqualTo(existingCustomer.getName());
 		assertThat(response.getPassword()).isEqualTo(existingCustomer.getPassword());
-		assertThat(response.getAuthority()).isEqualTo("ROLE_" + existingMember.getAuthority());
+		assertThat(response.getAuthority()).isEqualTo("ROLE_" + existingMember.getAuthority().name());
 	}
 
 	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 회원이 존재하지 않을 때")
@@ -260,8 +262,8 @@ class MemberServiceImplTest {
 	@Test
 	void checkMember_CustomerNotFound() {
 		//given
-		Customer existingCustomer = customer();
-		Member existingMember = member(existingCustomer);
+		Customer existingCustomer = createCustomer();
+		Member existingMember = createMember(existingCustomer);
 		String requestUserid = "nhnacademy";
 
 		when(memberRepository.findByUserId(requestUserid)).thenReturn(Optional.of(existingMember));
@@ -278,21 +280,9 @@ class MemberServiceImplTest {
 	}
 
 
-	private MemberUpdateRequest memberUpdateRequest() {
-		return MemberUpdateRequest.builder()
-			.name("수정된 이름")
-			.password("수정된 비밀번호")
-			.phoneNumber("010-0000-000")
-			.build();
-	}
-
-	private MemberWithdrawRequest memberWithdrawRequest() {
-		return MemberWithdrawRequest.builder()
-			.userId("nuribooks95")
-			.password("abc123")
-			.build();
-	}
-
+	/**
+	 * 테스트를 위한 MemberRegisterRequest 생성
+	 */
 	private MemberRegisterRequest memberCreateRequest() {
 		return MemberRegisterRequest.builder()
 			.name("boho")
@@ -304,26 +294,67 @@ class MemberServiceImplTest {
 			.build();
 	}
 
-	private Member member(Customer savedCustomer) {
+	/**
+	 * 테스트를 위한 MemberUpdateRequest 생성
+	 */
+	private MemberUpdateRequest memberUpdateRequest() {
+		return MemberUpdateRequest.builder()
+			.name("수정된 이름")
+			.password("수정된 비밀번호")
+			.phoneNumber("010-0000-000")
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 MemberWithdrawRequest 생성
+	 */
+	private MemberWithdrawRequest memberWithdrawRequest() {
+		return MemberWithdrawRequest.builder()
+			.userId("nuribooks95")
+			.password("abc123")
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 등급 생성
+	 */
+	private Grade createGrade() {
+		return Grade.builder()
+			.id(1)
+			.name("STANDARD")
+			.pointRate(3)
+			.requirement(BigDecimal.valueOf(100_000))
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 비회원 생성
+	 */
+	private Customer createCustomer() {
+		return Customer.builder()
+			.id(1L)
+			.name("boho")
+			.password("abc123")
+			.phoneNumber("042-8282-8282")
+			.email("nhnacademy@nuriBooks.com")
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 회원 생성
+	 */
+	private Member createMember(Customer savedCustomer) {
 		return Member.builder()
+			.id(1L)
 			.customer(savedCustomer)
 			.authority(AuthorityEnum.MEMBER)
-			.grade(GradeEnum.STANDARD)
+			.grade(createGrade())
 			.status(StatusEnum.ACTIVE)
 			.userId("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
-			.build();
-	}
-
-	private Customer customer() {
-		return Customer.builder()
-			.name("boho")
-			.password("abc123")
-			.phoneNumber("042-8282-8282")
-			.email("nhnacademy@nuriBooks.com")
 			.build();
 	}
 }

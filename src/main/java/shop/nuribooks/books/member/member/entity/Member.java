@@ -13,6 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
@@ -23,7 +24,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.nuribooks.books.member.customer.entity.Customer;
-import shop.nuribooks.books.member.grade.entity.GradeEnum;
+import shop.nuribooks.books.member.grade.entity.Grade;
 
 @Entity
 @Getter
@@ -54,8 +55,9 @@ public class Member {
 	 * STANDARD, GOLD, PLATINUM, ROYAL
 	 */
 	@NotNull
-	@Enumerated(STRING)
-	private GradeEnum grade;
+	@ManyToOne(fetch = LAZY)
+	@JoinColumn(name = "id")
+	private Grade grade;
 
 	/**
 	 * ACTIVE, INACTIVE, WITHDRAWN
@@ -92,7 +94,7 @@ public class Member {
 	 */
 	private LocalDateTime withdrawnAt;
 
-	public Member(Customer customer, AuthorityEnum authority, GradeEnum grade, StatusEnum status, String userId,
+	public Member(Customer customer, AuthorityEnum authority, Grade grade, StatusEnum status, String userId,
 		LocalDate birthday, LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
 		this.customer = customer;
 		this.authority = authority;
