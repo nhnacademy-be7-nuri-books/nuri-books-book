@@ -66,6 +66,18 @@ public class BookServiceImpl implements BookService {
 		return BookRegisterResponse.of(book);
 	}
 
+	//TODO: 좋아요나 조회수에 대한 업데이트는 따로 메서드를 구현할 계획입니다.
+	/**
+	 * 주어진 책 ID에 해당하는 책 정보를 업데이트합니다.
+	 * <p>
+	 *     관리자페이지에서 도서에 대한 정보를 수정하기 위한 메서드 입니다.
+	 * </p>
+	 * @param bookId 업데이트할 책의 ID
+	 * @param bookUpdateReq 책 업데이트 요청 정보를 포함한 객체
+	 * @throws BookIdNotFoundException 책 ID가 존재하지 않는 경우 발생
+	 * @throws BookStateIdNotFoundException 도서상태 ID가 존재하지 않는 경우 발생
+	 * @throws PublisherIdNotFoundException 주어진 출판사 ID가 존재하지 않는 경우 발생
+	 */
 	@Override
 	public void updateBook(Long bookId, BookUpdateRequest bookUpdateReq) {
 		Book book = bookRepository.findById(bookId)
