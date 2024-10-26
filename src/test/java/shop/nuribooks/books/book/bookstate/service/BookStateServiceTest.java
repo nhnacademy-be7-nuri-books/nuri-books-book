@@ -13,9 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.bookstate.dto.BookStateRequest;
 import shop.nuribooks.books.book.bookstate.dto.BookStateResponse;
-import shop.nuribooks.books.book.book.entitiy.Book;
+
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.exception.bookstate.BookStateDetailAlreadyExistException;
 import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
@@ -75,7 +76,7 @@ public class BookStateServiceTest {
 		List<BookStateResponse> result = bookStateService.getAllBooks();
 
 		assertEquals(1, result.size());
-		assertEquals(bookState.getDetail(), result.getFirst().detail());
+		assertEquals(bookState.getDetail(), result.get(0).detail());
 
 		verify(bookStateRepository, times(1)).findAll();
 	}
@@ -87,7 +88,6 @@ public class BookStateServiceTest {
 		List<BookStateResponse> result = bookStateService.getAllBooks();
 
 		assertTrue(result.isEmpty());
-
 		verify(bookStateRepository, times(1)).findAll();
 	}
 
@@ -106,7 +106,6 @@ public class BookStateServiceTest {
 	@Test
 	public void updateState_ShouldThrowBookStateDetailAlreadyExistException_WhenStateAlreadyExists() {
 		when(bookStateRepository.findById(1)).thenReturn(Optional.of(bookState));
-
 		when(bookStateRepository.existsBookStatesByDetail(bookStateRequest.detail())).thenReturn(true);
 
 		assertThrows(BookStateDetailAlreadyExistException.class, () -> {
@@ -123,6 +122,8 @@ public class BookStateServiceTest {
 		when(bookStateRepository.findById(1)).thenReturn(Optional.empty());
 
 		assertThrows(BookStateIdNotFoundException.class, () -> bookStateService.updateState(1, bookStateRequest));
+
+		verify(bookStateRepository, times(1)).findById(1);
 	}
 
 	@Test
@@ -145,5 +146,22 @@ public class BookStateServiceTest {
 		when(bookStateRepository.findById(1)).thenReturn(Optional.empty());
 
 		assertThrows(BookStateIdNotFoundException.class, () -> bookStateService.deleteState(1));
+
+		verify(bookStateRepository, times(1)).findById(1);
+	}
+
+	@Test
+	public void deleteState_ShouldHandleEmptyBookList_WhenStateHasNoAssociatedBooks() {
+		BookState defaultState = BookState.builder()
+			.detail("기본 상태")
+			.build();
+		when(bookStateRepository.findById(DEFAULT_STATE_ID)).thenReturn(Optional.of(defaultState));
+		when(bookStateRepository.findById(1)).thenReturn(Optional.of(bookState));
+		when(bookRepository.findByStateId(bookState)).thenReturn(List.of());
+
+		bookStateService.deleteState(1);
+
+		verify(bookRepository, never()).saveAll(anyList());
+		verify(bookStateRepository, times(1)).deleteById(1);
 	}
 }

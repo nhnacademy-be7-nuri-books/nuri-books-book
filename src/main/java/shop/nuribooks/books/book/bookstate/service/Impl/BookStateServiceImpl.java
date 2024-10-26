@@ -70,11 +70,13 @@ public class BookStateServiceImpl implements BookStateService {
 
 		List<Book> books = bookRepository.findByStateId(bookState);
 
-		for (Book book : books) {
-			book.updateStateId(defaultState);
+		if (!books.isEmpty()) {
+			for (Book book : books) {
+				book.updateStateId(defaultState);
+			}
+			bookRepository.saveAll(books);
 		}
 
-		bookRepository.saveAll(books);
 		bookStateRepository.deleteById(id);
 	}
 }
