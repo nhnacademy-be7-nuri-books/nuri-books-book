@@ -151,6 +151,15 @@ public class BookStateServiceTest {
 	}
 
 	@Test
+	public void deleteState_ShouldThrowException_WhenDefaultStateNotFound() {
+		when(bookStateRepository.findById(DEFAULT_STATE_ID)).thenReturn(Optional.empty());
+
+		assertThrows(BookStateIdNotFoundException.class, () -> bookStateService.deleteState(1));
+		verify(bookStateRepository, never()).deleteById(anyInt());
+	}
+
+
+	@Test
 	public void deleteState_ShouldHandleEmptyBookList_WhenStateHasNoAssociatedBooks() {
 		BookState defaultState = BookState.builder()
 			.detail("기본 상태")
