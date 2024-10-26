@@ -1,9 +1,13 @@
 package shop.nuribooks.books.member.grade.entity;
 
+import static jakarta.persistence.GenerationType.*;
+
 import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +24,8 @@ import lombok.NoArgsConstructor;
 public class Grade {
 
 	@Id
+	@GeneratedValue(strategy = IDENTITY)
+	@Column(name = "grade_id")
 	private Integer id;
 
 	/**

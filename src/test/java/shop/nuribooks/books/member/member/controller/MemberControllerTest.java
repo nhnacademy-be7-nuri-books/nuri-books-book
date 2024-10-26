@@ -134,6 +134,10 @@ class MemberControllerTest {
 			.andExpect(jsonPath("phoneNumber").value(response.getPhoneNumber()));
 	}
 
+
+	/**
+	 * 테스트를 위한 MemberRegisterRequest 생성
+	 */
 	private MemberRegisterRequest memberRegisterRequest() {
 		return MemberRegisterRequest.builder()
 			.name("boho")
@@ -145,6 +149,9 @@ class MemberControllerTest {
 			.build();
 	}
 
+	/**
+	 * 테스트를 위한 MemberRegisterResponse 생성
+	 */
 	private MemberRegisterResponse memberRegisterResponse() {
 		return MemberRegisterResponse.builder()
 			.name("boho")
@@ -155,6 +162,9 @@ class MemberControllerTest {
 			.build();
 	}
 
+	/**
+	 * 테스트를 위한 잘못된 MemberRegisterRequest 생성
+	 */
 	private MemberRegisterRequest badMemberRegisterRequest() {
 		return MemberRegisterRequest.builder()
 			.name("")
@@ -166,6 +176,9 @@ class MemberControllerTest {
 			.build();
 	}
 
+	/**
+	 * 테스트를 위한 MemberCheckResponse 생성
+	 */
 	private MemberCheckResponse memberCheckResponse() {
 		return MemberCheckResponse.builder()
 			.name("boho")
@@ -174,6 +187,9 @@ class MemberControllerTest {
 			.build();
 	}
 
+	/**
+	 * 테스트를 위한 MemberWithdrawRequest 생성
+	 */
 	private MemberWithdrawRequest memberWithdrawRequest() {
 		return MemberWithdrawRequest.builder()
 			.userId("nuribooks")
@@ -181,6 +197,9 @@ class MemberControllerTest {
 			.build();
 	}
 
+	/**
+	 * 테스트를 위한 MemberUpdateRequest 생성
+	 */
 	private MemberUpdateRequest memberUpdateRequest() {
 		return MemberUpdateRequest.builder()
 			.name("수정하고 싶은 이름")
@@ -189,6 +208,9 @@ class MemberControllerTest {
 			.build();
 	}
 
+	/**
+	 * 테스트를 위한 MemberUpdateResponse 생성
+	 */
 	private MemberUpdateResponse memberUpdateResponse() {
 		return MemberUpdateResponse.builder()
 			.name("수정된 이름")

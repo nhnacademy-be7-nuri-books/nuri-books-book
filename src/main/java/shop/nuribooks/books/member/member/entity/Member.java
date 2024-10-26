@@ -41,7 +41,7 @@ public class Member {
 	 */
 	@OneToOne(fetch = LAZY)
 	@MapsId
-	@JoinColumn(name = "id")
+	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
 	/**
@@ -56,7 +56,7 @@ public class Member {
 	 */
 	@NotNull
 	@ManyToOne(fetch = LAZY)
-	@JoinColumn(name = "id")
+	@JoinColumn(name = "grade_id")
 	private Grade grade;
 
 	/**
