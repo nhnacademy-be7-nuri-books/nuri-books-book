@@ -10,6 +10,7 @@ import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.exception.BadRequestException;
+import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.BookStatesIdNotFoundException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
@@ -17,13 +18,14 @@ import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookstate.repository.BookStateRepository;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.book.book.service.BookService;
+import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
 
 @RequiredArgsConstructor
 @Service
 public class BookServiceImpl implements BookService {
-	private final BookRepository booksRepository;
-	private final BookStateRepository bookStatesRepository;
-	private final PublisherRepository publishersRepository;
+	private final BookRepository bookRepository;
+	private final BookStateRepository bookStateRepository;
+	private final PublisherRepository publisherRepository;
 
 	@Override
 	public BookRegisterResponse registerBook(BookRegisterRequest reqDto) {
@@ -31,14 +33,14 @@ public class BookServiceImpl implements BookService {
 			throw new BadRequestException("요청 본문이 비어있습니다.");
 		}
 
-		if (booksRepository.existsByIsbn(reqDto.isbn())) {
+		if (bookRepository.existsByIsbn(reqDto.isbn())) {
 			throw new ResourceAlreadyExistIsbnException(reqDto.isbn());
 		}
 
-		BookState bookState = bookStatesRepository.findById(reqDto.stateId())
+		BookState bookState = bookStateRepository.findById(reqDto.stateId())
 			.orElseThrow(() -> new BookStatesIdNotFoundException(reqDto.stateId()));
 
-		Publisher publisher = publishersRepository.findById(reqDto.publisherId())
+		Publisher publisher = publisherRepository.findById(reqDto.publisherId())
 			.orElseThrow(() -> new PublisherIdNotFoundException(reqDto.publisherId()));
 
 		Book book = Book.builder()
@@ -59,13 +61,24 @@ public class BookServiceImpl implements BookService {
 			.viewCount(0L)
 			.build();
 
-		booksRepository.save(book);
+		bookRepository.save(book);
 
 		return BookRegisterResponse.of(book);
 	}
 
 	@Override
-	public void updateBook(Long id, BookUpdateRequest bookUpdateReq) {
+	public void updateBook(Long bookId, BookUpdateRequest bookUpdateReq) {
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(BookIdNotFoundException::new);
 
+		BookState bookState = bookStateRepository.findById(bookUpdateReq.stateId())
+			.orElseThrow(BookStateIdNotFoundException::new);
+
+		Publisher publisher = publisherRepository.findById(bookUpdateReq.publisherId())
+			.orElseThrow(() -> new PublisherIdNotFoundException(bookUpdateReq.publisherId()));
+
+		book.updateBookDetails(bookUpdateReq, bookState, publisher);
+
+		bookRepository.save(book);
 	}
 }

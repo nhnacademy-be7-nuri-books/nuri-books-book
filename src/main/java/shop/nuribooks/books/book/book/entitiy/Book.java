@@ -22,6 +22,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
+import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 
@@ -121,5 +122,24 @@ public class Book {
 	public void edit(BookEditor editor) {
 		this.stateId = editor.getStateId();
 	}
+
+	public void updateBookDetails(BookUpdateRequest request, BookState state, Publisher publisher) {
+		this.stateId = state;
+		this.publisherId = publisher;
+		this.title = request.title();
+		this.thumbnailImageUrl = request.thumbnailImageUrl();
+		this.detailImageUrl = request.detailImageUrl();
+		this.publicationDate = request.publicationDate();
+		this.price = request.price();
+		this.discountRate = request.discountRate();
+		this.description = request.description();
+		this.contents = request.contents();
+		this.isbn = request.isbn();
+		this.isPackageable = request.isPackageable();
+		this.likeCount = request.likeCount();
+		this.stock = request.stock();
+		this.viewCount = request.viewCount();
+	}
+
 }
 
