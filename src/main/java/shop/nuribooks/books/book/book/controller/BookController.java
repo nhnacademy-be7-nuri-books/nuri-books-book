@@ -42,6 +42,7 @@ public class BookController {
 	@PutMapping("/{bookId}")
 	public ResponseEntity<ResponseMessage> updateBook(@PathVariable Long bookId,
 		@Valid @RequestBody BookUpdateRequest bookUpdateReq) {
+
 		bookService.updateBook(bookId, bookUpdateReq);
 		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.OK.value(), "도서 수정 성공");
 		return ResponseEntity.ok(responseMessage);

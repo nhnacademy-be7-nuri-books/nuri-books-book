@@ -16,6 +16,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -45,9 +46,10 @@ public class Book {
 	private Publisher publisherId;
 
 	@Column(nullable = false, length = 50)
+	@NotBlank
 	private String title;
 
-	@NotNull
+	@NotBlank
 	private String thumbnailImageUrl;
 
 	private String detailImageUrl;
@@ -64,13 +66,14 @@ public class Book {
 	@Max(100)
 	private int discountRate;
 
-	@NotNull
+	@NotBlank
 	private String description;
 
-	@NotNull
+	@NotBlank
 	private String contents;
 
 	@Column(nullable = false, length = 20)
+	@NotBlank
 	private String isbn;
 
 	//TODO: Profile 어노테이션을 사용 OR 운영환경 설정 시 mysql 셋팅 후 주석 해제
@@ -115,12 +118,8 @@ public class Book {
 		this.viewCount = viewCount;
 	}
 
-	public BookEditor.BookEditorBuilder toEditor() {
-		return BookEditor.builder().stateId(this.stateId);
-	}
-
-	public void edit(BookEditor editor) {
-		this.stateId = editor.getStateId();
+	public void updateStateId(BookState updateBookState) {
+		this.stateId = updateBookState;
 	}
 
 	public void updateBookDetails(BookUpdateRequest request, BookState state, Publisher publisher) {
@@ -136,9 +135,7 @@ public class Book {
 		this.contents = request.contents();
 		this.isbn = request.isbn();
 		this.isPackageable = request.isPackageable();
-		this.likeCount = request.likeCount();
 		this.stock = request.stock();
-		this.viewCount = request.viewCount();
 	}
 
 }

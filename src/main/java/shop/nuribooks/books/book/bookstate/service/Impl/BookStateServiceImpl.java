@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.bookstate.dto.BookStateRequest;
 import shop.nuribooks.books.book.bookstate.dto.BookStateResponse;
 import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookEditor;
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.exception.bookstate.BookStateDetailAlreadyExistException;
 import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
@@ -72,10 +71,7 @@ public class BookStateServiceImpl implements BookStateService {
 		List<Book> books = bookRepository.findByStateId(bookState);
 
 		for (Book book : books) {
-			BookEditor bookEditor = BookEditor.builder()
-				.stateId(defaultState)
-				.build();
-			book.edit(bookEditor);
+			book.updateStateId(defaultState);
 		}
 
 		bookRepository.saveAll(books);
