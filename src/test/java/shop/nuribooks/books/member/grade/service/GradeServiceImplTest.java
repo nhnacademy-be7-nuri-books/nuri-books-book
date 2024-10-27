@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import shop.nuribooks.books.exception.member.GradeAlreadyExistException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
-import shop.nuribooks.books.member.grade.dto.EntityMapper;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
@@ -63,7 +62,6 @@ public class GradeServiceImplTest {
 	void registerGrade_gradeAlreadyExists() {
 	    //given
 		GradeRegisterRequest request = getGradeRegisterRequest();
-		Grade savedGrade = getSavedGrade();
 		when(gradeRepository.existsByName(request.name())).thenReturn(true);
 
 	    //when / then
@@ -94,7 +92,6 @@ public class GradeServiceImplTest {
 	@Test
 	void getGradeDetails_gradeNotFound() {
 		//given
-		Grade savedGrade = getSavedGrade();
 		String requiredName = "STANDARD";
 
 		when(gradeRepository.findByName(requiredName)).thenReturn(Optional.empty());
@@ -133,7 +130,6 @@ public class GradeServiceImplTest {
 	@Test
 	void updateGrade_gradeNotFound() {
 		//given
-		Grade savedGrade = getSavedGrade();
 		GradeUpdateRequest request = getGradeUpdateRequest();
 		String requiredName = "STANDARD";
 
@@ -167,7 +163,6 @@ public class GradeServiceImplTest {
 	@Test
 	void deleteGrade_gradeNotFound() {
 		//given
-		Grade savedGrade = getSavedGrade();
 		String requiredName = "STANDARD";
 
 		when(gradeRepository.findByName(requiredName)).thenReturn(Optional.empty());
