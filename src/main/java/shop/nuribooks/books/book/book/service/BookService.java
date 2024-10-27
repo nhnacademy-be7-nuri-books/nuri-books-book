@@ -7,4 +7,5 @@ import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 public interface BookService {
 	BookRegisterResponse registerBook(BookRegisterRequest reqDto);
 	void updateBook(Long bookId, BookUpdateRequest bookUpdateReq);
+	void deleteBook(Long bookId);
 }
