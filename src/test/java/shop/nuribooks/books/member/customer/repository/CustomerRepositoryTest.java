@@ -1,43 +1,42 @@
-package shop.nuribooks.books.member.member.repository;
+package shop.nuribooks.books.member.customer.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import shop.nuribooks.books.member.customer.entity.Customer;
-import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 
 @DataJpaTest
-class CustomerRepositoryTest {
+public class CustomerRepositoryTest {
 
 	@Autowired
 	private CustomerRepository customerRepository;
 
-	@DisplayName("입력된 이메일로 고객 존재 여부 확인")
+	@DisplayName("이메일로 비회원 등록 여부 확인")
 	@Test
 	void existsByEmail() {
-		//given
-		Customer customer = customer();
-		Customer savedCustomer = customerRepository.save(customer);
+	    //given
+		Customer savedCustomer = getSavedCustomer();
+		String requiredEmail = "nuri@nhnacademy.com";
 
 		//when
-		boolean exists = customerRepository.existsByEmail(savedCustomer.getEmail());
+		boolean exists = customerRepository.existsByEmail(requiredEmail);
 
 		//then
 		assertThat(exists).isTrue();
 	}
 
-	@DisplayName("고객 아이디와 비밀번호로 존재 여부 확인")
+	@DisplayName("비회원 아이디(PK)와 비밀번호로 등록 여부 확인")
 	@Test
 	void existsByIdAndPassword() {
-	    //given
-		Customer customer = customer();
-		Customer savedCustomer = customerRepository.save(customer);
+		//given
+		Customer savedCustomer = getSavedCustomer();
 
-	    //when
+		//when
 		boolean exists = customerRepository.existsByIdAndPassword(savedCustomer.getId(), savedCustomer.getPassword());
 
 		//then
@@ -45,15 +44,16 @@ class CustomerRepositoryTest {
 	}
 
 	/**
-	 * 테스트를 위한 비회원 생성
+	 * 테스트를 위해 repository에 비회원 저장 후 반환
 	 */
-	private Customer customer() {
-		return Customer.builder()
+	private Customer getSavedCustomer() {
+		Customer newCustomer = Customer.builder()
 			.name("nuri")
 			.password("abc123")
 			.phoneNumber("042-8282-8282")
-			.email("nhnacademy@nuriBooks.com")
+			.email("nuri@nhnacademy.com")
 			.build();
-	}
 
+		return customerRepository.save(newCustomer);
+	}
 }
