@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import shop.nuribooks.books.exception.member.GradeAlreadyExistException;
+import shop.nuribooks.books.exception.member.GradeInUseException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
@@ -25,6 +26,7 @@ import shop.nuribooks.books.member.grade.dto.response.GradeRegisterResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeUpdateResponse;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
+import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class GradeServiceImplTest {
@@ -34,6 +36,9 @@ public class GradeServiceImplTest {
 
 	@Mock
 	private GradeRepository gradeRepository;
+
+	@Mock
+	private MemberRepository memberRepository;
 
 	@DisplayName("등급 등록 성공")
 	@Test
@@ -149,6 +154,7 @@ public class GradeServiceImplTest {
 		String requiredName = "STANDARD";
 
 		when(gradeRepository.findByName(requiredName)).thenReturn(Optional.of(savedGrade));
+		when(memberRepository.existsByGradeId(savedGrade.getId())).thenReturn(false);
 	    doNothing().when(gradeRepository).delete(savedGrade);
 
 	    //when
@@ -171,6 +177,22 @@ public class GradeServiceImplTest {
 		assertThatThrownBy(() -> gradeServiceImpl.deleteGrade(requiredName))
 			.isInstanceOf(GradeNotFoundException.class)
 			.hasMessage("해당 이름의 등급이 존재하지 않습니다.");
+	}
+
+	@DisplayName("등급명으로 등급 삭제 실패 - 해당 등급이 이미 회원에게 할당됨")
+	@Test
+	void deleteGrade_gradeInUse() {
+		//given
+		Grade savedGrade = getSavedGrade();
+		String requiredName = "STANDARD";
+
+		when(gradeRepository.findByName(requiredName)).thenReturn(Optional.of(savedGrade));
+		when(memberRepository.existsByGradeId(savedGrade.getId())).thenReturn(true);
+
+		//when / then
+		assertThatThrownBy(() -> gradeServiceImpl.deleteGrade(requiredName))
+			.isInstanceOf(GradeInUseException.class)
+			.hasMessage("해당 등급을 가진 회원이 존재하여 삭제할 수 없습니다.");
 	}
 
 	@DisplayName("전체 등급 목록 조회")

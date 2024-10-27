@@ -32,7 +32,7 @@ class MemberRepositoryTest {
 	@Autowired
 	private GradeRepository gradeRepository;
 
-	@DisplayName("입력된 id로 회원 존재 여부 확인")
+	@DisplayName("입력된 userId로 회원 등록 여부 확인")
 	@Test
 	void existsByUserId() {
 		//given
@@ -45,7 +45,7 @@ class MemberRepositoryTest {
 		assertThat(exists).isTrue();
 	}
 
-	@DisplayName("입력된 id로 회원 조회")
+	@DisplayName("입력된 userId로 회원 조회")
 	@Test
 	void findByUserId() {
 		//given
@@ -58,6 +58,19 @@ class MemberRepositoryTest {
 		assertThat(foundMember).isPresent(); // 회원이 존재함을 확인
 		assertThat(foundMember.get().getId()).isEqualTo(savedMember.getId()); // ID가 같은지 확인
 		assertThat(foundMember.get().getUserId()).isEqualTo(savedMember.getUserId()); // UserId가 같은지 확인
+	}
+
+	@DisplayName("등급의 id로 회원 등록 여부 확인")
+	@Test
+	void existsByGradeId() {
+	    //given
+		Member savedMember = getSavedMember();
+
+		//when
+		boolean exists = memberRepository.existsByGradeId(savedMember.getGrade().getId());
+
+		//then
+		assertThat(exists).isTrue();
 	}
 
 	/**

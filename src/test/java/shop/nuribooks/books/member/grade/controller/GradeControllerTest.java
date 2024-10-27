@@ -167,9 +167,6 @@ public class GradeControllerTest {
 			.andExpect(jsonPath("message").value("등급이 성공적으로 삭제되었습니다."));
 	}
 
-	/**
-	 * 등급 목록 조회
-	 */
 	@DisplayName("등급 목록 조회")
 	@Test
 	void getGradeList() throws Exception {

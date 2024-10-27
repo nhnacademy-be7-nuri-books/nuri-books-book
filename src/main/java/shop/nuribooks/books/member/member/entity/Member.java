@@ -94,19 +94,6 @@ public class Member {
 	 */
 	private LocalDateTime withdrawnAt;
 
-	public Member(Customer customer, AuthorityEnum authority, Grade grade, StatusEnum status, String userId,
-		LocalDate birthday, LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
-		this.customer = customer;
-		this.authority = authority;
-		this.grade = grade;
-		this.status = status;
-		this.userId = userId;
-		this.birthday = birthday;
-		this.createdAt = createdAt;
-		this.point = point;
-		this.totalPaymentAmount = totalPaymentAmount;
-	}
-
 	public void changeToWithdrawn() {
 		this.status = INACTIVE;
 		this.withdrawnAt = LocalDateTime.now();

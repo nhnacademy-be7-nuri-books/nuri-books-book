@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.exception.member.GradeAlreadyExistException;
+import shop.nuribooks.books.exception.member.GradeInUseException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
 import shop.nuribooks.books.member.grade.dto.DtoMapper;
 import shop.nuribooks.books.member.grade.dto.EntityMapper;
@@ -19,6 +20,7 @@ import shop.nuribooks.books.member.grade.dto.response.GradeRegisterResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeUpdateResponse;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
+import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ import shop.nuribooks.books.member.grade.repository.GradeRepository;
 public class GradeServiceImpl implements GradeService {
 
 	private final GradeRepository gradeRepository;
+	private final MemberRepository memberRepository;
 
 	/**
 	 * 등급 등록
@@ -80,6 +83,9 @@ public class GradeServiceImpl implements GradeService {
 	@Transactional
 	public void deleteGrade(String name) {
 		Grade foundGrade = getGrade(name);
+		if (memberRepository.existsByGradeId(foundGrade.getId())) {
+			throw new GradeInUseException("해당 등급을 가진 회원이 존재하여 삭제할 수 없습니다.");
+		}
 		gradeRepository.delete(foundGrade);
 	}
 
