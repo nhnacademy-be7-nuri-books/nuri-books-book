@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
 import shop.nuribooks.books.book.book.service.BookService;
@@ -236,5 +235,29 @@ public class BookControllerTest {
 			.andExpect(jsonPath("$.message", containsString("ISBN은 필수 입력 항목입니다.")))
 			.andExpect(jsonPath("$.message", containsString("가격은 필수 입력 항목입니다.")))
 			.andExpect(jsonPath("$.message", containsString("도서 설명은 필수 입력 항목입니다.")));
+	}
+
+	@Test
+	public void deleteBook_ShouldReturnOk_WhenBookExists() throws Exception {
+		Long bookId = 1L;
+
+		doNothing().when(bookService).deleteBook(bookId);
+
+		mockMvc.perform(delete("/api/books/{bookId}", bookId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.message").value("도서 삭제 성공"));
+	}
+
+	@Test
+	public void deleteBook_ShouldReturnNotFound_WhenBookDoesNotExist() throws Exception {
+		Long bookId = 9999L;
+
+		doThrow(new ResourceNotFoundException("도서를 찾을 수 없습니다.")).when(bookService).deleteBook(bookId);
+
+		mockMvc.perform(delete("/api/books/{bookId}", bookId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.message").value("도서를 찾을 수 없습니다."));
 	}
 }
