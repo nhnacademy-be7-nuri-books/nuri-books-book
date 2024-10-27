@@ -183,4 +183,25 @@ public class BooksServiceImplTest {
 
 		assertThrows(PublisherIdNotFoundException.class, () -> booksService.updateBook(1L, updateRequest));
 	}
+
+	@Test
+	public void deleteBook_ShouldDeleteBook_WhenBookExists() {
+		Long bookId = 1L;
+
+		when(booksRepository.existsById(bookId)).thenReturn(true);
+		doNothing().when(booksRepository).deleteById(bookId);
+
+		assertDoesNotThrow(() -> booksService.deleteBook(bookId));
+		verify(booksRepository, times(1)).deleteById(bookId);
+	}
+
+	@Test
+	public void deleteBook_ShouldThrowBookIdNotFoundException_WhenBookDoesNotExist() {
+		Long bookId = 9999L;
+
+		when(booksRepository.existsById(bookId)).thenReturn(false);
+
+		assertThrows(BookIdNotFoundException.class, () -> booksService.deleteBook(bookId));
+		verify(booksRepository, never()).deleteById(bookId);
+	}
 }
