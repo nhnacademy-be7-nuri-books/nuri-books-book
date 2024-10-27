@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -17,6 +18,7 @@ import shop.nuribooks.books.member.customer.dto.response.CustomerUpdateResponse;
 import shop.nuribooks.books.member.customer.service.CustomerService;
 
 @RestController
+@RequestMapping("/api/member/customer")
 @RequiredArgsConstructor
 public class CustomerController {
 
@@ -28,7 +30,7 @@ public class CustomerController {
 	 * CustomerRegisterRequest에 비회원 이름, 비밀번호, 전화번호, 이메일을 담아서 요청
 	 * @return 비회원 등록에 성공하면 이름, 전화번호, 이메일을 CustomerRegisterResponse에 담아서 반환
 	 */
-	@PostMapping("/api/member/customer")
+	@PostMapping
 	public ResponseEntity<CustomerRegisterResponse> customerRegister(
 		@RequestBody @Valid CustomerRegisterRequest request) {
 
@@ -44,7 +46,7 @@ public class CustomerController {
 	 * @return 비회원 정보 수정에 성공하면 이름과 전화번호를 CustomerUpdateRequest에 담아서 반환
 	 */
 	@Deprecated
-	@PostMapping("/api/member/customer/{customerId}")
+	@PostMapping("/{customerId}")
 	public ResponseEntity<CustomerUpdateResponse> customerUpdate(
 		@PathVariable Long customerId, @RequestBody @Valid CustomerUpdateRequest request) {
 

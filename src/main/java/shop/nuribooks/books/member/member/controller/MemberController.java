@@ -3,11 +3,13 @@ package shop.nuribooks.books.member.member.controller;
 import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.member.service.MemberService;
 
 @RestController
+@RequestMapping("/api/member")
 @RequiredArgsConstructor
 public class MemberController {
 
@@ -34,7 +37,7 @@ public class MemberController {
 	 * 등록에 성공하면 name, userId, phoneNumber, email, birthday를 <br>
 	 * MemberRegisterResponse에 담아서 반환
 	 */
-	@PostMapping("/api/member")
+	@PostMapping
 	public ResponseEntity<MemberRegisterResponse> memberRegister(
 		@RequestBody @Valid MemberRegisterRequest request) {
 
@@ -49,7 +52,7 @@ public class MemberController {
 	 * 회원이 존재하면 이름, 비밀번호, 권한을 MemberCheckResponse에 담아서 반환 <br>
 	 * 회원이 존재하지 않는다면 이름, 비밀번호, 권한이 모두 null인 MemberCheckResponse를 반환
 	 */
-	@GetMapping("/api/member/{userId}")
+	@GetMapping("/{userId}")
 	public ResponseEntity<MemberCheckResponse> memberCheck(@PathVariable String userId) {
 
 		MemberCheckResponse response = memberService.checkMember(userId);
@@ -62,7 +65,7 @@ public class MemberController {
 	 * MemberWithdrawRequest의 모든 필드 즉, <br>
 	 * userId와 password에 대해서 검증 후 회원 탈퇴 진행
 	 */
-	@PatchMapping("/api/member/status")
+	@DeleteMapping
 	public ResponseEntity<ResponseMessage> memberWithdraw(
 		@RequestBody MemberWithdrawRequest request) {
 
@@ -78,7 +81,7 @@ public class MemberController {
 	 * name, password, phoneNumber에 대해서 검증 후 userId를 통해 수정 진행 <br>
 	 * MemberUpdateResponse에 변경한 이름과 전화번호 담아서 반환
 	 */
-	@PostMapping("/api/member/{userId}")
+	@PostMapping("{userId}")
 	public ResponseEntity<MemberUpdateResponse> memberUpdate(
 		@PathVariable String userId, @RequestBody @Valid MemberUpdateRequest request) {
 

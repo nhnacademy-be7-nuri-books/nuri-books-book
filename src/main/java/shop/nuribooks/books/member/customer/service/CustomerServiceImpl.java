@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.member.customer.dto.DtoMapper;
+import shop.nuribooks.books.member.customer.dto.EntityMapper;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
 import shop.nuribooks.books.member.customer.dto.request.CustomerUpdateRequest;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
@@ -31,24 +33,15 @@ public class CustomerServiceImpl implements CustomerService {
 	 */
 	@Transactional
 	public CustomerRegisterResponse registerCustomer(CustomerRegisterRequest request) {
-		if (customerRepository.existsByEmail(request.getEmail())) {
+		if (customerRepository.existsByEmail(request.email())) {
 			throw new EmailAlreadyExistsException("이미 존재하는 이메일입니다.");
 		}
 
-		Customer customer = Customer.builder()
-			.name(request.getName())
-			.password(request.getPassword())
-			.phoneNumber(request.getPhoneNumber())
-			.email(request.getEmail())
-			.build();
+		Customer customer = EntityMapper.toCustomerEntity(request);
 
 		Customer savedCustomer = customerRepository.save(customer);
 
-		return CustomerRegisterResponse.builder()
-			.name(savedCustomer.getName())
-			.phoneNumber(savedCustomer.getPhoneNumber())
-			.email(savedCustomer.getEmail())
-			.build();
+		return DtoMapper.toRegisterDto(savedCustomer);
 	}
 
 	/**
@@ -63,11 +56,8 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer findCustomer = customerRepository.findById(customerId)
 			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
 
-		findCustomer.changeCustomerInformation(request.getName(), request.getPhoneNumber());
+		findCustomer.changeCustomerInformation(request.name(), request.phoneNumber());
 
-		return CustomerUpdateResponse.builder()
-			.name(findCustomer.getName())
-			.phoneNumber(findCustomer.getPhoneNumber())
-			.build();
+		return DtoMapper.toUpdateDto(findCustomer);
 	}
 }

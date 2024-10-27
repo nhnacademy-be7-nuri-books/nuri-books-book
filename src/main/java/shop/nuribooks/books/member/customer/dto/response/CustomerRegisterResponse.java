@@ -1,13 +1,11 @@
 package shop.nuribooks.books.member.customer.dto.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 @Builder
-@AllArgsConstructor
-public class CustomerRegisterResponse {
+public record CustomerRegisterResponse (
 
-	private String name;
-	private String phoneNumber;
-	private String email;
-}
+	String name,
+	String phoneNumber,
+	String email
+) {}

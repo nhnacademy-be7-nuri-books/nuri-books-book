@@ -38,13 +38,6 @@ public class Customer {
 	@Email
 	private String email;
 
-	public Customer(String name, String password, String phoneNumber, String email) {
-		this.name = name;
-		this.password = password;
-		this.phoneNumber = phoneNumber;
-		this.email = email;
-	}
-
 	public void changeCustomerInformation(String name, String password, String phoneNumber) {
 		this.name = name;
 		this.password = password;

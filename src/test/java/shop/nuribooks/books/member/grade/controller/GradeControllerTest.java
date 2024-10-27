@@ -67,7 +67,7 @@ public class GradeControllerTest {
 
 	@DisplayName("등급 등록 실패 - validation 에러")
 	@Test
-	void gradeRegister_validationException() throws Exception {
+	void gradeRegister_invalidRequest() throws Exception {
 	    //given
 		GradeRegisterRequest badRequest = getBadGradeRegisterRequest();
 
@@ -130,7 +130,7 @@ public class GradeControllerTest {
 
 	@DisplayName("등급명으로 등급 수정 - validation 에러")
 	@Test
-	void gradeUpdate_validationException() throws Exception {
+	void gradeUpdate_invalidRequest() throws Exception {
 	    //given
 		GradeUpdateRequest badRequest = getBadGradeUpdateRequest();
 		String requiredName = "STANDARD";
