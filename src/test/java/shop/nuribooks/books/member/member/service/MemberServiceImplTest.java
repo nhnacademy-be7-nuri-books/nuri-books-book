@@ -62,8 +62,8 @@ class MemberServiceImplTest {
 		Customer savedCustomer = EntityMapper.toCustomerEntity(request);
 		Member savedMember = createMember(savedCustomer);
 
-		when(customerRepository.existsByEmail(request.getEmail())).thenReturn(false);
-		when(memberRepository.existsByUserId(request.getUserId())).thenReturn(false);
+		when(customerRepository.existsByEmail(request.email())).thenReturn(false);
+		when(memberRepository.existsByUserId(request.userId())).thenReturn(false);
 		when(customerRepository.save(any(Customer.class)))
 			.thenReturn(savedCustomer);
 		when(gradeRepository.findByName("STANDARD")).thenReturn(Optional.of(standard));
@@ -74,9 +74,9 @@ class MemberServiceImplTest {
 		MemberRegisterResponse response = memberServiceImpl.registerMember(request);
 
 		// then
-		assertThat(response.getUserId()).isEqualTo(request.getUserId());
-		assertThat(response.getPhoneNumber()).isEqualTo(request.getPhoneNumber());
-		assertThat(response.getEmail()).isEqualTo(request.getEmail());
+		assertThat(response.userId()).isEqualTo(request.userId());
+		assertThat(response.phoneNumber()).isEqualTo(request.phoneNumber());
+		assertThat(response.email()).isEqualTo(request.email());
 
 		// verify
 		verify(customerRepository, times(1)).save(any(Customer.class));
@@ -88,7 +88,7 @@ class MemberServiceImplTest {
 	public void registerMember_EmailAlreadyExists() {
 	    //given
 		MemberRegisterRequest request = memberCreateRequest();
-		when(customerRepository.existsByEmail(request.getEmail())).thenReturn(true);
+		when(customerRepository.existsByEmail(request.email())).thenReturn(true);
 
 	    //when / then
 		EmailAlreadyExistsException exception = assertThrows(EmailAlreadyExistsException.class,
@@ -103,8 +103,8 @@ class MemberServiceImplTest {
 	    //given
 		MemberRegisterRequest request = memberCreateRequest();
 
-		when(customerRepository.existsByEmail(request.getEmail())).thenReturn(false);
-		when(memberRepository.existsByUserId(request.getUserId())).thenReturn(true);
+		when(customerRepository.existsByEmail(request.email())).thenReturn(false);
+		when(memberRepository.existsByUserId(request.userId())).thenReturn(true);
 
 		//when / then
 		UserIdAlreadyExistsException exception = assertThrows(UserIdAlreadyExistsException.class,
@@ -121,8 +121,8 @@ class MemberServiceImplTest {
 		Customer existingCustomer = createCustomer();
 		Member existingMember = spy(createMember(existingCustomer));
 
-		when(memberRepository.findByUserId(request.getUserId())).thenReturn(Optional.of(existingMember));
-		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.getPassword())).thenReturn(true);
+		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.of(existingMember));
+		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.password())).thenReturn(true);
 
 		//when
 		memberServiceImpl.withdrawMember(request);
@@ -139,7 +139,7 @@ class MemberServiceImplTest {
 	    //given
 		MemberWithdrawRequest request = memberWithdrawRequest();
 
-		when(memberRepository.findByUserId(request.getUserId())).thenReturn(Optional.empty());
+		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.empty());
 
 	    //when / then
 		UserIdNotFoundException exception = assertThrows(UserIdNotFoundException.class,
@@ -156,8 +156,8 @@ class MemberServiceImplTest {
 		Customer existingCustomer = createCustomer();
 		Member existingMember = createMember(existingCustomer);
 
-		when(memberRepository.findByUserId(request.getUserId())).thenReturn(Optional.of(existingMember));
-		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.getPassword()))
+		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.of(existingMember));
+		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.password()))
 			.thenReturn(false);
 
 		//when / then
@@ -182,9 +182,9 @@ class MemberServiceImplTest {
 
 	    //then
 		verify(existingCustomer, times(1))
-			.changeCustomerInformation(request.getName(), request.getPassword(), request.getPhoneNumber());
-		assertThat(response.getName()).isEqualTo(existingCustomer.getName());
-		assertThat(response.getPhoneNumber()).isEqualTo(existingCustomer.getPhoneNumber());
+			.changeCustomerInformation(request.name(), request.password(), request.phoneNumber());
+		assertThat(response.name()).isEqualTo(existingCustomer.getName());
+		assertThat(response.phoneNumber()).isEqualTo(existingCustomer.getPhoneNumber());
 	}
 
 	@DisplayName("회원 정보 수정 실패 - 존재하지 않는 회원")
@@ -235,9 +235,9 @@ class MemberServiceImplTest {
 		MemberCheckResponse response = memberServiceImpl.checkMember(existingMember.getUserId());
 
 		//then
-		assertThat(response.getName()).isEqualTo(existingCustomer.getName());
-		assertThat(response.getPassword()).isEqualTo(existingCustomer.getPassword());
-		assertThat(response.getAuthority()).isEqualTo("ROLE_" + existingMember.getAuthority().name());
+		assertThat(response.name()).isEqualTo(existingCustomer.getName());
+		assertThat(response.password()).isEqualTo(existingCustomer.getPassword());
+		assertThat(response.authority()).isEqualTo("ROLE_" + existingMember.getAuthority().name());
 	}
 
 	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 회원이 존재하지 않을 때")
@@ -253,9 +253,9 @@ class MemberServiceImplTest {
 
 		//then
 		assertNotNull(response);
-		assertNull(response.getName());
-		assertNull(response.getPassword());
-		assertNull(response.getAuthority());
+		assertNull(response.name());
+		assertNull(response.password());
+		assertNull(response.authority());
 	}
 
 	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 고객이 존재하지 않을 때")
@@ -274,9 +274,9 @@ class MemberServiceImplTest {
 
 		//then
 		assertNotNull(response);
-		assertNull(response.getName());
-		assertNull(response.getPassword());
-		assertNull(response.getAuthority());
+		assertNull(response.name());
+		assertNull(response.password());
+		assertNull(response.authority());
 	}
 
 

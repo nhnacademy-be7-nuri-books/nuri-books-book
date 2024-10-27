@@ -54,10 +54,10 @@ public class MemberServiceImpl implements MemberService {
 	 */
 	@Transactional
 	public MemberRegisterResponse registerMember(MemberRegisterRequest request) {
-		if (customerRepository.existsByEmail(request.getEmail())) {
+		if (customerRepository.existsByEmail(request.email())) {
 			throw new EmailAlreadyExistsException("이미 존재하는 이메일입니다.");
 		}
-		if (memberRepository.existsByUserId(request.getUserId())) {
+		if (memberRepository.existsByUserId(request.userId())) {
 			throw new UserIdAlreadyExistsException("이미 존재하는 아이디입니다.");
 		}
 
@@ -69,8 +69,8 @@ public class MemberServiceImpl implements MemberService {
 			.authority(AuthorityEnum.MEMBER)
 			.grade(standard())
 			.status(StatusEnum.ACTIVE)
-			.userId(request.getUserId())
-			.birthday(request.getBirthday())
+			.userId(request.userId())
+			.birthday(request.birthday())
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
@@ -95,11 +95,11 @@ public class MemberServiceImpl implements MemberService {
 	 */
 	@Transactional
 	public void withdrawMember(MemberWithdrawRequest request) {
-		Member findMember = memberRepository.findByUserId(request.getUserId())
+		Member findMember = memberRepository.findByUserId(request.userId())
 			.orElseThrow(() -> new UserIdNotFoundException("존재하지 않는 아이디입니다."));
 
 		if (!customerRepository.existsByIdAndPassword(
-			findMember.getId(), request.getPassword())) {
+			findMember.getId(), request.password())) {
 			throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
 		}
 
@@ -126,7 +126,7 @@ public class MemberServiceImpl implements MemberService {
 			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
 
 		findCustomer.changeCustomerInformation(
-			request.getName(), request.getPassword(), request.getPhoneNumber());
+			request.name(), request.password(), request.phoneNumber());
 
 		return DtoMapper.toUpdateDto(findCustomer);
 	}

@@ -7,10 +7,10 @@ public class EntityMapper {
 
 	public static Customer toCustomerEntity(MemberRegisterRequest request) {
 		return Customer.builder()
-			.name(request.getName())
-			.password(request.getPassword())
-			.phoneNumber(request.getPhoneNumber())
-			.email(request.getEmail())
+			.name(request.name())
+			.password(request.password())
+			.phoneNumber(request.phoneNumber())
+			.email(request.email())
 			.build();
 	}
 }

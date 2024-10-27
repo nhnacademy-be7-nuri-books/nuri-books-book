@@ -61,11 +61,11 @@ class MemberControllerTest {
 
 		//then
 		result.andExpect(status().isCreated())
-			.andExpect(jsonPath("name").value(response.getName()))
-			.andExpect(jsonPath("userId").value(response.getUserId()))
-			.andExpect(jsonPath("phoneNumber").value(response.getPhoneNumber()))
-			.andExpect(jsonPath("email").value(response.getEmail()))
-			.andExpect(jsonPath("birthday").value(response.getBirthday().toString()));
+			.andExpect(jsonPath("name").value(response.name()))
+			.andExpect(jsonPath("userId").value(response.userId()))
+			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
+			.andExpect(jsonPath("email").value(response.email()))
+			.andExpect(jsonPath("birthday").value(response.birthday().toString()));
 	}
 
 	@DisplayName("회원 등록 실패 - validation 에러")
@@ -109,9 +109,9 @@ class MemberControllerTest {
 
 		//then
 		result.andExpect(status().isOk())
-			.andExpect(jsonPath("name").value(response.getName()))
-			.andExpect(jsonPath("password").value(response.getPassword()))
-			.andExpect(jsonPath("authority").value(response.getAuthority()));
+			.andExpect(jsonPath("name").value(response.name()))
+			.andExpect(jsonPath("password").value(response.password()))
+			.andExpect(jsonPath("authority").value(response.authority()));
 	}
 
 	@DisplayName("아이디와 비밀번호로 회원 탈퇴 성공")
@@ -151,8 +151,8 @@ class MemberControllerTest {
 
 		//then
 		result.andExpect(status().isOk())
-			.andExpect(jsonPath("name").value(response.getName()))
-			.andExpect(jsonPath("phoneNumber").value(response.getPhoneNumber()));
+			.andExpect(jsonPath("name").value(response.name()))
+			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()));
 	}
 
 	@DisplayName("회원 정보 수정 실패 - validation 에러")
