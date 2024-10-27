@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.book.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -51,6 +52,18 @@ public class BookController {
 
 		bookService.updateBook(bookId, bookUpdateReq);
 		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.OK.value(), "도서 수정 성공");
+		return ResponseEntity.ok(responseMessage);
+	}
+
+	@Operation(summary = "Delete a book", description = "This endpoint allows administrators to delete a book by its ID.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Book deletion successful"),
+		@ApiResponse(responseCode = "404", description = "Book not found")
+	})
+	@DeleteMapping("{bookId}")
+	public ResponseEntity<ResponseMessage> deleteBook(@PathVariable Long bookId) {
+		bookService.deleteBook(bookId);
+		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.OK.value(), "도서 삭제 성공");
 		return ResponseEntity.ok(responseMessage);
 	}
 }
