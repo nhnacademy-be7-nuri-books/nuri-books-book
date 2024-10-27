@@ -38,7 +38,7 @@ public class GradeServiceImpl implements GradeService {
 		if (gradeRepository.existsByName(request.name())) {
 			throw new GradeAlreadyExistException("이미 존재하는 등급입니다.");
 		}
-		Grade savedGrade = gradeRepository.save(EntityMapper.toEntity(request));
+		Grade savedGrade = gradeRepository.save(EntityMapper.toGradeEntity(request));
 
 		return DtoMapper.toRegisterDto(savedGrade);
 	}
@@ -102,4 +102,5 @@ public class GradeServiceImpl implements GradeService {
 		return gradeRepository.findByName(name)
 			.orElseThrow(() -> new GradeNotFoundException("해당 이름의 등급이 존재하지 않습니다."));
 	}
+
 }

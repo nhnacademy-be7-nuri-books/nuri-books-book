@@ -36,7 +36,7 @@ class MemberRepositoryTest {
 	@Test
 	void existsByUserId() {
 		//given
-		Member savedMember = getReadyMember();
+		Member savedMember = getSavedMember();
 
 		//when
 		boolean exists = memberRepository.existsByUserId(savedMember.getUserId());
@@ -49,7 +49,7 @@ class MemberRepositoryTest {
 	@Test
 	void findByUserId() {
 		//given
-		Member savedMember = getReadyMember();
+		Member savedMember = getSavedMember();
 
 		//when
 		Optional<Member> foundMember = memberRepository.findByUserId(savedMember.getUserId());
@@ -61,9 +61,9 @@ class MemberRepositoryTest {
 	}
 
 	/**
-	 * 테스트를 위한 초기화 작업들 후 repository에 저장된 회원 반환
+	 * 테스트를 위해 repository에 grade, customer, member 저장 후 member 반환
 	 */
-	private Member getReadyMember() {
+	private Member getSavedMember() {
 		Grade savedGrade = gradeRepository.save(createGrade());
 		Customer savedCustomer = customerRepository.save(createCustomer());
 		Member readyMember = createMember(savedCustomer, savedGrade);

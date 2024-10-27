@@ -23,6 +23,6 @@ public record GradeUpdateRequest(
 
 	@NotNull(message = "등급의 승급 조건 금액은 반드시 입력해야 합니다.")
 	@Column(precision = 11, scale = 2)
-	@DecimalMax(value = "100_000_000", message = "등급의 승급 조건 금액은 1억원을 초과할 수 없습니다.")
+	@DecimalMax(value = "100000000", message = "등급의 승급 조건 금액은 1억원을 초과할 수 없습니다.")
 	BigDecimal requirement
 ) {}

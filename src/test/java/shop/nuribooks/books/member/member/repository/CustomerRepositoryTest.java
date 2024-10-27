@@ -44,9 +44,11 @@ class CustomerRepositoryTest {
 		assertThat(exists).isTrue();
 	}
 
+	/**
+	 * 테스트를 위한 비회원 생성
+	 */
 	private Customer customer() {
 		return Customer.builder()
-			.id(null)
 			.name("nuri")
 			.password("abc123")
 			.phoneNumber("042-8282-8282")

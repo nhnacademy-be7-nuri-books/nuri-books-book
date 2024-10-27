@@ -5,7 +5,7 @@ import shop.nuribooks.books.member.grade.entity.Grade;
 
 public class EntityMapper {
 
-	public static Grade toEntity(GradeRegisterRequest request) {
+	public static Grade toGradeEntity(GradeRegisterRequest request) {
 		return Grade.builder()
 			.name(request.name())
 			.pointRate(request.pointRate())

@@ -38,9 +38,9 @@ public class GradeControllerTest {
 	@Test
 	public void gradeUpdate() throws Exception{
 	    //given
-		GradeUpdateRequest request = gradeUpdateRequest();
-		GradeUpdateResponse response = gradeUpdateResponse();
-		String requestName = "GOLD";
+		GradeUpdateRequest request = getGradeUpdateRequest();
+		GradeUpdateResponse response = getGradeUpdateResponse();
+		String requestName = "MASTER";
 
 		when(gradeService.updateGrade(eq(requestName), any(GradeUpdateRequest.class)))
 			.thenReturn(response);
@@ -57,7 +57,10 @@ public class GradeControllerTest {
 			.andExpect(jsonPath("requirement").value(response.requirement()));
 	}
 
-	private GradeUpdateRequest gradeUpdateRequest() {
+	/**
+	 * 테스트를 위한 GradeUpdateRequest 생성
+	 */
+	private GradeUpdateRequest getGradeUpdateRequest() {
 		return GradeUpdateRequest.builder()
 			.name("GOLD")
 			.pointRate(6)
@@ -65,7 +68,10 @@ public class GradeControllerTest {
 			.build();
 	}
 
-	private GradeUpdateResponse gradeUpdateResponse() {
+	/**
+	 * 테스트를 위한 GradeUpdateResponse 생성
+	 */
+	private GradeUpdateResponse getGradeUpdateResponse() {
 		return GradeUpdateResponse.builder()
 			.name("GOLD")
 			.pointRate(6)
