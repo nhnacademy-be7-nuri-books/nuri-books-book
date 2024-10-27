@@ -38,7 +38,7 @@ public class BookStateControllerTest {
 		String adminId = "admin123";
 		BookStateRequest bookStateReq = new BookStateRequest("재고있음");
 
-		doNothing().when(bookStateService).registerState(eq(adminId), any(BookStateRequest.class));
+		doNothing().when(bookStateService).registerState(any(BookStateRequest.class));
 
 		mockMvc.perform(post("/api/book-state")
 				.header("X-USER-ID", adminId)
@@ -69,7 +69,7 @@ public class BookStateControllerTest {
 		BookStateRequest bookStateReq = new BookStateRequest("재고있음");
 
 		doThrow(new ResourceAlreadyExistException("입력한 도서상태명 " + bookStateReq.detail() + " 이 이미 존재합니다."))
-			.when(bookStateService).registerState(eq(adminId), any(BookStateRequest.class));
+			.when(bookStateService).registerState(any(BookStateRequest.class));
 
 		mockMvc.perform(post("/api/book-state")
 				.header("X-USER-ID", adminId)

@@ -31,7 +31,6 @@ public class BookStateController {
 
 	private final BookStateService bookStateService;
 
-	//TODO : X-USER-ID 필요없을듯하여 추후 삭제 예정
 	@Operation(summary = "도서 상태 등록", description = "관리자가 새로운 도서 상태를 등록합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "도서 상태 등록 성공"),
@@ -39,11 +38,8 @@ public class BookStateController {
 		@ApiResponse(responseCode = "409", description = "도서 상태가 이미 존재함"),
 	})
 	@PostMapping
-	public ResponseEntity<ResponseMessage> registerBookState(
-		@RequestHeader("X-USER-ID") String adminId,
-		@Valid @RequestBody BookStateRequest bookStateReq) {
-
-		bookStateService.registerState(adminId, bookStateReq);
+	public ResponseEntity<ResponseMessage> registerBookState(@Valid @RequestBody BookStateRequest bookStateReq) {
+		bookStateService.registerState(bookStateReq);
 		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서상태 등록 성공");
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
 	}

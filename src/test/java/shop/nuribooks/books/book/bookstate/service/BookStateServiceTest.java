@@ -52,10 +52,9 @@ public class BookStateServiceTest {
 
 	@Test
 	public void registerState_ShouldSaveBookState_WhenRequestIsValid() {
-		String admin = "admin";
 		when(bookStateRepository.existsBookStatesByDetail(bookStateRequest.detail())).thenReturn(false);
 
-		bookStateService.registerState(admin, bookStateRequest);
+		bookStateService.registerState(bookStateRequest);
 
 		verify(bookStateRepository, times(1)).save(any(BookState.class));
 		verify(bookStateRepository, times(1)).existsBookStatesByDetail(bookStateRequest.detail());
@@ -63,10 +62,9 @@ public class BookStateServiceTest {
 
 	@Test
 	public void registerState_ShouldThrowBookStateDetailAlreadyExistException_WhenStateAlreadyExists() {
-		String admin = "admin";
 		when(bookStateRepository.existsBookStatesByDetail(bookStateRequest.detail())).thenReturn(true);
 
-		assertThrows(BookStateDetailAlreadyExistException.class, () -> bookStateService.registerState(admin, bookStateRequest));
+		assertThrows(BookStateDetailAlreadyExistException.class, () -> bookStateService.registerState(bookStateRequest));
 	}
 
 	@Test

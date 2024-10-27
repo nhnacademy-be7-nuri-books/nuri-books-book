@@ -27,7 +27,7 @@ public class BookStateServiceImpl implements BookStateService {
 	public static final Integer DEFAULT_STATE_ID = 1;
 
 	@Override
-	public void registerState(String adminId, BookStateRequest bookStateRequest) {
+	public void registerState(BookStateRequest bookStateRequest) {
 		if(bookStateRepository.existsBookStatesByDetail(bookStateRequest.detail())){
 			throw new BookStateDetailAlreadyExistException(bookStateRequest.detail());
 		}
