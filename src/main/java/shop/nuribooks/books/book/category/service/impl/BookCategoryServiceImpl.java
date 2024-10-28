@@ -64,6 +64,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	 * @throws CategoryNotFoundException    해당 ID의 카테고리를 찾을 수 없을 때 발생합니다.
 	 * @throws BookCategoryNotFoundException 해당 도서와 카테고리 간의 연관 관계가 없을 때 발생합니다.
 	 */
+	@Transactional
 	@Override
 	public void deleteBookCategory(Long bookId, Long categoryId) {
 		Book book = bookRepository.findById(bookId)
