@@ -68,6 +68,26 @@ public class BookStateServiceTest {
 	}
 
 	@Test
+	public void getBookState_ShouldReturnBookStateResponse_WhenStateExists() {
+		Integer stateId = 1;
+		when(bookStateRepository.findById(stateId)).thenReturn(Optional.of(bookState));
+
+		BookStateResponse result = bookStateService.getBookState(stateId);
+
+		assertEquals(bookState.getDetail(), result.detail());
+		verify(bookStateRepository, times(1)).findById(stateId);
+	}
+
+	@Test
+	public void getBookState_ShouldThrowBookStateIdNotFoundException_WhenStateNotFound() {
+		Integer stateId = 1;
+		when(bookStateRepository.findById(stateId)).thenReturn(Optional.empty());
+
+		assertThrows(BookStateIdNotFoundException.class, () -> bookStateService.getBookState(stateId));
+		verify(bookStateRepository, times(1)).findById(stateId);
+	}
+
+	@Test
 	public void getAllBooks_ShouldReturnBookStateResponseList_WhenBookStatesExist() {
 		when(bookStateRepository.findAll()).thenReturn(List.of(bookState));
 
@@ -156,7 +176,6 @@ public class BookStateServiceTest {
 		verify(bookStateRepository, never()).deleteById(anyInt());
 	}
 
-
 	@Test
 	public void deleteState_ShouldHandleEmptyBookList_WhenStateHasNoAssociatedBooks() {
 		BookState defaultState = BookState.builder()
@@ -171,4 +190,11 @@ public class BookStateServiceTest {
 		verify(bookRepository, never()).saveAll(anyList());
 		verify(bookStateRepository, times(1)).deleteById(1);
 	}
+
+	@Test
+	public void deleteState_ShouldThrowException_WhenDeletingDefaultState() {
+		assertThrows(IllegalStateException.class, () -> bookStateService.deleteState(DEFAULT_STATE_ID));
+		verify(bookStateRepository, never()).deleteById(DEFAULT_STATE_ID);
+	}
+
 }

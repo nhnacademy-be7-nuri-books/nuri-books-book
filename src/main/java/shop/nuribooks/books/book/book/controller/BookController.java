@@ -27,12 +27,12 @@ import shop.nuribooks.books.common.message.ResponseMessage;
 public class BookController {
 	private final BookService bookService;
 
-	@Operation(summary = "Register a new book", description = "This endpoint allows administrators to register a new book in the system.")
+	@Operation(summary = "신규 도서 등록", description = "관리자가 새로운 도서를 시스템에 등록할 수 있는 엔드포인트입니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "Book registration successful"),
-		@ApiResponse(responseCode = "400", description = "Invalid request data"),
-		@ApiResponse(responseCode = "404", description = "Book state or publisher not found"),
-		@ApiResponse(responseCode = "409", description = "ISBN already exists"),
+		@ApiResponse(responseCode = "201", description = "도서 등록 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+		@ApiResponse(responseCode = "404", description = "도서 상태 또는 출판사 미발견"),
+		@ApiResponse(responseCode = "409", description = "중복된 ISBN"),
 	})
 	@PostMapping
 	public ResponseEntity<BookRegisterResponse> registerBooks(@Valid @RequestBody BookRegisterRequest reqDto) {
@@ -40,11 +40,11 @@ public class BookController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
 	}
 
-	@Operation(summary = "Update book details", description = "This endpoint allows administrators to update an existing book's details by book ID.")
+	@Operation(summary = "도서 정보 수정", description = "관리자가 도서 ID를 통해 기존 도서의 정보를 수정할 수 있는 엔드포인트입니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "Book updated successfully"),
-		@ApiResponse(responseCode = "400", description = "Invalid request data"),
-		@ApiResponse(responseCode = "404", description = "Book not found")
+		@ApiResponse(responseCode = "200", description = "도서 수정 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+		@ApiResponse(responseCode = "404", description = "도서 미발견")
 	})
 	@PutMapping("/{bookId}")
 	public ResponseEntity<ResponseMessage> updateBook(@PathVariable Long bookId,
@@ -55,10 +55,10 @@ public class BookController {
 		return ResponseEntity.ok(responseMessage);
 	}
 
-	@Operation(summary = "Delete a book", description = "This endpoint allows administrators to delete a book by its ID.")
+	@Operation(summary = "도서 삭제", description = "관리자가 도서 ID를 통해 도서를 삭제할 수 있는 엔드포인트입니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "Book deletion successful"),
-		@ApiResponse(responseCode = "404", description = "Book not found")
+		@ApiResponse(responseCode = "200", description = "도서 삭제 성공"),
+		@ApiResponse(responseCode = "404", description = "도서 미발견")
 	})
 	@DeleteMapping("{bookId}")
 	public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
