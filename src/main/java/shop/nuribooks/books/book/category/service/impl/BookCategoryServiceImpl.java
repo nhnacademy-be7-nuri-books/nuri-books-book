@@ -11,6 +11,7 @@ import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.category.BookCategoryAlreadyExistsException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
 /**
@@ -39,6 +40,11 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(CategoryNotFoundException::new);
+
+		boolean exists = bookCategoryRepository.existsByBookAndCategory(book, category);
+		if (exists) {
+			throw new BookCategoryAlreadyExistsException(bookId, categoryId);
+		}
 
 		bookCategoryRepository.save(BookCategory.builder()
 			.book(book)

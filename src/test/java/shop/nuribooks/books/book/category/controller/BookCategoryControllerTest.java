@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import shop.nuribooks.books.book.category.service.BookCategoryService;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.category.BookCategoryAlreadyExistsException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
 @WebMvcTest(BookCategoryController.class)
@@ -43,9 +44,27 @@ public class BookCategoryControllerTest {
 		verify(bookCategoryService, times(1)).registerBookCategory(bookId, categoryId);
 	}
 
-	@DisplayName("존재하지 않는 도서 ID로 요청 시 BookNotFoundException 발생")
+	@DisplayName("이미 존재하는 연관 관계로 요청 시 BookCategoryAlreadyExistsException 발생")
 	@Test
 	@Order(2)
+	void registerBookCategory_AlreadyExistsException() throws Exception {
+		// Given
+		Long bookId = 1L;
+		Long categoryId = 1L;
+
+		doThrow(new BookCategoryAlreadyExistsException(bookId, categoryId))
+			.when(bookCategoryService).registerBookCategory(bookId, categoryId);
+
+		// When & Then
+		mockMvc.perform(post("/api/book-category/{bookId}/categories/{categoryId}", bookId, categoryId))
+			.andExpect(status().isConflict());
+
+		verify(bookCategoryService, times(1)).registerBookCategory(bookId, categoryId);
+	}
+
+	@DisplayName("존재하지 않는 도서 ID로 요청 시 BookNotFoundException 발생")
+	@Test
+	@Order(3)
 	void registerBookCategory_BookNotFoundException() throws Exception {
 		// Given
 		Long bookId = 1L;
@@ -63,7 +82,7 @@ public class BookCategoryControllerTest {
 
 	@DisplayName("존재하지 않는 카테고리 ID로 요청 시 CategoryNotFoundException 발생")
 	@Test
-	@Order(3)
+	@Order(4)
 	void registerBookCategory_CategoryNotFoundException() throws Exception {
 		// Given
 		Long bookId = 1L;
@@ -81,7 +100,7 @@ public class BookCategoryControllerTest {
 
 	@DisplayName("서버 내부 오류 발생 시 500 에러 반환")
 	@Test
-	@Order(4)
+	@Order(5)
 	void registerBookCategory_InternalServerError() throws Exception {
 		// Given
 		Long bookId = 1L;

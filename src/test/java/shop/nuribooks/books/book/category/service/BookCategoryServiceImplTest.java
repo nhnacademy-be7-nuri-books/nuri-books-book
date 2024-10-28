@@ -1,4 +1,4 @@
-package shop.nuribooks.books.book.category.service.impl;
+package shop.nuribooks.books.book.category.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -21,7 +21,9 @@ import shop.nuribooks.books.book.category.entitiy.BookCategory;
 import shop.nuribooks.books.book.category.entitiy.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
+import shop.nuribooks.books.book.category.service.impl.BookCategoryServiceImpl;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.category.BookCategoryAlreadyExistsException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -68,8 +70,35 @@ public class BookCategoryServiceImplTest {
 		verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
 	}
 
-	@DisplayName("책이 존재하지 않을 때 BookNotFoundException 발생")
+	@DisplayName("책과 카테고리가 이미 연관되어 있을 때 BookCategoryAlreadyExistsException 발생")
+	@Test
 	@Order(2)
+	void registerBookCategory_AlreadyExistsException() {
+		// Given
+		Long bookId = 1L;
+		Long categoryId = 1L;
+
+		Book book = mock(Book.class);
+		Category category = mock(Category.class);
+
+		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+		when(bookCategoryRepository.existsByBookAndCategory(book, category)).thenReturn(true);
+
+		// When & Then
+		assertThatThrownBy(() -> bookCategoryService.registerBookCategory(bookId, categoryId))
+			.isInstanceOf(BookCategoryAlreadyExistsException.class)
+			.hasMessageContaining(String.valueOf(bookId))
+			.hasMessageContaining(String.valueOf(categoryId));
+
+		verify(bookRepository, times(1)).findById(bookId);
+		verify(categoryRepository, times(1)).findById(categoryId);
+		verify(bookCategoryRepository, times(1)).existsByBookAndCategory(book, category);
+		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
+	}
+
+	@DisplayName("책이 존재하지 않을 때 BookNotFoundException 발생")
+	@Order(3)
 	@Test
 	void registerBookCategory_BookNotFoundException() {
 		// Given
@@ -89,7 +118,7 @@ public class BookCategoryServiceImplTest {
 	}
 
 	@DisplayName("카테고리가 존재하지 않을 때 CategoryNotFoundException 발생")
-	@Order(3)
+	@Order(4)
 	@Test
 	void registerBookCategory_CategoryNotFoundException() {
 		// Given
