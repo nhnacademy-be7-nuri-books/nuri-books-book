@@ -50,6 +50,7 @@ public class AuthorityController {
 
     @Operation(summary = "권한 삭제", description = "ID로 권한을 삭제합니다.")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "삭제 성공"),
             @ApiResponse(responseCode = "404", description = "찾을 수 없음")
     })
     @DeleteMapping("/api/member/authority/{authorityId}")

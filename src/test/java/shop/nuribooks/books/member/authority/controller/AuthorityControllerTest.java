@@ -83,7 +83,7 @@ class AuthorityControllerTest {
         // given
         // when // then
         mockMvc.perform(delete("/api/member/authority/{authorityId}", 1L))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @DisplayName("권한을 수정한다.")
