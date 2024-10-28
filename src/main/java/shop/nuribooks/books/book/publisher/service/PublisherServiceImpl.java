@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.publisher.dto.PublisherRequest;
 import shop.nuribooks.books.book.publisher.dto.PublisherResponse;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entitiy.PublisherEditor;
 import shop.nuribooks.books.exception.publisher.PublisherAlreadyExistsException;
 import shop.nuribooks.books.exception.publisher.PublisherNotFoundException;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
@@ -79,5 +80,38 @@ public class PublisherServiceImpl implements PublisherService {
 			.orElseThrow(() -> new PublisherNotFoundException("출판사가 존재하지 않습니다."));
 
 		publisherRepository.delete(publisher);
+	}
+
+	/**
+	 * updatePublisher : 출판사 정보 수정
+	 * @author kyongmin
+	 *
+	 * @param name 수정할 출판사 기존 이름
+	 * 존재하지 않는 출판사일 경우 PublisherNotFoundException 발생
+	 * @param request 수정할 출판사 이름이 포함된 요청 객체
+	 * @return 수정된 출판사 이름을 포함한 PublisherResponse
+	 */
+	@Override
+	public PublisherResponse updatePublisher(String name, PublisherRequest request) {
+		Publisher publisher = publisherRepository.findByName(name)
+			.orElseThrow(() -> new PublisherNotFoundException("출판사가 존재하지 않습니다."));
+
+		PublisherEditor publisherEditor = getPublisherEditor(request, publisher);
+		publisher.edit(publisherEditor);
+		return PublisherResponse.of(publisher);
+	}
+
+	/**
+	 * getPublisherEditor : 수정사항을 반영한 빌더 생성
+	 *
+	 * @param request 수정된 정보가 담긴 요청 객체
+	 * @param publisher 기존 출판사 엔티티
+	 * @return 수정된 출판사 정보를 포함한 PublisherEditor
+	 */
+	private static PublisherEditor getPublisherEditor(PublisherRequest request, Publisher publisher) {
+		PublisherEditor.PublisherEditorBuilder builder = publisher.toEditor();
+		return builder
+			.name(request.name())
+			.build();
 	}
 }

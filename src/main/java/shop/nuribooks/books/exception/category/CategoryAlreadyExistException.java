@@ -11,4 +11,8 @@ public class CategoryAlreadyExistException extends ResourceAlreadyExistException
 		super("입력한 카테고리ID는 " + id + " 이미 존재합니다");
 	}
 
+	public CategoryAlreadyExistException() {
+		super("카테고리가 이미 존재합니다.");
+	}
+
 }

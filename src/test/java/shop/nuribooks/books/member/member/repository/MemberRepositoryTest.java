@@ -3,6 +3,10 @@ package shop.nuribooks.books.member.member.repository;
 import static java.math.BigDecimal.*;
 import static org.assertj.core.api.Assertions.*;
 
+import static shop.nuribooks.books.member.member.entity.AuthorityEnum.*;
+import static shop.nuribooks.books.member.member.entity.GradeEnum.*;
+import static shop.nuribooks.books.member.member.entity.StatusEnum.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -43,16 +47,16 @@ class MemberRepositoryTest {
 	@DisplayName("입력된 id로 회원 조회")
 	@Test
 	void findByUserId() {
-	    //given
+		//given
 		Customer customer = customer();
 		Customer savedCustomer = customerRepository.save(customer);
 		Member member = member(savedCustomer);
 		Member savedMember = memberRepository.save(member);
 
-	    //when
+		//when
 		Optional<Member> foundMember = memberRepository.findByUserId(savedMember.getUserId());
 
-	    //then
+		//then
 		assertThat(foundMember).isPresent(); // 회원이 존재함을 확인
 		assertThat(foundMember.get().getId()).isEqualTo(savedMember.getId()); // ID가 같은지 확인
 		assertThat(foundMember.get().getUserId()).isEqualTo(savedMember.getUserId()); // UserId가 같은지 확인
