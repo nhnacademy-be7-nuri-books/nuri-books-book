@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
+import shop.nuribooks.books.member.address.entity.Address;
+import shop.nuribooks.books.member.address.repository.AddressRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.dto.DtoMapper;
@@ -37,6 +40,7 @@ import shop.nuribooks.books.member.resignedmember.repository.ResignedMemberRepos
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
 
@@ -44,6 +48,7 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberRepository memberRepository;
 	private final GradeRepository gradeRepository;
 	private final ResignedMemberRepository resignedMemberRepository;
+	private final AddressRepository addressRepository;
 
 	/**
 	 * 회원등록 <br>
@@ -152,33 +157,55 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	/**
+	 * 스케쥴링 메서드
+	 * 탈퇴 회원의 Withdrawn상태 기간 경과를 매일 자정에 확인하여 1년이 지나면 <br>
+	 * 해당 회원들의 주소를 모두 찾아 AddressRepository에서 삭제하고, <br>
+	 * MemberRepository에서 해당 회원을, CustomerRepository에서도 동일한 id의 비회원을 삭제한다. <br>
+	 * 그 회원이 사용했던 userId만을 ResignedMember에 담아 ResignedMemberRepository에 저장
+	 */
+	@Scheduled(cron = "0 0 0 * * ?")
+	@Transactional
+	public void removeWithdrawnMembers() {
+		try {
+			List<Member> membersToDelete = memberRepository.findAll().stream()
+				.filter(Member::isWithdrawnForOverOneYear)
+				.toList();
+
+			if (membersToDelete.isEmpty()) {
+				log.info("탈퇴 일시가 1년이 지난 회원이 존재하지 않습니다.");
+				return;
+			}
+
+			List<Customer> customersToDelete = membersToDelete.stream()
+				.map(member -> customerRepository.findById(member.getId())
+					.orElseThrow(() -> new CustomerNotFoundException("삭제하려는 고객이 존재하지 않습니다.")))
+				.toList();
+
+			List<Address> addressesToDelete = membersToDelete.stream()
+				.flatMap(member -> addressRepository.findAllByMemberId(member.getId()).stream())
+				.toList();
+
+			List<ResignedMember> completelyResignedMembers = membersToDelete.stream()
+				.map(member -> ResignedMember.builder()
+					.resignedUserId(member.getUserId())
+					.build())
+				.toList();
+
+			addressRepository.deleteAll(addressesToDelete);
+			memberRepository.deleteAll(membersToDelete);
+			customerRepository.deleteAll(customersToDelete);
+			resignedMemberRepository.saveAll(completelyResignedMembers);
+
+		} catch (Exception e) {
+			log.error("회원의 탈퇴 일시 경과를 확인하는 스케줄링에 에러가 발생했습니다 : {}", e.getMessage());
+		}
+	}
+
+	/**
 	 * STANDARD 등급을 가져오는 메서드
 	 */
 	private Grade standard() {
 		return gradeRepository.findByName("STANDARD")
 			.orElseThrow(() -> new GradeNotFoundException("STANDARD 등급이 존재하지 않습니다."));
-	}
-
-	/**
-	 * 스케쥴링 메서드
-	 * 탈퇴 회원의 Withdrawn상태 기간을 매일 자정에 확인하여 1년이 지나면 <br>
-	 * MemberRepository에서 회원을 삭제하고, 그 회원이 사용했던 userId만을 ResignedMember에 담아 <br>
-	 * resignedMemberRepository에 저장
-	 */
-	@Scheduled(cron = "0 0 0 * * ?")
-	@Transactional
-	public void removeWithdrawnMembers() {
-		List<Member> membersToDelete = memberRepository.findAll().stream()
-			.filter(Member::isWithdrawnForOverOneYear)
-			.toList();
-
-		List<ResignedMember> completelyResignedMembers = membersToDelete.stream()
-			.map(member -> ResignedMember.builder()
-				.resignedUserId(member.getUserId())
-				.build())
-			.toList();
-
-		memberRepository.deleteAll(membersToDelete);
-		resignedMemberRepository.saveAll(completelyResignedMembers);
 	}
 }
