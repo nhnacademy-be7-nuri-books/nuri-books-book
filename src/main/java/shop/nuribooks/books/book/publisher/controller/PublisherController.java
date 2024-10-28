@@ -97,7 +97,7 @@ public class PublisherController {
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	@DeleteMapping("/api/publishers/{publisherName}")
-	public ResponseEntity<HttpStatus> deletePublisher(@PathVariable String publisherName) {
+	public ResponseEntity<HttpStatus> deletePublisher(@Valid @PathVariable String publisherName) {
 		publisherService.deletePublisher(publisherName);
 		return ResponseEntity.status(HttpStatus.OK).build();
 
@@ -119,7 +119,7 @@ public class PublisherController {
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	@PutMapping("/api/publishers/{publisherName}")
-	public ResponseEntity<PublisherResponse> updatePublisher(@PathVariable String publisherName,
+	public ResponseEntity<PublisherResponse> updatePublisher(@Valid @PathVariable String publisherName,
 		@RequestBody PublisherRequest request) {
 		PublisherResponse response = publisherService.updatePublisher(publisherName, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);

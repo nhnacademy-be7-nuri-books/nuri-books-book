@@ -30,7 +30,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           source: "target/*.jar"
-          target: "~/"
+          target: "~/books/books.jar"
           rm: false
 
       - name: execute shell script
