@@ -17,7 +17,7 @@ public record BookRegisterRequest(
 	@NotNull(message = "출판사 ID는 필수입니다.")
 	Long publisherId,
 
-	@NotNull(message = "제목은 필수입니다.")
+	@NotBlank(message = "제목은 필수입니다.")
 	@Size(min = 1, max = 50, message = "제목은 1자 이상 50자 이하여야 합니다.")
 	String title,
 
