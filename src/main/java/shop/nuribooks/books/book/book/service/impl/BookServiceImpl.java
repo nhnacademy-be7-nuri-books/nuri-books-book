@@ -71,11 +71,17 @@ public class BookServiceImpl implements BookService {
 		return BookRegisterResponse.of(book);
 	}
 
-	@Transactional(readOnly = true)
+	//도서 상세 조회 시 조회수 증가 추가
+	//TODO:성능 고려한 비동기 업데이트나 조회기능과 독립적으로 관리하는 방안 생각중
+	@Transactional
 	@Override
 	public BookResponse getBookById(Long bookId) {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(BookIdNotFoundException::new);
+
+		book.incrementViewCount();
+		bookRepository.save(book);
+
 		return BookResponse.of(book);
 	}
 

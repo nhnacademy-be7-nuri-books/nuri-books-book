@@ -138,5 +138,9 @@ public class Book {
 		this.stock = request.stock();
 	}
 
+	public void incrementViewCount() {
+		this.viewCount++;
+	}
+
 }
 
