@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
+import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
@@ -65,6 +66,13 @@ public class BookServiceImpl implements BookService {
 		bookRepository.save(book);
 
 		return BookRegisterResponse.of(book);
+	}
+
+	@Override
+	public BookResponse getBookById(Long bookId) {
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(BookIdNotFoundException::new);
+		return BookResponse.of(book);
 	}
 
 	//TODO: 좋아요나 조회수에 대한 업데이트는 따로 메서드를 구현할 계획입니다.
