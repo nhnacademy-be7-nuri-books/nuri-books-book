@@ -2,8 +2,8 @@ package shop.nuribooks.books.exception.member;
 
 import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 
-public class GradeAlreadyExistException extends ResourceAlreadyExistException {
-	public GradeAlreadyExistException(String message) {
+public class GradeAlreadyExistsException extends ResourceAlreadyExistException {
+	public GradeAlreadyExistsException(String message) {
 		super(message);
 	}
 }

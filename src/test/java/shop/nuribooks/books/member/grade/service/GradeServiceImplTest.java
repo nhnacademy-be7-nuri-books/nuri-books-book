@@ -15,7 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import shop.nuribooks.books.exception.member.GradeAlreadyExistException;
+import shop.nuribooks.books.exception.member.GradeAlreadyExistsException;
 import shop.nuribooks.books.exception.member.GradeInUseException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
@@ -71,7 +71,7 @@ public class GradeServiceImplTest {
 
 	    //when / then
 		assertThatThrownBy(() -> gradeServiceImpl.registerGrade(request))
-			.isInstanceOf(GradeAlreadyExistException.class)
+			.isInstanceOf(GradeAlreadyExistsException.class)
 			.hasMessage("이미 존재하는 등급입니다.");
 	}
 

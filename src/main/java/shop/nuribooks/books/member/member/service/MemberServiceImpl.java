@@ -2,7 +2,10 @@ package shop.nuribooks.books.member.member.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -152,5 +155,19 @@ public class MemberServiceImpl implements MemberService {
 	private Grade standard() {
 		return gradeRepository.findByName("STANDARD")
 			.orElseThrow(() -> new GradeNotFoundException("STANDARD 등급이 존재하지 않습니다."));
+	}
+
+	/**
+	 * 탈퇴 회원의 Withdrawn상태 기간을 매일 자정에 확인하여 1년이 지나면 <br>
+	 * memberRepository에서 회원을 삭제하고, 그 회원이 사용했던 userId만을 resignedMemberRepository에 저장
+	 */
+	@Scheduled(cron = "0 0 0 * * ?")
+	@Transactional
+	public void removeWithdrawnMembers() {
+		List<Member> membersToDelete = memberRepository.findAll().stream()
+			.filter(Member::isWithdrawnForOverOneYear)
+			.collect(Collectors.toList());
+
+		memberRepository.deleteAll(membersToDelete);
 	}
 }

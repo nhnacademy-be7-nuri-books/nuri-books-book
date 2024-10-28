@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.exception.member.GradeAlreadyExistException;
+import shop.nuribooks.books.exception.member.GradeAlreadyExistsException;
 import shop.nuribooks.books.exception.member.GradeInUseException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
 import shop.nuribooks.books.member.grade.dto.DtoMapper;
@@ -39,7 +39,7 @@ public class GradeServiceImpl implements GradeService {
 	@Transactional
 	public GradeRegisterResponse registerGrade(GradeRegisterRequest request) {
 		if (gradeRepository.existsByName(request.name())) {
-			throw new GradeAlreadyExistException("이미 존재하는 등급입니다.");
+			throw new GradeAlreadyExistsException("이미 존재하는 등급입니다.");
 		}
 		Grade savedGrade = gradeRepository.save(EntityMapper.toGradeEntity(request));
 

@@ -7,6 +7,7 @@ import static shop.nuribooks.books.member.member.entity.StatusEnum.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -94,8 +95,18 @@ public class Member {
 	 */
 	private LocalDateTime withdrawnAt;
 
+	/**
+	 * 회원 탈퇴 시 상태를 탈퇴됨으로, 탈퇴 일시를 현재 시간으로 초기화
+	 */
 	public void changeToWithdrawn() {
-		this.status = INACTIVE;
+		this.status = WITHDRAWN;
 		this.withdrawnAt = LocalDateTime.now();
+	}
+
+	/**
+	 * 탈퇴 일시가 1년이 지났는지 확인
+	 */
+	public boolean isWithdrawnForOverOneYear() {
+		return withdrawnAt != null && ChronoUnit.YEARS.between(withdrawnAt, LocalDateTime.now()) >= 1;
 	}
 }
