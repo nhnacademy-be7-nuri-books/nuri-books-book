@@ -2,12 +2,12 @@ package shop.nuribooks.books.member.member.entity;
 
 import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.FetchType.*;
+import static java.time.temporal.ChronoUnit.*;
 import static shop.nuribooks.books.member.member.entity.StatusEnum.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -88,12 +88,12 @@ public class Member {
 	/**
 	 * 마지막 로그인 일시
 	 */
-	private LocalDateTime latestLoginAt;
+	private LocalDateTime latestLoginAt = null;
 
 	/**
 	 * 탈퇴 일시
 	 */
-	private LocalDateTime withdrawnAt;
+	private LocalDateTime withdrawnAt = null;
 
 	/**
 	 * 회원 탈퇴 시 상태를 탈퇴됨으로, 탈퇴 일시를 현재 시간으로 초기화
@@ -107,6 +107,6 @@ public class Member {
 	 * 탈퇴 일시가 1년이 지났는지 확인
 	 */
 	public boolean isWithdrawnForOverOneYear() {
-		return withdrawnAt != null && ChronoUnit.YEARS.between(withdrawnAt, LocalDateTime.now()) >= 1;
+		return withdrawnAt != null && YEARS.between(withdrawnAt, LocalDateTime.now()) >= 1;
 	}
 }

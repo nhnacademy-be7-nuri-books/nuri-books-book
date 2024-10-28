@@ -3,7 +3,6 @@ package shop.nuribooks.books.member.member.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -33,6 +32,8 @@ import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.entity.StatusEnum;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
+import shop.nuribooks.books.member.resignedmember.entity.ResignedMember;
+import shop.nuribooks.books.member.resignedmember.repository.ResignedMemberRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +43,7 @@ public class MemberServiceImpl implements MemberService {
 	private final CustomerRepository customerRepository;
 	private final MemberRepository memberRepository;
 	private final GradeRepository gradeRepository;
+	private final ResignedMemberRepository resignedMemberRepository;
 
 	/**
 	 * 회원등록 <br>
@@ -158,16 +160,25 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	/**
+	 * 스케쥴링 메서드
 	 * 탈퇴 회원의 Withdrawn상태 기간을 매일 자정에 확인하여 1년이 지나면 <br>
-	 * memberRepository에서 회원을 삭제하고, 그 회원이 사용했던 userId만을 resignedMemberRepository에 저장
+	 * MemberRepository에서 회원을 삭제하고, 그 회원이 사용했던 userId만을 ResignedMember에 담아 <br>
+	 * resignedMemberRepository에 저장
 	 */
 	@Scheduled(cron = "0 0 0 * * ?")
 	@Transactional
 	public void removeWithdrawnMembers() {
 		List<Member> membersToDelete = memberRepository.findAll().stream()
 			.filter(Member::isWithdrawnForOverOneYear)
-			.collect(Collectors.toList());
+			.toList();
+
+		List<ResignedMember> completelyResignedMembers = membersToDelete.stream()
+			.map(member -> ResignedMember.builder()
+				.resignedUserId(member.getUserId())
+				.build())
+			.toList();
 
 		memberRepository.deleteAll(membersToDelete);
+		resignedMemberRepository.saveAll(completelyResignedMembers);
 	}
 }
