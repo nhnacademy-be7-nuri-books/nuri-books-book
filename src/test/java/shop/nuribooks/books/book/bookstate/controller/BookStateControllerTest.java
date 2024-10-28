@@ -81,8 +81,33 @@ public class BookStateControllerTest {
 	}
 
 	@Test
+	public void getBookStateById_ShouldReturnOk_WhenStateExists() throws Exception {
+		Integer stateId = 1;
+		BookStateResponse bookStateResponse = new BookStateResponse(stateId, "재고있음");
+
+		when(bookStateService.getBookState(stateId)).thenReturn(bookStateResponse);
+
+		mockMvc.perform(get("/api/book-state/{id}", stateId))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id").value(stateId))
+			.andExpect(jsonPath("$.detail").value("재고있음"));
+	}
+
+	@Test
+	public void getBookStateById_ShouldReturnNotFound_WhenStateDoesNotExist() throws Exception {
+		Integer stateId = 1;
+
+		doThrow(new BookStateIdNotFoundException())
+			.when(bookStateService).getBookState(stateId);
+
+		mockMvc.perform(get("/api/book-state/{id}", stateId))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.statusCode").value(404))
+			.andExpect(jsonPath("$.message").value("도서상태를 찾을 수 없습니다."));
+	}
+
+	@Test
 	public void getBookState_ShouldReturnOk_WhenStatesExist() throws Exception {
-		// 예시 도서 상태 목록
 		List<BookStateResponse> bookStates = List.of(
 			new BookStateResponse(1, "재고있음"),
 			new BookStateResponse(2, "재입고"),
@@ -120,6 +145,19 @@ public class BookStateControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.statusCode").value(200))
 			.andExpect(jsonPath("$.message").value("도서상태 수정 성공"));
+	}
+
+	@Test
+	public void updateBookState_ShouldReturnBadRequest_WhenRequestFieldMissing() throws Exception {
+		Integer stateId = 1;
+		BookStateRequest invalidRequest = new BookStateRequest(null); // 필수 필드 누락
+
+		mockMvc.perform(patch("/api/book-state/{id}", stateId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(invalidRequest)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.statusCode").value(400))
+			.andExpect(jsonPath("$.message").value("도서상태명은 필수입니다."));
 	}
 
 	@Test
