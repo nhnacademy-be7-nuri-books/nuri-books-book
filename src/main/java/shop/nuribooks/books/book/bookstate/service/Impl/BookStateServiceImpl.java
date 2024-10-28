@@ -37,6 +37,14 @@ public class BookStateServiceImpl implements BookStateService {
 	}
 
 	@Override
+	public BookStateResponse getBookState(Integer id) {
+		BookState bookState = bookStateRepository.findById(id)
+			.orElseThrow(BookStateIdNotFoundException::new);
+
+		return BookStateResponse.of(bookState);
+	}
+
+	@Override
 	public List<BookStateResponse> getAllBookStates() {
 		List<BookState> bookStateList = bookStateRepository.findAll();
 
