@@ -61,9 +61,8 @@ public class BookController {
 		@ApiResponse(responseCode = "404", description = "Book not found")
 	})
 	@DeleteMapping("{bookId}")
-	public ResponseEntity<ResponseMessage> deleteBook(@PathVariable Long bookId) {
+	public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
 		bookService.deleteBook(bookId);
-		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.OK.value(), "도서 삭제 성공");
-		return ResponseEntity.ok(responseMessage);
+		return ResponseEntity.noContent().build();
 	}
 }

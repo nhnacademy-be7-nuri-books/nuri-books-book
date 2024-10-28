@@ -77,9 +77,8 @@ public class BookStateController {
 		@ApiResponse(responseCode = "200", description = "도서 상태 삭제 성공"),
 		@ApiResponse(responseCode = "404", description = "도서 상태를 찾을 수 없음"),
 	})
-	public ResponseEntity<ResponseMessage> deleteBookState(@PathVariable Integer id) {
+	public ResponseEntity<Void> deleteBookState(@PathVariable Integer id) {
 		bookStateService.deleteState(id);
-		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.OK.value(), "도서상태 삭제 성공");
-		return ResponseEntity.ok(responseMessage);
+		return ResponseEntity.noContent().build();
 	}
 }

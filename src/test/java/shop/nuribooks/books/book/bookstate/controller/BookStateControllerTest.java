@@ -145,9 +145,7 @@ public class BookStateControllerTest {
 		doNothing().when(bookStateService).deleteState(stateId);
 
 		mockMvc.perform(delete("/api/book-state/{id}", stateId))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.statusCode").value(200))
-			.andExpect(jsonPath("$.message").value("도서상태 삭제 성공"));
+			.andExpect(status().isNoContent());
 	}
 
 	@Test

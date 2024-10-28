@@ -245,8 +245,8 @@ public class BookControllerTest {
 
 		mockMvc.perform(delete("/api/books/{bookId}", bookId)
 				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.message").value("도서 삭제 성공"));
+			.andExpect(status().isNoContent());
+			//.andExpect(jsonPath("$.message").value("도서 삭제 성공"));
 	}
 
 	@Test
