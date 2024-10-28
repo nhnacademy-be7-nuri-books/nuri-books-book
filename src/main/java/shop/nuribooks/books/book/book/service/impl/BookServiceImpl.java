@@ -99,6 +99,7 @@ public class BookServiceImpl implements BookService {
 	 * @throws BookStateIdNotFoundException 도서상태 ID가 존재하지 않는 경우 발생
 	 * @throws PublisherIdNotFoundException 주어진 출판사 ID가 존재하지 않는 경우 발생
 	 */
+	@Transactional
 	@Override
 	public void updateBook(Long bookId, BookUpdateRequest bookUpdateReq) {
 		Book book = bookRepository.findById(bookId)
