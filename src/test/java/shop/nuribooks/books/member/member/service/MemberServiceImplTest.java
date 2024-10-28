@@ -129,7 +129,7 @@ class MemberServiceImplTest {
 
 	    //then
 		verify(existingMember, times(1)).changeToWithdrawn(); // 메서드 호출 확인
-		assertThat(existingMember.getStatus()).isEqualTo(StatusEnum.INACTIVE); // 상태가 INACTIVE로 변경되었는지 확인
+		assertThat(existingMember.getStatus()).isEqualTo(StatusEnum.WITHDRAWN); // 상태가 WITHDRAWN로 변경되었는지 확인
 		assertThat(existingMember.getWithdrawnAt()).isNotNull(); // withdrawnAt이 현재 시간으로 설정되었는지 확인
 	}
 
