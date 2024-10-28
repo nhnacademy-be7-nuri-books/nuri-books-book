@@ -37,7 +37,7 @@ public class BookStateServiceImpl implements BookStateService {
 	}
 
 	@Override
-	public List<BookStateResponse> getAllBooks() {
+	public List<BookStateResponse> getAllBookStates() {
 		List<BookState> bookStateList = bookStateRepository.findAll();
 
 		return bookStateList.stream().map(bookState -> new BookStateResponse(bookState.getId(), bookState.getDetail()))

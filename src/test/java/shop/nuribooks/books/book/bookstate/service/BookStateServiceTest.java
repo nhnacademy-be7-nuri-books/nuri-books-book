@@ -71,7 +71,7 @@ public class BookStateServiceTest {
 	public void getAllBooks_ShouldReturnBookStateResponseList_WhenBookStatesExist() {
 		when(bookStateRepository.findAll()).thenReturn(List.of(bookState));
 
-		List<BookStateResponse> result = bookStateService.getAllBooks();
+		List<BookStateResponse> result = bookStateService.getAllBookStates();
 
 		assertEquals(1, result.size());
 		assertEquals(bookState.getDetail(), result.get(0).detail());
@@ -83,7 +83,7 @@ public class BookStateServiceTest {
 	public void getAllBooks_ShouldReturnEmptyList_WhenNoBookStatesExist() {
 		when(bookStateRepository.findAll()).thenReturn(List.of());
 
-		List<BookStateResponse> result = bookStateService.getAllBooks();
+		List<BookStateResponse> result = bookStateService.getAllBookStates();
 
 		assertTrue(result.isEmpty());
 		verify(bookStateRepository, times(1)).findAll();

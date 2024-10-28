@@ -89,7 +89,7 @@ public class BookStateControllerTest {
 			new BookStateResponse(3, "매진")
 		);
 
-		when(bookStateService.getAllBooks()).thenReturn(bookStates);
+		when(bookStateService.getAllBookStates()).thenReturn(bookStates);
 
 		mockMvc.perform(get("/api/book-state"))
 			.andExpect(status().isOk())
@@ -100,7 +100,7 @@ public class BookStateControllerTest {
 
 	@Test
 	public void getBookState_ShouldReturnEmptyList_WhenNoStatesExist() throws Exception {
-		when(bookStateService.getAllBooks()).thenReturn(List.of());
+		when(bookStateService.getAllBookStates()).thenReturn(List.of());
 
 		mockMvc.perform(get("/api/book-state"))
 			.andExpect(status().isOk())

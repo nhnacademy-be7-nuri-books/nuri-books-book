@@ -50,7 +50,7 @@ public class BookStateController {
 	})
 	@GetMapping
 	public ResponseEntity<List<BookStateResponse>> getBookState() {
-		List<BookStateResponse> bookStateResponses = bookStateService.getAllBooks();
+		List<BookStateResponse> bookStateResponses = bookStateService.getAllBookStates();
 		return ResponseEntity.ok(bookStateResponses);
 	}
 
@@ -82,5 +82,4 @@ public class BookStateController {
 		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.OK.value(), "도서상태 삭제 성공");
 		return ResponseEntity.ok(responseMessage);
 	}
-
 }
