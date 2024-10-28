@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import jakarta.validation.Valid;
 import shop.nuribooks.books.book.category.dto.CategoryRequest;
 import shop.nuribooks.books.book.category.dto.CategoryResponse;
 import shop.nuribooks.books.book.category.service.CategoryService;
+import shop.nuribooks.books.common.message.ResponseMessage;
 
 /**
  * 카테고리와 관련된 작업을 처리하는 컨트롤러.
@@ -89,7 +91,7 @@ public class CategoryController {
 	 * @return 모든 카테고리의 응답 리스트
 	 */
 	@Operation(summary = "모든 카테고리 조회", description = "모든 카테고리를 조회합니다.")
-	@ApiResponses({
+	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "성공적으로 모든 카테고리를 조회하였습니다.")
 	})
 
@@ -107,7 +109,7 @@ public class CategoryController {
 	 * @return 조회된 카테고리의 응답 객체와 그 하위 카테고리
 	 */
 	@Operation(summary = "카테고리 조회", description = "주어진 ID에 해당하는 카테고리를 조회합니다.")
-	@ApiResponses({
+	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "성공적으로 카테고리를 조회하였습니다."),
 		@ApiResponse(responseCode = "404", description = "해당 ID의 카테고리를 찾을 수 없습니다.")
 	})
@@ -126,7 +128,7 @@ public class CategoryController {
 	 * @return 업데이트된 카테고리의 응답 DTO
 	 */
 	@Operation(summary = "카테고리 업데이트", description = "주어진 ID에 해당하는 카테고리를 업데이트합니다.")
-	@ApiResponses({
+	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "성공적으로 카테고리를 업데이트하였습니다."),
 		@ApiResponse(responseCode = "404", description = "해당 ID의 카테고리를 찾을 수 없습니다."),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
@@ -140,6 +142,28 @@ public class CategoryController {
 		@PathVariable Long categoryId) {
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.updateCategory(dto, categoryId));
+	}
+
+	/**
+	 * 특정 카테고리를 삭제합니다.
+	 *
+	 * @author janghyun
+	 * @param categoryId 삭제할 카테고리의 ID
+	 * @return 삭제 결과를 나타내는 응답 메시지
+	 */
+	@Operation(summary = "카테고리 삭제", description = "주어진 ID에 해당하는 카테고리를 삭제합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공적으로 카테고리를 삭제하였습니다."),
+		@ApiResponse(responseCode = "404", description = "해당 ID의 카테고리를 찾을 수 없습니다."),
+	})
+	@DeleteMapping("/{categoryId}")
+	public ResponseEntity<ResponseMessage> deleteCategory(
+		@Parameter(description = "업데이트할 카테고리의 ID", required = true)
+		@PathVariable Long categoryId
+	) {
+		categoryService.deleteCategory(categoryId);
+
+		return ResponseEntity.ok().body(new ResponseMessage(200, "카테고리가 성공적으로 삭제 되었습니다."));
 	}
 
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -96,9 +97,31 @@ public class PublisherController {
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	@DeleteMapping("/api/publishers/{publisherName}")
-	public ResponseEntity<HttpStatus> deletePublisher(@PathVariable String publisherName) {
+	public ResponseEntity<HttpStatus> deletePublisher(@Valid @PathVariable String publisherName) {
 		publisherService.deletePublisher(publisherName);
 		return ResponseEntity.status(HttpStatus.OK).build();
 
+	}
+
+	/**
+	 * 요청받은 이름에 해당하는 출판사 정보 수정하는 controller
+	 * @author kyongmin
+	 *
+	 * @param publisherName 수정할 출판사 기존 이름
+	 * @param request 수정할 출판사 이름이 포함된 요청 객체
+	 * @return 해당 이름의 출판사 정보가 담긴 ResponseEntity
+	 */
+	@Operation(summary = "출판사 수정", description = "주어진 이름의 출판사를 수정합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "출판사 수정 성공"),
+		@ApiResponse(responseCode = "404", description = "출판사 미존재"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+		@ApiResponse(responseCode = "500", description = "서버 오류")
+	})
+	@PutMapping("/api/publishers/{publisherName}")
+	public ResponseEntity<PublisherResponse> updatePublisher(@Valid @PathVariable String publisherName,
+		@RequestBody PublisherRequest request) {
+		PublisherResponse response = publisherService.updatePublisher(publisherName, request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 }
