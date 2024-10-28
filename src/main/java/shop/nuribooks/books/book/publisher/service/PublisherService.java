@@ -14,4 +14,6 @@ public interface PublisherService {
 	PublisherResponse getPublisher(String name);
 
 	void deletePublisher(String name);
+
+	PublisherResponse updatePublisher(String name, PublisherRequest request);
 }

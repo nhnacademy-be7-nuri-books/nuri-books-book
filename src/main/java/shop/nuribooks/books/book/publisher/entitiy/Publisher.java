@@ -31,4 +31,13 @@ public class Publisher {
 		this.name = name;
 		this.id = id;
 	}
+
+	public PublisherEditor.PublisherEditorBuilder toEditor() {
+		return PublisherEditor.builder()
+			.name(name);
+	}
+
+	public void edit(PublisherEditor editor) {
+		name = editor.getName();
+	}
 }
