@@ -14,6 +14,7 @@ import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.exception.BadRequestException;
+import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.BookStatesIdNotFoundException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
@@ -79,7 +80,11 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public Page<BookResponse> getBooks(Pageable pageable) {
-		return bookRepository.findAll(pageable).map(BookResponse::of);
+		Page<Book> bookPage = bookRepository.findAll(pageable);
+		if(bookPage.isEmpty() && pageable.getPageNumber() > 0) {
+			throw new InvalidPageRequestException();
+		}
+		return bookPage.map(BookResponse::of);
 	}
 
 	//TODO: 좋아요나 조회수에 대한 업데이트는 따로 메서드를 구현할 계획입니다.
