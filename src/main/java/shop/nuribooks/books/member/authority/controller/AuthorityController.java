@@ -36,8 +36,9 @@ public class AuthorityController {
     }
 
     @DeleteMapping("/api/member/authority/{authorityId}")
-    public void authorityRemove(@PathVariable Long authorityId) {
+    public ResponseEntity authorityRemove(@PathVariable Long authorityId) {
         authorityService.removeAuthority(authorityId);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/api/member/authority/{authorityId}")
