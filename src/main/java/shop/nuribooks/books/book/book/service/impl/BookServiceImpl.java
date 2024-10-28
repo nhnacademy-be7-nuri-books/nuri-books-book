@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.book.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +75,11 @@ public class BookServiceImpl implements BookService {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(BookIdNotFoundException::new);
 		return BookResponse.of(book);
+	}
+
+	@Override
+	public Page<BookResponse> getBooks(Pageable pageable) {
+		return bookRepository.findAll(pageable).map(BookResponse::of);
 	}
 
 	//TODO: 좋아요나 조회수에 대한 업데이트는 따로 메서드를 구현할 계획입니다.
