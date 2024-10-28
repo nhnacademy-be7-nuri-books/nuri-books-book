@@ -1,6 +1,7 @@
 package shop.nuribooks.books.book.category.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entitiy.Book;
@@ -34,6 +35,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	 * @throws BookNotFoundException     해당 ID의 도서를 찾을 수 없을 때 발생합니다.
 	 * @throws CategoryNotFoundException 해당 ID의 카테고리를 찾을 수 없을 때 발생합니다.
 	 */
+	@Transactional
 	@Override
 	public void registerBookCategory(Long bookId, Long categoryId) {
 		Book book = bookRepository.findById(bookId)
