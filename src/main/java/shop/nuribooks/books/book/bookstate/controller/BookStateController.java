@@ -44,7 +44,18 @@ public class BookStateController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
 	}
 
-	@Operation(summary = "도서 상태 조회", description = "모든 도서 상태를 조회합니다.")
+	@Operation(summary = "도서 상태 단일 조회", description = "특정 ID에 해당하는 도서 상태 정보를 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "도서 상태 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "도서 상태를 찾을 수 없음")
+	})
+	@GetMapping("/{id}")
+	public ResponseEntity<BookStateResponse> getBookState(@PathVariable Integer id) {
+		BookStateResponse bookStateResponse = bookStateService.getBookState(id);
+		return ResponseEntity.ok(bookStateResponse);
+	}
+
+	@Operation(summary = "도서 상태 목록 조회", description = "모든 도서 상태를 조회합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "도서 상태 조회 성공"),
 	})
