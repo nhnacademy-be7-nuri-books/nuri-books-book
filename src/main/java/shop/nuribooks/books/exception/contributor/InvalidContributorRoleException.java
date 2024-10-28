@@ -6,7 +6,4 @@ public class InvalidContributorRoleException extends IllegalArgumentException {
 		super(message);
 	}
 
-	public InvalidContributorRoleException(String message, Throwable cause) {
-		super(message, cause);
-	}
 }

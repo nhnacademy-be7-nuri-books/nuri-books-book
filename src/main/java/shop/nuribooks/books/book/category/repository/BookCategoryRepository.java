@@ -12,4 +12,5 @@ public interface BookCategoryRepository extends JpaRepository<BookCategory, Long
 	boolean existsByBookAndCategory(Book book, Category category);
 
 	Optional<BookCategory> findByBookAndCategory(Book book, Category category);
+
 }
