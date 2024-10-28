@@ -81,7 +81,7 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public Page<BookResponse> getBooks(Pageable pageable) {
 		Page<Book> bookPage = bookRepository.findAll(pageable);
-		if(bookPage.isEmpty() && pageable.getPageNumber() > 0) {
+		if(bookPage.isEmpty() && pageable.getPageNumber() > 0 && pageable.getPageNumber() >= bookPage.getTotalPages()) {
 			throw new InvalidPageRequestException();
 		}
 		return bookPage.map(BookResponse::of);
