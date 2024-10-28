@@ -71,6 +71,7 @@ public class BookServiceImpl implements BookService {
 		return BookRegisterResponse.of(book);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public BookResponse getBookById(Long bookId) {
 		Book book = bookRepository.findById(bookId)
@@ -78,6 +79,7 @@ public class BookServiceImpl implements BookService {
 		return BookResponse.of(book);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public Page<BookResponse> getBooks(Pageable pageable) {
 		Page<Book> bookPage = bookRepository.findAll(pageable);
