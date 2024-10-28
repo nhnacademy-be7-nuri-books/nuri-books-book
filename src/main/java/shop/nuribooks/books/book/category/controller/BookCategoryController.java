@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
 
 @RequiredArgsConstructor
-@RequestMapping("api/book-category")
+@RequestMapping("/api/book-category")
 @RestController
 public class BookCategoryController {
 
