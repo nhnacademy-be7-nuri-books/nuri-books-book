@@ -1,4 +1,4 @@
-name: dev-build-phase
+name: deploy-actions
 on:
   push:
     branches:
