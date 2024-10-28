@@ -46,7 +46,7 @@ class AuthorityControllerTest {
         mockMvc.perform(post("/api/member/authority")
                         .content(objectMapper.writeValueAsString(authorityRegisterRequest))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
 

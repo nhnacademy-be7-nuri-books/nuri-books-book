@@ -3,6 +3,7 @@ package shop.nuribooks.books.member.authority.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,7 +26,7 @@ public class AuthorityController {
     @PostMapping("/api/member/authority")
     public ResponseEntity<AuthorityResponse> authorityRegister(@RequestBody @Valid AuthorityRegisterRequest request) {
         AuthorityResponse authorityResponse = authorityService.registerAuthority(request);
-        return ResponseEntity.ok(authorityResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(authorityResponse);
     }
 
     @GetMapping("/api/member/authority")
