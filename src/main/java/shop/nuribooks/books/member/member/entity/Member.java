@@ -2,6 +2,7 @@ package shop.nuribooks.books.member.member.entity;
 
 import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.FetchType.*;
+import static java.time.temporal.ChronoUnit.*;
 import static shop.nuribooks.books.member.member.entity.StatusEnum.*;
 
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
@@ -22,7 +24,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
+import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.grade.entity.Grade;
 
 @Entity
 @Getter
@@ -39,7 +42,7 @@ public class Member {
 	 */
 	@OneToOne(fetch = LAZY)
 	@MapsId
-	@JoinColumn(name = "id")
+	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
 	/**
@@ -53,8 +56,9 @@ public class Member {
 	 * STANDARD, GOLD, PLATINUM, ROYAL
 	 */
 	@NotNull
-	@Enumerated(STRING)
-	private GradeEnum grade;
+	@ManyToOne(fetch = LAZY)
+	@JoinColumn(name = "grade_id")
+	private Grade grade;
 
 	/**
 	 * ACTIVE, INACTIVE, WITHDRAWN
@@ -84,28 +88,25 @@ public class Member {
 	/**
 	 * 마지막 로그인 일시
 	 */
-	private LocalDateTime latestLoginAt;
+	private LocalDateTime latestLoginAt = null;
 
 	/**
 	 * 탈퇴 일시
 	 */
-	private LocalDateTime withdrawnAt;
+	private LocalDateTime withdrawnAt = null;
 
-	public Member(Customer customer, AuthorityEnum authority, GradeEnum grade, StatusEnum status, String userId,
-		LocalDate birthday, LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
-		this.customer = customer;
-		this.authority = authority;
-		this.grade = grade;
-		this.status = status;
-		this.userId = userId;
-		this.birthday = birthday;
-		this.createdAt = createdAt;
-		this.point = point;
-		this.totalPaymentAmount = totalPaymentAmount;
+	/**
+	 * 회원 탈퇴 시 상태를 탈퇴됨으로, 탈퇴 일시를 현재 시간으로 초기화
+	 */
+	public void changeToWithdrawn() {
+		this.status = WITHDRAWN;
+		this.withdrawnAt = LocalDateTime.now();
 	}
 
-	public void changeToWithdrawn() {
-		this.status = INACTIVE;
-		this.withdrawnAt = LocalDateTime.now();
+	/**
+	 * 탈퇴 일시가 1년이 지났는지 확인
+	 */
+	public boolean isWithdrawnForOverOneYear() {
+		return withdrawnAt != null && YEARS.between(withdrawnAt, LocalDateTime.now()) >= 1;
 	}
 }
