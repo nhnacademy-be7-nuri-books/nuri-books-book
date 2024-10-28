@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import shop.nuribooks.books.member.authority.dto.requset.AuthorityEditRequest;
 import shop.nuribooks.books.member.authority.dto.requset.AuthorityRegisterRequest;
 import shop.nuribooks.books.member.authority.entity.AuthorityType;
@@ -60,7 +61,7 @@ class AuthorityControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(result -> {
                     Throwable thrown = result.getResolvedException();
-                    assertThat(thrown).isInstanceOf(HttpMessageNotReadableException.class); // 예외 타입 확인
+                    assertThat(thrown).isInstanceOf(MethodArgumentNotValidException.class); // 예외 타입 확인
                 });
 
     }
