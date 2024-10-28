@@ -45,7 +45,7 @@ class MemberStateControllerTest {
         mockMvc.perform(post("/api/member/state")
                         .content(objectMapper.writeValueAsString(memberStateRegisterRequest))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         // then
     }
 
@@ -84,7 +84,7 @@ class MemberStateControllerTest {
 
         // when
         mockMvc.perform(delete("/api/member/state/{memberStateId}", 1L))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
         // then
     }
 
