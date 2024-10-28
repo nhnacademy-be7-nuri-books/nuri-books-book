@@ -133,11 +133,6 @@ public class BooksServiceImplTest {
 	}
 
 	@Test
-	public void registerBook_ShouldThrowBadRequestException_WhenRequestIsNull() {
-		assertThrows(BadRequestException.class, () -> bookService.registerBook(null));
-	}
-
-	@Test
 	public void registerBook_ShouldThrowBookStateIdNotFoundException_WhenBookStateNotFound() {
 		when(bookStateRepository.findById(1)).thenReturn(Optional.empty());
 		assertThrows(BookStatesIdNotFoundException.class, () -> bookService.registerBook(reqDto));

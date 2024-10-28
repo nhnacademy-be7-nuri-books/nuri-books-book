@@ -34,10 +34,6 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public BookRegisterResponse registerBook(BookRegisterRequest reqDto) {
-		if (reqDto == null) {
-			throw new BadRequestException("요청 본문이 비어있습니다.");
-		}
-
 		if (bookRepository.existsByIsbn(reqDto.isbn())) {
 			throw new ResourceAlreadyExistIsbnException(reqDto.isbn());
 		}
