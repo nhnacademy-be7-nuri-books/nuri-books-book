@@ -9,10 +9,6 @@ import static shop.nuribooks.books.member.member.entity.GradeEnum.STANDARD;
 import static shop.nuribooks.books.member.member.entity.StatusEnum.ACTIVE;
 import static shop.nuribooks.books.member.member.entity.StatusEnum.INACTIVE;
 
-import static shop.nuribooks.books.member.member.entity.AuthorityEnum.*;
-import static shop.nuribooks.books.member.member.entity.GradeEnum.*;
-import static shop.nuribooks.books.member.member.entity.StatusEnum.*;
-
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

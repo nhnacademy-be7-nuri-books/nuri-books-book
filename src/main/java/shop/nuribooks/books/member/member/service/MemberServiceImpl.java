@@ -5,9 +5,6 @@ import static shop.nuribooks.books.member.authority.entity.AuthorityType.MEMBER;
 import static shop.nuribooks.books.member.member.entity.GradeEnum.STANDARD;
 import static shop.nuribooks.books.member.member.entity.StatusEnum.ACTIVE;
 
-import static shop.nuribooks.books.member.member.entity.AuthorityEnum.MEMBER;
-import static shop.nuribooks.books.member.member.entity.GradeEnum.STANDARD;
-import static shop.nuribooks.books.member.member.entity.StatusEnum.ACTIVE;
 
 import java.time.LocalDateTime;
 
