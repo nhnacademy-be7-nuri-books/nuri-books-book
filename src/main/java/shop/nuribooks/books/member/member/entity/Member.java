@@ -93,7 +93,7 @@ public class Member {
 	private LocalDateTime withdrawnAt;
 
 	public Member(Customer customer, AuthorityType authority, GradeEnum grade, StatusEnum status, String userId,
-                  LocalDate birthday, LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
+				  LocalDate birthday, LocalDateTime createdAt, BigDecimal point, BigDecimal totalPaymentAmount) {
 		this.customer = customer;
 		this.authority = authority;
 		this.grade = grade;

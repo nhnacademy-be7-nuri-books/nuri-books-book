@@ -1,4 +1,4 @@
-package shop.nuribooks.books.member.authority.controller;
+package shop.nuribooks.books.member.state.controller;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
@@ -18,13 +18,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import shop.nuribooks.books.member.authority.dto.requset.AuthorityEditRequest;
-import shop.nuribooks.books.member.authority.dto.requset.AuthorityRegisterRequest;
-import shop.nuribooks.books.member.authority.entity.AuthorityType;
-import shop.nuribooks.books.member.authority.service.AuthorityService;
+import shop.nuribooks.books.member.state.dto.request.MemberStateEditRequest;
+import shop.nuribooks.books.member.state.dto.request.MemberStateRegisterRequest;
+import shop.nuribooks.books.member.state.entity.MemberStateType;
+import shop.nuribooks.books.member.state.service.MemberStateService;
 
-@WebMvcTest(AuthorityController.class)
-class AuthorityControllerTest {
+@WebMvcTest(MemberStateController.class)
+class MemberStateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -33,68 +33,72 @@ class AuthorityControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private AuthorityService authorityService;
+    private MemberStateService memberStateService;
 
-    @DisplayName("권한을 등록한다.")
+    @DisplayName("회원 상태를 등록한다.")
     @Test
-    void authorityRegister() throws Exception {
+    void memberStateRegister() throws Exception {
         // given
-        AuthorityRegisterRequest authorityRegisterRequest = new AuthorityRegisterRequest(AuthorityType.MEMBER);
+        MemberStateRegisterRequest memberStateRegisterRequest = new MemberStateRegisterRequest(MemberStateType.ACTIVE);
 
-        // when // then
-        mockMvc.perform(post("/api/member/authority")
-                        .content(objectMapper.writeValueAsString(authorityRegisterRequest))
+        // when
+        mockMvc.perform(post("/api/member/state")
+                        .content(objectMapper.writeValueAsString(memberStateRegisterRequest))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+        // then
     }
-
 
     @DisplayName("enum 역직렬화에 실패할 경우 예외가 던져진다.")
     @Test
-    void authorityRegisterFailDeserialize() throws Exception {
+    void memberStateRegisterFailDeserialize() throws Exception {
         // given
 
-        // when // then
-        mockMvc.perform(post("/api/member/authority")
-                        .content("{\"authorityType\":\"MaaaaEMBER\"}")
+        // when
+        mockMvc.perform(post("/api/member/state")
+                        .content("{\"memberStateType\":\"aactive\"}")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(result -> {
                     Throwable thrown = result.getResolvedException();
                     assertThat(thrown).isInstanceOf(MethodArgumentNotValidException.class);
                 });
 
+        // then
     }
 
-    @DisplayName("권한들을 가져온다")
+    @DisplayName("회원 상태를 가져온다")
     @Test
-    void authorityList() throws Exception {
+    void memberStateList() throws Exception {
         // given
-        when(authorityService.findAll()).thenReturn(List.of());
-
-        // when // then
-        mockMvc.perform(get("/api/member/authority"))
+        when(memberStateService.findAll()).thenReturn(List.of());
+        // when
+        mockMvc.perform(get("/api/member/state"))
                 .andExpect(status().isOk());
+        // then
     }
 
-    @DisplayName("권한을 삭제한다.")
+    @DisplayName("회원 상태를 삭제한다.")
     @Test
-    void authorityRemove() throws Exception {
+    void memberStateRemove() throws Exception {
         // given
-        // when // then
-        mockMvc.perform(delete("/api/member/authority/{authorityId}", 1L))
+
+        // when
+        mockMvc.perform(delete("/api/member/state/{memberStateId}", 1L))
                 .andExpect(status().isOk());
+        // then
     }
 
-    @DisplayName("권한을 수정한다.")
+    @DisplayName("회원 상태를 수정한다.")
     @Test
-    void authorityModify() throws Exception {
+    void memberStateModify() throws Exception {
         // given
-        AuthorityEditRequest authorityEditRequest = new AuthorityEditRequest(AuthorityType.MEMBER);
+        MemberStateEditRequest memberStateEditRequest = new MemberStateEditRequest(MemberStateType.ACTIVE);
 
         // when // then
-        mockMvc.perform(put("/api/member/authority/{authorityId}", 1L)
-                        .content(objectMapper.writeValueAsString(authorityEditRequest))
+        mockMvc.perform(put("/api/member/state/{memberStateId}", 1L)
+                        .content(objectMapper.writeValueAsString(memberStateEditRequest))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
 }
