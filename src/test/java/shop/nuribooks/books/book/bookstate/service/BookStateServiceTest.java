@@ -12,12 +12,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.bookstate.dto.BookStateRequest;
 import shop.nuribooks.books.book.bookstate.dto.BookStateResponse;
 
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
+import shop.nuribooks.books.exception.DefaultStateDeletionException;
 import shop.nuribooks.books.exception.bookstate.BookStateDetailAlreadyExistException;
 import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -149,14 +151,31 @@ public class BookStateServiceTest {
 		BookState defaultState = BookState.builder()
 			.detail("기본 상태")
 			.build();
+		ReflectionTestUtils.setField(defaultState, "id", DEFAULT_STATE_ID);
+
+		BookState bookStateToDelete = BookState.builder()
+			.detail("삭제할 상태")
+			.build();
+		ReflectionTestUtils.setField(bookStateToDelete, "id", 2);
+
+		Book book1 = mock(Book.class);
+		Book book2 = mock(Book.class);
+
 		when(bookStateRepository.findById(DEFAULT_STATE_ID)).thenReturn(Optional.of(defaultState));
-		when(bookStateRepository.findById(1)).thenReturn(Optional.of(bookState));
-		when(bookRepository.findByStateId(bookState)).thenReturn(List.of(book));
+		when(bookStateRepository.findById(2)).thenReturn(Optional.of(bookStateToDelete));
+		when(bookRepository.findByStateId(bookStateToDelete)).thenReturn(List.of(book1, book2));
 
-		bookStateService.deleteState(1);
+		doNothing().when(book1).updateStateId(defaultState);
+		doNothing().when(book2).updateStateId(defaultState);
 
-		verify(bookRepository, times(1)).saveAll(anyList());
-		verify(bookStateRepository, times(1)).deleteById(1);
+		bookStateService.deleteState(2);
+
+		verify(book1, times(1)).updateStateId(defaultState);
+		verify(book2, times(1)).updateStateId(defaultState);
+
+		verify(bookRepository, times(1)).saveAll(List.of(book1, book2));
+
+		verify(bookStateRepository, times(1)).deleteById(2);
 	}
 
 	@Test
@@ -181,20 +200,36 @@ public class BookStateServiceTest {
 		BookState defaultState = BookState.builder()
 			.detail("기본 상태")
 			.build();
-		when(bookStateRepository.findById(DEFAULT_STATE_ID)).thenReturn(Optional.of(defaultState));
-		when(bookStateRepository.findById(1)).thenReturn(Optional.of(bookState));
-		when(bookRepository.findByStateId(bookState)).thenReturn(List.of());
+		ReflectionTestUtils.setField(defaultState, "id", DEFAULT_STATE_ID);
 
-		bookStateService.deleteState(1);
+		BookState bookStateToDelete = BookState.builder()
+			.detail("삭제할 상태")
+			.build();
+		ReflectionTestUtils.setField(bookStateToDelete, "id", 2);
+
+		when(bookStateRepository.findById(DEFAULT_STATE_ID)).thenReturn(Optional.of(defaultState));
+		when(bookStateRepository.findById(2)).thenReturn(Optional.of(bookStateToDelete));
+
+		when(bookRepository.findByStateId(bookStateToDelete)).thenReturn(List.of());
+
+		bookStateService.deleteState(2);
 
 		verify(bookRepository, never()).saveAll(anyList());
-		verify(bookStateRepository, times(1)).deleteById(1);
+
+		verify(bookStateRepository, times(1)).deleteById(2);
 	}
 
 	@Test
 	public void deleteState_ShouldThrowException_WhenDeletingDefaultState() {
-		assertThrows(IllegalStateException.class, () -> bookStateService.deleteState(DEFAULT_STATE_ID));
+		BookState defaultState = BookState.builder()
+			.detail("기본 상태")
+			.build();
+		ReflectionTestUtils.setField(defaultState, "id", DEFAULT_STATE_ID);
+
+		when(bookStateRepository.findById(DEFAULT_STATE_ID)).thenReturn(Optional.of(defaultState));
+
+		assertThrows(DefaultStateDeletionException.class, () -> bookStateService.deleteState(DEFAULT_STATE_ID));
+
 		verify(bookStateRepository, never()).deleteById(DEFAULT_STATE_ID);
 	}
-
 }

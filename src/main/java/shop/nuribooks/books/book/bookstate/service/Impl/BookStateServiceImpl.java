@@ -11,6 +11,7 @@ import shop.nuribooks.books.book.bookstate.dto.BookStateRequest;
 import shop.nuribooks.books.book.bookstate.dto.BookStateResponse;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
+import shop.nuribooks.books.exception.DefaultStateDeletionException;
 import shop.nuribooks.books.exception.bookstate.BookStateDetailAlreadyExistException;
 import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -70,10 +71,14 @@ public class BookStateServiceImpl implements BookStateService {
 	@Transactional
 	@Override
 	public void deleteState(Integer id) {
-		BookState defaultState = bookStateRepository.findById(DEFAULT_STATE_ID)
+		BookState bookState = bookStateRepository.findById(id)
 			.orElseThrow(BookStateIdNotFoundException::new);
 
-		BookState bookState = bookStateRepository.findById(id)
+		if(id.equals(DEFAULT_STATE_ID)) {
+			throw new DefaultStateDeletionException();
+		}
+
+		BookState defaultState = bookStateRepository.findById(DEFAULT_STATE_ID)
 			.orElseThrow(BookStateIdNotFoundException::new);
 
 		List<Book> books = bookRepository.findByStateId(bookState);

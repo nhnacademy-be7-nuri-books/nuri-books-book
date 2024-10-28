@@ -217,18 +217,21 @@ public class BooksServiceImplTest {
 	}
 
 	@Test
-	public void getBookById_ShouldReturnBookResponse_WhenBookExists() {
+	public void getBookById_ShouldReturnBookResponseAndIncrementViewCount_WhenBookExists() {
 		Long bookId = 1L;
 		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
 
 		BookResponse result = bookService.getBookById(bookId);
 
+		// 조회수 증가 확인
 		assertNotNull(result);
 		assertEquals(bookId, result.id());
 		assertEquals("Original Book Title", result.title());
-		verify(bookRepository, times(1)).findById(bookId);
-	}
+		assertEquals(1L, book.getViewCount());
 
+		// bookRepository.save(book) 호출 확인
+		verify(bookRepository, times(1)).save(book);
+	}
 
 	@Test
 	public void getBookById_ShouldThrowBookIdNotFoundException_WhenBookDoesNotExist() {
@@ -236,7 +239,7 @@ public class BooksServiceImplTest {
 		when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
 		assertThrows(BookIdNotFoundException.class, () -> bookService.getBookById(bookId));
-		verify(bookRepository, times(1)).findById(bookId);
+		verify(bookRepository, never()).save(any());
 	}
 
 	@Test

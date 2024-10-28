@@ -139,4 +139,19 @@ public class BookTest {
 		assertThat(book.getStateId().getDetail()).isEqualTo("매진");
 	}
 
+	@Test
+	public void testIncrementViewCount() {
+		Book book = Book.builder()
+			.stateId(BookState.builder().detail("In Stock").build())
+			.publisherId(new Publisher("Publisher"))
+			.title("Title")
+			.viewCount(0L)
+			.build();
+
+		book.incrementViewCount();
+		assertThat(book.getViewCount()).isEqualTo(1L);
+
+		book.incrementViewCount();
+		assertThat(book.getViewCount()).isEqualTo(2L);
+	}
 }
