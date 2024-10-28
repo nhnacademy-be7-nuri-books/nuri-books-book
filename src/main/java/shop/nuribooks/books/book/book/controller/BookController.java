@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.book.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,6 +42,16 @@ public class BookController {
 	public ResponseEntity<BookRegisterResponse> registerBooks(@Valid @RequestBody BookRegisterRequest reqDto) {
 		BookRegisterResponse resDto = bookService.registerBook(reqDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
+	}
+
+	@Operation(summary = "도서 목록 조회", description = "페이지네이션을 통해 도서 목록을 조회하는 엔드포인트입니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "도서 목록 조회 성공")
+	})
+	@GetMapping
+	public ResponseEntity<Page<BookResponse>> getBooks(Pageable pageable) {
+		Page<BookResponse> bookResponses = bookService.getBooks(pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(bookResponses);
 	}
 
 	@Operation(summary = "도서 상세 조회", description = "도서 ID를 통해 도서의 상세 정보를 조회하는 엔드포인트입니다.")
