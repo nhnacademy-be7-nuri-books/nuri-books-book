@@ -7,20 +7,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
+import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
+import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.bookstate.entitiy.BookState;
+import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.exception.BadRequestException;
+import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
 import shop.nuribooks.books.book.book.service.BookService;
 
@@ -141,6 +152,103 @@ public class BookControllerTest {
 				.content(objectMapper.writeValueAsString(reqDto)))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.message").value("해당 id를 찾지 못했습니다."));
+	}
+
+	@Test
+	public void getBooks_ShouldReturnPageOfBooks_WhenRequestIsValid() throws Exception {
+		BookState bookState = BookState.builder().detail("InStock").build();
+		Publisher publisher = new Publisher(1L, "Publisher Name");
+		Pageable pageable = PageRequest.of(0, 10);
+
+		Book book = Book.builder()
+			.stateId(bookState)
+			.publisherId(publisher)
+			.title("책 제목")
+			.thumbnailImageUrl("thumbnail.jpg")
+			.detailImageUrl("detail.jpg")
+			.publicationDate(LocalDate.now())
+			.price(BigDecimal.valueOf(10000))
+			.discountRate(0)
+			.description("책 설명")
+			.contents("책 내용")
+			.isbn("1234567890123")
+			.isPackageable(true)
+			.stock(10)
+			.likeCount(10)
+			.viewCount(50L)
+			.build();
+
+		BookResponse bookResponse = BookResponse.of(book);
+		Page<BookResponse> bookPage = new PageImpl<>(List.of(bookResponse), pageable, 1);
+		when(bookService.getBooks(pageable)).thenReturn(bookPage);
+
+		mockMvc.perform(get("/api/books")
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("page", "0")
+				.param("size", "10"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.content[0].id").value(book.getId()))
+			.andExpect(jsonPath("$.content[0].title").value("책 제목"));
+	}
+
+	@Test
+	public void getBooks_ShouldReturnBadRequest_WhenPageIsOutOfRange() throws Exception {
+		Pageable pageable = PageRequest.of(10, 10);
+		when(bookService.getBooks(pageable)).thenThrow(new InvalidPageRequestException());
+
+		mockMvc.perform(get("/api/books")
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("page", "10")
+				.param("size", "10"))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("페이지 범위를 초과했습니다."));
+	}
+
+	@Test
+	public void getBookById_ShouldReturnBook_WhenBookExists() throws Exception {
+		Long bookId = 1L;
+		BookState bookState = BookState.builder().detail("InStock").build();
+		Publisher publisher = new Publisher(1L, "Publisher Name");
+
+		Book book = Book.builder()
+			.stateId(bookState)
+			.publisherId(publisher)
+			.title("책 제목")
+			.thumbnailImageUrl("thumbnail.jpg")
+			.detailImageUrl("detail.jpg")
+			.publicationDate(LocalDate.now())
+			.price(BigDecimal.valueOf(10000))
+			.discountRate(0)
+			.description("책 설명")
+			.contents("책 내용")
+			.isbn("1234567890123")
+			.isPackageable(true)
+			.stock(10)
+			.likeCount(10)
+			.viewCount(50L)
+			.build();
+
+		ReflectionTestUtils.setField(book, "id", bookId);
+
+		BookResponse bookResponse = BookResponse.of(book);
+		when(bookService.getBookById(bookId)).thenReturn(bookResponse);
+
+		mockMvc.perform(get("/api/books/{bookId}", bookId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id").value(bookId))
+			.andExpect(jsonPath("$.title").value("책 제목"));
+	}
+
+	@Test
+	public void getBookById_ShouldReturnNotFound_WhenBookDoesNotExist() throws Exception {
+		Long bookId = 9999L;
+		when(bookService.getBookById(bookId)).thenThrow(new ResourceNotFoundException("도서를 찾을 수 없습니다."));
+
+		mockMvc.perform(get("/api/books/{bookId}", bookId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.message").value("도서를 찾을 수 없습니다."));
 	}
 
 	@Test
