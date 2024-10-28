@@ -27,6 +27,7 @@ public class BookStateServiceImpl implements BookStateService {
 
 	public static final Integer DEFAULT_STATE_ID = 1;
 
+	@Transactional
 	@Override
 	public void registerState(BookStateRequest bookStateRequest) {
 		if(bookStateRepository.existsBookStatesByDetail(bookStateRequest.detail())){

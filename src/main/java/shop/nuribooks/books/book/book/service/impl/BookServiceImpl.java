@@ -13,7 +13,6 @@ import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
-import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.BookStatesIdNotFoundException;
@@ -32,6 +31,7 @@ public class BookServiceImpl implements BookService {
 	private final BookStateRepository bookStateRepository;
 	private final PublisherRepository publisherRepository;
 
+	@Transactional
 	@Override
 	public BookRegisterResponse registerBook(BookRegisterRequest reqDto) {
 		if (bookRepository.existsByIsbn(reqDto.isbn())) {
