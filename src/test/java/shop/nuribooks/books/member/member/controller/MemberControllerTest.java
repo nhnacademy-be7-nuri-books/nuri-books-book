@@ -1,17 +1,18 @@
 package shop.nuribooks.books.member.member.controller;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDate;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -48,37 +49,57 @@ class MemberControllerTest {
 	@Test
 	void memberRegister() throws Exception {
 		//given
-		MemberRegisterRequest request = memberRegisterRequest();
-		MemberRegisterResponse response = memberRegisterResponse();
+		MemberRegisterRequest request = getMemberRegisterRequest();
+		MemberRegisterResponse response = getMemberRegisterResponse();
 
 		when(memberService.registerMember(any(MemberRegisterRequest.class))).thenReturn(response);
 
 		//when
 		ResultActions result = mockMvc.perform(post("/api/member")
-				.contentType(MediaType.APPLICATION_JSON)
+				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)));
 
 		//then
 		result.andExpect(status().isCreated())
-			.andExpect(jsonPath("name").value(response.getName()))
-			.andExpect(jsonPath("userId").value(response.getUserId()))
-			.andExpect(jsonPath("phoneNumber").value(response.getPhoneNumber()))
-			.andExpect(jsonPath("email").value(response.getEmail()))
-			.andExpect(jsonPath("birthday").value(response.getBirthday().toString()));
+			.andExpect(jsonPath("name").value(response.name()))
+			.andExpect(jsonPath("userId").value(response.userId()))
+			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
+			.andExpect(jsonPath("email").value(response.email()))
+			.andExpect(jsonPath("birthday").value(response.birthday().toString()));
 	}
 
-	// @DisplayName("회원 등록 실패 - 유효하지 않은 요청 데이터")
-	// @Test
-	// void memberRegister_InvalidRequestData() {
-	// 	//given
-	// 	MemberRegisterRequest badRequest = badMemberRegisterRequest();
-	// }
+	@DisplayName("회원 등록 실패 - validation 에러")
+	@Test
+	void memberRegister_InvalidRequest() throws Exception {
+		//given
+		MemberRegisterRequest badRequest = getBadMemberRegisterRequest();
 
-	@DisplayName("아이디로 회원 이름, 비밀번호, 권한 조회")
+		//when
+		ResultActions badResult = mockMvc.perform(post("/api/member")
+			.contentType(APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(badRequest)));
+
+		//then
+		badResult.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message")
+				.value(Matchers.containsString("이름은 반드시 입력해야 합니다.")))
+			.andExpect(jsonPath("$.message")
+				.value(Matchers.containsString("아이디는 반드시 8자 이상 20자 이하로 입력해야 합니다.")))
+			.andExpect(jsonPath("$.message")
+				.value(Matchers.containsString("비밀번호는 반드시 입력해야 합니다.")))
+			.andExpect(jsonPath("$.message")
+				.value(Matchers.containsString("전화번호는 반드시 입력해야 합니다.")))
+			.andExpect(jsonPath("$.message")
+				.value(Matchers.containsString("유효한 이메일 형식으로 입력해야 합니다.")))
+			.andExpect(jsonPath("$.message")
+				.value(Matchers.containsString("생일은 반드시 입력해야 합니다.")));
+	}
+
+	@DisplayName("아이디로 회원 이름, 비밀번호, 권한 조회 성공")
 	@Test
 	void memberCheck() throws Exception {
 		//given
-		MemberCheckResponse response = memberCheckResponse();
+		MemberCheckResponse response = getMemberCheckResponse();
 		String requestUserId = "nuribooks";
 
 		when(memberService.checkMember(requestUserId)).thenReturn(response);
@@ -88,21 +109,21 @@ class MemberControllerTest {
 
 		//then
 		result.andExpect(status().isOk())
-			.andExpect(jsonPath("name").value(response.getName()))
-			.andExpect(jsonPath("password").value(response.getPassword()))
-			.andExpect(jsonPath("authority").value(response.getAuthority()));
+			.andExpect(jsonPath("name").value(response.name()))
+			.andExpect(jsonPath("password").value(response.password()))
+			.andExpect(jsonPath("authority").value(response.authority()));
 	}
 
-	@DisplayName("아이디와 비밀번호로 회원 탈퇴")
+	@DisplayName("아이디와 비밀번호로 회원 탈퇴 성공")
 	@Test
 	void memberWithdraw() throws Exception {
 		//given
-		MemberWithdrawRequest request = memberWithdrawRequest();
+		MemberWithdrawRequest request = getMemberWithdrawRequest();
 		doNothing().when(memberService).withdrawMember(any(MemberWithdrawRequest.class));
 
 		//when
-		ResultActions result = mockMvc.perform(patch("/api/member/status")
-			.contentType(MediaType.APPLICATION_JSON)
+		ResultActions result = mockMvc.perform(delete("/api/member")
+			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
 		//then
@@ -112,12 +133,12 @@ class MemberControllerTest {
 				.value("탈퇴가 성공적으로 완료되었습니다. 귀하의 앞날에 무궁한 발전이 있기를 진심으로 기원하겠습니다."));
 	}
 
-	@DisplayName("회원 정보 수정")
+	@DisplayName("회원 정보 수정 성공")
 	@Test
 	void memberUpdate() throws Exception {
 		//given
-		MemberUpdateRequest request = memberUpdateRequest();
-		MemberUpdateResponse response = memberUpdateResponse();
+		MemberUpdateRequest request = getMemberUpdateRequest();
+		MemberUpdateResponse response = getMemberUpdateResponse();
 		String requestUserId = "nuribooks";
 
 		// 단일 원시 값에 대해서만 Mockito는 매처 없이도 작동하지만 여러 인자에 대해서는 모든 인자를 매처로 제공해야 함
@@ -125,16 +146,42 @@ class MemberControllerTest {
 
 		//when
 		ResultActions result = mockMvc.perform(post("/api/member/{userId}", requestUserId)
-			.contentType(MediaType.APPLICATION_JSON)
+			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
 		//then
 		result.andExpect(status().isOk())
-			.andExpect(jsonPath("name").value(response.getName()))
-			.andExpect(jsonPath("phoneNumber").value(response.getPhoneNumber()));
+			.andExpect(jsonPath("name").value(response.name()))
+			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()));
 	}
 
-	private MemberRegisterRequest memberRegisterRequest() {
+	@DisplayName("회원 정보 수정 실패 - validation 에러")
+	@Test
+	void memberUpdate_invalidRequest() throws Exception {
+	    //given
+		MemberUpdateRequest badRequest = getBadMemberUpdateRequest();
+		String requiredUserId = "nuribooks";
+
+		//when
+		ResultActions badResult = mockMvc.perform(post("/api/member/{userId}", requiredUserId)
+			.contentType(APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(badRequest)));
+
+		//then
+		badResult.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message")
+				.value(Matchers.containsString("이름은 반드시 입력해야 합니다.")))
+			.andExpect(jsonPath("$.message")
+				.value(Matchers.containsString("비밀번호는 반드시 입력해야 합니다.")))
+			.andExpect(jsonPath("$.message")
+				.value(Matchers.containsString("전화번호는 반드시 입력해야 합니다.")));
+	}
+
+
+	/**
+	 * 테스트를 위한 MemberRegisterRequest 생성
+	 */
+	private MemberRegisterRequest getMemberRegisterRequest() {
 		return MemberRegisterRequest.builder()
 			.name("boho")
 			.userId("nuribooks")
@@ -145,7 +192,10 @@ class MemberControllerTest {
 			.build();
 	}
 
-	private MemberRegisterResponse memberRegisterResponse() {
+	/**
+	 * 테스트를 위한 MemberRegisterResponse 생성
+	 */
+	private MemberRegisterResponse getMemberRegisterResponse() {
 		return MemberRegisterResponse.builder()
 			.name("boho")
 			.userId("nuribooks")
@@ -155,9 +205,12 @@ class MemberControllerTest {
 			.build();
 	}
 
-	private MemberRegisterRequest badMemberRegisterRequest() {
+	/**
+	 * 테스트를 위한 잘못된 MemberRegisterRequest 생성
+	 */
+	private MemberRegisterRequest getBadMemberRegisterRequest() {
 		return MemberRegisterRequest.builder()
-			.name("")
+			.name("  ")
 			.userId("a")
 			.password(null)
 			.phoneNumber("")
@@ -166,7 +219,10 @@ class MemberControllerTest {
 			.build();
 	}
 
-	private MemberCheckResponse memberCheckResponse() {
+	/**
+	 * 테스트를 위한 MemberCheckResponse 생성
+	 */
+	private MemberCheckResponse getMemberCheckResponse() {
 		return MemberCheckResponse.builder()
 			.name("boho")
 			.password("abc123")
@@ -174,14 +230,20 @@ class MemberControllerTest {
 			.build();
 	}
 
-	private MemberWithdrawRequest memberWithdrawRequest() {
+	/**
+	 * 테스트를 위한 MemberWithdrawRequest 생성
+	 */
+	private MemberWithdrawRequest getMemberWithdrawRequest() {
 		return MemberWithdrawRequest.builder()
 			.userId("nuribooks")
 			.password("abc123")
 			.build();
 	}
 
-	private MemberUpdateRequest memberUpdateRequest() {
+	/**
+	 * 테스트를 위한 MemberUpdateRequest 생성
+	 */
+	private MemberUpdateRequest getMemberUpdateRequest() {
 		return MemberUpdateRequest.builder()
 			.name("수정하고 싶은 이름")
 			.password("수정하고 싶은 비밀번호")
@@ -189,10 +251,24 @@ class MemberControllerTest {
 			.build();
 	}
 
-	private MemberUpdateResponse memberUpdateResponse() {
+	/**
+	 * 테스트를 위한 MemberUpdateResponse 생성
+	 */
+	private MemberUpdateResponse getMemberUpdateResponse() {
 		return MemberUpdateResponse.builder()
 			.name("수정된 이름")
 			.phoneNumber("010-0000-0000")
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 잘못된 MemberUpdateRequest 생성
+	 */
+	private MemberUpdateRequest getBadMemberUpdateRequest() {
+		return MemberUpdateRequest.builder()
+			.name("   ")
+			.password("   ")
+			.phoneNumber(null)
 			.build();
 	}
 

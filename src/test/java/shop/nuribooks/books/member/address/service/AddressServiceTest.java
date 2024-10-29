@@ -3,8 +3,9 @@ package shop.nuribooks.books.member.address.service;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.*;
 import static shop.nuribooks.books.member.member.entity.AuthorityEnum.MEMBER;
-import static shop.nuribooks.books.member.member.entity.GradeEnum.STANDARD;
+import static shop.nuribooks.books.member.grade.entity.GradeEnum.STANDARD;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,12 +19,14 @@ import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
 import shop.nuribooks.books.member.address.dto.requset.AddressEditRequest;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 import shop.nuribooks.books.member.address.entity.Address;
-import shop.nuribooks.books.member.member.entity.Customer;
+import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.grade.entity.Grade;
+import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusEnum;
 import shop.nuribooks.books.exception.address.AddressNotFoundException;
 import shop.nuribooks.books.member.address.repository.AddressRepository;
-import shop.nuribooks.books.member.member.repository.CustomerRepository;
+import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @Transactional
@@ -42,6 +45,9 @@ class AddressServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private GradeRepository gradeRepository;
+
     @DisplayName("회원의 주소를 생성한다.")
     @Test
     void addAddress() {
@@ -49,7 +55,10 @@ class AddressServiceTest {
         Customer customer = createCustomer();
         customerRepository.save(customer);
 
-        Member member = createMember(customer);
+        Grade grade = creategrade();
+        gradeRepository.save(grade);
+
+        Member member = createMember(customer, grade);
         memberRepository.save(member);
 
         AddressRegisterRequest request = AddressRegisterRequest.builder()
@@ -73,7 +82,10 @@ class AddressServiceTest {
         Customer customer = createCustomer();
         customerRepository.save(customer);
 
-        Member member = createMember(customer);
+        Grade grade = creategrade();
+        gradeRepository.save(grade);
+
+        Member member = createMember(customer, grade);
         memberRepository.save(member);
 
         Address address = createAddress(member);
@@ -94,7 +106,10 @@ class AddressServiceTest {
         Customer customer = createCustomer();
         customerRepository.save(customer);
 
-        Member member = createMember(customer);
+        Grade grade = creategrade();
+        gradeRepository.save(grade);
+
+        Member member = createMember(customer, grade);
         memberRepository.save(member);
 
         Address address = createAddress(member);
@@ -115,7 +130,10 @@ class AddressServiceTest {
         Customer customer = createCustomer();
         customerRepository.save(customer);
 
-        Member member = createMember(customer);
+        Grade grade = creategrade();
+        gradeRepository.save(grade);
+
+        Member member = createMember(customer, grade);
         memberRepository.save(member);
 
         Address address = createAddress(member);
@@ -149,11 +167,11 @@ class AddressServiceTest {
                 .build();
     }
 
-    private Member createMember(Customer customer) {
+    private Member createMember(Customer customer, Grade grade) {
         return Member.builder()
                 .customer(customer)
                 .authority(MEMBER)
-                .grade(STANDARD)
+                .grade(grade)
                 .userId("nuriaaaaaa")
                 .status(StatusEnum.ACTIVE)
                 .birthday(LocalDate.of(1988, 8, 12))
@@ -172,6 +190,17 @@ class AddressServiceTest {
                 .phoneNumber("042-8282-8282")
                 .email("nhnacademy@nuriBooks.com")
                 .build();
+    }
+
+    /**
+     * 테스트를 위한 Grade 생성
+     */
+    private Grade creategrade() {
+        return Grade.builder()
+            .name("STANDARD")
+            .pointRate(3)
+            .requirement(BigDecimal.valueOf(100_000))
+            .build();
     }
 
 }

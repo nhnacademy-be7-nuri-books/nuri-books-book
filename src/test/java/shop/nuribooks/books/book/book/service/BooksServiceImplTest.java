@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,13 +14,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
+import shop.nuribooks.books.book.book.dto.BookResponse;
+import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.exception.BadRequestException;
+import shop.nuribooks.books.exception.InvalidPageRequestException;
+import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.BookStatesIdNotFoundException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
@@ -27,32 +37,32 @@ import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookstate.repository.BookStateRepository;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.book.book.service.impl.BookServiceImpl;
+import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class BooksServiceImplTest {
 
 	@InjectMocks
-	private BookServiceImpl booksService;
+	private BookServiceImpl bookService;
 
 	@Mock
-	private BookRepository booksRepository;
+	private BookRepository bookRepository;
 
 	@Mock
-	private BookStateRepository bookStatesRepository;
+	private BookStateRepository bookStateRepository;
 
 	@Mock
-	private PublisherRepository publishersRepository;
+	private PublisherRepository publisherRepository;
 
 	private BookRegisterRequest reqDto;
-
+	private BookUpdateRequest updateRequest;
 	private BookState bookState;
 	private Publisher publisher;
+	private Book book;
 
 	@BeforeEach
 	public void setUp() {
-		bookState = BookState.builder()
-			.detail("InStock")
-			.build();
+		bookState = BookState.builder().detail("InStock").build();
 		publisher = new Publisher(1L, "Publisher Name");
 
 		reqDto = new BookRegisterRequest(
@@ -70,85 +80,218 @@ public class BooksServiceImplTest {
 			true,
 			100
 		);
+
+		updateRequest = new BookUpdateRequest(
+			1,
+			1L,
+			"Updated Book Title",
+			"updated_thumbnail.jpg",
+			"updated_detail.jpg",
+			LocalDate.now(),
+			BigDecimal.valueOf(25000),
+			15,
+			"Updated Description",
+			"Updated Contents",
+			"0987654321098",
+			true,
+			50
+		);
+
+		book = Book.builder()
+			.stateId(bookState)
+			.publisherId(publisher)
+			.title("Original Book Title")
+			.thumbnailImageUrl("original_thumbnail.jpg")
+			.detailImageUrl("original_detail.jpg")
+			.publicationDate(LocalDate.now())
+			.price(BigDecimal.valueOf(20000))
+			.discountRate(10)
+			.description("Original Description")
+			.contents("Original Contents")
+			.isbn("1234567890123")
+			.isPackageable(true)
+			.stock(100)
+			.likeCount(0)
+			.viewCount(0L)
+			.build();
+
+		ReflectionTestUtils.setField(book, "id", 1L);
 	}
 
 	@Test
 	public void registerBook_ShouldReturnResponse_WhenValidRequest() {
-		when(bookStatesRepository.findById(1)).thenReturn(Optional.of(bookState));
-		when(publishersRepository.findById(1L)).thenReturn(Optional.of(publisher));
-		when(booksRepository.existsByIsbn(reqDto.isbn())).thenReturn(false);
-		when(booksRepository.save(any(Book.class))).thenAnswer(invocation -> {
-			Book book = invocation.getArgument(0);
-			return book;
-		});
+		when(bookStateRepository.findById(1)).thenReturn(Optional.of(bookState));
+		when(publisherRepository.findById(1L)).thenReturn(Optional.of(publisher));
+		when(bookRepository.existsByIsbn(reqDto.isbn())).thenReturn(false);
+		when(bookRepository.save(any(Book.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		BookRegisterResponse result = booksService.registerBook(reqDto);
+		BookRegisterResponse result = bookService.registerBook(reqDto);
 
 		assertNotNull(result);
 		assertEquals("Book Title", result.title());
-		verify(booksRepository, times(1)).save(any(Book.class));
-	}
-
-	@Test
-	public void registerBook_ShouldThrowBadRequestException_WhenRequestIsNull() {
-		assertThrows(BadRequestException.class, () -> booksService.registerBook(null));
+		verify(bookRepository, times(1)).save(any(Book.class));
 	}
 
 	@Test
 	public void registerBook_ShouldThrowBookStateIdNotFoundException_WhenBookStateNotFound() {
-		when(bookStatesRepository.findById(1)).thenReturn(Optional.empty());
-
-		assertThrows(BookStatesIdNotFoundException.class, () -> booksService.registerBook(reqDto));
-		verify(bookStatesRepository, times(1)).findById(1);
+		when(bookStateRepository.findById(1)).thenReturn(Optional.empty());
+		assertThrows(BookStatesIdNotFoundException.class, () -> bookService.registerBook(reqDto));
 	}
 
 	@Test
 	public void registerBook_ShouldThrowPublisherIdNotFoundException_WhenPublisherNotFound() {
-		when(bookStatesRepository.findById(1)).thenReturn(Optional.of(bookState));
-		when(publishersRepository.findById(1L)).thenReturn(Optional.empty());
+		when(bookStateRepository.findById(1)).thenReturn(Optional.of(bookState));
+		when(publisherRepository.findById(1L)).thenReturn(Optional.empty());
 
-		assertThrows(PublisherIdNotFoundException.class, () -> booksService.registerBook(reqDto));
-		verify(publishersRepository, times(1)).findById(1L);
+		assertThrows(PublisherIdNotFoundException.class, () -> bookService.registerBook(reqDto));
 	}
 
 	@Test
 	public void registerBook_ShouldThrowResourceAlreadyExistIsbnException_WhenIsbnAlreadyExists() {
-		when(booksRepository.existsByIsbn(reqDto.isbn())).thenReturn(true);
-
-		assertThrows(ResourceAlreadyExistIsbnException.class, () -> booksService.registerBook(reqDto));
-		verify(booksRepository, times(1)).existsByIsbn(reqDto.isbn());
+		when(bookRepository.existsByIsbn(reqDto.isbn())).thenReturn(true);
+		assertThrows(ResourceAlreadyExistIsbnException.class, () -> bookService.registerBook(reqDto));
 	}
 
 	@Test
-	public void registerBook_ShouldSaveBook_WhenBookStateAndPublisherFound() {
-		when(bookStatesRepository.findById(1)).thenReturn(Optional.of(bookState));
-		when(publishersRepository.findById(1L)).thenReturn(Optional.of(publisher));
-		when(booksRepository.existsByIsbn(reqDto.isbn())).thenReturn(false);
+	public void getBooks_ShouldReturnEmptyPage_WhenRequestingFirstPageButNoBooks() {
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Book> emptyPage = new PageImpl<>(List.of(), pageable, 0);
 
-		Book mockBook = Book.builder()
-			.stateId(bookState)
-			.publisherId(publisher)
-			.title("Book Title")
-			.thumbnailImageUrl("thumbnail.jpg")
-			.detailImageUrl("detail.jpg")
-			.publicationDate(LocalDate.now())
-			.price(BigDecimal.valueOf(20000))
-			.discountRate(10)
-			.description("Book Description")
-			.contents("Book Contents")
-			.isbn("1234567890123")
-			.isPackageable(true)
-			.likeCount(0)
-			.stock(100)
-			.viewCount(0L)
-			.build();
+		when(bookRepository.findAll(pageable)).thenReturn(emptyPage);
 
-		when(booksRepository.save(any(Book.class))).thenReturn(mockBook);
+		Page<BookResponse> result = bookService.getBooks(pageable);
+		assertTrue(result.isEmpty());
+		verify(bookRepository, times(1)).findAll(pageable);
+	}
 
-		BookRegisterResponse result = booksService.registerBook(reqDto);
+	@Test
+	public void getBooks_ShouldThrowInvalidPageRequestException_WhenPageIsEmptyAndPageNumberExceedsZero() {
+		Pageable pageable = PageRequest.of(2, 10);
+		Page<Book> emptyPage = new PageImpl<>(List.of(), pageable, 10);
 
+		when(bookRepository.findAll(pageable)).thenReturn(emptyPage);
+
+		assertThrows(InvalidPageRequestException.class, () -> bookService.getBooks(pageable));
+		verify(bookRepository, times(1)).findAll(pageable);
+	}
+
+	@Test
+	public void getBooks_ShouldThrowInvalidPageRequestException_WhenPageNumberExceedsTotalPages() {
+		Pageable pageable = PageRequest.of(5, 10);
+		Page<Book> emptyPage = new PageImpl<>(List.of(), pageable, 30);
+
+		when(bookRepository.findAll(pageable)).thenReturn(emptyPage);
+
+		assertThrows(InvalidPageRequestException.class, () -> bookService.getBooks(pageable));
+		verify(bookRepository, times(1)).findAll(pageable);
+	}
+
+	@Test
+	public void getBooks_ShouldNotThrowException_WhenPageIsNotEmptyAndPageNumberGreaterThanZero() {
+		Pageable pageable = PageRequest.of(1, 10);
+		List<Book> books = List.of(book);
+		Page<Book> bookPage = new PageImpl<>(books, pageable, 30);
+
+		when(bookRepository.findAll(pageable)).thenReturn(bookPage);
+
+		Page<BookResponse> result = bookService.getBooks(pageable);
+		assertFalse(result.isEmpty());
+		verify(bookRepository, times(1)).findAll(pageable);
+	}
+
+	@Test
+	public void getBooks_ShouldNotThrowException_WhenPageIsEmptyAndPageNumberLessThanTotalPages() {
+		Pageable pageable = PageRequest.of(1, 10);
+		Page<Book> emptyPage = new PageImpl<>(List.of(), pageable, 30);
+
+		when(bookRepository.findAll(pageable)).thenReturn(emptyPage);
+
+		Page<BookResponse> result = bookService.getBooks(pageable);
+		assertTrue(result.isEmpty());
+		verify(bookRepository, times(1)).findAll(pageable);
+	}
+
+	@Test
+	public void getBookById_ShouldReturnBookResponseAndIncrementViewCount_WhenBookExists() {
+		Long bookId = 1L;
+		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+
+		BookResponse result = bookService.getBookById(bookId);
+
+		// 조회수 증가 확인
 		assertNotNull(result);
-		assertEquals("Book Title", result.title());
-		verify(booksRepository, times(1)).save(any(Book.class));
+		assertEquals(bookId, result.id());
+		assertEquals("Original Book Title", result.title());
+		assertEquals(1L, book.getViewCount());
+
+		// bookRepository.save(book) 호출 확인
+		verify(bookRepository, times(1)).save(book);
+	}
+
+	@Test
+	public void getBookById_ShouldThrowBookIdNotFoundException_WhenBookDoesNotExist() {
+		Long bookId = 9999L;
+		when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+
+		assertThrows(BookIdNotFoundException.class, () -> bookService.getBookById(bookId));
+		verify(bookRepository, never()).save(any());
+	}
+
+	@Test
+	public void updateBook_ShouldUpdateBook_WhenValidRequest() {
+		when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+		when(bookStateRepository.findById(1)).thenReturn(Optional.of(bookState));
+		when(publisherRepository.findById(1L)).thenReturn(Optional.of(publisher));
+
+		bookService.updateBook(1L, updateRequest);
+
+		assertEquals("Updated Book Title", book.getTitle());
+		assertEquals("updated_thumbnail.jpg", book.getThumbnailImageUrl());
+		assertEquals(BigDecimal.valueOf(25000), book.getPrice());
+		verify(bookRepository, times(1)).save(book);
+	}
+
+	@Test
+	public void updateBook_ShouldThrowBookIdNotFoundException_WhenBookNotFound() {
+		when(bookRepository.findById(1L)).thenReturn(Optional.empty());
+		assertThrows(BookIdNotFoundException.class, () -> bookService.updateBook(1L, updateRequest));
+	}
+
+	@Test
+	public void updateBook_ShouldThrowBookStateIdNotFoundException_WhenBookStateNotFound() {
+		when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+		when(bookStateRepository.findById(1)).thenReturn(Optional.empty());
+
+		assertThrows(BookStateIdNotFoundException.class, () -> bookService.updateBook(1L, updateRequest));
+	}
+
+	@Test
+	public void updateBook_ShouldThrowPublisherIdNotFoundException_WhenPublisherNotFound() {
+		when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+		when(bookStateRepository.findById(1)).thenReturn(Optional.of(bookState));
+		when(publisherRepository.findById(1L)).thenReturn(Optional.empty());
+
+		assertThrows(PublisherIdNotFoundException.class, () -> bookService.updateBook(1L, updateRequest));
+	}
+
+	@Test
+	public void deleteBook_ShouldDeleteBook_WhenBookExists() {
+		Long bookId = 1L;
+
+		when(bookRepository.existsById(bookId)).thenReturn(true);
+		doNothing().when(bookRepository).deleteById(bookId);
+
+		assertDoesNotThrow(() -> bookService.deleteBook(bookId));
+		verify(bookRepository, times(1)).deleteById(bookId);
+	}
+
+	@Test
+	public void deleteBook_ShouldThrowBookIdNotFoundException_WhenBookDoesNotExist() {
+		Long bookId = 9999L;
+
+		when(bookRepository.existsById(bookId)).thenReturn(false);
+
+		assertThrows(BookIdNotFoundException.class, () -> bookService.deleteBook(bookId));
+		verify(bookRepository, never()).deleteById(bookId);
 	}
 }

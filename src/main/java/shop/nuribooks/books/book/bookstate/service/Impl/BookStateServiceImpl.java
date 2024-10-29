@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.bookstate.dto.BookStateRequest;
 import shop.nuribooks.books.book.bookstate.dto.BookStateResponse;
 import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookEditor;
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
+import shop.nuribooks.books.exception.DefaultStateDeletionException;
 import shop.nuribooks.books.exception.bookstate.BookStateDetailAlreadyExistException;
 import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -27,8 +27,9 @@ public class BookStateServiceImpl implements BookStateService {
 
 	public static final Integer DEFAULT_STATE_ID = 1;
 
+	@Transactional
 	@Override
-	public void registerState(String adminId, BookStateRequest bookStateRequest) {
+	public void registerState(BookStateRequest bookStateRequest) {
 		if(bookStateRepository.existsBookStatesByDetail(bookStateRequest.detail())){
 			throw new BookStateDetailAlreadyExistException(bookStateRequest.detail());
 		}
@@ -38,7 +39,15 @@ public class BookStateServiceImpl implements BookStateService {
 	}
 
 	@Override
-	public List<BookStateResponse> getAllBooks() {
+	public BookStateResponse getBookState(Integer id) {
+		BookState bookState = bookStateRepository.findById(id)
+			.orElseThrow(BookStateIdNotFoundException::new);
+
+		return BookStateResponse.of(bookState);
+	}
+
+	@Override
+	public List<BookStateResponse> getAllBookStates() {
 		List<BookState> bookStateList = bookStateRepository.findAll();
 
 		return bookStateList.stream().map(bookState -> new BookStateResponse(bookState.getId(), bookState.getDetail()))
@@ -63,22 +72,25 @@ public class BookStateServiceImpl implements BookStateService {
 	@Transactional
 	@Override
 	public void deleteState(Integer id) {
-		BookState defaultState = bookStateRepository.findById(DEFAULT_STATE_ID)
+		BookState bookState = bookStateRepository.findById(id)
 			.orElseThrow(BookStateIdNotFoundException::new);
 
-		BookState bookState = bookStateRepository.findById(id)
+		if(id.equals(DEFAULT_STATE_ID)) {
+			throw new DefaultStateDeletionException();
+		}
+
+		BookState defaultState = bookStateRepository.findById(DEFAULT_STATE_ID)
 			.orElseThrow(BookStateIdNotFoundException::new);
 
 		List<Book> books = bookRepository.findByStateId(bookState);
 
-		for (Book book : books) {
-			BookEditor bookEditor = BookEditor.builder()
-				.stateId(defaultState)
-				.build();
-			book.edit(bookEditor);
+		if (!books.isEmpty()) {
+			for (Book book : books) {
+				book.updateStateId(defaultState);
+			}
+			bookRepository.saveAll(books);
 		}
 
-		bookRepository.saveAll(books);
 		bookStateRepository.deleteById(id);
 	}
 }

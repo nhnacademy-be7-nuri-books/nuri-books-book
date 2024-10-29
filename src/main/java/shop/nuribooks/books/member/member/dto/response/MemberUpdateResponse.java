@@ -1,16 +1,10 @@
 package shop.nuribooks.books.member.member.dto.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class MemberUpdateResponse {
+public record MemberUpdateResponse (
 
-	private String name;
-	private String phoneNumber;
-}
+	String name,
+	String phoneNumber
+) {}
