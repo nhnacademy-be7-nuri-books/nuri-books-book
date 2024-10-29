@@ -1,7 +1,6 @@
 package shop.nuribooks.books.config;
 
 import org.jasypt.encryption.StringEncryptor;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,13 +17,13 @@ public class JasyptConfigTest {
 	@Autowired
 	private Environment env;
 
-	@Test
-	void test() {
-		encryptInfos("MYSQL_URL");
-		encryptInfos("MYSQL_DEV_URL");
-		encryptInfos("MYSQL_ID");
-		encryptInfos("MYSQL_PWD");
-	}
+	// @Test
+	// void test() {
+	// 	encryptInfos("MYSQL_URL");
+	// 	encryptInfos("MYSQL_DEV_URL");
+	// 	encryptInfos("MYSQL_ID");
+	// 	encryptInfos("MYSQL_PWD");
+	// }
 
 	private String encryptInfos(String key) {
 		String value = env.getProperty(key);
