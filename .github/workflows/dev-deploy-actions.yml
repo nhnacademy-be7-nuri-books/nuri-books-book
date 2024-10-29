@@ -2,7 +2,7 @@ name: dev-deploy-phase
 on:
   push:
     branches:
-      - "main"
+      - develop
 
 jobs:
   dev-deploy:
