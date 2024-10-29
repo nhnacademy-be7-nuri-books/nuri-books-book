@@ -19,7 +19,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import shop.nuribooks.books.member.address.repository.AddressRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.dto.EntityMapper;
@@ -41,7 +40,6 @@ import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.entity.StatusEnum;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
-import shop.nuribooks.books.member.resignedmember.repository.ResignedMemberRepository;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceImplTest {
@@ -57,12 +55,6 @@ class MemberServiceImplTest {
 
 	@Mock
 	private MemberRepository memberRepository;
-
-	@Mock
-	ResignedMemberRepository resignedMemberRepository;
-
-	@Mock
-	AddressRepository addressRepository;
 
 	@DisplayName("회원 등록 성공")
 	@Test
@@ -289,27 +281,6 @@ class MemberServiceImplTest {
 		assertNull(response.password());
 		assertNull(response.authority());
 	}
-
-	// =========== 테스트 작성 중입니다, ==============
-	// @DisplayName("탈퇴 일시가 1년이 지나면 회원을 완전히 삭제하고 사용했던 userId만을 따로 저장")
-	// @Test
-	// void removeWithdrawnMembers() {
-	//     //given
-	// 	List<Customer> customersToDelete = getDynamicCustomers(1L, 2L, 3L);
-	// 	List<Member> membersToDelete = getDynamicWithdrawnMembers(1L, 2L, 3L);
-	//
-	// 	when(memberRepository.findAll()).thenReturn(membersToDelete);
-	// 	when(customerRepository.findById(anyLong())).thenAnswer(invocationOnMock -> {
-	// 		Long id = invocationOnMock.getArgument(0);
-	// 		return customersToDelete.stream()
-	// 			.filter(customer -> customer.getId().equals(id));
-	// 	});
-	//
-	// 	//when
-	//
-	//     //then
-	// }
-
 
 	/**
 	 * 테스트를 위한 MemberRegisterRequest 생성

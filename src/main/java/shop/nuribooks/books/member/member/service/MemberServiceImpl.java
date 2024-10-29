@@ -157,12 +157,13 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	/**
-	 * 스케쥴링 메서드
+	 * @deprecated 이 스케쥴링 메서드는 사용되지 않을 것입니다.
 	 * 탈퇴 회원의 Withdrawn상태 기간 경과를 매일 자정에 확인하여 1년이 지나면 <br>
 	 * 해당 회원들의 주소를 모두 찾아 AddressRepository에서 삭제하고, <br>
 	 * MemberRepository에서 해당 회원을, CustomerRepository에서도 동일한 id의 비회원을 삭제한다. <br>
 	 * 그 회원이 사용했던 userId만을 ResignedMember에 담아 ResignedMemberRepository에 저장
 	 */
+	@Deprecated
 	@Scheduled(cron = "0 0 0 * * ?")
 	@Transactional
 	public void removeWithdrawnMembers() {
