@@ -4,8 +4,14 @@ import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterRespons
 import shop.nuribooks.books.member.customer.dto.response.CustomerUpdateResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
 
+/**
+ * @author Jprotection
+ */
 public class DtoMapper {
 
+	/**
+	 * Customer를 CustomerRegisterResponse로 변환
+	 */
 	public static CustomerRegisterResponse toRegisterDto(Customer customer) {
 		return CustomerRegisterResponse.builder()
 			.name(customer.getName())
@@ -14,6 +20,9 @@ public class DtoMapper {
 			.build();
 	}
 
+	/**
+	 * Customer를 CustomerUpdateResponse로 변환
+	 */
 	public static CustomerUpdateResponse toUpdateDto(Customer customer) {
 		return CustomerUpdateResponse.builder()
 			.name(customer.getName())

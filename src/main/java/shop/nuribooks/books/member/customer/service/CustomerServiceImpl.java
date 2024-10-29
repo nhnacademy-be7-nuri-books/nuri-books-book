@@ -15,6 +15,9 @@ import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 
+/**
+ * @author Jprotection
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

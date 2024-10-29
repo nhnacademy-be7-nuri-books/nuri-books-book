@@ -20,6 +20,9 @@ import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterRespons
 import shop.nuribooks.books.member.customer.dto.response.CustomerUpdateResponse;
 import shop.nuribooks.books.member.customer.service.CustomerService;
 
+/**
+ * @author Jprotection
+ */
 @RestController
 @RequestMapping("/api/member/customer")
 @RequiredArgsConstructor

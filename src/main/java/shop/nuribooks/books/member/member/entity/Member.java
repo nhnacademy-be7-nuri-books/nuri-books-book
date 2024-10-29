@@ -51,6 +51,7 @@ public class Member {
 	@NotNull
 	@Enumerated(STRING)
 	private AuthorityType authority;
+
 	/**
 	 * STANDARD, GOLD, PLATINUM, ROYAL
 	 */
@@ -65,6 +66,13 @@ public class Member {
 	@NotNull
 	@Enumerated(STRING)
 	private StatusType status;
+
+	/**
+	 * MALE, FEMALE
+	 */
+	@NotNull
+	@Enumerated(STRING)
+	private GenderType gender;
 
 	@NotBlank
 	@Size(min = 8, max = 20)

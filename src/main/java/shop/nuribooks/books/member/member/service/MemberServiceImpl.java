@@ -38,6 +38,9 @@ import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.member.resignedmember.entity.ResignedMember;
 import shop.nuribooks.books.member.resignedmember.repository.ResignedMemberRepository;
 
+/**
+ * @author Jprotection
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -60,7 +63,7 @@ public class MemberServiceImpl implements MemberService {
 	 * MemberRegisterRequest로 name, userId, password, phoneNumber, email, birthday를 받는다. <br>
 	 * 생성일자(createdAt)는 현재 시간, point와 totalPaymentAmount는 0으로 초기화 <br>
 	 * 권한은 MEMBER, 등급은 STANDARD, 상태는 ACTIVE로 초기화 <br>
-	 * @return MemberRegisterResponse에 이름, 유저 아이디, 전화번호, 이메일, 생일을 담아서 반환
+	 * @return MemberRegisterResponse에 이름, 성별, 유저 아이디, 전화번호, 이메일, 생일을 담아서 반환
 	 */
 	@Transactional
 	public MemberRegisterResponse registerMember(MemberRegisterRequest request) {
@@ -79,6 +82,7 @@ public class MemberServiceImpl implements MemberService {
 			.authority(AuthorityType.MEMBER)
 			.grade(standard())
 			.status(StatusType.ACTIVE)
+			.gender(request.gender())
 			.userId(request.userId())
 			.birthday(request.birthday())
 			.createdAt(LocalDateTime.now())

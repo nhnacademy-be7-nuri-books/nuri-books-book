@@ -7,6 +7,9 @@ import shop.nuribooks.books.member.member.dto.response.MemberCheckResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 
+/**
+ * @author Jprotection
+ */
 public interface MemberService {
 
 	/**

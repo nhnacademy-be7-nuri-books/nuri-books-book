@@ -5,6 +5,9 @@ import shop.nuribooks.books.member.customer.dto.request.CustomerUpdateRequest;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.dto.response.CustomerUpdateResponse;
 
+/**
+ * @author Jprotection
+ */
 public interface CustomerService {
 
 	/**

@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import shop.nuribooks.books.member.member.entity.Member;
 
+/**
+ * @author Jprotection
+ */
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	boolean existsByUserId(String userId);
