@@ -5,6 +5,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +46,43 @@ class TagControllerTest {
 			.andExpect(jsonPath("$.name").value("tag1"));
 
 		verify(tagService).registerTag(any(TagRequest.class));
+	}
+
+	@DisplayName("모든 태그 조회")
+	@Test
+	void getAllTags() throws Exception {
+		TagResponse tag1 = TagResponse.builder().id(1L).name("tag1").build();
+		TagResponse tag2 = TagResponse.builder().id(2L).name("tag2").build();
+		List<TagResponse> response = List.of(tag1, tag2);
+
+		when(tagService.getAllTags()).thenReturn(response);
+
+		mockMvc.perform(get("/api/books/tags")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0].id").value(1L))
+			.andExpect(jsonPath("$[0].name").value("tag1"))
+			.andExpect(jsonPath("$[1].id").value(2L))
+			.andExpect(jsonPath("$[1].name").value("tag2"));
+
+		verify(tagService, times(1)).getAllTags();
+
+	}
+
+	@DisplayName("특정 태그 조회")
+	@Test
+	void getTag() throws Exception {
+		Long id = 1L;
+		TagResponse response = TagResponse.builder().id(id).name("tag1").build();
+
+		when(tagService.getTag(id)).thenReturn(response);
+
+		mockMvc.perform(get("/api/books/tags/{tagId}", id)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.name").value("tag1"));
+
+		verify(tagService).getTag(id);
+
 	}
 }
