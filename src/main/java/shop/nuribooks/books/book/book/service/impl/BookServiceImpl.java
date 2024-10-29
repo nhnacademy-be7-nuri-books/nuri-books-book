@@ -11,15 +11,12 @@ import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
-import shop.nuribooks.books.exception.book.BookStatesIdNotFoundException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.bookstate.repository.BookStateRepository;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
@@ -28,7 +25,6 @@ import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
 @Service
 public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
-	private final BookStateRepository bookStateRepository;
 	private final PublisherRepository publisherRepository;
 
 	@Transactional
@@ -38,15 +34,12 @@ public class BookServiceImpl implements BookService {
 			throw new ResourceAlreadyExistIsbnException(reqDto.isbn());
 		}
 
-		BookState bookState = bookStateRepository.findById(reqDto.stateId())
-			.orElseThrow(() -> new BookStatesIdNotFoundException(reqDto.stateId()));
-
 		Publisher publisher = publisherRepository.findById(reqDto.publisherId())
 			.orElseThrow(() -> new PublisherIdNotFoundException(reqDto.publisherId()));
 
 		Book book = Book.builder()
-			.stateId(bookState)
 			.publisherId(publisher)
+			.state(reqDto.state())
 			.title(reqDto.title())
 			.thumbnailImageUrl(reqDto.thumbnailImageUrl())
 			.detailImageUrl(reqDto.detailImageUrl())
@@ -109,13 +102,10 @@ public class BookServiceImpl implements BookService {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(BookIdNotFoundException::new);
 
-		BookState bookState = bookStateRepository.findById(bookUpdateReq.stateId())
-			.orElseThrow(BookStateIdNotFoundException::new);
-
 		Publisher publisher = publisherRepository.findById(bookUpdateReq.publisherId())
 			.orElseThrow(() -> new PublisherIdNotFoundException(bookUpdateReq.publisherId()));
 
-		book.updateBookDetails(bookUpdateReq, bookState, publisher);
+		book.updateBookDetails(bookUpdateReq, publisher);
 
 		bookRepository.save(book);
 	}

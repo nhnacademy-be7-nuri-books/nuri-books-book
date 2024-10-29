@@ -78,7 +78,7 @@ public class BookTest {
 			20
 		);
 
-		book.updateBookDetails(request, state, publisher);
+		book.updateBookDetails(request, publisher);
 
 		assertThat(book.getTitle()).isEqualTo("Updated Title");
 		assertThat(book.getThumbnailImageUrl()).isEqualTo("updated_thumbnail.jpg");
@@ -88,8 +88,8 @@ public class BookTest {
 	@Test
 	public void testBuilderWithNullValues() {
 		Book book = Book.builder()
-			.stateId(null)
 			.publisherId(null)
+			.state(null)
 			.title(null)
 			.thumbnailImageUrl(null)
 			.detailImageUrl(null)
