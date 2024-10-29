@@ -55,6 +55,7 @@ public class AddressEditor {
         }
 
         public AddressEditor.AddressEditorBuilder isDefault(final boolean isDefault) {
+            this.isDefault = isDefault;
             return this;
         }
 
