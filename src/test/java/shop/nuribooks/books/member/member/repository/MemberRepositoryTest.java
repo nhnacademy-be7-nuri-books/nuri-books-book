@@ -17,6 +17,7 @@ import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
+import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusType;
 
@@ -115,6 +116,7 @@ class MemberRepositoryTest {
 			.authority(AuthorityType.MEMBER)
 			.grade(savedGrade)
 			.status(StatusType.ACTIVE)
+			.gender(GenderType.MALE)
 			.userId("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())

@@ -21,6 +21,7 @@ import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
+import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.exception.address.AddressNotFoundException;
@@ -171,6 +172,7 @@ class AddressServiceTest {
                 .customer(customer)
                 .authority(MEMBER)
                 .grade(grade)
+                .gender(GenderType.MALE)
                 .userId("nuriaaaaaa")
                 .status(StatusType.ACTIVE)
                 .birthday(LocalDate.of(1988, 8, 12))

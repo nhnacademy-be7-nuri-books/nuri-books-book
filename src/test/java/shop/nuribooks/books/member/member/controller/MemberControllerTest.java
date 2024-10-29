@@ -26,6 +26,7 @@ import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberCheckResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
+import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.service.MemberService;
 
 @WebMvcTest(MemberController.class)
@@ -62,6 +63,7 @@ class MemberControllerTest {
 		//then
 		result.andExpect(status().isCreated())
 			.andExpect(jsonPath("name").value(response.name()))
+			.andExpect(jsonPath("gender").value(response.gender().name()))
 			.andExpect(jsonPath("userId").value(response.userId()))
 			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
 			.andExpect(jsonPath("email").value(response.email()))
@@ -83,6 +85,8 @@ class MemberControllerTest {
 		badResult.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("이름은 반드시 입력해야 합니다.")))
+			.andExpect(jsonPath("$.message")
+				.value(Matchers.containsString("성별은 반드시 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("아이디는 반드시 8자 이상 20자 이하로 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
@@ -184,6 +188,7 @@ class MemberControllerTest {
 	private MemberRegisterRequest getMemberRegisterRequest() {
 		return MemberRegisterRequest.builder()
 			.name("boho")
+			.gender(GenderType.MALE)
 			.userId("nuribooks")
 			.password("abc123")
 			.phoneNumber("042-8282-8282")
@@ -198,6 +203,7 @@ class MemberControllerTest {
 	private MemberRegisterResponse getMemberRegisterResponse() {
 		return MemberRegisterResponse.builder()
 			.name("boho")
+			.gender(GenderType.MALE)
 			.userId("nuribooks")
 			.phoneNumber("042-8282-8282")
 			.email("nhnacademy@nuriBooks.com")
@@ -211,6 +217,7 @@ class MemberControllerTest {
 	private MemberRegisterRequest getBadMemberRegisterRequest() {
 		return MemberRegisterRequest.builder()
 			.name("  ")
+			.gender(null)
 			.userId("a")
 			.password(null)
 			.phoneNumber("")

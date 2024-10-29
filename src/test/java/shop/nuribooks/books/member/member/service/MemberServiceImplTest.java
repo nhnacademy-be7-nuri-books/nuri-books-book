@@ -30,6 +30,7 @@ import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
+import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
@@ -80,6 +81,7 @@ class MemberServiceImplTest {
 		assertThat(response.userId()).isEqualTo(request.userId());
 		assertThat(response.phoneNumber()).isEqualTo(request.phoneNumber());
 		assertThat(response.email()).isEqualTo(request.email());
+		assertThat(response.gender()).isEqualTo(request.gender());
 
 		// verify
 		verify(customerRepository, times(1)).save(any(Customer.class));
@@ -288,6 +290,7 @@ class MemberServiceImplTest {
 	private MemberRegisterRequest getMemberCreateRequest() {
 		return MemberRegisterRequest.builder()
 			.name("boho")
+			.gender(GenderType.MALE)
 			.userId("nuribooks95")
 			.password("abc123")
 			.phoneNumber("042-8282-8282")
@@ -352,6 +355,7 @@ class MemberServiceImplTest {
 			.authority(AuthorityType.MEMBER)
 			.grade(getGrade())
 			.status(StatusType.ACTIVE)
+			.gender(GenderType.MALE)
 			.userId("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
@@ -386,6 +390,7 @@ class MemberServiceImplTest {
 					.authority(AuthorityType.MEMBER)
 					.grade(getGrade())
 					.status(StatusType.WITHDRAWN)
+					.gender(GenderType.MALE)
 					.userId("nuribooks95")
 					.birthday(LocalDate.of(1988, 8, 12))
 					.createdAt(LocalDateTime.now())
