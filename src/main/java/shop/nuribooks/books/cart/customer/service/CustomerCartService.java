@@ -1,16 +1,9 @@
 package shop.nuribooks.books.cart.customer.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
+import shop.nuribooks.books.cart.customer.dto.request.CustomerCartAddRequest;
 
-@RequiredArgsConstructor
-@Service
-public class CustomerCartService {
-    private final RedisTemplate<String, String> redisTemplate;
+public interface CustomerCartService {
 
-    public void addToCart(int sessionId, int bookId) {
-        redisTemplate.opsForValue().set("test", "Test");
-    }
+    void addToCart(CustomerCartAddRequest request);
 
 }
