@@ -3,7 +3,7 @@ package shop.nuribooks.books.member.member.entity;
 import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.FetchType.*;
 import static java.time.temporal.ChronoUnit.*;
-import static shop.nuribooks.books.member.member.entity.StatusEnum.*;
+import static shop.nuribooks.books.member.member.entity.StatusType.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -50,8 +50,7 @@ public class Member {
 	 */
 	@NotNull
 	@Enumerated(STRING)
-	private AuthorityEnum authority;
-
+	private AuthorityType authority;
 	/**
 	 * STANDARD, GOLD, PLATINUM, ROYAL
 	 */
@@ -65,7 +64,7 @@ public class Member {
 	 */
 	@NotNull
 	@Enumerated(STRING)
-	private StatusEnum status;
+	private StatusType status;
 
 	@NotBlank
 	@Size(min = 8, max = 20)

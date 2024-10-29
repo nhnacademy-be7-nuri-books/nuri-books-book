@@ -29,7 +29,7 @@ import shop.nuribooks.books.member.member.dto.response.MemberCheckResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
-import shop.nuribooks.books.member.member.entity.AuthorityEnum;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
@@ -38,7 +38,7 @@ import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
 import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
-import shop.nuribooks.books.member.member.entity.StatusEnum;
+import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -132,7 +132,7 @@ class MemberServiceImplTest {
 
 	    //then
 		verify(existingMember, times(1)).changeToWithdrawn(); // 메서드 호출 확인
-		assertThat(existingMember.getStatus()).isEqualTo(StatusEnum.WITHDRAWN); // 상태가 WITHDRAWN로 변경되었는지 확인
+		assertThat(existingMember.getStatus()).isEqualTo(StatusType.WITHDRAWN); // 상태가 WITHDRAWN로 변경되었는지 확인
 		assertThat(existingMember.getWithdrawnAt()).isNotNull(); // withdrawnAt이 현재 시간으로 설정되었는지 확인
 	}
 
@@ -349,9 +349,9 @@ class MemberServiceImplTest {
 		return Member.builder()
 			.id(1L)
 			.customer(savedCustomer)
-			.authority(AuthorityEnum.MEMBER)
+			.authority(AuthorityType.MEMBER)
 			.grade(getGrade())
-			.status(StatusEnum.ACTIVE)
+			.status(StatusType.ACTIVE)
 			.userId("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
@@ -383,9 +383,9 @@ class MemberServiceImplTest {
 				.mapToObj(i -> Member.builder()
 					.id(ids[i])
 					.customer(getDynamicCustomers(ids).get(i))
-					.authority(AuthorityEnum.MEMBER)
+					.authority(AuthorityType.MEMBER)
 					.grade(getGrade())
-					.status(StatusEnum.WITHDRAWN)
+					.status(StatusType.WITHDRAWN)
 					.userId("nuribooks95")
 					.birthday(LocalDate.of(1988, 8, 12))
 					.createdAt(LocalDateTime.now())

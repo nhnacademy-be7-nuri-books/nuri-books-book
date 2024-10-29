@@ -24,7 +24,7 @@ import shop.nuribooks.books.member.member.dto.response.MemberCheckResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
-import shop.nuribooks.books.member.member.entity.AuthorityEnum;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
@@ -33,7 +33,7 @@ import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
 import shop.nuribooks.books.exception.member.UserIdNotFoundException;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
-import shop.nuribooks.books.member.member.entity.StatusEnum;
+import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.member.resignedmember.entity.ResignedMember;
 import shop.nuribooks.books.member.resignedmember.repository.ResignedMemberRepository;
@@ -76,9 +76,9 @@ public class MemberServiceImpl implements MemberService {
 
 		Member newMember = Member.builder()
 			.customer(savedCustomer)
-			.authority(AuthorityEnum.MEMBER)
+			.authority(AuthorityType.MEMBER)
 			.grade(standard())
-			.status(StatusEnum.ACTIVE)
+			.status(StatusType.ACTIVE)
 			.userId(request.userId())
 			.birthday(request.birthday())
 			.createdAt(LocalDateTime.now())

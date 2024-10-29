@@ -16,9 +16,9 @@ import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
-import shop.nuribooks.books.member.member.entity.AuthorityEnum;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.member.member.entity.StatusEnum;
+import shop.nuribooks.books.member.member.entity.StatusType;
 
 @DataJpaTest
 class MemberRepositoryTest {
@@ -112,9 +112,9 @@ class MemberRepositoryTest {
 	private Member createMember(Customer savedCustomer, Grade savedGrade) {
 		return Member.builder()
 			.customer(savedCustomer)
-			.authority(AuthorityEnum.MEMBER)
+			.authority(AuthorityType.MEMBER)
 			.grade(savedGrade)
-			.status(StatusEnum.ACTIVE)
+			.status(StatusType.ACTIVE)
 			.userId("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())

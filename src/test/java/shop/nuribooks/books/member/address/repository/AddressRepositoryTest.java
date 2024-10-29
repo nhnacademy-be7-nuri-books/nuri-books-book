@@ -2,7 +2,7 @@ package shop.nuribooks.books.member.address.repository;
 
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.*;
-import static shop.nuribooks.books.member.member.entity.AuthorityEnum.MEMBER;
+import static shop.nuribooks.books.member.member.entity.AuthorityType.MEMBER;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,7 +17,7 @@ import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.member.member.entity.StatusEnum;
+import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -74,7 +74,7 @@ class AddressRepositoryTest {
                 .authority(MEMBER)
                 .grade(grade)
                 .userId("nuriaaaaaa")
-                .status(StatusEnum.ACTIVE)
+                .status(StatusType.ACTIVE)
                 .birthday(LocalDate.of(1988, 8, 12))
                 .createdAt(LocalDateTime.now())
                 .point(ZERO)
