@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import shop.nuribooks.books.member.authority.dto.requset.AuthorityEditRequest;
 import shop.nuribooks.books.member.authority.dto.requset.AuthorityRegisterRequest;
 import shop.nuribooks.books.member.authority.dto.response.AuthorityResponse;
 import shop.nuribooks.books.member.authority.service.AuthorityService;
 
 @RequiredArgsConstructor
-@Controller
+@RestController
 public class AuthorityController {
 
     private final AuthorityService authorityService;
