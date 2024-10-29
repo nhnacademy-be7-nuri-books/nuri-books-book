@@ -9,13 +9,14 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 
 public record BookUpdateRequest(
-	@NotNull(message = "도서 상태 ID는 필수 입력 항목입니다.")
-	Integer stateId,
-
 	@NotNull(message = "출판사 ID는 필수 입력 항목입니다.")
 	Long publisherId,
+
+	@NotNull(message = "도서 상태는 필수 입력 항목입니다.")
+	BookStateEnum state,
 
 	@NotBlank(message = "도서 제목은 필수 입력 항목입니다.")
 	@Size(min = 1, max = 50, message = "도서 제목은 1자에서 50자 사이여야 합니다.")
