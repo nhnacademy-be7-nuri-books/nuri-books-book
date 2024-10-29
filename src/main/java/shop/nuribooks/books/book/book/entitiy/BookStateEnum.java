@@ -24,7 +24,7 @@ public enum BookStateEnum {
 	public static BookStateEnum fromString(String name) {
 		try {
 			return BookStateEnum.valueOf(name.toUpperCase());
-		} catch (BadRequestException e) {
+		} catch (IllegalArgumentException e) {
 			throw new InvalidBookStateException(name);
 		}
 	}
