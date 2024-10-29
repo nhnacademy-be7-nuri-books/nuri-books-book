@@ -15,9 +15,9 @@ public enum GenderType {
 	}
 
 	@JsonCreator
-	public static StatusType fromValue(String value) {
-		return Stream.of(StatusType.values())
-			.filter(memberStateType -> memberStateType.getValue().equals(value.toUpperCase()))
+	public static GenderType fromValue(String value) {
+		return Stream.of(GenderType.values())
+			.filter(genderType -> genderType.getValue().equals(value.toUpperCase()))
 			.findFirst()
 			.orElse(null);
 	}

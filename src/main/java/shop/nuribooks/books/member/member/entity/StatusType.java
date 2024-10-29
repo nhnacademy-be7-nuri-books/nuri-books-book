@@ -17,7 +17,7 @@ public enum StatusType {
 	@JsonCreator
 	public static StatusType fromValue(String value) {
 		return Stream.of(StatusType.values())
-			.filter(memberStateType -> memberStateType.getValue().equals(value.toUpperCase()))
+			.filter(statusType -> statusType.getValue().equals(value.toUpperCase()))
 			.findFirst()
 			.orElse(null);
 	}

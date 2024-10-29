@@ -1,7 +1,6 @@
 package shop.nuribooks.books.member.customer.dto;
 
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
-import shop.nuribooks.books.member.customer.dto.response.CustomerUpdateResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
 
 /**
@@ -20,13 +19,4 @@ public class DtoMapper {
 			.build();
 	}
 
-	/**
-	 * Customer를 CustomerUpdateResponse로 변환
-	 */
-	public static CustomerUpdateResponse toUpdateDto(Customer customer) {
-		return CustomerUpdateResponse.builder()
-			.name(customer.getName())
-			.phoneNumber(customer.getPhoneNumber())
-			.build();
-	}
 }
