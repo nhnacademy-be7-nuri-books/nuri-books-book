@@ -48,9 +48,9 @@ public class DtoMapper {
 	 */
 	public static MemberAuthInfoResponse toAuthInfoDto(Customer customer, Member member) {
 		return MemberAuthInfoResponse.builder()
-			.name(customer.getName())
+			.username(member.getUserId())
 			.password(customer.getPassword())
-			.authority("ROLE_" + member.getAuthority().name())
+			.role("ROLE_" + member.getAuthority().name())
 			.build();
 	}
 

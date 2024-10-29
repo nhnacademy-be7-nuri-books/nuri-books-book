@@ -120,9 +120,9 @@ class MemberControllerTest {
 
 		//then
 		result.andExpect(status().isOk())
-			.andExpect(jsonPath("name").value(response.name()))
+			.andExpect(jsonPath("username").value(response.username()))
 			.andExpect(jsonPath("password").value(response.password()))
-			.andExpect(jsonPath("authority").value(response.authority()));
+			.andExpect(jsonPath("role").value(response.role()));
 	}
 
 	@DisplayName("아이디로 비밀번호로 회원 상세 조회 성공")
@@ -273,9 +273,9 @@ class MemberControllerTest {
 	 */
 	private MemberAuthInfoResponse getGetMemberAuthInfoResponse() {
 		return MemberAuthInfoResponse.builder()
-			.name("boho")
+			.username("nuribooks")
 			.password("abc123")
-			.authority("ROLE_MEMBER")
+			.role("ROLE_MEMBER")
 			.build();
 	}
 

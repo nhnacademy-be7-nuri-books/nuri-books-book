@@ -229,19 +229,19 @@ class MemberServiceImplTest {
 	@Test
 	void getMemberAuthInfo() {
 	    //given
-		Customer existingCustomer = getSavedCustomer();
-		Member existingMember = getSavedMember(existingCustomer);
+		Customer savedCustomer = getSavedCustomer();
+		Member savedMember = getSavedMember(savedCustomer);
 
-		when(memberRepository.findByUserId(existingMember.getUserId())).thenReturn(Optional.of(existingMember));
-		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.of(existingCustomer));
+		when(memberRepository.findByUserId(savedMember.getUserId())).thenReturn(Optional.of(savedMember));
+		when(customerRepository.findById(savedMember.getId())).thenReturn(Optional.of(savedCustomer));
 
 	    //when
-		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(existingMember.getUserId());
+		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(savedMember.getUserId());
 
 		//then
-		assertThat(response.name()).isEqualTo(existingCustomer.getName());
-		assertThat(response.password()).isEqualTo(existingCustomer.getPassword());
-		assertThat(response.authority()).isEqualTo("ROLE_" + existingMember.getAuthority().name());
+		assertThat(response.username()).isEqualTo(savedMember.getUserId());
+		assertThat(response.password()).isEqualTo(savedCustomer.getPassword());
+		assertThat(response.role()).isEqualTo("ROLE_" + savedMember.getAuthority().name());
 	}
 
 	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 회원이 존재하지 않을 때")
@@ -257,9 +257,9 @@ class MemberServiceImplTest {
 
 		//then
 		assertNotNull(response);
-		assertNull(response.name());
+		assertNull(response.username());
 		assertNull(response.password());
-		assertNull(response.authority());
+		assertNull(response.role());
 	}
 
 	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 고객이 존재하지 않을 때")
@@ -278,9 +278,9 @@ class MemberServiceImplTest {
 
 		//then
 		assertNotNull(response);
-		assertNull(response.name());
+		assertNull(response.username());
 		assertNull(response.password());
-		assertNull(response.authority());
+		assertNull(response.role());
 	}
 
 	@DisplayName("회원 상세 조회 성공")
