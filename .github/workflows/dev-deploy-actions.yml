@@ -4,6 +4,9 @@ on:
     branches:
       - "main"
 
+env:
+  JASYPT_PASSWORD: ${{secrets.JASYPT_PASSWORD}}
+
 jobs:
   dev-deploy:
     runs-on: ubuntu-latest
