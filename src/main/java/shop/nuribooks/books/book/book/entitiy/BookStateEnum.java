@@ -1,6 +1,5 @@
 package shop.nuribooks.books.book.book.entitiy;
 
-import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.book.InvalidBookStateException;
 
 public enum BookStateEnum {
@@ -21,6 +20,7 @@ public enum BookStateEnum {
 		return korName;
 	}
 
+	//enum에 존재하는 값 비교를 위한 메서드
 	public static BookStateEnum fromString(String name) {
 		try {
 			return BookStateEnum.valueOf(name.toUpperCase());

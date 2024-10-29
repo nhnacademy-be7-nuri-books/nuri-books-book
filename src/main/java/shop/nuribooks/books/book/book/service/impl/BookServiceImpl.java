@@ -28,6 +28,8 @@ public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
 
+	//관리자 페이지에서 관리자의 직접 도서 등록을 위한 메서드
+	//TODO: 외부 api를 이용한 도서 등록기능 별도 구현 예정
 	@Transactional
 	@Override
 	public BookRegisterResponse registerBook(BookRegisterRequest reqDto) {
@@ -77,6 +79,8 @@ public class BookServiceImpl implements BookService {
 		return BookResponse.of(book);
 	}
 
+	//관리자페이지에서 도서 목록조회를 하여 도서를 관리하기 위한 메서드
+	//TODO: 추후 엘라스틱 서치 적용 시 사용자를 위한 도서 검색 기능을 따로 구현 예정
 	@Transactional(readOnly = true)
 	@Override
 	public Page<AdminBookListResponse> getBooks(Pageable pageable) {
@@ -121,6 +125,7 @@ public class BookServiceImpl implements BookService {
 		bookRepository.save(book);
 	}
 
+	//관리자페이지에서 관리자의 도서 삭제 기능
 	@Transactional
 	@Override
 	public void deleteBook(Long bookId) {
