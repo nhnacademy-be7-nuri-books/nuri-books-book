@@ -4,6 +4,9 @@ on:
     branches:
       - "main"
 
+env:
+  JASYPT_PASSWORD: ${{secrets.JASYPT_PASSWORD}}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -17,7 +20,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        run: mvn -B package -P prod --file pom.xml
 
       - name: Run SonarQube
         run: mvn sonar:sonar -Dsonar.projectKey=${{secrets.SONAR_KEY}} -Dsonar.projectName=${{secrets.SONAR_KEY}} -Dsonar.host.url=${{secrets.SONAR_URL}} -Dsonar.login=${{secrets.SONAR_TOKEN}}
