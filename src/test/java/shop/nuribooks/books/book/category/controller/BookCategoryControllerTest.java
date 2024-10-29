@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.category.BookCategoryAlreadyExistsException;
+import shop.nuribooks.books.exception.category.BookCategoryNotFoundException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
 @WebMvcTest(BookCategoryController.class)
@@ -115,4 +116,92 @@ public class BookCategoryControllerTest {
 
 		verify(bookCategoryService, times(1)).registerBookCategory(bookId, categoryId);
 	}
+
+	@DisplayName("도서와 카테고리가 존재하고 연관 관계가 있을 때 삭제 성공")
+	@Test
+	@Order(6)
+	void deleteBookCategory_Success() throws Exception {
+		// Given
+		Long bookId = 1L;
+		Long categoryId = 1L;
+
+		// When & Then
+		mockMvc.perform(delete("/api/book-category/{bookId}/categories/{categoryId}", bookId, categoryId))
+			.andExpect(status().isNoContent());
+
+		verify(bookCategoryService, times(1)).deleteBookCategory(bookId, categoryId);
+	}
+
+	@DisplayName("존재하지 않는 도서 ID로 삭제 요청 시 BookNotFoundException 발생")
+	@Test
+	@Order(7)
+	void deleteBookCategory_BookNotFoundException() throws Exception {
+		// Given
+		Long bookId = 1L;
+		Long categoryId = 1L;
+
+		doThrow(new BookNotFoundException(bookId))
+			.when(bookCategoryService).deleteBookCategory(bookId, categoryId);
+
+		// When & Then
+		mockMvc.perform(delete("/api/book-category/{bookId}/categories/{categoryId}", bookId, categoryId))
+			.andExpect(status().isNotFound());
+
+		verify(bookCategoryService, times(1)).deleteBookCategory(bookId, categoryId);
+	}
+
+	@DisplayName("존재하지 않는 카테고리 ID로 삭제 요청 시 CategoryNotFoundException 발생")
+	@Test
+	@Order(8)
+	void deleteBookCategory_CategoryNotFoundException() throws Exception {
+		// Given
+		Long bookId = 1L;
+		Long categoryId = 1L;
+
+		doThrow(new CategoryNotFoundException())
+			.when(bookCategoryService).deleteBookCategory(bookId, categoryId);
+
+		// When & Then
+		mockMvc.perform(delete("/api/book-category/{bookId}/categories/{categoryId}", bookId, categoryId))
+			.andExpect(status().isNotFound());
+
+		verify(bookCategoryService, times(1)).deleteBookCategory(bookId, categoryId);
+	}
+
+	@DisplayName("연관 관계가 존재하지 않을 때 BookCategoryNotFoundException 발생")
+	@Test
+	@Order(9)
+	void deleteBookCategory_BookCategoryNotFoundException() throws Exception {
+		// Given
+		Long bookId = 1L;
+		Long categoryId = 1L;
+
+		doThrow(new BookCategoryNotFoundException(bookId, categoryId))
+			.when(bookCategoryService).deleteBookCategory(bookId, categoryId);
+
+		// When & Then
+		mockMvc.perform(delete("/api/book-category/{bookId}/categories/{categoryId}", bookId, categoryId))
+			.andExpect(status().isNotFound());
+
+		verify(bookCategoryService, times(1)).deleteBookCategory(bookId, categoryId);
+	}
+
+	@DisplayName("서버 내부 오류 발생 시 500 에러 반환")
+	@Test
+	@Order(10)
+	void deleteBookCategory_InternalServerError() throws Exception {
+		// Given
+		Long bookId = 1L;
+		Long categoryId = 1L;
+
+		doThrow(new RuntimeException("Internal Server Error"))
+			.when(bookCategoryService).deleteBookCategory(bookId, categoryId);
+
+		// When & Then
+		mockMvc.perform(delete("/api/book-category/{bookId}/categories/{categoryId}", bookId, categoryId))
+			.andExpect(status().isInternalServerError());
+
+		verify(bookCategoryService, times(1)).deleteBookCategory(bookId, categoryId);
+	}
+
 }
