@@ -31,7 +31,6 @@ public class BookStateController {
 
 	private final BookStateService bookStateService;
 
-	//TODO : X-USER-ID 필요없을듯하여 추후 삭제 예정
 	@Operation(summary = "도서 상태 등록", description = "관리자가 새로운 도서 상태를 등록합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "도서 상태 등록 성공"),
@@ -39,22 +38,30 @@ public class BookStateController {
 		@ApiResponse(responseCode = "409", description = "도서 상태가 이미 존재함"),
 	})
 	@PostMapping
-	public ResponseEntity<ResponseMessage> registerBookState(
-		@RequestHeader("X-USER-ID") String adminId,
-		@Valid @RequestBody BookStateRequest bookStateReq) {
-
-		bookStateService.registerState(adminId, bookStateReq);
+	public ResponseEntity<ResponseMessage> registerBookState(@Valid @RequestBody BookStateRequest bookStateReq) {
+		bookStateService.registerState(bookStateReq);
 		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서상태 등록 성공");
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
 	}
 
-	@Operation(summary = "도서 상태 조회", description = "모든 도서 상태를 조회합니다.")
+	@Operation(summary = "도서 상태 단일 조회", description = "특정 ID에 해당하는 도서 상태 정보를 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "도서 상태 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "도서 상태를 찾을 수 없음")
+	})
+	@GetMapping("/{id}")
+	public ResponseEntity<BookStateResponse> getBookState(@PathVariable Integer id) {
+		BookStateResponse bookStateResponse = bookStateService.getBookState(id);
+		return ResponseEntity.ok(bookStateResponse);
+	}
+
+	@Operation(summary = "도서 상태 목록 조회", description = "모든 도서 상태를 조회합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "도서 상태 조회 성공"),
 	})
 	@GetMapping
 	public ResponseEntity<List<BookStateResponse>> getBookState() {
-		List<BookStateResponse> bookStateResponses = bookStateService.getAllBooks();
+		List<BookStateResponse> bookStateResponses = bookStateService.getAllBookStates();
 		return ResponseEntity.ok(bookStateResponses);
 	}
 
@@ -81,10 +88,8 @@ public class BookStateController {
 		@ApiResponse(responseCode = "200", description = "도서 상태 삭제 성공"),
 		@ApiResponse(responseCode = "404", description = "도서 상태를 찾을 수 없음"),
 	})
-	public ResponseEntity<ResponseMessage> deleteBookState(@PathVariable Integer id) {
+	public ResponseEntity<Void> deleteBookState(@PathVariable Integer id) {
 		bookStateService.deleteState(id);
-		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.OK.value(), "도서상태 삭제 성공");
-		return ResponseEntity.ok(responseMessage);
+		return ResponseEntity.noContent().build();
 	}
-
 }

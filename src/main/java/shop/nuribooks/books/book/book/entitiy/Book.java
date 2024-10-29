@@ -13,14 +13,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
+import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 
@@ -43,9 +47,11 @@ public class Book {
 	private Publisher publisherId;
 
 	@Column(nullable = false, length = 50)
+	@NotBlank
+	@Size(min = 1, max = 50)
 	private String title;
 
-	@NotNull
+	@NotBlank
 	private String thumbnailImageUrl;
 
 	private String detailImageUrl;
@@ -54,6 +60,7 @@ public class Book {
 	private LocalDate publicationDate;
 
 	@NotNull
+	@DecimalMin(value = "0.0", inclusive = false)
 	private BigDecimal price;
 
 	@NotNull
@@ -61,13 +68,14 @@ public class Book {
 	@Max(100)
 	private int discountRate;
 
-	@NotNull
+	@NotBlank
 	private String description;
 
-	@NotNull
+	@NotBlank
 	private String contents;
 
 	@Column(nullable = false, length = 20)
+	@NotBlank
 	private String isbn;
 
 	//TODO: Profile 어노테이션을 사용 OR 운영환경 설정 시 mysql 셋팅 후 주석 해제
@@ -112,12 +120,29 @@ public class Book {
 		this.viewCount = viewCount;
 	}
 
-	public BookEditor.BookEditorBuilder toEditor() {
-		return BookEditor.builder().stateId(this.stateId);
+	public void updateStateId(BookState updateBookState) {
+		this.stateId = updateBookState;
 	}
 
-	public void edit(BookEditor editor) {
-		this.stateId = editor.getStateId();
+	public void updateBookDetails(BookUpdateRequest request, BookState state, Publisher publisher) {
+		this.stateId = state;
+		this.publisherId = publisher;
+		this.title = request.title();
+		this.thumbnailImageUrl = request.thumbnailImageUrl();
+		this.detailImageUrl = request.detailImageUrl();
+		this.publicationDate = request.publicationDate();
+		this.price = request.price();
+		this.discountRate = request.discountRate();
+		this.description = request.description();
+		this.contents = request.contents();
+		this.isbn = request.isbn();
+		this.isPackageable = request.isPackageable();
+		this.stock = request.stock();
 	}
+
+	public void incrementViewCount() {
+		this.viewCount++;
+	}
+
 }
 
