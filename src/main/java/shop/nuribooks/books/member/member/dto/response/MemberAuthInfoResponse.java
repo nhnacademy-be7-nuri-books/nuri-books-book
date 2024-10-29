@@ -3,7 +3,7 @@ package shop.nuribooks.books.member.member.dto.response;
 import lombok.Builder;
 
 @Builder
-public record MemberCheckResponse (
+public record MemberAuthInfoResponse(
 
 	String name,
 	String password,

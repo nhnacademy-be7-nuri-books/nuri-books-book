@@ -2,7 +2,6 @@ package shop.nuribooks.books.member.member.entity;
 
 import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.FetchType.*;
-import static java.time.temporal.ChronoUnit.*;
 import static shop.nuribooks.books.member.member.entity.StatusType.*;
 
 import java.math.BigDecimal;
@@ -108,12 +107,5 @@ public class Member {
 	public void changeToWithdrawn() {
 		this.status = WITHDRAWN;
 		this.withdrawnAt = LocalDateTime.now();
-	}
-
-	/**
-	 * 탈퇴 일시가 1년이 지났는지 확인
-	 */
-	public boolean isWithdrawnForOverOneYear() {
-		return withdrawnAt != null && YEARS.between(withdrawnAt, LocalDateTime.now()) >= 1;
 	}
 }

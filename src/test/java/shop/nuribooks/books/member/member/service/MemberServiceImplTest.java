@@ -7,10 +7,7 @@ import static org.mockito.Mockito.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,10 +19,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.dto.EntityMapper;
+import shop.nuribooks.books.member.member.dto.request.MemberDetailsRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
-import shop.nuribooks.books.member.member.dto.response.MemberCheckResponse;
+import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
+import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
@@ -64,7 +63,7 @@ class MemberServiceImplTest {
 		MemberRegisterRequest request = getMemberCreateRequest();
 		Grade standard = getGrade();
 		Customer savedCustomer = EntityMapper.toCustomerEntity(request);
-		Member savedMember = getMember(savedCustomer);
+		Member savedMember = getSavedMember(savedCustomer);
 
 		when(customerRepository.existsByEmail(request.email())).thenReturn(false);
 		when(memberRepository.existsByUserId(request.userId())).thenReturn(false);
@@ -123,8 +122,8 @@ class MemberServiceImplTest {
 	    //given
 		MemberWithdrawRequest request = getMemberWithdrawRequest();
 
-		Customer existingCustomer = getCustomer();
-		Member existingMember = spy(getMember(existingCustomer));
+		Customer existingCustomer = getSavedCustomer();
+		Member existingMember = spy(getSavedMember(existingCustomer));
 
 		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.password())).thenReturn(true);
@@ -158,8 +157,8 @@ class MemberServiceImplTest {
 		//given
 		MemberWithdrawRequest request = getMemberWithdrawRequest();
 
-		Customer existingCustomer = getCustomer();
-		Member existingMember = getMember(existingCustomer);
+		Customer existingCustomer = getSavedCustomer();
+		Member existingMember = getSavedMember(existingCustomer);
 
 		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.password()))
@@ -176,8 +175,8 @@ class MemberServiceImplTest {
 	void updateMember() {
 	    //given
 		MemberUpdateRequest request = getMemberUpdateRequest();
-		Customer existingCustomer = spy(getCustomer());
-		Member existingMember = getMember(existingCustomer);
+		Customer existingCustomer = spy(getSavedCustomer());
+		Member existingMember = getSavedMember(existingCustomer);
 
 		when(memberRepository.findByUserId(existingMember.getUserId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.of(existingCustomer));
@@ -212,8 +211,8 @@ class MemberServiceImplTest {
 	void updateMember_CustomerNotFound() {
 		//given
 		MemberUpdateRequest request = getMemberUpdateRequest();
-		Customer existingCustomer = getCustomer();
-		Member existingMember = getMember(existingCustomer);
+		Customer existingCustomer = getSavedCustomer();
+		Member existingMember = getSavedMember(existingCustomer);
 
 		String requestUserId = "nhnacademy";
 
@@ -228,16 +227,16 @@ class MemberServiceImplTest {
 
 	@DisplayName("회원 이름, 비밀번호, 권한 조회 성공")
 	@Test
-	void checkMember() {
+	void getMemberAuthInfo() {
 	    //given
-		Customer existingCustomer = getCustomer();
-		Member existingMember = getMember(existingCustomer);
+		Customer existingCustomer = getSavedCustomer();
+		Member existingMember = getSavedMember(existingCustomer);
 
 		when(memberRepository.findByUserId(existingMember.getUserId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.of(existingCustomer));
 
 	    //when
-		MemberCheckResponse response = memberServiceImpl.checkMember(existingMember.getUserId());
+		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(existingMember.getUserId());
 
 		//then
 		assertThat(response.name()).isEqualTo(existingCustomer.getName());
@@ -247,14 +246,14 @@ class MemberServiceImplTest {
 
 	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 회원이 존재하지 않을 때")
 	@Test
-	void checkMember_UserIdNotFound() {
+	void getMember_AuthInfo_UserIdNotFound() {
 		//given
 		String requestUserid = "nhnacademy";
 
 		when(memberRepository.findByUserId(requestUserid)).thenReturn(Optional.empty());
 
 		//when
-		MemberCheckResponse response = memberServiceImpl.checkMember(requestUserid);
+		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(requestUserid);
 
 		//then
 		assertNotNull(response);
@@ -265,17 +264,17 @@ class MemberServiceImplTest {
 
 	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 고객이 존재하지 않을 때")
 	@Test
-	void checkMember_CustomerNotFound() {
+	void getMember_AuthInfo_CustomerNotFound() {
 		//given
-		Customer existingCustomer = getCustomer();
-		Member existingMember = getMember(existingCustomer);
+		Customer existingCustomer = getSavedCustomer();
+		Member existingMember = getSavedMember(existingCustomer);
 		String requestUserid = "nhnacademy";
 
 		when(memberRepository.findByUserId(requestUserid)).thenReturn(Optional.of(existingMember));
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.empty());
 
 		//when
-		MemberCheckResponse response = memberServiceImpl.checkMember(requestUserid);
+		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(requestUserid);
 
 		//then
 		assertNotNull(response);
@@ -284,9 +283,74 @@ class MemberServiceImplTest {
 		assertNull(response.authority());
 	}
 
-	/**
-	 * 테스트를 위한 MemberRegisterRequest 생성
-	 */
+	@DisplayName("회원 상세 조회 성공")
+	@Test
+	void getMemberDetails() {
+		//given
+		Customer savedCustomer = getSavedCustomer();
+		Member savedMember = getSavedMember(savedCustomer);
+		MemberDetailsRequest request = getMemberDetailsRequest();
+
+		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.of(savedMember));
+		when(customerRepository.findByIdAndPassword(savedMember.getId(), request.password()))
+			.thenReturn(Optional.of(savedCustomer));
+
+		//when
+		MemberDetailsResponse response = memberServiceImpl.getMemberDetails(request);
+
+		//then
+		assertThat(response.name()).isEqualTo(savedCustomer.getName());
+			assertThat(response.gender()).isEqualTo(savedMember.getGender());
+			assertThat(response.phoneNumber()).isEqualTo(savedCustomer.getPhoneNumber());
+			assertThat(response.email()).isEqualTo(savedCustomer.getEmail());
+			assertThat(response.birthday()).isEqualTo(savedMember.getBirthday());
+			assertThat(response.userId()).isEqualTo(savedMember.getUserId());
+			assertThat(response.password()).isEqualTo(savedCustomer.getPassword());
+			assertThat(response.point()).isEqualTo(savedMember.getPoint());
+			assertThat(response.totalPaymentAmount()).isEqualTo(savedMember.getTotalPaymentAmount());
+			assertThat(response.authority()).isEqualTo(savedMember.getAuthority());
+			assertThat(response.grade()).isEqualTo(savedMember.getGrade());
+			assertThat(response.status()).isEqualTo(savedMember.getStatus());
+			assertThat(response.createdAt()).isEqualTo(savedMember.getCreatedAt());
+			assertThat(response.latestLoginAt()).isEqualTo(savedMember.getLatestLoginAt());
+	}
+
+	@DisplayName("회원 상세 조회 실패 - 회원이 존재하지 않을 때")
+	@Test
+	void getMemberDetails_MemberNotFound() {
+		//given
+		MemberDetailsRequest request = getNonexistentMemberDetailsRequest();
+
+		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.empty());
+
+		//when / then
+		assertThatThrownBy(() -> memberServiceImpl.getMemberDetails(request))
+			.isInstanceOf(UserIdNotFoundException.class)
+			.hasMessage("존재하지 않는 아이디입니다.");
+	}
+
+	@DisplayName("회원 상세 조회 실패 - 고객이 존재하지 않을 때")
+	@Test
+	void getMemberDetails_CustomerNotFound() {
+		//given
+		Customer savedCustomer = getSavedCustomer();
+		Member savedMember = getSavedMember(savedCustomer);
+		MemberDetailsRequest request = getNonexistentMemberDetailsRequest();
+
+		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.of(savedMember));
+		when(customerRepository.findByIdAndPassword(savedMember.getId(), request.password()))
+			.thenReturn(Optional.empty());
+
+		//when / then
+		assertThatThrownBy(() -> memberServiceImpl.getMemberDetails(request))
+			.isInstanceOf(InvalidPasswordException.class)
+			.hasMessage("비밀번호가 일치하지 않습니다.");
+	}
+
+
+		/**
+		 * 테스트를 위한 MemberRegisterRequest 생성
+		 */
 	private MemberRegisterRequest getMemberCreateRequest() {
 		return MemberRegisterRequest.builder()
 			.name("boho")
@@ -321,6 +385,26 @@ class MemberServiceImplTest {
 	}
 
 	/**
+	 * 테스트를 위한 MemberDetailsRequest 생성
+	 */
+	private MemberDetailsRequest getMemberDetailsRequest() {
+		return MemberDetailsRequest.builder()
+			.userId("nuribooks95")
+			.password("abc123")
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 존재하지 않는 회원의 MemberDetailsRequest 생성
+	 */
+	private MemberDetailsRequest getNonexistentMemberDetailsRequest() {
+		return MemberDetailsRequest.builder()
+			.userId("alice")
+			.password("alice123")
+			.build();
+	}
+
+	/**
 	 * 테스트를 위한 등급 생성
 	 */
 	private Grade getGrade() {
@@ -335,7 +419,7 @@ class MemberServiceImplTest {
 	/**
 	 * 테스트를 위한 비회원 생성
 	 */
-	private Customer getCustomer() {
+	private Customer getSavedCustomer() {
 		return Customer.builder()
 			.id(1L)
 			.name("boho")
@@ -348,9 +432,8 @@ class MemberServiceImplTest {
 	/**
 	 * 테스트를 위한 회원 생성
 	 */
-	private Member getMember(Customer savedCustomer) {
+	private Member getSavedMember(Customer savedCustomer) {
 		return Member.builder()
-			.id(1L)
 			.customer(savedCustomer)
 			.authority(AuthorityType.MEMBER)
 			.grade(getGrade())
@@ -362,42 +445,5 @@ class MemberServiceImplTest {
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
 			.build();
-	}
-
-	/**
-	 * 테스트를 위한 동적 비회원 목록 생성
-	 */
-	private List<Customer> getDynamicCustomers(Long... ids) {
-		return Arrays.stream(ids)
-			.map(id -> Customer.builder()
-				.id(id)
-				.name("boho" + id)
-				.password("abc123")
-				.phoneNumber("042-8282-8282")
-				.email("nhnacademy" + id + "@nuriBooks.com")
-				.build())
-			.toList();
-	}
-
-	/**
-	 * 테스트를 위한 동적 탈퇴 회원 목록 생성
-	 */
-	private List<Member> getDynamicWithdrawnMembers(Long... ids) {
-		return IntStream.range(0, ids.length)
-				.mapToObj(i -> Member.builder()
-					.id(ids[i])
-					.customer(getDynamicCustomers(ids).get(i))
-					.authority(AuthorityType.MEMBER)
-					.grade(getGrade())
-					.status(StatusType.WITHDRAWN)
-					.gender(GenderType.MALE)
-					.userId("nuribooks95")
-					.birthday(LocalDate.of(1988, 8, 12))
-					.createdAt(LocalDateTime.now())
-					.point(BigDecimal.ZERO)
-					.totalPaymentAmount(BigDecimal.ZERO)
-					.withdrawnAt(LocalDateTime.of(2025 - ids[i].intValue(), 5, 14, 15, 30, 57))
-					.build())
-			.toList();
 	}
 }

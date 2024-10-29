@@ -57,8 +57,8 @@ class MemberRepositoryTest {
 
 		//then
 		assertThat(foundMember).isPresent(); // 회원이 존재함을 확인
-		assertThat(foundMember.get().getId()).isEqualTo(savedMember.getId()); // ID가 같은지 확인
-		assertThat(foundMember.get().getUserId()).isEqualTo(savedMember.getUserId()); // UserId가 같은지 확인
+		assertThat(foundMember.get().getId()).isEqualTo(savedMember.getId());
+		assertThat(foundMember.get().getUserId()).isEqualTo(savedMember.getUserId());
 	}
 
 	@DisplayName("등급의 id로 회원 등록 여부 확인")

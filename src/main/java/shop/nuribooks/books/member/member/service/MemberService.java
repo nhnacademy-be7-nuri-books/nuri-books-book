@@ -1,9 +1,11 @@
 package shop.nuribooks.books.member.member.service;
 
+import shop.nuribooks.books.member.member.dto.request.MemberDetailsRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
-import shop.nuribooks.books.member.member.dto.response.MemberCheckResponse;
+import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
+import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 
@@ -28,7 +30,12 @@ public interface MemberService {
 	MemberUpdateResponse updateMember(String userId, MemberUpdateRequest request);
 
 	/**
-	 * 회원 등록 여부 확인
+	 * 회원 인증 정보 조회
 	 */
-	MemberCheckResponse checkMember(String userId);
+	MemberAuthInfoResponse getMemberAuthInfo(String userId);
+
+	/**
+	 * 회원 상세 조회
+	 */
+	MemberDetailsResponse getMemberDetails(MemberDetailsRequest request);
 }
