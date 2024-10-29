@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -74,6 +75,23 @@ class MemberRepositoryTest {
 		assertThat(exists).isTrue();
 	}
 
+	@DisplayName("마지막 로그인 날짜가 입력된 날짜보다 이전인 회원들을 조회")
+	@Test
+	void findAllByLatestLoginAtBefore() {
+		//given
+		Member savedMember = getSavedMember();
+		LocalDateTime thresholdDate = LocalDateTime.now().minusDays(90);
+
+		//when
+		List<Member> inactiveMembers = memberRepository.findAllByLatestLoginAtBefore(thresholdDate);
+
+		//then
+		assertThat(inactiveMembers).hasSize(1);
+		assertThat(inactiveMembers).extracting(Member::getUserId)
+			.containsExactlyInAnyOrder(savedMember.getUserId());
+	}
+
+
 	/**
 	 * 테스트를 위해 repository에 grade, customer, member 저장 후 member 반환
 	 */
@@ -115,13 +133,14 @@ class MemberRepositoryTest {
 			.customer(savedCustomer)
 			.authority(AuthorityType.MEMBER)
 			.grade(savedGrade)
-			.status(StatusType.ACTIVE)
+			.status(StatusType.INACTIVE)
 			.gender(GenderType.MALE)
 			.userId("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
+			.latestLoginAt(LocalDateTime.of(2024,2,22,22,22,22))
 			.build();
 	}
 }
