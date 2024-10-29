@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
@@ -51,9 +52,9 @@ public class BookController {
 		@ApiResponse(responseCode = "400", description = "잘못된 페이징 요청")
 	})
 	@GetMapping
-	public ResponseEntity<Page<BookResponse>> getBooks(Pageable pageable) {
-		Page<BookResponse> bookResponses = bookService.getBooks(pageable);
-		return ResponseEntity.status(HttpStatus.OK).body(bookResponses);
+	public ResponseEntity<Page<AdminBookListResponse>> getBooks(Pageable pageable) {
+		Page<AdminBookListResponse> adminBookListResponse = bookService.getBooks(pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(adminBookListResponse);
 	}
 
 	@Operation(summary = "도서 상세 조회", description = "도서 ID를 통해 도서의 상세 정보를 조회하는 엔드포인트입니다.")

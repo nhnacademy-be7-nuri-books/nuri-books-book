@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
@@ -78,7 +79,7 @@ public class BookServiceImpl implements BookService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public Page<BookResponse> getBooks(Pageable pageable) {
+	public Page<AdminBookListResponse> getBooks(Pageable pageable) {
 		if(pageable.getPageNumber() < 0) {
 			throw new InvalidPageRequestException("페이지 번호는 0 이상이어야 합니다.");
 		}
@@ -89,7 +90,7 @@ public class BookServiceImpl implements BookService {
 			throw new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다.");
 		}
 
-		return bookPage.map(BookResponse::of);
+		return bookPage.map(AdminBookListResponse::of);
 	}
 
 	//TODO: 좋아요나 조회수에 대한 업데이트는 따로 메서드를 구현할 계획입니다.

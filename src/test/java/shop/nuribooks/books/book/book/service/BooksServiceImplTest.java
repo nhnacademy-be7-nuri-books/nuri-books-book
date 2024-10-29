@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
@@ -166,7 +167,7 @@ public class BooksServiceImplTest {
 
 		when(bookRepository.findAll(pageable)).thenReturn(bookPage);
 
-		Page<BookResponse> result = bookService.getBooks(pageable);
+		Page<AdminBookListResponse> result = bookService.getBooks(pageable);
 
 		assertFalse(result.isEmpty());
 		assertEquals(1, result.getTotalElements());

@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
@@ -117,26 +118,18 @@ public class BookControllerTest {
 	@Test
 	public void getBooks_ShouldReturnPageOfBooks_WhenRequestIsValid() throws Exception {
 		Pageable pageable = PageRequest.of(0, 10);
-		BookResponse bookResponse = new BookResponse(
+		AdminBookListResponse bookResponse = new AdminBookListResponse(
 			1L,
 			null,
 			BookStateEnum.NORMAL.getKorName(),
 			"책 제목",
-			"thumbnail.jpg",
-			null,
-			LocalDate.parse("2024-10-21"),
 			BigDecimal.valueOf(10000),
 			0,
-			"책 설명",
-			"책 내용",
-			"1234567890123",
 			true,
-			10,
-			10,
-			100L
+			10
 		);
 
-		Page<BookResponse> bookPage = new PageImpl<>(List.of(bookResponse), pageable, 1);
+		Page<AdminBookListResponse> bookPage = new PageImpl<>(List.of(bookResponse), pageable, 1);
 		when(bookService.getBooks(pageable)).thenReturn(bookPage);
 
 		mockMvc.perform(get("/api/books")
