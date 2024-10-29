@@ -12,7 +12,6 @@ import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
-import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
@@ -78,9 +77,6 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public Page<BookResponse> getBooks(Pageable pageable) {
 		Page<Book> bookPage = bookRepository.findAll(pageable);
-		if(bookPage.isEmpty() && pageable.getPageNumber() > 0 && pageable.getPageNumber() >= bookPage.getTotalPages()) {
-			throw new InvalidPageRequestException();
-		}
 		return bookPage.map(BookResponse::of);
 	}
 

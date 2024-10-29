@@ -24,6 +24,7 @@ import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.common.message.ResponseMessage;
+import shop.nuribooks.books.exception.InvalidPageRequestException;
 
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
@@ -51,6 +52,10 @@ public class BookController {
 	@GetMapping
 	public ResponseEntity<Page<BookResponse>> getBooks(Pageable pageable) {
 		Page<BookResponse> bookResponses = bookService.getBooks(pageable);
+
+		if(pageable.getPageNumber() > 0 && pageable.getPageNumber() >= bookResponses.getTotalPages()) {
+			throw new InvalidPageRequestException();
+		}
 		return ResponseEntity.status(HttpStatus.OK).body(bookResponses);
 	}
 

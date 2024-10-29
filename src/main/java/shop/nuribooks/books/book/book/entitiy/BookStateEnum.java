@@ -14,8 +14,7 @@ public enum BookStateEnum {
 		this.korName = korName;
 	}
 
-	@Override
-	public String toString() {
+	public String getKorName() {
 		return korName;
 	}
 }

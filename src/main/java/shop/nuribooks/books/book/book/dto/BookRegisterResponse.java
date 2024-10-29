@@ -7,8 +7,8 @@ import shop.nuribooks.books.book.book.entitiy.Book;
 
 public record BookRegisterResponse(
 	Long id,
-	Integer stateId,
 	Long publisherId,
+	String korName,
 	String title,
 	String thumbnailImageUrl,
 	LocalDate publicationDate,
@@ -20,8 +20,8 @@ public record BookRegisterResponse(
 	public static BookRegisterResponse of(Book book) {
 		return new BookRegisterResponse(
 			book.getId(),
-			book.getStateId().getId(),
 			book.getPublisherId().getId(),
+			book.getState().getKorName(),
 			book.getTitle(),
 			book.getThumbnailImageUrl(),
 			book.getPublicationDate(),

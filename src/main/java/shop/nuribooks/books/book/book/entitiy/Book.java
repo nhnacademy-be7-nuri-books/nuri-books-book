@@ -27,7 +27,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 
 @Entity
