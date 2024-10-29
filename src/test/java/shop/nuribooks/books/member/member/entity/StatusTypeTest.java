@@ -11,7 +11,7 @@ public class StatusTypeTest {
 	@Test
 	void getValue() {
 		assertThat(StatusType.ACTIVE.getValue()).isEqualTo("ACTIVE");
-		assertThat(StatusType.DORMANT.getValue()).isEqualTo("DORMANT");
+		assertThat(StatusType.INACTIVE.getValue()).isEqualTo("DORMANT");
 		assertThat(StatusType.WITHDRAWN.getValue()).isEqualTo("WITHDRAWN");
 	}
 
@@ -19,7 +19,7 @@ public class StatusTypeTest {
 	@Test
 	void fromValue_ValidInput() {
 		assertThat(StatusType.fromValue("ACTIVE")).isEqualTo(StatusType.ACTIVE);
-		assertThat(StatusType.fromValue("DORMANT")).isEqualTo(StatusType.DORMANT);
+		assertThat(StatusType.fromValue("DORMANT")).isEqualTo(StatusType.INACTIVE);
 		assertThat(StatusType.fromValue("WITHDRAWN")).isEqualTo(StatusType.WITHDRAWN);
 	}
 
@@ -27,7 +27,7 @@ public class StatusTypeTest {
 	@Test
 	void fromValue_UpperCaseInput() {
 		assertThat(StatusType.fromValue("active")).isEqualTo(StatusType.ACTIVE);
-		assertThat(StatusType.fromValue("dormant")).isEqualTo(StatusType.DORMANT);
+		assertThat(StatusType.fromValue("dormant")).isEqualTo(StatusType.INACTIVE);
 		assertThat(StatusType.fromValue("withdrawn")).isEqualTo(StatusType.WITHDRAWN);
 	}
 

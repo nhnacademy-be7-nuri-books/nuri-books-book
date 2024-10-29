@@ -108,4 +108,11 @@ public class Member {
 		this.status = WITHDRAWN;
 		this.withdrawnAt = LocalDateTime.now();
 	}
+
+	/**
+	 * 마지막 로그일 날짜로부터 90일이 지나면 상태를 INACTIVE로 변경
+	 */
+	public void changeToInactive() {
+		this.status = INACTIVE;
+	}
 }

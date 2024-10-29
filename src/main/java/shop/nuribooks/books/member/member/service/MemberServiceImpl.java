@@ -3,6 +3,7 @@ package shop.nuribooks.books.member.member.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -176,6 +177,23 @@ public class MemberServiceImpl implements MemberService {
 			.orElseThrow(() -> new InvalidPasswordException("비밀번호가 일치하지 않습니다."));
 
 		return DtoMapper.toDetailsDto(foundCustomer, foundMember);
+	}
+
+	/**
+	 * 매일 04:00시 정각에 마지막 로그인 날짜가 90일이 지난 회원들을 찾아, <br>
+	 * 그 중에서 상태가 ACTIVE인 회원들을 INACTIVE로 변경
+	 */
+	@Scheduled(cron = "0 0 4 * * ?")
+	public void checkInactiveMembers() {
+		LocalDateTime thresholdDate = LocalDateTime.now().minusDays(90);
+
+		memberRepository.findAllByLatestLoginAtBefore(thresholdDate)
+			.stream()
+			.filter(member -> member.getStatus() == StatusType.ACTIVE)
+			.forEach(member -> {
+				log.info("신규 휴면 회원이 발생하였습니다. - 회원 아이디: {}", member.getUserId());
+				member.changeToInactive();
+			});
 	}
 
 	// /**

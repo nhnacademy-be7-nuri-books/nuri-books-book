@@ -7,6 +7,8 @@ import static org.mockito.Mockito.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -347,10 +349,30 @@ class MemberServiceImplTest {
 			.hasMessage("비밀번호가 일치하지 않습니다.");
 	}
 
+	@DisplayName("마지막 로그인 날짜로부터 90일이 지난 회원을 휴면 처리")
+	@Test
+	void checkInactiveMembers() {
+		//given
+		Customer savedCustomer = getSavedCustomer();
+		Member inactiveMember = getInactiveMember(savedCustomer);
+		Member scheduledInactiveMember = spy(getScheduledInactiveMember(savedCustomer));
+		List<Member> members = Arrays.asList(inactiveMember, scheduledInactiveMember);
 
-		/**
-		 * 테스트를 위한 MemberRegisterRequest 생성
-		 */
+		when(memberRepository.findAllByLatestLoginAtBefore(any(LocalDateTime.class)))
+			.thenReturn(members);
+
+		//when
+		memberServiceImpl.checkInactiveMembers();
+
+		//then
+		assertThat(scheduledInactiveMember.getStatus()).isEqualTo(StatusType.INACTIVE);
+		verify(scheduledInactiveMember, times(1)).changeToInactive();
+	}
+
+
+	/**
+	 * 테스트를 위한 MemberRegisterRequest 생성
+	 */
 	private MemberRegisterRequest getMemberCreateRequest() {
 		return MemberRegisterRequest.builder()
 			.name("boho")
@@ -444,6 +466,44 @@ class MemberServiceImplTest {
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 휴면 회원 생성
+	 */
+	private Member getInactiveMember(Customer savedCustomer) {
+		return Member.builder()
+			.customer(savedCustomer)
+			.authority(AuthorityType.MEMBER)
+			.grade(getGrade())
+			.status(StatusType.INACTIVE)
+			.gender(GenderType.MALE)
+			.userId("nuribooks95")
+			.birthday(LocalDate.of(1988, 8, 12))
+			.createdAt(LocalDateTime.now())
+			.point(BigDecimal.ZERO)
+			.totalPaymentAmount(BigDecimal.ZERO)
+			.latestLoginAt(LocalDateTime.of(2024,2,22,22,22,22))
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 휴면 예정 회원 생성
+	 */
+	private Member getScheduledInactiveMember(Customer savedCustomer) {
+		return Member.builder()
+			.customer(savedCustomer)
+			.authority(AuthorityType.MEMBER)
+			.grade(getGrade())
+			.status(StatusType.ACTIVE)
+			.gender(GenderType.MALE)
+			.userId("nuribooks95")
+			.birthday(LocalDate.of(1988, 8, 12))
+			.createdAt(LocalDateTime.now())
+			.point(BigDecimal.ZERO)
+			.totalPaymentAmount(BigDecimal.ZERO)
+			.latestLoginAt(LocalDateTime.of(2024, 3, 3, 3, 3, 3))
 			.build();
 	}
 }

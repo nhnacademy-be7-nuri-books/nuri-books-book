@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum StatusType {
 
-	ACTIVE, DORMANT, WITHDRAWN;
+	ACTIVE, INACTIVE, WITHDRAWN;
 
 	@JsonValue
 	public String getValue() {
