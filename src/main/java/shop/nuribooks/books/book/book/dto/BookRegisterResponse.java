@@ -3,6 +3,8 @@ package shop.nuribooks.books.book.book.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import shop.nuribooks.books.book.book.entitiy.Book;
 
 public record BookRegisterResponse(
@@ -11,6 +13,7 @@ public record BookRegisterResponse(
 	String korName,
 	String title,
 	String thumbnailImageUrl,
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	LocalDate publicationDate,
 	BigDecimal price,
 	int discountRate,
