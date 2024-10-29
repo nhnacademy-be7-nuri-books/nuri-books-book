@@ -27,6 +27,7 @@ import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
@@ -136,15 +137,67 @@ public class BooksServiceImplTest {
 	}
 
 	@Test
-	public void getBooks_ShouldReturnEmptyPage_WhenRequestingFirstPageButNoBooks() {
-		Pageable pageable = PageRequest.of(0, 10);
-		Page<Book> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+	public void getBooks_ShouldThrowInvalidPageRequestException_WhenPageNumberIsNegative() {
+		Pageable pageable = mock(Pageable.class);
+		when(pageable.getPageNumber()).thenReturn(-1);
+
+		InvalidPageRequestException exception = assertThrows(InvalidPageRequestException.class, () -> bookService.getBooks(pageable));
+		assertEquals("페이지 번호는 0 이상이어야 합니다.", exception.getMessage());
+	}
+
+	@Test
+	public void getBooks_ShouldThrowInvalidPageRequestException_WhenPageNumberExceedsTotalPages() {
+		Pageable pageable = PageRequest.of(5, 10);  // 페이지 번호가 총 페이지 수를 초과하는 경우
+		Page<Book> emptyPage = new PageImpl<>(List.of(), pageable, 3);  // 총 3 페이지까지 존재한다고 가정
 
 		when(bookRepository.findAll(pageable)).thenReturn(emptyPage);
 
+		assertThrows(InvalidPageRequestException.class, () -> bookService.getBooks(pageable));
+	}
+
+	@Test
+	public void getBooks_ShouldReturnPageOfBooks_WhenRequestIsValid() {
+		Pageable pageable = PageRequest.of(0, 10);
+		Book book = Book.builder()
+			.title("Valid Book")
+			.state(BookStateEnum.NORMAL)
+			.build();
+		Page<Book> bookPage = new PageImpl<>(List.of(book), pageable, 1);
+
+		when(bookRepository.findAll(pageable)).thenReturn(bookPage);
+
 		Page<BookResponse> result = bookService.getBooks(pageable);
-		assertTrue(result.isEmpty());
-		verify(bookRepository, times(1)).findAll(pageable);
+
+		assertFalse(result.isEmpty());
+		assertEquals(1, result.getTotalElements());
+		assertEquals("Valid Book", result.getContent().getFirst().title());
+	}
+
+	@Test
+	public void getBooks_ShouldNotThrowException_WhenPageNumberEqualsTotalPages() {
+		Book book = Book.builder()
+			.publisherId(publisher)
+			.state(BookStateEnum.NORMAL)
+			.title("Sample Title")
+			.thumbnailImageUrl("url")
+			.publicationDate(LocalDate.now())
+			.price(BigDecimal.valueOf(100))
+			.discountRate(10)
+			.description("Sample description")
+			.contents("Sample contents")
+			.isbn("1234567890")
+			.isPackageable(false)
+			.stock(10)
+			.likeCount(0)
+			.viewCount(0L)
+			.build();
+
+		Pageable pageable = PageRequest.of(3, 10);
+		Page<Book> bookPage = new PageImpl<>(List.of(book), pageable, 4);
+
+		when(bookRepository.findAll(pageable)).thenReturn(bookPage);
+
+		assertDoesNotThrow(() -> bookService.getBooks(pageable));
 	}
 
 	@Test

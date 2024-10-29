@@ -119,11 +119,11 @@ public class BookControllerTest {
 		Pageable pageable = PageRequest.of(0, 10);
 		BookResponse bookResponse = new BookResponse(
 			1L,
-			null,  // Assuming publisher can be null or adjust as per requirement
+			null,
 			BookStateEnum.NORMAL.getKorName(),
 			"책 제목",
 			"thumbnail.jpg",
-			null,  // If detailImageUrl is optional
+			null,
 			LocalDate.parse("2024-10-21"),
 			BigDecimal.valueOf(10000),
 			0,
@@ -151,7 +151,7 @@ public class BookControllerTest {
 	@Test
 	public void getBooks_ShouldReturnBadRequest_WhenPageIsOutOfRange() throws Exception {
 		Pageable pageable = PageRequest.of(10, 10);
-		when(bookService.getBooks(pageable)).thenThrow(new InvalidPageRequestException());
+		when(bookService.getBooks(pageable)).thenThrow(new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다."));
 
 		mockMvc.perform(get("/api/books")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -160,55 +160,6 @@ public class BookControllerTest {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.message").value("조회 가능한 페이지 범위를 초과했습니다."));
 	}
-
-	@Test
-	public void getBooks_ShouldReturnPageOfBooks_WhenPageNumberIsWithinTotalPages() throws Exception {
-		Pageable pageable = PageRequest.of(1, 10);  // 유효한 페이지 요청
-		BookResponse bookResponse = new BookResponse(
-			1L,
-			null,  // Publisher가 없을 경우 null 사용
-			"상태",
-			"책 제목",
-			"thumbnail.jpg",
-			"detail.jpg",
-			LocalDate.now(),
-			BigDecimal.valueOf(10000),
-			10,
-			"책 설명",
-			"책 내용",
-			"1234567890123",
-			true,
-			5,
-			10,
-			100L
-		);
-		Page<BookResponse> bookPage = new PageImpl<>(List.of(bookResponse), pageable, 20);  // 유효한 페이지 생성
-
-		when(bookService.getBooks(pageable)).thenReturn(bookPage);
-
-		mockMvc.perform(get("/api/books")
-				.param("page", "1")  // 유효한 페이지 번호
-				.param("size", "10")
-				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.content[0].title").value("책 제목"));
-	}
-
-	@Test
-	public void getBooks_ShouldThrowInvalidPageRequestException_WhenPageNumberExceedsTotalPages() throws Exception {
-		Pageable pageable = PageRequest.of(5, 10);  // 요청 페이지가 유효 범위를 벗어난 경우
-		Page<BookResponse> bookPage = new PageImpl<>(List.of(), pageable, 40);  // 4 페이지까지 존재하는 경우
-
-		when(bookService.getBooks(pageable)).thenReturn(bookPage);
-
-		mockMvc.perform(get("/api/books")
-				.param("page", "5")  // 유효 범위를 벗어난 페이지 번호
-				.param("size", "10")
-				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.message").value("조회 가능한 페이지 범위를 초과했습니다."));
-	}
-
 
 	@Test
 	public void getBookById_ShouldReturnBookResponse_WhenBookExists() throws Exception {

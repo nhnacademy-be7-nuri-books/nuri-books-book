@@ -47,15 +47,12 @@ public class BookController {
 
 	@Operation(summary = "도서 목록 조회", description = "페이지네이션을 통해 도서 목록을 조회하는 엔드포인트입니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "도서 목록 조회 성공")
+		@ApiResponse(responseCode = "200", description = "도서 목록 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 페이징 요청")
 	})
 	@GetMapping
 	public ResponseEntity<Page<BookResponse>> getBooks(Pageable pageable) {
 		Page<BookResponse> bookResponses = bookService.getBooks(pageable);
-
-		if(pageable.getPageNumber() > 0 && pageable.getPageNumber() >= bookResponses.getTotalPages()) {
-			throw new InvalidPageRequestException();
-		}
 		return ResponseEntity.status(HttpStatus.OK).body(bookResponses);
 	}
 

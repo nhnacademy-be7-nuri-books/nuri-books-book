@@ -13,6 +13,7 @@ import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
@@ -78,7 +79,16 @@ public class BookServiceImpl implements BookService {
 	@Transactional(readOnly = true)
 	@Override
 	public Page<BookResponse> getBooks(Pageable pageable) {
+		if(pageable.getPageNumber() < 0) {
+			throw new InvalidPageRequestException("페이지 번호는 0 이상이어야 합니다.");
+		}
+
 		Page<Book> bookPage = bookRepository.findAll(pageable);
+
+		if(pageable.getPageNumber() > bookPage.getTotalPages() - 1) {
+			throw new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다.");
+		}
+
 		return bookPage.map(BookResponse::of);
 	}
 
