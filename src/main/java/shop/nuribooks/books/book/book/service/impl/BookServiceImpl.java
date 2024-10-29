@@ -11,6 +11,7 @@ import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
@@ -18,7 +19,6 @@ import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.book.book.service.BookService;
-import shop.nuribooks.books.exception.bookstate.BookStateIdNotFoundException;
 
 @RequiredArgsConstructor
 @Service
@@ -36,9 +36,11 @@ public class BookServiceImpl implements BookService {
 		Publisher publisher = publisherRepository.findById(reqDto.publisherId())
 			.orElseThrow(() -> new PublisherIdNotFoundException(reqDto.publisherId()));
 
+		BookStateEnum bookStateEnum = BookStateEnum.fromString(String.valueOf(reqDto.state()));
+
 		Book book = Book.builder()
 			.publisherId(publisher)
-			.state(reqDto.state())
+			.state(bookStateEnum)
 			.title(reqDto.title())
 			.thumbnailImageUrl(reqDto.thumbnailImageUrl())
 			.detailImageUrl(reqDto.detailImageUrl())
@@ -89,7 +91,7 @@ public class BookServiceImpl implements BookService {
 	 * @param bookId 업데이트할 책의 ID
 	 * @param bookUpdateReq 책 업데이트 요청 정보를 포함한 객체
 	 * @throws BookIdNotFoundException 책 ID가 존재하지 않는 경우 발생
-	 * @throws BookStateIdNotFoundException 도서상태 ID가 존재하지 않는 경우 발생
+	 * @throws shop.nuribooks.books.exception.book.InvalidBookStateException BookStateEnum에 존재하지 않는 도서상태가 입력된 경우 발생
 	 * @throws PublisherIdNotFoundException 주어진 출판사 ID가 존재하지 않는 경우 발생
 	 */
 	@Transactional
@@ -101,7 +103,9 @@ public class BookServiceImpl implements BookService {
 		Publisher publisher = publisherRepository.findById(bookUpdateReq.publisherId())
 			.orElseThrow(() -> new PublisherIdNotFoundException(bookUpdateReq.publisherId()));
 
-		book.updateBookDetails(bookUpdateReq, publisher);
+		BookStateEnum bookStateEnum = BookStateEnum.fromString(String.valueOf(bookUpdateReq.state()));
+
+		book.updateBookDetails(bookUpdateReq, bookStateEnum, publisher);
 
 		bookRepository.save(book);
 	}

@@ -121,9 +121,9 @@ public class Book {
 		this.viewCount = viewCount;
 	}
 
-	public void updateBookDetails(BookUpdateRequest request, Publisher publisher) {
+	public void updateBookDetails(BookUpdateRequest request, BookStateEnum bookStateEnum, Publisher publisher) {
 		this.publisherId = publisher;
-		this.state = request.state();
+		this.state = bookStateEnum;
 		this.title = request.title();
 		this.thumbnailImageUrl = request.thumbnailImageUrl();
 		this.detailImageUrl = request.detailImageUrl();

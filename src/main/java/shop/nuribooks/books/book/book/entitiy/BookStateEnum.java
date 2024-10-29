@@ -1,5 +1,8 @@
 package shop.nuribooks.books.book.book.entitiy;
 
+import shop.nuribooks.books.exception.BadRequestException;
+import shop.nuribooks.books.exception.book.InvalidBookStateException;
+
 public enum BookStateEnum {
 	NEW("신간"),
 	NORMAL("정가판매"),
@@ -16,6 +19,14 @@ public enum BookStateEnum {
 
 	public String getKorName() {
 		return korName;
+	}
+
+	public static BookStateEnum fromString(String name) {
+		try {
+			return BookStateEnum.valueOf(name.toUpperCase());
+		} catch (BadRequestException e) {
+			throw new InvalidBookStateException(name);
+		}
 	}
 }
 
