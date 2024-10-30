@@ -1,42 +1,27 @@
-package shop.nuribooks.books.common.config;
+package shop.nuribooks.books.cart.customer.service;
 
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Value;
+import com.redis.testcontainers.RedisContainer;
+import jakarta.annotation.PreDestroy;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Profile("!test")
-@Configuration
-public class RedisConfig {
+@Profile("test")
+@TestConfiguration
+public class RedisTestConfig {
 
-    @Value("${spring.data.redis.host}")
-    private String host;
-
-    @Value("${spring.data.redis.port}")
-    private int port;
-
-    @Value("${spring.data.redis.password}")
-    private String password;
-
-    @Value("${spring.data.redis.database}")
-    private int database;
+    private RedisContainer redisContainer = new RedisContainer("redis:7.0.5");
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(host);
-        redisStandaloneConfiguration.setPort(port);
-        redisStandaloneConfiguration.setPassword(password);
-        redisStandaloneConfiguration.setDatabase(database);
-        return new LettuceConnectionFactory(redisStandaloneConfiguration);
+        redisContainer = new RedisContainer("redis:7.0.5");
+        redisContainer.start();
+        return new LettuceConnectionFactory(redisContainer.getHost(), redisContainer.getFirstMappedPort());
     }
 
     @Bean
@@ -49,4 +34,11 @@ public class RedisConfig {
         sessionRedisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         return sessionRedisTemplate;
     }
+
+    @PreDestroy
+    public void stopRedisContainer() {
+        redisContainer.stop();
+    }
+
+
 }

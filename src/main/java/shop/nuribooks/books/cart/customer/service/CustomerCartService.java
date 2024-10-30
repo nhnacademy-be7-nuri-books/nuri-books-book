@@ -8,5 +8,9 @@ public interface CustomerCartService {
 
     void addToCart(CustomerCartAddRequest request);
 
-//    List<CustomerCartResponse> getCustomerCartList(Long sessionId);
+    //비회원 장바구니 조회
+    List<CustomerCartResponse> getCustomerCartList(String sessionId);
+
+    //비회원 장바구니 삭제
+    void removeCustomerCart(String sessionId);
 }
