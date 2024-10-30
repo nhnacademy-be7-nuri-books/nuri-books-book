@@ -9,12 +9,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -27,4 +27,20 @@ public class Contributor {
 	@NotNull
 	@Length(min = 1, max = 50)
 	private String name;
+
+	@Builder
+	public Contributor(Long id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+
+	public ContributorEditor.ContributorEditorBuilder toEditor() {
+		return ContributorEditor.builder()
+			.name(name);
+	}
+
+	public void edit(ContributorEditor editor) {
+		name = editor.getName();
+	}
+
 }
