@@ -3,7 +3,6 @@ package shop.nuribooks.books.member.customer.controller;
 import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,11 +14,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
-import shop.nuribooks.books.member.customer.dto.request.CustomerUpdateRequest;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
-import shop.nuribooks.books.member.customer.dto.response.CustomerUpdateResponse;
 import shop.nuribooks.books.member.customer.service.CustomerService;
 
+/**
+ * @author Jprotection
+ */
 @RestController
 @RequestMapping("/api/member/customer")
 @RequiredArgsConstructor
@@ -48,21 +48,6 @@ public class CustomerController {
 		return ResponseEntity.status(CREATED).body(response);
 	}
 
-	/**
-	 * 비회원 정보 수정
-	 * @param customerId 비회원 기본키
-	 * @param request CustomerUpdateRequest에 이름과 전화번호를 담아서 요청
-	 * @return 비회원 정보 수정에 성공하면 이름과 전화번호를 CustomerUpdateRequest에 담아서 반환
-	 */
-	@Deprecated
-	@PostMapping("/{customerId}")
-	public ResponseEntity<CustomerUpdateResponse> customerUpdate(
-		@PathVariable Long customerId, @RequestBody @Valid CustomerUpdateRequest request) {
-
-		CustomerUpdateResponse response = customerService.updateCustomer(customerId, request);
-
-		return ResponseEntity.status(OK).body(response);
-	}
 }
 
 

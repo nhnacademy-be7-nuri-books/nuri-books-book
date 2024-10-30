@@ -7,11 +7,13 @@ import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Builder;
+import shop.nuribooks.books.member.member.entity.GenderType;
 
 @Builder
 public record MemberRegisterResponse (
 
 	String name,
+	GenderType gender,
 	String userId,
 	String phoneNumber,
 	String email,

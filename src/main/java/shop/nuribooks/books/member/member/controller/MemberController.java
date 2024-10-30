@@ -17,14 +17,22 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.common.message.ResponseMessage;
+import shop.nuribooks.books.exception.member.CustomerNotFoundException;
+import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.member.member.dto.request.MemberDetailsRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
-import shop.nuribooks.books.member.member.dto.response.MemberCheckResponse;
+import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
+import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.member.service.MemberService;
 
+
+/**
+ * @author Jprotection
+ */
 @RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
@@ -57,18 +65,17 @@ public class MemberController {
 	/**
 	 * 아이디로 회원의 이름과 비밀번호, 권한을 조회 <br>
 	 * pathVariable로 입력된 userId 길이 검사 후 회원 확인 진행 <br>
-	 * 회원이 존재하면 이름, 비밀번호, 권한을 MemberCheckResponse에 담아서 반환 <br>
-	 * 회원이 존재하지 않는다면 이름, 비밀번호, 권한이 모두 null인 MemberCheckResponse를 반환
+	 * 회원이 존재하면 이름, 비밀번호, 권한을 MemberAuthInfoResponse에 담아서 반환 <br>
+	 * 회원이 존재하지 않는다면 이름, 비밀번호, 권한이 모두 null인 MemberAuthInfoResponse를 반환
 	 */
-	@Operation(summary = "유저 아이디로 회원 조회", description = "유저 아이디로 회원의 이름과 비밀번호, 권한을 조회합니다.")
+	@Operation(summary = "유저 아이디로 회원 인증 조회", description = "유저 아이디로 회원의 이름과 비밀번호, 권한을 조회합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "회원 조회 성공"),
+		@ApiResponse(responseCode = "200", description = "회원 인증 조회 성공"),
 		@ApiResponse(responseCode = "404", description = "회원이 존재하지 않음")
 	})
 	@GetMapping("/{userId}")
-	public ResponseEntity<MemberCheckResponse> memberCheck(@PathVariable String userId) {
-
-		MemberCheckResponse response = memberService.checkMember(userId);
+	public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfo(@PathVariable String userId) {
+		MemberAuthInfoResponse response = memberService.getMemberAuthInfo(userId);
 
 		return ResponseEntity.status(OK).body(response);
 	}
@@ -81,8 +88,8 @@ public class MemberController {
 	@Operation(summary = "회원 탈퇴", description = "유저 아이디와 비밀번호로 회원을 탈퇴합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
-		@ApiResponse(responseCode = "400", description = "회원 탈퇴 요청 데이터가 유효하지 않음"),
-		@ApiResponse(responseCode = "404", description = "회원이 존재하지 않음")
+		@ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않음"),
+		@ApiResponse(responseCode = "404", description = "유저 아이디가 존재하지 않음")
 	})
 	@DeleteMapping
 	public ResponseEntity<ResponseMessage> memberWithdraw(
@@ -92,6 +99,24 @@ public class MemberController {
 
 		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),
 			"탈퇴가 성공적으로 완료되었습니다. 귀하의 앞날에 무궁한 발전이 있기를 진심으로 기원하겠습니다."));
+	}
+
+	/**
+	 * 입력받은 아이디와 비밀번호로 회원 상세 정보 조회 <br>
+	 * MemberDetailsRequest로 받은 userId와 password로 회원을 찾아서 <br>
+	 * MemberDetailsResponse에 회원의 모든 정보를 담아서 반환
+	 */
+	@Operation(summary = "유저 아이디와 비밀번호로 회원 상세 조회", description = "유저 아이디와 비밀번호로 회원의 상세 정보를 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "회원 상세 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않음"),
+		@ApiResponse(responseCode = "404", description = "유저 아이디가 존재하지 않음")
+	})
+	@GetMapping
+	public ResponseEntity<MemberDetailsResponse> getMemberDetails(@RequestBody MemberDetailsRequest request) {
+		MemberDetailsResponse response = memberService.getMemberDetails(request);
+
+		return ResponseEntity.status(OK).body(response);
 	}
 
 	/**
