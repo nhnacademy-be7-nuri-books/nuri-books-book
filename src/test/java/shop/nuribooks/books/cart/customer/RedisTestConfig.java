@@ -1,4 +1,4 @@
-package shop.nuribooks.books.cart.customer.service;
+package shop.nuribooks.books.cart.customer;
 
 import com.redis.testcontainers.RedisContainer;
 import jakarta.annotation.PreDestroy;

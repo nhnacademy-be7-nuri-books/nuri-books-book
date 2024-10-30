@@ -5,6 +5,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import shop.nuribooks.books.cart.customer.dto.request.CustomerCartAddRequest;
+import shop.nuribooks.books.cart.customer.dto.request.CustomerCartRemoveItemRequest;
 import shop.nuribooks.books.cart.customer.dto.response.CustomerCartResponse;
 import shop.nuribooks.books.cart.customer.entitiy.CustomerCart;
 import shop.nuribooks.books.cart.customer.repository.CustomerCartRepository;
@@ -14,6 +15,7 @@ import shop.nuribooks.books.cart.customer.repository.CustomerCartRepository;
 public class CustomerCartServiceImpl implements CustomerCartService {
     public static final String CART_KEY = "cart:";
     private final CustomerCartRepository customerCartRepository;
+
 
     // 비회원 장바구니 담기
     @Override
@@ -38,10 +40,18 @@ public class CustomerCartServiceImpl implements CustomerCartService {
     //비회원 장바구니 전체 삭제
     @Override
     public void removeCustomerCart(String sessionId) {
+        //TODO: 장바구니가 없는 경우 예외 처리
         customerCartRepository.removeCart(sessionId);
     }
 
     //비회원 장바구니 특정 도서 삭제
+    @Override
+    public void removeCustomerCartItem(CustomerCartRemoveItemRequest request) {
+        //TODO: 아이템 없는 경우 예외 처리
+        customerCartRepository.removeCartItem(request.sessionId(), request.bookId().toString());
+    }
+
+
 
 
 
