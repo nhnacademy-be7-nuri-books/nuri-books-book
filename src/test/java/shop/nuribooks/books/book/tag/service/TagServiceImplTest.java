@@ -132,6 +132,48 @@ class TagServiceImplTest {
 
 	}
 
+	@DisplayName("특정 태그 수정")
+	@Test
+	void updateTag() {
+		//given
+		Long id = 1L;
+		Tag existingTag = registerTag();
+		TagRequest request = TagRequest.builder().name("update").build();
+		Tag updatedTag = Tag.builder().id(id).name("update").build();
+
+		// when
+		when(tagRepository.findById(id)).thenReturn(Optional.of(existingTag));
+		when(tagRepository.save(any(Tag.class))).thenReturn(updatedTag);
+
+		TagResponse response = tagService.updateTag(id, request);
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.name()).isEqualTo("update");
+
+		verify(tagRepository).findById(id);
+
+	}
+
+	@DisplayName("특정 태그 수정 - 실패")
+	@Test
+	void failed_updateTag() {
+		// given
+		Long id = 999L;
+		TagRequest request = TagRequest.builder().name("nonExistingTag").build();
+
+		// when
+		when(tagRepository.findById(id)).thenReturn(Optional.empty());
+
+		// then
+		assertThatThrownBy(() -> tagService.updateTag(id, request))
+			.isInstanceOf(TagNotFoundException.class)
+			.hasMessageContaining("태그가 존재하지 않습니다.");
+
+		verify(tagRepository).findById(id);
+		verify(tagRepository, never()).save(any(Tag.class));
+	}
+
 	private Tag registerTag() {
 		return Tag.builder().name("tag1").build();
 	}
