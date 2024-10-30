@@ -2,7 +2,7 @@ name: dev-deploy-phase
 on:
   push:
     branches:
-      - "main"
+      - develop
 
 env:
   JASYPT_PASSWORD: ${{secrets.JASYPT_PASSWORD}}
@@ -30,7 +30,7 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
           source: "target/*.jar"
-          target: "~/books/books.jar"
+          target: "~/"
           rm: true
 
       - name: execute shell script
