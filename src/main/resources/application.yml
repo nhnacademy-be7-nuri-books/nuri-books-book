@@ -19,6 +19,10 @@ spring:
     init:
       mode: never
 
+aladin:
+  api:
+    key: ENC(L6ztXJXEDUzurinyR6rhd9V99PEBzgxY0sI6S2Ptllw=)
+
 server:
   port: 8083
 
