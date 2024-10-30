@@ -183,6 +183,7 @@ public class MemberServiceImpl implements MemberService {
 	 * 매일 04:00시 정각에 마지막 로그인 날짜가 90일이 지난 회원들을 찾아, <br>
 	 * 그 중에서 상태가 ACTIVE인 회원들을 INACTIVE로 변경
 	 */
+	@Transactional
 	@Scheduled(cron = "0 0 4 * * ?")
 	public void checkInactiveMembers() {
 		LocalDateTime thresholdDate = LocalDateTime.now().minusDays(90);

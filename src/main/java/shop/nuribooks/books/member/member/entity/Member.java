@@ -26,6 +26,9 @@ import lombok.NoArgsConstructor;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
 
+/**
+ * @author Jprotection
+ */
 @Entity
 @Getter
 @Builder
