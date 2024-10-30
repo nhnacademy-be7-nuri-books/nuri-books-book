@@ -43,9 +43,4 @@ public class Customer {
 		this.password = password;
 		this.phoneNumber = phoneNumber;
 	}
-
-	public void changeCustomerInformation(String name, String phoneNumber) {
-		this.name = name;
-		this.phoneNumber = phoneNumber;
-	}
 }
