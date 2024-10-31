@@ -1,0 +1,66 @@
+### 기여자 등록
+POST localhost:8083/api/contributors
+Content-Type:application/json
+
+{
+  "name": "test"
+}
+
+### 기여자 수정
+PUT localhost:8083/api/contributors/1
+Content-Type:application/json
+
+{
+  "name": "test1"
+}
+
+### 기여자 조회
+GET localhost:8083/api/contributors/1
+
+### 기여자 삭제
+DELETE localhost:8083/api/contributors/1
+Content-Type:application/json
+
+
+
+### 기여자 역할 등록
+POST localhost:8083/api/contributors/roles
+Content-Type:application/json
+
+{
+  "name": "author"
+}
+
+### 기여자 역할 조회
+GET localhost:8083/api/contributors/roles
+
+### 기여자 역할 수정
+PUT localhost:8083/api/contributors/roles/author
+Content-Type:application/json
+
+{
+  "name": "coAuthor"
+}
+
+### 기여자 역할 삭제
+DELETE localhost:8083/api/contributors/roles/author
+
+
+### 책 등록
+POST localhost:8083/api/books
+Content-Type:application/json
+
+{
+  "stateId": 1,
+  "publisherId": 2,
+  "title": "Spring in Action",
+  "thumbnailImageUrl": "https://example.com/thumbnail.jpg",
+  "publicationDate": "2022-10-10",
+  "price": 35000,
+  "discountRate": 10,
+  "description": "A comprehensive guide to Spring Framework.",
+  "contents": "Introduction, Getting Started, Advanced Concepts...",
+  "isbn": "978-3-16-148410-0",
+  "isPackageable": true,
+  "stock": 100
+}
