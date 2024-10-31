@@ -10,7 +10,7 @@ import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 
 public record BookResponse(
 	Long id,
-	Publisher publisher,
+	String publisherName,
 	String state,
 	String title,
 	String thumbnailImageUrl,
@@ -30,7 +30,7 @@ public record BookResponse(
 	public static BookResponse of(Book book) {
 		return new BookResponse(
 			book.getId(),
-			book.getPublisherId(),
+			book.getPublisherId().getName(),
 			book.getState().getKorName(),
 			book.getTitle(),
 			book.getThumbnailImageUrl(),

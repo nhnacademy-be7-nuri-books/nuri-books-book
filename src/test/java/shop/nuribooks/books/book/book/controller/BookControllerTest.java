@@ -65,7 +65,7 @@ public class BookControllerTest {
 
 		BookRegisterResponse resDto = new BookRegisterResponse(
 			1L,
-			1L,
+			"출판사",
 			BookStateEnum.NORMAL.getKorName(),
 			"책 제목",
 			"thumbnail.jpg",

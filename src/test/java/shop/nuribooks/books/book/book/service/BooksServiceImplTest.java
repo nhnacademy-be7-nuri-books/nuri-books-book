@@ -159,10 +159,6 @@ public class BooksServiceImplTest {
 	@Test
 	public void getBooks_ShouldReturnPageOfBooks_WhenRequestIsValid() {
 		Pageable pageable = PageRequest.of(0, 10);
-		Book book = Book.builder()
-			.title("Valid Book")
-			.state(BookStateEnum.NORMAL)
-			.build();
 		Page<Book> bookPage = new PageImpl<>(List.of(book), pageable, 1);
 
 		when(bookRepository.findAll(pageable)).thenReturn(bookPage);
@@ -171,7 +167,7 @@ public class BooksServiceImplTest {
 
 		assertFalse(result.isEmpty());
 		assertEquals(1, result.getTotalElements());
-		assertEquals("Valid Book", result.getContent().getFirst().title());
+		assertEquals("Original Book Title", result.getContent().getFirst().title());
 	}
 
 	@Test
