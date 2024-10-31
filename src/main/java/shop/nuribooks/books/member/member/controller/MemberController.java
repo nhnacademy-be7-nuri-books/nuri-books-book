@@ -17,8 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.common.message.ResponseMessage;
-import shop.nuribooks.books.exception.member.CustomerNotFoundException;
-import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.member.dto.request.MemberDetailsRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
