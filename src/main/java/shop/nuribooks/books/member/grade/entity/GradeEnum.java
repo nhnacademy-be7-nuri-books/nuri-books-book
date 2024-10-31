@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 
 public enum GradeEnum {
 
-	STANDARD(3, BigDecimal.valueOf(100_000)),
-	GOLD(5, BigDecimal.valueOf(200_000)),
-	PLATINUM(8, BigDecimal.valueOf(350_000)),
-	ROYAL(12, BigDecimal.valueOf(500_000));
+	STANDARD(1, BigDecimal.valueOf(100_000)),
+	ROYAL(2, BigDecimal.valueOf(200_000)),
+	GOLD(2, BigDecimal.valueOf(300_000)),
+	PLATINUM(3, BigDecimal.valueOf(500_000));
 
 	/**
 	 * 할인율

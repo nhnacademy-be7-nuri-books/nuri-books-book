@@ -13,6 +13,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class CartId implements Serializable {
 
-	private Long MemberId;
-	private Long BookId;
+	private Long memberId;
+	private Long bookId;
 }
