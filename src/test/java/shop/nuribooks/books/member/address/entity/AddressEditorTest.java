@@ -47,38 +47,4 @@ class AddressEditorTest {
                 .containsExactly("name2", "address", "addressDetail", true);
     }
 
-    @DisplayName("Address 빌더 테스트")
-    @Test
-    void addressBuilderTest() {
-
-        // when
-        Address address = Address.builder()
-                .name("name")
-                .address("address")
-                .addressDetail("addressDetail")
-                .isDefault(false)
-                .build();
-
-        // then
-        assertThat(address).extracting("name", "address", "addressDetail", "isDefault")
-                .containsExactly("name", "address", "addressDetail", false);
-    }
-//
-//
-//    @DisplayName("AddressEditRequest 빌더 테스트")
-//    @Test
-//    void addressBuilderTest() {
-//
-//        // when
-//        Address address = Address.builder()
-//                .name("name")
-//                .address("address")
-//                .addressDetail("addressDetail")
-//                .isDefault(false)
-//                .build();
-//
-//        // then
-//        assertThat(address).extracting("name", "address", "addressDetail", "isDefault")
-//                .containsExactly("name", "address", "addressDetail", false);
-//    }
 }
