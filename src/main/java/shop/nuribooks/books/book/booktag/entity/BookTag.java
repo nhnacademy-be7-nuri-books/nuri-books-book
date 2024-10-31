@@ -20,7 +20,6 @@ import shop.nuribooks.books.book.tag.entity.Tag;
 @Entity
 @NoArgsConstructor
 @Getter
-@Setter
 @Table(name = "book_tags")
 public class BookTag {
 	@Id

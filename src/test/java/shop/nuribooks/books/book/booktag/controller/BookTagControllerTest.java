@@ -32,6 +32,9 @@ class BookTagControllerTest {
 	@MockBean
 	private BookTagService bookTagService;
 
+	@Autowired
+	private ObjectMapper objectMapper;
+
 	@DisplayName("도서 태그 등록")
 	@Test
 	void registerTagToBook() throws Exception {
@@ -52,5 +55,61 @@ class BookTagControllerTest {
 			.andExpect(jsonPath("$.tagId").isArray())
 			.andExpect(jsonPath("$.tagId[0]").value(2L))
 			.andExpect(jsonPath("$.tagId[1]").value(3L));
+	}
+
+	@Test
+	@DisplayName("유효성 검사 실패 - 음수 bookId")
+	void registerTagToBook_InvalidBookId() throws Exception {
+		// Given: 음수 bookId로 유효성 검사 실패를 유발
+		BookTagRequest request = new BookTagRequest(-1L, List.of(1L, 2L));
+
+		// When & Then
+		mockMvc.perform(post("/api/book-tags")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("bookId는 양수여야 합니다")); // 필드 오류 메시지 확인
+	}
+
+	@Test
+	@DisplayName("유효성 검사 실패 - 음수 tagId")
+	void registerTagToBook_InvalidTagId() throws Exception {
+		// Given: 음수 tagId로 유효성 검사 실패를 유발
+		BookTagRequest request = new BookTagRequest(1L, List.of(-1L, 2L));
+
+		// When & Then
+		mockMvc.perform(post("/api/book-tags")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("tagId는 양수여야 합니다"));
+	}
+
+	@Test
+	@DisplayName("유효성 검사 실패 - Null bookId")
+	void registerTagToBook_NullBookId() throws Exception {
+		// Given: null bookId로 유효성 검사 실패를 유발
+		BookTagRequest request = new BookTagRequest(null, List.of(1L, 2L));
+
+		// When & Then
+		mockMvc.perform(post("/api/book-tags")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("bookId는 필수 입력 항목입니다"));
+	}
+
+	@Test
+	@DisplayName("유효성 검사 실패 - Null tagId")
+	void registerTagToBook_NullTagId() throws Exception {
+		// Given: null tagId로 유효성 검사 실패를 유발
+		BookTagRequest request = new BookTagRequest(1L, null);
+
+		// When & Then
+		mockMvc.perform(post("/api/book-tags")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("tagId는 필수 입력 항목입니다"));
 	}
 }
