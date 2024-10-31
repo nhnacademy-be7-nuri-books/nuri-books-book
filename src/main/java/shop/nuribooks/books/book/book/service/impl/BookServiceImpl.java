@@ -13,7 +13,7 @@ import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
-import shop.nuribooks.books.book.client.AladinFeginClient;
+import shop.nuribooks.books.book.client.AladinFeignClient;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
@@ -28,7 +28,7 @@ import shop.nuribooks.books.book.book.service.BookService;
 public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
-	private final AladinFeginClient aladinFeginClient;
+	private final AladinFeignClient aladinFeignClient;
 
 	//관리자 페이지에서 관리자의 직접 도서 등록을 위한 메서드
 	//TODO: 외부 api를 이용한 도서 등록기능 별도 구현 예정

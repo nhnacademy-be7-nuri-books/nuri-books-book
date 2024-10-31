@@ -6,15 +6,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import shop.nuribooks.books.book.book.dto.AladinBookListItemResponse;
 import shop.nuribooks.books.book.book.dto.AladinBookListResponse;
-import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.service.AladinBookService;
-import shop.nuribooks.books.book.client.AladinFeginClient;
+import shop.nuribooks.books.book.client.AladinFeignClient;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AladinBookServiceImpl implements AladinBookService {
-	private final AladinFeginClient aladinFeginClient;
+	private final AladinFeignClient aladinFeignClient;
 
 	@Value("${aladin.api.key}")
 	private String ttbKey;
@@ -22,7 +24,14 @@ public class AladinBookServiceImpl implements AladinBookService {
 	//도서 리스트 조회 메서드
 	//TODO: 추후 파라미터 추가 예정
 	@Override
-	public List<AladinBookListResponse> getNewBooks() {
-		return aladinFeginClient.getNewBooks(ttbKey, "ItemNewAll", 10, 1, "Book", "JS");
+	public List<AladinBookListItemResponse> getNewBooks() {
+		try {
+			AladinBookListResponse response = aladinFeignClient.getNewBooks(ttbKey, "ItemNewAll", 10, 1, "Book", "JS", "20131101");
+			log.info("Received response: {}", response);
+			return response.item();
+		} catch (Exception ex) {
+			log.error("Error: ", ex);
+			throw new RuntimeException("Failed to retrieve new books from Aladin");
+		}
 	}
 }

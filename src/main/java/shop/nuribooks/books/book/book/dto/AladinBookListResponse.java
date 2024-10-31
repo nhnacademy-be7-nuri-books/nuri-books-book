@@ -1,10 +1,10 @@
 package shop.nuribooks.books.book.book.dto;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record AladinBookListResponse(
-	String title,
-	String author,
-	String isbn,
-	int priceStandard,
-	String cover
+	@JsonProperty("item") List<AladinBookListItemResponse> item
 ) {
 }

@@ -1,7 +1,5 @@
 package shop.nuribooks.books.book.client;
 
-import java.util.List;
-
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,17 +7,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import shop.nuribooks.books.book.book.dto.AladinBookListResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 
-@FeignClient(name = "aladinClient", url = "http://api.aladin.co.kr")
-public interface AladinFeginClient {
+@FeignClient(name = "aladinClient", url = "https://aladin.co.kr")
+public interface AladinFeignClient {
 
-	@GetMapping("/ttb/api/ItemSearch.aspx")
-	List<AladinBookListResponse> getNewBooks(
+	@GetMapping("/ttb/api/ItemList.aspx")
+	AladinBookListResponse getNewBooks(
 		@RequestParam("ttbkey") String ttbKey,
 		@RequestParam(value = "QueryType", defaultValue = "ItemNewAll") String queryType,
 		@RequestParam(value = "MaxResults", defaultValue = "10") int maxResults,
 		@RequestParam(value = "start", defaultValue = "1") int startIndex,
 		@RequestParam(value = "SearchTarget", defaultValue = "Book") String searchTarget,
-		@RequestParam(value = "output", defaultValue = "JS") String output
+		@RequestParam(value = "output", defaultValue = "JS") String output,
+		@RequestParam(value = "Version", defaultValue = "20131101") String version
 	);
 
 	@GetMapping("/ttb/api/ItemLookUp.aspx")
