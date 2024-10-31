@@ -14,4 +14,5 @@ public interface TagService {
 
 	TagResponse updateTag(Long id, TagRequest request);
 
+	void deleteTag(Long id);
 }

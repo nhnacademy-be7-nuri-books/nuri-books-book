@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -96,4 +97,21 @@ public class TagController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
+	/**
+	 * 특정 태그 삭제하는 controller
+	 *
+	 * @param tagId 삭제할 태그 id
+	 * @return 상태코드 200 포함한 응답 ResponseEntity
+	 */
+	@Operation(summary = "태그 삭제", description = "ID에 해당하는 태그를 삭제합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "204", description = "태그 삭제 성공"),
+		@ApiResponse(responseCode = "404", description = "태그를 찾을 수 없음"),
+		@ApiResponse(responseCode = "500", description = "서버 오류")
+	})
+	@DeleteMapping("/{tagId}")
+	public ResponseEntity<HttpStatus> deleteTag(@Valid @PathVariable Long tagId) {
+		tagService.deleteTag(tagId);
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
 }
