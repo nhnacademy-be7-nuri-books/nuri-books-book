@@ -5,7 +5,9 @@ import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -20,12 +22,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.annotation.PostConstruct;
+import shop.nuribooks.books.member.grade.entity.Grade;
+import shop.nuribooks.books.member.member.dto.request.MemberDetailsRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
-import shop.nuribooks.books.member.member.dto.response.MemberCheckResponse;
+import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
+import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
+import shop.nuribooks.books.member.member.entity.GenderType;
+import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.service.MemberService;
 
 @WebMvcTest(MemberController.class)
@@ -62,6 +70,7 @@ class MemberControllerTest {
 		//then
 		result.andExpect(status().isCreated())
 			.andExpect(jsonPath("name").value(response.name()))
+			.andExpect(jsonPath("gender").value(response.gender().name()))
 			.andExpect(jsonPath("userId").value(response.userId()))
 			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
 			.andExpect(jsonPath("email").value(response.email()))
@@ -84,6 +93,8 @@ class MemberControllerTest {
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("이름은 반드시 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
+				.value(Matchers.containsString("성별은 반드시 입력해야 합니다.")))
+			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("아이디는 반드시 8자 이상 20자 이하로 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("비밀번호는 반드시 입력해야 합니다.")))
@@ -97,21 +108,56 @@ class MemberControllerTest {
 
 	@DisplayName("아이디로 회원 이름, 비밀번호, 권한 조회 성공")
 	@Test
-	void memberCheck() throws Exception {
+	void getMemberAuthInfo() throws Exception {
 		//given
-		MemberCheckResponse response = getMemberCheckResponse();
+		MemberAuthInfoResponse response = getGetMemberAuthInfoResponse();
 		String requestUserId = "nuribooks";
 
-		when(memberService.checkMember(requestUserId)).thenReturn(response);
+		when(memberService.getMemberAuthInfo(requestUserId)).thenReturn(response);
 
 		//when
 		ResultActions result = mockMvc.perform(get("/api/member/{userId}", requestUserId));
 
 		//then
 		result.andExpect(status().isOk())
-			.andExpect(jsonPath("name").value(response.name()))
+			.andExpect(jsonPath("username").value(response.username()))
 			.andExpect(jsonPath("password").value(response.password()))
-			.andExpect(jsonPath("authority").value(response.authority()));
+			.andExpect(jsonPath("role").value(response.role()));
+	}
+
+	@DisplayName("아이디로 비밀번호로 회원 상세 조회 성공")
+	@Test
+	void getMemberDetails() throws Exception {
+		//given
+		MemberDetailsRequest request = getMemberDetailsRequest();
+		MemberDetailsResponse response = getMemberDetailsResponse();
+
+		when(memberService.getMemberDetails(request)).thenReturn(response);
+
+		//when
+		ResultActions result = mockMvc.perform(get("/api/member")
+			.contentType(APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(request)));
+
+		//then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("name").value(response.name()))
+			.andExpect(jsonPath("gender").value(response.gender().name()))
+			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
+			.andExpect(jsonPath("email").value(response.email()))
+			.andExpect(jsonPath("birthday").value(response.birthday().toString()))
+			.andExpect(jsonPath("userId").value(response.userId()))
+			.andExpect(jsonPath("password").value(response.password()))
+			.andExpect(jsonPath("point").value(response.point()))
+			.andExpect(jsonPath("totalPaymentAmount").value(response.totalPaymentAmount()))
+			.andExpect(jsonPath("authority").value(response.authority().name()))
+			.andExpect(jsonPath("grade.id").value(response.grade().getId()))
+			.andExpect(jsonPath("grade.name").value(response.grade().getName()))
+			.andExpect(jsonPath("grade.pointRate").value(response.grade().getPointRate()))
+			.andExpect(jsonPath("grade.requirement").value(response.grade().getRequirement()))
+			.andExpect(jsonPath("status").value(response.status().name()))
+			.andExpect(jsonPath("createdAt").value(response.createdAt().toString()))
+			.andExpect(jsonPath("latestLoginAt").value(response.latestLoginAt().toString()));
 	}
 
 	@DisplayName("아이디와 비밀번호로 회원 탈퇴 성공")
@@ -184,6 +230,7 @@ class MemberControllerTest {
 	private MemberRegisterRequest getMemberRegisterRequest() {
 		return MemberRegisterRequest.builder()
 			.name("boho")
+			.gender(GenderType.MALE)
 			.userId("nuribooks")
 			.password("abc123")
 			.phoneNumber("042-8282-8282")
@@ -198,6 +245,7 @@ class MemberControllerTest {
 	private MemberRegisterResponse getMemberRegisterResponse() {
 		return MemberRegisterResponse.builder()
 			.name("boho")
+			.gender(GenderType.MALE)
 			.userId("nuribooks")
 			.phoneNumber("042-8282-8282")
 			.email("nhnacademy@nuriBooks.com")
@@ -211,6 +259,7 @@ class MemberControllerTest {
 	private MemberRegisterRequest getBadMemberRegisterRequest() {
 		return MemberRegisterRequest.builder()
 			.name("  ")
+			.gender(null)
 			.userId("a")
 			.password(null)
 			.phoneNumber("")
@@ -220,13 +269,57 @@ class MemberControllerTest {
 	}
 
 	/**
-	 * 테스트를 위한 MemberCheckResponse 생성
+	 * 테스트를 위한 MemberAuthInfoResponse 생성
 	 */
-	private MemberCheckResponse getMemberCheckResponse() {
-		return MemberCheckResponse.builder()
-			.name("boho")
+	private MemberAuthInfoResponse getGetMemberAuthInfoResponse() {
+		return MemberAuthInfoResponse.builder()
+			.username("nuribooks")
 			.password("abc123")
-			.authority("ROLE_MEMBER")
+			.role("ROLE_MEMBER")
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 MemberDetailsRequest 생성
+	 */
+	private MemberDetailsRequest getMemberDetailsRequest() {
+		return MemberDetailsRequest.builder()
+			.userId("nuribooks95")
+			.password("abc123")
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 MemberDetailsResponse 생성
+	 */
+	private MemberDetailsResponse getMemberDetailsResponse() {
+		return MemberDetailsResponse.builder()
+			.name("boho")
+			.gender(GenderType.MALE)
+			.phoneNumber("042-8282-8282")
+			.email("boho@nhnacademy.com")
+			.birthday(LocalDate.of(2000, 2, 22))
+			.userId("nuribooks")
+			.password("abc123")
+			.point(BigDecimal.ZERO)
+			.totalPaymentAmount(BigDecimal.ZERO)
+			.authority(AuthorityType.MEMBER)
+			.grade(getStandardGrade())
+			.status(StatusType.ACTIVE)
+			.createdAt(LocalDateTime.of(2020, 2, 22, 22, 22 ,22))
+			.latestLoginAt(LocalDateTime.of(2022,2,22,22,22,22))
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 등급 생성
+	 */
+	private Grade getStandardGrade() {
+		return Grade.builder()
+			.id(1)
+			.name("STANDARD")
+			.pointRate(3)
+			.requirement(BigDecimal.valueOf(100_000))
 			.build();
 	}
 

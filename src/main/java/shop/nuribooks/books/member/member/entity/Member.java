@@ -2,8 +2,7 @@ package shop.nuribooks.books.member.member.entity;
 
 import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.FetchType.*;
-import static java.time.temporal.ChronoUnit.*;
-import static shop.nuribooks.books.member.member.entity.StatusEnum.*;
+import static shop.nuribooks.books.member.member.entity.StatusType.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -50,7 +49,7 @@ public class Member {
 	 */
 	@NotNull
 	@Enumerated(STRING)
-	private AuthorityEnum authority;
+	private AuthorityType authority;
 
 	/**
 	 * STANDARD, GOLD, PLATINUM, ROYAL
@@ -65,7 +64,14 @@ public class Member {
 	 */
 	@NotNull
 	@Enumerated(STRING)
-	private StatusEnum status;
+	private StatusType status;
+
+	/**
+	 * MALE, FEMALE
+	 */
+	@NotNull
+	@Enumerated(STRING)
+	private GenderType gender;
 
 	@NotBlank
 	@Size(min = 8, max = 20)
@@ -104,9 +110,9 @@ public class Member {
 	}
 
 	/**
-	 * 탈퇴 일시가 1년이 지났는지 확인
+	 * 마지막 로그일 날짜로부터 90일이 지나면 상태를 INACTIVE로 변경
 	 */
-	public boolean isWithdrawnForOverOneYear() {
-		return withdrawnAt != null && YEARS.between(withdrawnAt, LocalDateTime.now()) >= 1;
+	public void changeToInactive() {
+		this.status = INACTIVE;
 	}
 }

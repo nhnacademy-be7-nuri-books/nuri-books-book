@@ -7,6 +7,8 @@ import org.hibernate.annotations.ColumnDefault;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,7 +27,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.bookstate.entitiy.BookState;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 
 @Entity
@@ -39,12 +40,12 @@ public class Book {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "book_state_id", nullable = false)
-	private BookState stateId;
-
-	@ManyToOne
 	@JoinColumn(name = "publisher_id", nullable = false)
 	private Publisher publisherId;
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private BookStateEnum state;
 
 	@Column(nullable = false, length = 50)
 	@NotBlank
@@ -99,11 +100,11 @@ public class Book {
 
 	@Builder
 	@Jacksonized
-	private Book(BookState stateId, Publisher publisherId, String title, String thumbnailImageUrl,
+	private Book(Publisher publisherId, BookStateEnum state, String title, String thumbnailImageUrl,
 		String detailImageUrl, LocalDate publicationDate, BigDecimal price, int discountRate,
 		String description, String contents, String isbn, boolean isPackageable, int stock,
 		int likeCount, Long viewCount) {
-		this.stateId = stateId;
+		this.state = state;
 		this.publisherId = publisherId;
 		this.title = title;
 		this.thumbnailImageUrl = thumbnailImageUrl;
@@ -120,13 +121,9 @@ public class Book {
 		this.viewCount = viewCount;
 	}
 
-	public void updateStateId(BookState updateBookState) {
-		this.stateId = updateBookState;
-	}
-
-	public void updateBookDetails(BookUpdateRequest request, BookState state, Publisher publisher) {
-		this.stateId = state;
+	public void updateBookDetails(BookUpdateRequest request, BookStateEnum bookStateEnum, Publisher publisher) {
 		this.publisherId = publisher;
+		this.state = bookStateEnum;
 		this.title = request.title();
 		this.thumbnailImageUrl = request.thumbnailImageUrl();
 		this.detailImageUrl = request.detailImageUrl();
