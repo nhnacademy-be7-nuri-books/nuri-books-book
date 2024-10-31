@@ -38,4 +38,11 @@ public class Cart {
 	private Book book;
 
 	private int quantity;
+
+	/**
+	 * 동일한 도서에 대해서 장바구니 생성 요청이 오면 도서의 수량을 1씩 증가시킨다.
+	 */
+	public void addQuantity() {
+		quantity++;
+	}
 }
