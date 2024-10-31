@@ -1,6 +1,7 @@
 package shop.nuribooks.books.book.review.entity;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -68,7 +69,7 @@ public class Review {
 
 	// 조회 시 사용될듯?
 	@OneToMany(mappedBy = "review")
-	private List<ReviewImage> reviewImage;
+	private List<ReviewImage> reviewImages;
 
 	@Builder
 	public Review(String title, String content, int score, Member member, Book book) {
@@ -78,5 +79,6 @@ public class Review {
 		this.createdAt = LocalDateTime.now();
 		this.member = member;
 		this.book = book;
+		this.reviewImages = new LinkedList<>();
 	}
 }
