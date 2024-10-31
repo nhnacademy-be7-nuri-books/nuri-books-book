@@ -12,11 +12,11 @@ public interface AladinFeginClient {
 	@GetMapping("/ttb/api/ItemSearch.aspx")
 	BookResponse getNewBooks(
 		@RequestParam("ttbkey") String ttbKey,
-		@RequestParam("QueryType") String queryType,
-		@RequestParam("MaxResults") int maxResults,
-		@RequestParam("start") int startIndex,
-		@RequestParam("SearchTarget") String searchTarget,
-		@RequestParam("output") String output
+		@RequestParam(value = "QueryType", defaultValue = "ItemNewAll") String queryType,
+		@RequestParam(value = "MaxResults", defaultValue = "10") int maxResults,
+		@RequestParam(value = "start", defaultValue = "1") int startIndex,
+		@RequestParam(value = "SearchTarget", defaultValue = "Book") String searchTarget,
+		@RequestParam(value = "output", defaultValue = "JS") String output
 	);
 
 	@GetMapping("/ttb/api/ItemLookUp.aspx")
