@@ -105,7 +105,7 @@ public class TagController {
 	 */
 	@Operation(summary = "태그 삭제", description = "ID에 해당하는 태그를 삭제합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "태그 삭제 성공"),
+		@ApiResponse(responseCode = "204", description = "태그 삭제 성공"),
 		@ApiResponse(responseCode = "404", description = "태그를 찾을 수 없음"),
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
