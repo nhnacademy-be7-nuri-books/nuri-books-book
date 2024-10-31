@@ -85,4 +85,24 @@ class TagControllerTest {
 		verify(tagService).getTag(id);
 
 	}
+
+	@DisplayName("특정 태그 수정")
+	@Test
+	void updateTag() throws Exception {
+		Long id = 1L;
+		TagRequest request = TagRequest.builder().name("tag1").build();
+		TagResponse response = TagResponse.builder().id(id).name("update").build();
+
+		when(tagService.updateTag(id, request)).thenReturn(response);
+
+		mockMvc.perform(put("/api/books/tags/{tagId}", id)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isCreated())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(content().json("{\"name\":\"update\"}"));
+
+		verify(tagService).updateTag(id, request);
+
+	}
 }

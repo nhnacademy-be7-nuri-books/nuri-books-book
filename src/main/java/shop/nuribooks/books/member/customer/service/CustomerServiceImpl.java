@@ -7,14 +7,14 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.member.customer.dto.DtoMapper;
 import shop.nuribooks.books.member.customer.dto.EntityMapper;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
-import shop.nuribooks.books.member.customer.dto.request.CustomerUpdateRequest;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
-import shop.nuribooks.books.member.customer.dto.response.CustomerUpdateResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
-import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 
+/**
+ * @author Jprotection
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -42,22 +42,5 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer savedCustomer = customerRepository.save(customer);
 
 		return DtoMapper.toRegisterDto(savedCustomer);
-	}
-
-	/**
-	 * 비회원 정보 수정
-	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
-	 * @param customerId 비회원 기본키
-	 * @param request CustomerUpdateRequest에 이름과 전화번호를 담아서 요청
-	 * @return 비회원 정보 수정에 성공하면 이름과 전화번호를 CustomerUpdateRequest에 담아서 반환
-	 */
-	@Transactional
-	public CustomerUpdateResponse updateCustomer(Long customerId, CustomerUpdateRequest request) {
-		Customer findCustomer = customerRepository.findById(customerId)
-			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
-
-		findCustomer.changeCustomerInformation(request.name(), request.phoneNumber());
-
-		return DtoMapper.toUpdateDto(findCustomer);
 	}
 }
