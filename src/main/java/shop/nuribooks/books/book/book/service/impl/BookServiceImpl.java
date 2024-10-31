@@ -1,6 +1,5 @@
 package shop.nuribooks.books.book.book.service.impl;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,9 +29,6 @@ public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
 	private final AladinFeginClient aladinFeginClient;
-
-	@Value("${aladin.api.key}")
-	private String ttbKey;
 
 	//관리자 페이지에서 관리자의 직접 도서 등록을 위한 메서드
 	//TODO: 외부 api를 이용한 도서 등록기능 별도 구현 예정
