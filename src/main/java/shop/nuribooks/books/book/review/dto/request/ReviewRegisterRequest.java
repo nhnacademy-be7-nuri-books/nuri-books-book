@@ -26,15 +26,12 @@ public record ReviewRegisterRequest(
 	@Max(value = 5, message = "별점은 5점 이하여야 합니다.")
 	int score,
 
-	@NotNull(message = "작성자 id가 필요합니다.")
-	long memberId,
-
 	@NotNull(message = "도서 id가 필요합니다.")
 	long bookId,
 
 	// @NotNull(message = "주문 상세 id가 필요합니다.")
 	// long orderDetailId,
-	
+
 	List<ReviewImageRegisterRequest> reviewImageRegisterRequests
 ) {
 	public Review toEntity(Member member, Book book /* , OrderDetail orderDetail */) {
