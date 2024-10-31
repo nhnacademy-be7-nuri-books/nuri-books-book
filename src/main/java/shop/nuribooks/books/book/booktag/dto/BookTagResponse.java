@@ -6,8 +6,8 @@ import lombok.Builder;
 import shop.nuribooks.books.book.book.entitiy.Book;
 
 @Builder
-public record BookTagResponse(Long bookTagId, Long bookId, List<Long> tagId) {
-	public static BookTagResponse of(Book book, Long bookId, List<Long> tagIds) {
-		return new BookTagResponse(book.getId(), bookId, tagIds);
+public record BookTagResponse(List<Long> bookTagIds, Long bookId, List<Long> tagIds) {
+	public static BookTagResponse of(List<Long> bookTagIds, Long bookId, List<Long> tagIds) {
+		return new BookTagResponse(bookTagIds, bookId, tagIds);
 	}
 }

@@ -76,6 +76,15 @@ class BookTagServiceImplTest {
 		when(tagRepository.findById(2L)).thenReturn(Optional.of(tag1));
 		when(tagRepository.findById(3L)).thenReturn(Optional.of(tag2));
 
+		when(bookTagRepository.save(any(BookTag.class))).thenAnswer(invocation -> {
+			BookTag bookTag = invocation.getArgument(0);
+			return BookTag.builder()
+					.id(1L)
+					.book(bookTag.getBook())
+					.tag(bookTag.getTag())
+					.build();
+		});
+
 		BookTagRequest request = new BookTagRequest(1L, List.of(2L, 3L));
 
 		// When
@@ -84,9 +93,10 @@ class BookTagServiceImplTest {
 		// Then
 		assertNotNull(response);
 		assertEquals(1L, response.bookId());
-		assertEquals(List.of(2L, 3L), response.tagId());
+		assertEquals(List.of(2L, 3L), response.tagIds());
 		verify(bookTagRepository, times(2)).save(any(BookTag.class));
 	}
+
 
 
 	@DisplayName("도서 태그 등록 실패 - 책 없음")

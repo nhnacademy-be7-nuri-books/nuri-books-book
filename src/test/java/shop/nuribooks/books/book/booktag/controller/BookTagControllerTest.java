@@ -40,22 +40,26 @@ class BookTagControllerTest {
 	void registerTagToBook() throws Exception {
 		// Given
 		BookTagRequest request = new BookTagRequest(1L, List.of(2L, 3L));
-		BookTagResponse response = new BookTagResponse(1L, 1L, List.of(2L, 3L));
+		List<Long> bookTagIds = List.of(1L, 2L);
+		BookTagResponse response = BookTagResponse.of(bookTagIds, 1L, List.of(2L, 3L));
 
-		// Mocking the service call
 		when(bookTagService.registerTagToBook(any(BookTagRequest.class)))
-			.thenReturn(response);
+				.thenReturn(response);
 
 		// When & Then
 		mockMvc.perform(post("/api/book-tags")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(new ObjectMapper().writeValueAsString(request)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.bookId").value(1L))
-			.andExpect(jsonPath("$.tagId").isArray())
-			.andExpect(jsonPath("$.tagId[0]").value(2L))
-			.andExpect(jsonPath("$.tagId[1]").value(3L));
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(new ObjectMapper().writeValueAsString(request)))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.bookId").value(1L))
+				.andExpect(jsonPath("$.bookTagIds").isArray())
+				.andExpect(jsonPath("$.bookTagIds[0]").value(1L))
+				.andExpect(jsonPath("$.bookTagIds[1]").value(2L))
+				.andExpect(jsonPath("$.tagIds").isArray())
+				.andExpect(jsonPath("$.tagIds[0]").value(2L))
+				.andExpect(jsonPath("$.tagIds[1]").value(3L));
 	}
+
 
 	@Test
 	@DisplayName("유효성 검사 실패 - 음수 bookId")

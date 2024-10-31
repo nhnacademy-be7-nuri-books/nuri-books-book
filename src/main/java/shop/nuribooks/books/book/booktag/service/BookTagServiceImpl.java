@@ -35,21 +35,23 @@ public class BookTagServiceImpl implements BookTagService {
 	@Override
 	public BookTagResponse registerTagToBook(BookTagRequest request) {
 		Book book = bookRepository.findById(request.bookId())
-			.orElseThrow(() -> new BookNotFoundException(request.bookId()));
+				.orElseThrow(() -> new BookNotFoundException(request.bookId()));
 
 		List<Tag> tags = new ArrayList<>();
 		for (Long tagId : request.tagId()) {
 			Tag tag = tagRepository.findById(tagId)
-				.orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다."));
+					.orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다."));
 			tags.add(tag);
 		}
 
+		List<Long> bookTagIds = new ArrayList<>();
 		for (Tag tag : tags) {
 			BookTag bookTag = BookTag.builder()
-				.book(book)
-				.tag(tag)
-				.build();
-			bookTagRepository.save(bookTag);
+					.book(book)
+					.tag(tag)
+					.build();
+			BookTag savedBookTag = bookTagRepository.save(bookTag);
+			bookTagIds.add(savedBookTag.getId());
 		}
 
 		List<Long> tagIds = new ArrayList<>();
@@ -57,7 +59,8 @@ public class BookTagServiceImpl implements BookTagService {
 			tagIds.add(tag.getId());
 		}
 
-		return BookTagResponse.of(book, request.bookId(), tagIds);
+		return BookTagResponse.of(bookTagIds, request.bookId(), tagIds);
 	}
+
 
 }
