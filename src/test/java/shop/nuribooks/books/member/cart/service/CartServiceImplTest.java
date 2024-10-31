@@ -18,6 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.cart.dto.CartAddResponse;
 import shop.nuribooks.books.member.cart.entity.Cart;
 import shop.nuribooks.books.member.cart.repository.CartRepository;
@@ -43,20 +45,22 @@ class CartServiceImplTest {
 	private BookRepository bookRepository;
 
 
-	@DisplayName("회원과 도서의 id로 장바구니 생성")
+	@DisplayName("회원과 도서의 id로 장바구니 생성 성공")
 	@Test
 	void addToCart() {
 		//given
 		Member savedMember = getSavedMember();
 		Book savedBook = getSavedBook();
 		Cart savedCart = getSavedCart();
+		Long memberId = 1L;
+		Long bookId = 1L;
 
-		when(memberRepository.findById(1L)).thenReturn(Optional.of(savedMember));
-		when(bookRepository.findById(1L)).thenReturn(Optional.of(savedBook));
+		when(memberRepository.findById(memberId)).thenReturn(Optional.of(savedMember));
+		when(bookRepository.findById(bookId)).thenReturn(Optional.of(savedBook));
 		when(cartRepository.save(any(Cart.class))).thenReturn(savedCart);
 
 		//when
-		CartAddResponse result = cartServiceImpl.addToCart(1L, 1L);
+		CartAddResponse result = cartServiceImpl.addToCart(memberId, bookId);
 
 		//then
 		assertThat(result.state()).isEqualTo(savedBook.getState());
@@ -65,6 +69,39 @@ class CartServiceImplTest {
 		assertThat(result.price()).isEqualTo(savedBook.getPrice());
 		assertThat(result.discountRate()).isEqualTo(savedBook.getDiscountRate());
 	}
+
+	@DisplayName("회원과 도서의 id로 장바구니 생성 실패 - 존재하지 않는 회원")
+	@Test
+	void addToCart_memberNotFound() {
+		//given
+		Long memberId = 1L;
+		Long bookId = 1L;
+
+		when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+		//when / then
+		assertThatThrownBy(() -> cartServiceImpl.addToCart(memberId, bookId))
+			.isInstanceOf(MemberNotFoundException.class)
+			.hasMessage("존재하지 않는 회원입니다.");
+	}
+
+	@DisplayName("회원과 도서의 id로 장바구니 생성 실패 - 존재하지 않는 도서")
+	@Test
+	void addToCart_bookNotFound() {
+		//given
+		Member savedMember = getSavedMember();
+		Long memberId = 1L;
+		Long bookId = 1L;
+
+		when(memberRepository.findById(memberId)).thenReturn(Optional.of(savedMember));
+		when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+
+		// when / then
+		assertThatThrownBy(() -> cartServiceImpl.addToCart(memberId, bookId))
+			.isInstanceOf(BookNotFoundException.class)
+			.hasMessage("해당 도서를 찾을 수 없습니다. Id : " + bookId);
+	}
+
 
 	/**
 	 * 테스트를 위한 회원 생성
