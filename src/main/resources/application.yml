@@ -19,6 +19,15 @@ spring:
     init:
       mode: never
 
+  cloud:
+    openfeign:
+      client:
+        config:
+          aladinClient:
+            connect-timeout: 5000
+            read-timeout: 5000
+            logger-level: basic
+
 aladin:
   api:
     key: ENC(L6ztXJXEDUzurinyR6rhd9V99PEBzgxY0sI6S2Ptllw=)

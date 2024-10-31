@@ -26,11 +26,10 @@ public class JasyptConfigTest {
 	// 	encryptInfos("MYSQL_PWD");
 	// }
 
-	@Test
+	/*@Test
 	void encryptAladinApiKey() {
 		encryptInfos("aladin.api.key");
-
-	}
+	}*/
 
 	private String encryptInfos(String key) {
 		String value = env.getProperty(key);
