@@ -32,7 +32,8 @@ public record ReviewRegisterRequest(
 	// @NotNull(message = "주문 상세 id가 필요합니다.")
 	// long orderDetailId,
 
-	List<ReviewImageRegisterRequest> reviewImageRegisterRequests
+	@Size(max = 10)
+	List<String> reviewImages
 ) {
 	public Review toEntity(Member member, Book book /* , OrderDetail orderDetail */) {
 		Review review = Review.builder()
@@ -44,8 +45,11 @@ public record ReviewRegisterRequest(
 			// .orderDetail(orderDetail)
 			.build();
 
-		for (ReviewImageRegisterRequest reviewImageRegisterRequest : reviewImageRegisterRequests) {
-			ReviewImage reviewImage = reviewImageRegisterRequest.toEntity(review);
+		for (String image : reviewImages) {
+			ReviewImage reviewImage = ReviewImage.builder()
+				.imageUrl(image)
+				.review(review)
+				.build();
 			review.getReviewImages().add(reviewImage);
 		}
 

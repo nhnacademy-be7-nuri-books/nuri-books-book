@@ -25,7 +25,6 @@ import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.exception.reivew.ReviewImageOverMaxException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -83,15 +82,6 @@ public class ReviewServiceTest {
 
 		review = reviewRegisterRequest.toEntity(member, book);
 		ReflectionTestUtils.setField(review, "id", 1L);
-	}
-
-	@Test
-	public void registerReviewImageCountOver() {
-		for (int i = 0; i <= 10; i++) {
-			reviewRegisterRequest.reviewImageRegisterRequests().add(null);
-		}
-		assertThrows(ReviewImageOverMaxException.class,
-			() -> reviewService.registerReview(reviewRegisterRequest, member.getId()));
 	}
 
 	@Test
