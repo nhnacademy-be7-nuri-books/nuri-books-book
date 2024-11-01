@@ -47,8 +47,6 @@ public class ReviewServiceTest {
 	@BeforeEach
 	public void setUp() {
 		this.book = Book.builder()
-			.stateId(null)
-			.publisherId(null)
 			.title("Original Book Title")
 			.thumbnailImageUrl("original_thumbnail.jpg")
 			.detailImageUrl("original_detail.jpg")
