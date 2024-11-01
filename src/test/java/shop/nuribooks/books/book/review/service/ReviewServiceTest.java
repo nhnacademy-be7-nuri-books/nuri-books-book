@@ -5,7 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +19,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
-import shop.nuribooks.books.book.review.dto.response.ReviewBreifResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewBriefResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
@@ -69,7 +69,7 @@ public class ReviewServiceTest {
 			"content",
 			4,
 			book.getId(),
-			new LinkedList<>()
+			List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
 		);
 
 		member = Member.builder()
@@ -78,7 +78,13 @@ public class ReviewServiceTest {
 			.build();
 		ReflectionTestUtils.setField(member, "id", 1L);
 
-		review = reviewRegisterRequest.toEntity(member, book);
+		review = Review.builder()
+			.title("title")
+			.content("content")
+			.score(4)
+			.member(member)
+			.book(book)
+			.build();
 		ReflectionTestUtils.setField(review, "id", 1L);
 	}
 
@@ -102,7 +108,7 @@ public class ReviewServiceTest {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(reviewRepository.save(any())).thenReturn(review);
-		assertEquals(ReviewBreifResponse.of(review),
+		assertEquals(ReviewBriefResponse.of(review),
 			reviewService.registerReview(reviewRegisterRequest, member.getId()));
 	}
 }
