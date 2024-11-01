@@ -23,12 +23,18 @@ public class ReviewServiceImpl implements ReviewService {
 	private final BookRepository bookRepository;
 	private final ReviewRepository reviewRepository;
 
+	/**
+	 * 리뷰 등록. 리뷰 이미지도 함께 등록합니다.
+	 * @param reviewRegisterRequest
+	 * @param memberId
+	 * @return
+	 */
 	@Override
 	public ReviewBreifResponse registerReview(ReviewRegisterRequest reviewRegisterRequest, long memberId) {
 		if (reviewRegisterRequest.reviewImageRegisterRequests().size() > 10) {
 			throw new ReviewImageOverMaxException();
 		}
-		
+
 		Member member = this.memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 유저입니다."));
 		Book book = this.bookRepository.findById(reviewRegisterRequest.bookId())
