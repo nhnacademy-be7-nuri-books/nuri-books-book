@@ -1,17 +1,15 @@
 package shop.nuribooks.books.book.contributor.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import shop.nuribooks.books.book.contributor.entitiy.Contributor;
 
-@Getter
-@AllArgsConstructor
-public class ContributorResponse {
-	private Long id;
-	private String name;
-
-	public ContributorResponse(String name) {
-		this.name = name;
+@Builder
+public record ContributorResponse(Long id, String name) {
+	public static ContributorResponse of(Contributor contributor) {
+		return ContributorResponse.builder()
+			.id(contributor.getId())
+			.name(contributor.getName())
+			.build();
 	}
-
 }
 

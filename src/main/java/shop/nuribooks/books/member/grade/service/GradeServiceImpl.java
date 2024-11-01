@@ -21,6 +21,9 @@ import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
+/**
+ * @author Jprotection
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

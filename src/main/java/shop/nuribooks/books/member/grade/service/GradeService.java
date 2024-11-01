@@ -9,6 +9,9 @@ import shop.nuribooks.books.member.grade.dto.response.GradeListResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeRegisterResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeUpdateResponse;
 
+/**
+ * @author Jprotection
+ */
 public interface GradeService {
 
 	GradeRegisterResponse registerGrade(GradeRegisterRequest request);
