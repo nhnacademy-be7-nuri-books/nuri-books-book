@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -68,7 +69,7 @@ public class Review {
 	// TODO:: 상세 주문 필드 추가
 
 	// 조회 시 사용될듯?
-	@OneToMany(mappedBy = "review")
+	@OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
 	private List<ReviewImage> reviewImages;
 
 	@Builder
