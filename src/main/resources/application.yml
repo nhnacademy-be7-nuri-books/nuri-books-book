@@ -1,6 +1,9 @@
 spring:
   application:
     name: books
+  #    기본 profile local. profile을 설정하면 설정 값으로 바뀜.
+  profiles:
+    active: local
 
 server:
   port: 8083
