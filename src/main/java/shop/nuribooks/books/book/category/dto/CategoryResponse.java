@@ -6,23 +6,60 @@ import java.util.stream.Collectors;
 import shop.nuribooks.books.book.category.entitiy.Category;
 
 /**
- * 카테고리 등록 응답을 나타내는 DTO 클래스.
+ * 카테고리 응답 DTO.
+ *
+ * @param id            카테고리 ID
+ * @param name          카테고리 이름
+ * @param path          카테고리 경로
+ * @param subCategories 하위 카테고리 리스트
  */
-public record CategoryResponse(Long id, String name, String parentCategoryName,
-                               List<CategoryResponse> children) {
+public record CategoryResponse(
+	Long id,
+	String name,
+	String path,
+	List<CategoryResponse> subCategories) {
 
 	/**
-	 * Category 엔티티로부터 CategoryRegisterRes 객체를 생성하는 생성자.
+	 * Category 엔티티를 기반으로 응답 DTO를 생성합니다.
+	 * 모든 하위 카테고리를 포함하여 변환합니다.
 	 *
-	 * @param entity Category 엔티티 객체
+	 * @param category 카테고리 엔티티
+	 * @return 카테고리 응답 DTO
 	 */
-	public CategoryResponse(Category entity) {
-		this(entity.getId(),
-			entity.getName(),
-			(entity.getParentCategory() == null) ? "대분류" : entity.getParentCategory().getName(),
-			(entity.getSubCategory() == null) ? null :
-				entity.getSubCategory().stream()
-					.map(CategoryResponse::new)
-					.collect(Collectors.toList()));
+	public static CategoryResponse fromAll(Category category) {
+		List<CategoryResponse> subCategoryResponses = category.getSubCategory().stream()
+			.map(CategoryResponse::fromAll)
+			.collect(Collectors.toList());
+
+		return new CategoryResponse(
+			category.getId(),
+			category.getName(),
+			category.getPath(),
+			subCategoryResponses
+		);
 	}
+
+	/**
+	 * Category 엔티티를 기반으로 응답 DTO를 생성합니다.
+	 * 바로 하위 카테고리들만 포함하여 변환합니다.
+	 *
+	 * @param category 카테고리 엔티티
+	 * @return 카테고리 응답 DTO
+	 */
+	public static CategoryResponse fromOneLevel(Category category) {
+		// 한 단계 하위 카테고리만 포함
+		List<CategoryResponse> subCategoryResponses = category.getSubCategory().stream()
+			.map(subCategory -> new CategoryResponse(subCategory.getId(), subCategory.getName(), subCategory.getPath(),
+				List.of()))
+			.collect(Collectors.toList());
+
+		return new CategoryResponse(
+			category.getId(),
+			category.getName(),
+			category.getPath(),
+			subCategoryResponses
+		);
+	}
+
 }
+

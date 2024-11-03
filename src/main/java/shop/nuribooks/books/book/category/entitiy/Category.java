@@ -6,7 +6,6 @@ import java.util.List;
 import org.hibernate.annotations.BatchSize;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +15,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,10 +31,11 @@ public class Category {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotNull
 	@Setter
-	@Column(length = 30, nullable = false)
 	private String name;
+
+	@Setter
+	private String path;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_category_id")
@@ -45,10 +44,11 @@ public class Category {
 	@BatchSize(size = 100)
 	@OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Category> subCategory = new ArrayList<>();
-	
+
 	@Builder
 	public Category(String name, Category parentCategory) {
 		this.name = name;
 		this.parentCategory = parentCategory;
 	}
+
 }

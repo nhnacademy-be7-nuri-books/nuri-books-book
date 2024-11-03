@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +54,11 @@ class CategoryControllerTest {
 	 * 유효한 요청을 통해 대분류 카테고리를 등록할 때, HTTP 상태 코드 201(Created)을 반환하는지 테스트합니다.
 	 */
 	@Test
+	@DisplayName("대분류 카테고리 등록 성공 테스트")
 	void registerMainCategory_whenValidRequest_thenReturnsCreated() throws Exception {
 		// given
 		CategoryRequest dto = new CategoryRequest("여행");
 		Category category = Category.builder().name("여행").build();
-		CategoryResponse response = new CategoryResponse(category);
 		when(categoryService.registerMainCategory(any(CategoryRequest.class))).thenReturn(category);
 
 		// when & then
@@ -65,40 +66,32 @@ class CategoryControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
 			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.name").value("여행"));
+			.andExpect(jsonPath("$.message").value("카테고리가 성공적으로 생성되었습니다."));
 	}
 
-	/**
-	 * 유효한 요청을 통해 하위 분류 카테고리를 등록할 때, HTTP 상태 코드 201(Created)을 반환하는지 테스트합니다.
-	 */
 	@Test
-	void registerSubCategory_whenValidRequest_thenReturnsCreated() throws Exception {
+	@DisplayName("잘못된 요청 데이터로 인한 등록 실패 테스트")
+	void registerMainCategory_badRequest() throws Exception {
 		// given
-		Long parentCategoryId = 1L;
-		CategoryRequest dto = new CategoryRequest("국내 여행");
-		Category parentCategory = Category.builder().name("여행").build();
-		Category subCategory = Category.builder().name("국내 여행").parentCategory(parentCategory).build();
-		CategoryResponse response = new CategoryResponse(subCategory);
-		when(categoryService.registerSubCategory(any(CategoryRequest.class), eq(parentCategoryId))).thenReturn(
-			subCategory);
+		CategoryRequest categoryRequest = new CategoryRequest(""); // 이름이 설정되지 않음
 
 		// when & then
-		mockMvc.perform(post("/api/categories/{categoryId}", parentCategoryId)
+		mockMvc.perform(post("/api/categories")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(dto)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.name").value("국내 여행"));
+				.content(objectMapper.writeValueAsString(categoryRequest)))
+			.andExpect(status().isBadRequest());
 	}
 
 	/**
 	 * 대분류 카테고리가 이미 존재할 때, HTTP 상태 코드 409(Conflict)을 반환하는지 테스트합니다.
 	 */
 	@Test
+	@DisplayName("이미 존재하는 대분류 카테고리 생성 테스트")
 	void registerMainCategory_whenCategoryAlreadyExists_thenThrowsException() throws Exception {
 		// given
 		CategoryRequest dto = new CategoryRequest("여행");
-		doThrow(new CategoryAlreadyExistException("여행")).when(
-			categoryService).registerMainCategory(any(CategoryRequest.class));
+		doThrow(new CategoryAlreadyExistException("여행")).when(categoryService)
+			.registerMainCategory(any(CategoryRequest.class));
 
 		// when & then
 		mockMvc.perform(post("/api/categories")
@@ -109,9 +102,31 @@ class CategoryControllerTest {
 	}
 
 	/**
+	 * 유효한 요청을 통해 하위 분류 카테고리를 등록할 때, HTTP 상태 코드 201(Created)을 반환하는지 테스트합니다.
+	 */
+	@Test
+	@DisplayName("유효한 하위 카테고리 생성 테스트")
+	void registerSubCategory_whenValidRequest_thenReturnsCreated() throws Exception {
+		// given
+		Long parentCategoryId = 1L;
+		CategoryRequest dto = new CategoryRequest("국내 여행");
+		Category parentCategory = Category.builder().name("여행").build();
+		Category subCategory = Category.builder().name("국내 여행").parentCategory(parentCategory).build();
+		when(categoryService.registerSubCategory(any(CategoryRequest.class), eq(parentCategoryId))).thenReturn(
+			subCategory);
+
+		// when & then
+		mockMvc.perform(post("/api/categories/{categoryId}", parentCategoryId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(dto)))
+			.andExpect(status().isCreated());
+	}
+
+	/**
 	 * 부모 카테고리를 찾을 수 없는 경우, HTTP 상태 코드 404(Not Found)를 반환하는지 테스트합니다.
 	 */
 	@Test
+	@DisplayName("부모 카테고리 X 하위 카테고리 생성 테스트")
 	void registerSubCategory_whenParentCategoryNotFound_thenThrowsException() throws Exception {
 		// given
 		Long parentCategoryId = 1L;
@@ -131,6 +146,7 @@ class CategoryControllerTest {
 	 * 동일한 이름의 하위 카테고리가 이미 존재하는 경우, HTTP 상태 코드 409(Conflict)을 반환하는지 테스트합니다.
 	 */
 	@Test
+	@DisplayName("동일한 이름의 하위 카테고리 생성 테스트")
 	void registerSubCategory_whenSubCategoryAlreadyExists_thenThrowsException() throws Exception {
 		// given
 		Long parentCategoryId = 1L;
@@ -150,11 +166,12 @@ class CategoryControllerTest {
 	 * 모든 카테고리를 조회할 때, HTTP 상태 코드 200(OK)을 반환하고 올바른 응답을 받는지 테스트합니다.
 	 */
 	@Test
+	@DisplayName("모든 카테고리 조회 테스트")
 	void getAllCategories_whenCalled_thenReturnsOk() throws Exception {
 		// given
 		List<CategoryResponse> categories = List.of(
-			new CategoryResponse(Category.builder().name("여행").build()),
-			new CategoryResponse(Category.builder().name("국내 여행").build())
+			CategoryResponse.fromAll(Category.builder().name("여행").build()),
+			CategoryResponse.fromAll(Category.builder().name("국내 여행").build())
 		);
 		when(categoryService.getAllCategory()).thenReturn(categories);
 
@@ -171,11 +188,12 @@ class CategoryControllerTest {
 	 * 유효한 ID로 특정 카테고리를 조회할 때, HTTP 상태 코드 200(OK)을 반환하고 올바른 카테고리 데이터를 받는지 테스트합니다.
 	 */
 	@Test
+	@DisplayName("유효한 ID 특정 카테고리 테스트")
 	void getCategoryById_whenValidId_thenReturnsOk() throws Exception {
 		// given
 		Long categoryId = 1L;
 		Category category = Category.builder().name("여행").build();
-		CategoryResponse response = new CategoryResponse(category);
+		CategoryResponse response = CategoryResponse.fromOneLevel(category);
 		when(categoryService.getCategoryById(categoryId)).thenReturn(response);
 
 		// when & then
@@ -189,6 +207,7 @@ class CategoryControllerTest {
 	 * 유효하지 않은 ID로 특정 카테고리를 조회할 때, HTTP 상태 코드 404(Not Found)를 반환하는지 테스트합니다.
 	 */
 	@Test
+	@DisplayName("없는 ID로 카테고리 조회 테스트")
 	void getCategoryById_whenInvalidId_thenReturnsNotFound() throws Exception {
 		// given
 		Long categoryId = 999L;
@@ -206,60 +225,65 @@ class CategoryControllerTest {
 	 * 유효한 요청을 통해 카테고리를 업데이트할 때, HTTP 상태 코드 200(OK)을 반환하는지 테스트합니다.
 	 */
 	@Test
+	@DisplayName("카테고리를 업데이트 테스트")
 	void updateCategory_whenValidRequest_thenReturnsOk() throws Exception {
 		// given
 		Long categoryId = 1L;
-		CategoryRequest dto = new CategoryRequest("여행 업데이트");
-		doNothing().when(categoryService).updateCategory(any(CategoryRequest.class), eq(categoryId));
+		CategoryRequest dto = new CategoryRequest("여행 수정");
+		doNothing().when(categoryService).updateCategory(any(CategoryRequest.class), any(Long.class));
 
 		// when & then
-		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
+		mockMvc.perform(patch("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
-			.andExpect(status().isOk());
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.message").value("카테고리가 성공적으로 수정되었습니다."));
 	}
 
 	/**
 	 * 유효하지 않은 ID로 카테고리를 업데이트할 때, HTTP 상태 코드 404(Not Found)를 반환하는지 테스트합니다.
 	 */
 	@Test
-	void updateCategory_whenInvalidId_thenReturnsNotFound() throws Exception {
+	@DisplayName("존재하지 않는 카테고리를 업데이트할 때, HTTP 상태 코드 404(Not Found)를 반환하는지 테스트합니다.")
+	void updateCategory_whenCategoryNotFound_thenReturnsNotFound() throws Exception {
 		// given
-		Long categoryId = 999L;
-		CategoryRequest dto = new CategoryRequest("여행 업데이트");
-		doThrow(new CategoryNotFoundException("Category not found with ID: " + categoryId)).when(categoryService)
-			.updateCategory(any(CategoryRequest.class), eq(categoryId));
+		Long categoryId = 1L;
+		CategoryRequest dto = new CategoryRequest("여행 수정");
+		doThrow(new CategoryNotFoundException("카테고리를 찾을 수 없습니다.")).when(categoryService)
+			.updateCategory(any(CategoryRequest.class), any(Long.class));
 
 		// when & then
-		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
+		mockMvc.perform(patch("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
 			.andExpect(status().isNotFound())
-			.andExpect(jsonPath("$.message").value("Category not found with ID: " + categoryId));
+			.andExpect(jsonPath("$.message").value("카테고리를 찾을 수 없습니다."));
 	}
 
 	/**
 	 * 잘못된 요청을 통해 카테고리를 업데이트할 때, HTTP 상태 코드 400(Bad Request)을 반환하는지 테스트합니다.
 	 */
 	@Test
+	@DisplayName("잘못된 요청 데이터 카테고리 업데이트 테스트")
 	void updateCategory_whenInvalidRequest_thenReturnsBadRequest() throws Exception {
 		// given
 		Long categoryId = 1L;
 		CategoryRequest dto = new CategoryRequest(""); // 빈 이름으로 잘못된 요청
 
 		// when & then
-		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
+		mockMvc.perform(patch("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
-			.andExpect(status().isBadRequest());
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("카테고리 이름은 필수입니다."));
 	}
 
 	/**
-	 * 특정 카테고리를 삭제하는 테스트를 생성합니다.
+	 * 특정 카테고리를 삭제하는 테스트
 	 *
-	 * @author janghyun
 	 */
 	@Test
+	@DisplayName("특정 카테고리를 삭제하는 테스트")
 	void deleteCategory_whenValidId_thenReturnsOk() throws Exception {
 		// given
 		Long categoryId = 1L;
@@ -268,16 +292,16 @@ class CategoryControllerTest {
 		// when & then
 		mockMvc.perform(delete("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.message").value("카테고리가 성공적으로 삭제 되었습니다."));
+			.andExpect(status().isNoContent());
+
 	}
 
 	/**
 	 * 유효하지 않은 ID로 카테고리를 삭제할 때, HTTP 상태 코드 404(Not Found)를 반환하는지 테스트합니다.
 	 *
-	 * @author janghyun
 	 */
 	@Test
+	@DisplayName("유효하지 않은 ID 카테고리 삭제 테스트")
 	void deleteCategory_whenInvalidId_thenReturnsNotFound() throws Exception {
 		// given
 		Long categoryId = 999L;
