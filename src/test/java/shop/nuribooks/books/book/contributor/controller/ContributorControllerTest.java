@@ -36,8 +36,8 @@ class ContributorControllerTest {
 	@Test
 	void registerContributor() throws Exception {
 		// given
-		ContributorRequest request = new ContributorRequest("Kim");
-		ContributorResponse response = new ContributorResponse(1L, "Kim");
+		ContributorRequest request = ContributorRequest.builder().name("Kim").build();
+		ContributorResponse response = ContributorResponse.builder().id(1L).name("Kim").build();
 
 		when(contributorService.registerContributor(any(ContributorRequest.class))).thenReturn(response);
 
@@ -56,8 +56,8 @@ class ContributorControllerTest {
 	void updateContributor() throws Exception {
 		// given
 		Long contributorId = 1L;
-		ContributorRequest request = new ContributorRequest("Lee");
-		ContributorResponse response = new ContributorResponse(1L, "Lee");
+		ContributorRequest request = ContributorRequest.builder().name("Lee").build();
+		ContributorResponse response = ContributorResponse.builder().id(1L).name("Lee").build();
 
 		when(contributorService.updateContributor(eq(contributorId), any(ContributorRequest.class))).thenReturn(response);
 
@@ -77,7 +77,7 @@ class ContributorControllerTest {
 	void getContributor() throws Exception {
 		// given
 		Long contributorId = 1L;
-		ContributorResponse response = new ContributorResponse(1L, "Kim");
+		ContributorResponse response = ContributorResponse.builder().id(1L).name("Kim").build();
 
 		when(contributorService.getContributor(contributorId)).thenReturn(response);
 

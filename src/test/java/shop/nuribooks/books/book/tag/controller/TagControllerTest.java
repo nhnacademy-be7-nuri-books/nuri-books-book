@@ -105,4 +105,16 @@ class TagControllerTest {
 		verify(tagService).updateTag(id, request);
 
 	}
+
+	@DisplayName("특정 태그 삭제")
+	@Test
+	void deleteTag() throws Exception {
+		Long tagId = 1L;
+
+		mockMvc.perform(delete("/api/books/tags/{tagId}", tagId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+
+		verify(tagService).deleteTag(tagId);
+	}
 }
