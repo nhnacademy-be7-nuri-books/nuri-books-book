@@ -1,11 +1,13 @@
 package shop.nuribooks.books.book.booktag.controller;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,9 +25,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import shop.nuribooks.books.book.TestUtils;
+import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
 import shop.nuribooks.books.book.booktag.service.BookTagService;
@@ -92,8 +97,8 @@ class BookTagControllerTest {
 				.viewCount(1L)
 				.build();
 
-		book = bookRepository.save(book);
-		book1 = bookRepository.save(book1);
+		TestUtils.setIdForEntity(book, 1L);
+		TestUtils.setIdForEntity(book1, 2L);
 
 	}
 	@DisplayName("도서 태그 등록")
@@ -172,6 +177,83 @@ class BookTagControllerTest {
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.message").value("tagId는 필수 입력 항목입니다"));
+	}
+
+	@DisplayName("도서 태그 조회 성공")
+	@Test
+	void getBookTag_Success() throws Exception {
+		// Given
+		Long bookId = 1L;
+		Long bookTagId = 2L; // 가상의 bookTagId 생성
+		List<String> tagNames = Collections.singletonList("Sample Tag"); // 가상의 태그 이름 생성
+		BookTagGetResponse response = BookTagGetResponse.of(bookTagId, bookId, tagNames);
+
+		when(bookTagService.getBookTag(bookId)).thenReturn(response);
+
+		// When & Then
+		mockMvc.perform(get("/api/book-tags/book/{bookId}", bookId)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.bookTagId").value(bookTagId)) // bookTagId 확인
+				.andExpect(jsonPath("$.bookId").value(bookId)) // bookId 확인
+				.andExpect(jsonPath("$.tagNames[0]").value("Sample Tag")); // tagNames 확인
+	}
+
+	@DisplayName("태그에 해당하는 도서 조회 성공")
+	@Test
+	void getBooksByTagId() throws Exception {
+		// Given
+		Long tagId = 1L;
+
+		BookResponse bookResponse1 = BookResponse.of(book);
+		BookResponse bookResponse2 = BookResponse.of(book1);
+
+		List<BookResponse> responses = List.of(bookResponse1, bookResponse2);
+		when(bookTagService.getBooksByTagId(tagId)).thenReturn(responses);
+
+		// When & Then
+		mockMvc.perform(get("/api/book-tags/tag/{tagId}", tagId)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$", hasSize(2)))
+				.andExpect(jsonPath("$[0].id").value(book.getId()))
+				.andExpect(jsonPath("$[0].title").value(book.getTitle()))
+				.andExpect(jsonPath("$[0].publisher.id").value(book.getPublisherId().getId()))
+				.andExpect(jsonPath("$[0].publisher.name").value(book.getPublisherId().getName()))
+				.andExpect(jsonPath("$[1].id").value(book1.getId()))
+				.andExpect(jsonPath("$[1].title").value(book1.getTitle()))
+				.andExpect(jsonPath("$[1].publisher.id").value(book1.getPublisherId().getId()))
+				.andExpect(jsonPath("$[1].publisher.name").value(book1.getPublisherId().getName()))
+				.andExpect(jsonPath("$[0].state").value(book.getState().getKorName()))
+				.andExpect(jsonPath("$[0].thumbnailImageUrl").value(book.getThumbnailImageUrl()))
+				.andExpect(jsonPath("$[0].detailImageUrl").value(book.getDetailImageUrl()))
+				.andExpect(jsonPath("$[0].publicationDate").value(book.getPublicationDate().toString()))
+				.andExpect(jsonPath("$[0].price").value(book.getPrice()))
+				.andExpect(jsonPath("$[0].discountRate").value(book.getDiscountRate()))
+				.andExpect(jsonPath("$[0].description").value(book.getDescription()))
+				.andExpect(jsonPath("$[0].contents").value(book.getContents()))
+				.andExpect(jsonPath("$[0].isbn").value(book.getIsbn()))
+				.andExpect(jsonPath("$[0].isPackageable").value(book.isPackageable()))
+				.andExpect(jsonPath("$[0].likeCount").value(book.getLikeCount()))
+				.andExpect(jsonPath("$[0].stock").value(book.getStock()))
+				.andExpect(jsonPath("$[0].viewCount").value(book.getViewCount()));
+	}
+
+
+	@DisplayName("도서 태그 삭제 성공")
+	@Test
+	void deleteBookTag() throws Exception {
+		// Given
+		Long bookTagId = 1L;
+
+		// When & Then
+		mockMvc.perform(delete("/api/book-tags/{bookTagId}", bookTagId)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNoContent());
+
+		verify(bookTagService, times(1)).deleteBookTag(bookTagId);
 	}
 
 }
