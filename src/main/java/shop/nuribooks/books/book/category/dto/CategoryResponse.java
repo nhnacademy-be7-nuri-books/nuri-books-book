@@ -16,7 +16,6 @@ import shop.nuribooks.books.book.category.entitiy.Category;
 public record CategoryResponse(
 	Long id,
 	String name,
-	String path,
 	List<CategoryResponse> subCategories) {
 
 	/**
@@ -34,7 +33,6 @@ public record CategoryResponse(
 		return new CategoryResponse(
 			category.getId(),
 			category.getName(),
-			category.getPath(),
 			subCategoryResponses
 		);
 	}
@@ -49,14 +47,13 @@ public record CategoryResponse(
 	public static CategoryResponse fromOneLevel(Category category) {
 		// 한 단계 하위 카테고리만 포함
 		List<CategoryResponse> subCategoryResponses = category.getSubCategory().stream()
-			.map(subCategory -> new CategoryResponse(subCategory.getId(), subCategory.getName(), subCategory.getPath(),
+			.map(subCategory -> new CategoryResponse(subCategory.getId(), subCategory.getName(),
 				List.of()))
 			.collect(Collectors.toList());
 
 		return new CategoryResponse(
 			category.getId(),
 			category.getName(),
-			category.getPath(),
 			subCategoryResponses
 		);
 	}

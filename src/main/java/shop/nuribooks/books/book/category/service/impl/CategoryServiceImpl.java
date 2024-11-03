@@ -49,7 +49,6 @@ public class CategoryServiceImpl implements CategoryService {
 		Category category = Category.builder()
 			.name(dto.name())
 			.build();
-		updateCategoryPath(category);
 
 		return categoryRepository.save(category);
 	}
@@ -81,7 +80,6 @@ public class CategoryServiceImpl implements CategoryService {
 			.parentCategory(parentCategory)
 			.build();
 
-		updateCategoryPath(category);
 		return categoryRepository.save(category);
 	}
 
@@ -144,7 +142,6 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 
 		category.setName(dto.name());
-		updateCategoryPath(category);
 		categoryRepository.save(category);
 	}
 
@@ -160,35 +157,6 @@ public class CategoryServiceImpl implements CategoryService {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(CategoryNotFoundException::new);
 		categoryRepository.delete(category);
-	}
-
-	/**
-	 * 카테고리의 경로를 설정하거나 갱신합니다.
-	 * 부모 카테고리가 존재하면 부모의 경로를 기반으로 현재 카테고리 경로를 설정합니다.
-	 * 이후 하위 카테고리들의 경로도 재귀적으로 갱신합니다.
-	 *
-	 * @param category 경로를 설정할 카테고리 객체
-	 */
-	private void updateCategoryPath(Category category) {
-		if (category.getParentCategory() != null) {
-			category.setPath(category.getParentCategory().getPath() + " > " + category.getName());
-		} else {
-			category.setPath(category.getName());
-		}
-		updateSubCategoryPaths(category);
-	}
-
-	/**
-	 * 하위 카테고리의 경로를 재귀적으로 갱신합니다.
-	 * 상위 카테고리의 경로 변경에 따라 모든 하위 카테고리의 경로를 갱신합니다.
-	 *
-	 * @param category 경로를 갱신할 상위 카테고리 객체
-	 */
-	private void updateSubCategoryPaths(Category category) {
-		for (Category sub : category.getSubCategory()) {
-			sub.setPath(category.getPath() + " > " + sub.getName());
-			updateSubCategoryPaths(sub);
-		}
 	}
 
 }
