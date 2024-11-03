@@ -12,7 +12,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
+import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
@@ -23,6 +25,7 @@ import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusType;
 
 @DataJpaTest
+@Import(QuerydslConfiguration.class)
 class MemberRepositoryTest {
 
 	@Autowired
@@ -65,7 +68,7 @@ class MemberRepositoryTest {
 	@DisplayName("등급의 id로 회원 등록 여부 확인")
 	@Test
 	void existsByGradeId() {
-	    //given
+		//given
 		Member savedMember = getSavedMember();
 
 		//when
@@ -90,7 +93,6 @@ class MemberRepositoryTest {
 		assertThat(inactiveMembers).extracting(Member::getUserId)
 			.containsExactlyInAnyOrder(savedMember.getUserId());
 	}
-
 
 	/**
 	 * 테스트를 위해 repository에 grade, customer, member 저장 후 member 반환
@@ -140,7 +142,7 @@ class MemberRepositoryTest {
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
-			.latestLoginAt(LocalDateTime.of(2024,2,22,22,22,22))
+			.latestLoginAt(LocalDateTime.of(2024, 2, 22, 22, 22, 22))
 			.build();
 	}
 }

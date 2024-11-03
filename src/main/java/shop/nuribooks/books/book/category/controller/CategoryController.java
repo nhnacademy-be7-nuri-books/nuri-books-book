@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +26,8 @@ import shop.nuribooks.books.common.message.ResponseMessage;
 /**
  * 카테고리와 관련된 작업을 처리하는 컨트롤러.
  * 대분류와 하위 분류를 생성하는 엔드포인트를 제공합니다.
+ *
+ * @author janghyun
  */
 @RestController
 @RequestMapping("/api/categories")
@@ -122,10 +124,8 @@ public class CategoryController {
 	/**
 	 * 특정 카테고리를 업데이트합니다.
 	 *
-	 * @author janghyun
 	 * @param dto 업데이트할 카테고리의 정보
 	 * @param categoryId 업데이트할 카테고리의 ID
-	 * @return 업데이트된 카테고리의 응답 DTO
 	 */
 	@Operation(summary = "카테고리 업데이트", description = "주어진 ID에 해당하는 카테고리를 업데이트합니다.")
 	@ApiResponses(value = {
@@ -133,15 +133,15 @@ public class CategoryController {
 		@ApiResponse(responseCode = "404", description = "해당 ID의 카테고리를 찾을 수 없습니다."),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
 	})
-	@PutMapping("/{categoryId}")
-	public ResponseEntity<CategoryResponse> updateCategory(
+	@PatchMapping("/{categoryId}")
+	public ResponseEntity<Void> updateCategory(
 		@Valid
 		@Parameter(description = "업데이트할 카테고리의 정보", required = true)
 		@RequestBody CategoryRequest dto,
 		@Parameter(description = "업데이트할 카테고리의 ID", required = true)
 		@PathVariable Long categoryId) {
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.updateCategory(dto, categoryId));
+		return ResponseEntity.ok().build();
 	}
 
 	/**

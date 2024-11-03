@@ -11,16 +11,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.common.config.QuerydslConfiguration;
 
 /**
  * CategoryRepository의 기능을 테스트하는 클래스.
  */
 @DataJpaTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Import(QuerydslConfiguration.class)
 class CategoryRepositoryTest {
 
 	@Autowired

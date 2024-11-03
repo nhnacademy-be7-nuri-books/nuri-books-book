@@ -9,10 +9,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
+import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.grade.entity.Grade;
 
 @DataJpaTest
+@Import(QuerydslConfiguration.class)
 public class GradeRepositoryTest {
 
 	@Autowired
@@ -34,7 +37,7 @@ public class GradeRepositoryTest {
 	@DisplayName("입력된 등급명으로 등급 조회")
 	@Test
 	public void findByName() {
-	    //given
+		//given
 		Grade savedGrade = getSavedGrade();
 
 		//when

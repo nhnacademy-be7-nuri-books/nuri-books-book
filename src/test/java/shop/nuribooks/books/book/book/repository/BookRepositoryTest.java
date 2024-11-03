@@ -1,20 +1,24 @@
 package shop.nuribooks.books.book.book.repository;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
-import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
+import static org.assertj.core.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+
+import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
+import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
+import shop.nuribooks.books.common.config.QuerydslConfiguration;
 
 @DataJpaTest
+@Import(QuerydslConfiguration.class)
 public class BookRepositoryTest {
 
 	@Autowired

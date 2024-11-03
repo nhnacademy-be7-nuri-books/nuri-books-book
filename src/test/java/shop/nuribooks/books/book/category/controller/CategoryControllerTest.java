@@ -210,15 +210,13 @@ class CategoryControllerTest {
 		// given
 		Long categoryId = 1L;
 		CategoryRequest dto = new CategoryRequest("여행 업데이트");
-		CategoryResponse response = new CategoryResponse(Category.builder().name("여행 업데이트").build());
-		when(categoryService.updateCategory(any(CategoryRequest.class), eq(categoryId))).thenReturn(response);
+		doNothing().when(categoryService).updateCategory(any(CategoryRequest.class), eq(categoryId));
 
 		// when & then
 		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.name").value("여행 업데이트"));
+			.andExpect(status().isOk());
 	}
 
 	/**

@@ -16,6 +16,8 @@ import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
 /**
  * 카테고리 관련 작업을 처리하는 서비스 구현체.
+ *
+ * @author janghyun
  */
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -53,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 	/**
 	 * 기존 대분류 아래에 새로운 하위 분류 카테고리를 등록합니다.
-	 * @author janghyun
+	 *
 	 * @param dto 하위 분류 등록 요청 DTO
 	 * @param parentCategoryId 부모 카테고리의 ID
 	 * @return 등록된 하위 카테고리 엔티티
@@ -115,15 +117,13 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 주어진 ID에 해당하는 카테고리를 업데이트합니다.
 	 * 카테고리가 존재하지 않을 경우 CategoryNotFoundException을 발생시킵니다.
 	 *
-	 * @author janghyun
-	 * @param dto 업데이트할 카테고리의 정보가 담긴 객체
+	 * @param dto        업데이트할 카테고리의 정보가 담긴 객체
 	 * @param categoryId 업데이트할 카테고리의 ID
-	 * @return 업데이트된 카테고리의 응답 객체
 	 * @throws CategoryNotFoundException 주어진 ID에 해당하는 카테고리가 존재하지 않을 경우
 	 */
 	@Override
 	@Transactional
-	public CategoryResponse updateCategory(CategoryRequest dto, Long categoryId) {
+	public void updateCategory(CategoryRequest dto, Long categoryId) {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
@@ -141,8 +141,6 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 
 		category.setName(dto.name());
-
-		return new CategoryResponse(categoryRepository.save(category));
 	}
 
 	/**
@@ -151,6 +149,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 * @param categoryId 삭제할 카테고리의 ID
 	 * @author janghyun
 	 */
+	@Transactional
 	@Override
 	public void deleteCategory(Long categoryId) {
 		Category category = categoryRepository.findById(categoryId)

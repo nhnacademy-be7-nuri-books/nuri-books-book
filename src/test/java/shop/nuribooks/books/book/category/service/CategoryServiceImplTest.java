@@ -183,7 +183,7 @@ class CategoryServiceImplTest {
 			.hasMessageContaining("입력한 카테고리ID는 999 존재하지 않습니다.");
 		verify(categoryRepository, times(1)).findById(categoryId);
 	}
-
+	
 	@Test
 	void updateCategory_ShouldUpdateCategorySuccessfully() {
 		// Given
@@ -193,16 +193,13 @@ class CategoryServiceImplTest {
 
 		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
 		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(false);
-		when(categoryRepository.save(any(Category.class))).thenReturn(existingCategory);
 
 		// When
-		CategoryResponse result = categoryService.updateCategory(dto, categoryId);
+		categoryService.updateCategory(dto, categoryId);
 
 		// Then
-		assertNotNull(result);
-		assertEquals("Updated Category Name", result.name());
+		assertEquals("Updated Category Name", existingCategory.getName());
 		verify(categoryRepository).findById(categoryId);
-		verify(categoryRepository).save(existingCategory);
 	}
 
 	@Test
