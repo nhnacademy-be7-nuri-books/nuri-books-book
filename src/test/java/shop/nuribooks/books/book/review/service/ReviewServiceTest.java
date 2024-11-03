@@ -19,7 +19,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
-import shop.nuribooks.books.book.review.dto.response.ReviewBriefResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
@@ -108,7 +108,7 @@ public class ReviewServiceTest {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(reviewRepository.save(any())).thenReturn(review);
-		assertEquals(ReviewBriefResponse.of(review),
+		assertEquals(ReviewMemberResponse.of(review),
 			reviewService.registerReview(reviewRegisterRequest, member.getId()));
 	}
 }

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
-import shop.nuribooks.books.book.review.dto.response.ReviewBriefResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.ReviewService;
@@ -29,7 +29,7 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public ReviewBriefResponse registerReview(ReviewRegisterRequest reviewRegisterRequest, long memberId) {
+	public ReviewMemberResponse registerReview(ReviewRegisterRequest reviewRegisterRequest, long memberId) {
 
 		Member member = this.memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 유저입니다."));
@@ -39,6 +39,6 @@ public class ReviewServiceImpl implements ReviewService {
 		Review review = reviewRegisterRequest.toEntity(member, book);
 		Review result = this.reviewRepository.save(review);
 
-		return ReviewBriefResponse.of(result);
+		return ReviewMemberResponse.of(result);
 	}
 }

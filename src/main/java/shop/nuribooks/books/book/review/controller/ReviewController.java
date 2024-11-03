@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
-import shop.nuribooks.books.book.review.dto.response.ReviewBriefResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
 
 @RestController
@@ -29,11 +29,11 @@ public class ReviewController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@PostMapping
-	public ResponseEntity<ReviewBriefResponse> registerReview(
+	public ResponseEntity<ReviewMemberResponse> registerReview(
 		@Valid @RequestBody ReviewRegisterRequest reviewRegisterRequest,
 		@RequestHeader("X-USER-ID") long memberId
 	) {
-		ReviewBriefResponse response = this.reviewService.registerReview(reviewRegisterRequest, memberId);
+		ReviewMemberResponse response = this.reviewService.registerReview(reviewRegisterRequest, memberId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 }

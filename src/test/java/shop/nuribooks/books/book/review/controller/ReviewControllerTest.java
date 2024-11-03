@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
-import shop.nuribooks.books.book.review.dto.response.ReviewBriefResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
 
 @WebMvcTest(ReviewController.class)
@@ -40,7 +40,7 @@ public class ReviewControllerTest {
 			List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
 		);
 
-		ReviewBriefResponse response = new ReviewBriefResponse(
+		ReviewMemberResponse response = new ReviewMemberResponse(
 			0,
 			"title",
 			"contentcontent",
