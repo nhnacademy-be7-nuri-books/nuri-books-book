@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
+import shop.nuribooks.books.member.cart.dto.CartAddRequest;
 import shop.nuribooks.books.member.cart.dto.CartAddResponse;
 import shop.nuribooks.books.member.cart.entity.Cart;
 import shop.nuribooks.books.member.cart.service.CartService;
@@ -45,16 +46,15 @@ class CartControllerTest {
 	@Test
 	void addToCart() throws Exception {
 		//given
-		Long memberId = 1L;
-		Long bookId = 1L;
+		CartAddRequest request = getCartAddRequest();
 		CartAddResponse response = getCartAddResponse();
 
-		when(cartService.addToCart(memberId, bookId)).thenReturn(response);
+		when(cartService.addToCart(request)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc
-			.perform(post("/api/member/cart/{memberId}/{bookId}", memberId, bookId)
-			.contentType(APPLICATION_JSON));
+		ResultActions result = mockMvc.perform(post("/api/member/cart")
+			.contentType(APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(request)));
 
 		//then
 		result.andExpect(status().isCreated())
@@ -115,6 +115,17 @@ class CartControllerTest {
 		return Cart.builder()
 			.member(getSavedMember())
 			.book(getSavedBook())
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 CartAddRequest 생성
+	 */
+	private CartAddRequest getCartAddRequest() {
+		return CartAddRequest.builder()
+			.memberId(1L)
+			.bookId(1L)
+			.quantity(1)
 			.build();
 	}
 

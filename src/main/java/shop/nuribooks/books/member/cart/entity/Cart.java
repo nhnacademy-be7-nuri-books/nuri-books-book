@@ -2,6 +2,8 @@ package shop.nuribooks.books.member.cart.entity;
 
 import static jakarta.persistence.FetchType.*;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -39,10 +41,14 @@ public class Cart {
 
 	private int quantity;
 
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
+
 	/**
-	 * 동일한 도서에 대해서 장바구니 생성 요청이 오면 도서의 수량을 1씩 증가시킨다.
+	 * 동일한 도서에 대해서 장바구니 생성 요청이 오면 도서의 수량을 변화시킨다.
 	 */
-	public void addQuantity() {
-		quantity++;
+	public void updateQuantity(int count) {
+		quantity += count;
+		updatedAt = LocalDateTime.now();
 	}
 }

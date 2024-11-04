@@ -17,4 +17,8 @@ public class DtoMapper {
 			.isPackageable(book.isPackageable())
 			.build();
 	}
+
+	public static CartAddResponse toCartNullDto() {
+		return CartAddResponse.builder().build();
+	}
 }

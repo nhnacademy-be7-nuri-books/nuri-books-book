@@ -1,5 +1,7 @@
 package shop.nuribooks.books.member.cart.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -8,6 +10,7 @@ import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.member.cart.dto.CartAddRequest;
 import shop.nuribooks.books.member.cart.dto.CartAddResponse;
 import shop.nuribooks.books.member.cart.dto.DtoMapper;
 import shop.nuribooks.books.member.cart.entity.Cart;
@@ -35,25 +38,32 @@ public class CartServiceImpl implements CartService {
 	 * 기존 장바구니가 존재한다면 수량만 하나 증가시켜 다시 CartAddResponse로 반환
 	 */
 	@Transactional
-	public CartAddResponse addToCart(Long memberId, Long bookId) {
-		CartId cartId = new CartId(memberId, bookId);
+	public CartAddResponse addToCart(CartAddRequest request) {
+		CartId cartId = new CartId(request.memberId(), request.bookId());
 
 		return cartRepository.findById(cartId)
 			.map(cart -> {
-				cart.addQuantity();
+				cart.updateQuantity(request.quantity());
+
+				if (cart.getQuantity() <= 0) {
+					cartRepository.delete(cart);
+					return DtoMapper.toCartNullDto();
+				}
+
 				Cart quantityIncreasedCart = cartRepository.save(cart);
 				return DtoMapper.toCartAddDto(quantityIncreasedCart);
 			})
 			.orElseGet(() -> {
-				Member foundMember = memberRepository.findById(memberId)
+				Member foundMember = memberRepository.findById(request.memberId())
 					.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
-				Book foundBook = bookRepository.findById(bookId)
-					.orElseThrow(() -> new BookNotFoundException(bookId)); // "해당 도서를 찾을 수 없습니다. Id : "
+				Book foundBook = bookRepository.findById(request.bookId())
+					.orElseThrow(() -> new BookNotFoundException(request.bookId())); // "해당 도서를 찾을 수 없습니다. Id : "
 
 				Cart newCart = Cart.builder()
 					.member(foundMember)
 					.book(foundBook)
-					.quantity(1)
+					.quantity(request.quantity())
+					.createdAt(LocalDateTime.now())
 					.build();
 
 				Cart savedCart = cartRepository.save(newCart);

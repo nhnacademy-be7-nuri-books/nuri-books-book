@@ -213,7 +213,7 @@ public class MemberServiceImpl implements MemberService {
 
 	/**
 	 * 매일 04:30분에 탈퇴 날짜가 1년이 지난 회원들을 찾아, <br>
-	 * userId와, status, withdrawnAt을 제외한 모든 필드들을 공백 처리
+	 * userId와, status, withdrawnAt을 제외한 모든 필드들을 NULL 또는 공백 처리
 	 */
 	@Scheduled(cron = "0 30 4 * * ?")
 	@Transactional
