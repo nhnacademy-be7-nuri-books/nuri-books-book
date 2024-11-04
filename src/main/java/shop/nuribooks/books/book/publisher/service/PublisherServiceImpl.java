@@ -56,27 +56,26 @@ public class PublisherServiceImpl implements PublisherService {
 	 * getPublisher : 출판사 정보 조회
 	 * @author kyongmin
 	 *
-	 * @param name 이름으로 출판사 정보 조회
+	 * @param id id로 출판사 정보 조회
 	 *             존재하지 않는 출판사일 경우 PublisherNotFoundException 발생
 	 * @return 해당하는 출판사 정보를 포함한 PublisherResponse
 	 */
 	@Override
-	public PublisherResponse getPublisher(String name) {
-		Publisher publisher = publisherRepository.findByName(name)
+	public PublisherResponse getPublisher(Long id) {
+		Publisher publisher = publisherRepository.findById(id)
 			.orElseThrow(() -> new PublisherNotFoundException("출판사가 존재하지 않습니다."));
 		return PublisherResponse.of(publisher);
 	}
 
 	/**
 	 * deletePublisher : 출판사 정보 삭제
-	 * @author kyongmin
 	 *
-	 * @param name 이름으로 출판사 정보 삭제
+	 * @param id id로 출판사 정보 삭제
 	 *             존재하지 않는 출판사일 경우 PublisherNotFoundException 발생
 	 */
 	@Override
-	public void deletePublisher(String name) {
-		Publisher publisher = publisherRepository.findByName(name)
+	public void deletePublisher(Long id) {
+		Publisher publisher = publisherRepository.findById(id)
 			.orElseThrow(() -> new PublisherNotFoundException("출판사가 존재하지 않습니다."));
 
 		publisherRepository.delete(publisher);
@@ -84,16 +83,15 @@ public class PublisherServiceImpl implements PublisherService {
 
 	/**
 	 * updatePublisher : 출판사 정보 수정
-	 * @author kyongmin
 	 *
-	 * @param name 수정할 출판사 기존 이름
+	 * @param id 수정할 출판사 id
 	 * 존재하지 않는 출판사일 경우 PublisherNotFoundException 발생
 	 * @param request 수정할 출판사 이름이 포함된 요청 객체
 	 * @return 수정된 출판사 이름을 포함한 PublisherResponse
 	 */
 	@Override
-	public PublisherResponse updatePublisher(String name, PublisherRequest request) {
-		Publisher publisher = publisherRepository.findByName(name)
+	public PublisherResponse updatePublisher(Long id, PublisherRequest request) {
+		Publisher publisher = publisherRepository.findById(id)
 			.orElseThrow(() -> new PublisherNotFoundException("출판사가 존재하지 않습니다."));
 
 		PublisherEditor publisherEditor = getPublisherEditor(request, publisher);
