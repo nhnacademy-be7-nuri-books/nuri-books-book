@@ -1,6 +1,7 @@
 package shop.nuribooks.books.book.review.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entitiy.Book;
@@ -12,10 +13,12 @@ import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.ReviewService;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
 	private final MemberRepository memberRepository;
@@ -39,6 +42,24 @@ public class ReviewServiceImpl implements ReviewService {
 		Review review = reviewRequest.toEntity(member, book);
 		Review result = this.reviewRepository.save(review);
 
+		return ReviewMemberResponse.of(result);
+	}
+
+	/**
+	 * review update
+	 * @param reviewRequest
+	 * @param memberId
+	 * @return
+	 */
+	@Override
+	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId, long memberId) {
+		// 기존 review update 처리
+		Review prevReview = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException());
+		prevReview.updated();
+		reviewRepository.save(prevReview);
+
+		Review newReview = reviewRequest.toEntity(prevReview.getMember(), prevReview.getBook());
+		Review result = reviewRepository.save(newReview);
 		return ReviewMemberResponse.of(result);
 	}
 }

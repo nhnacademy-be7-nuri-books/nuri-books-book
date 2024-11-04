@@ -25,6 +25,7 @@ import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -110,5 +111,20 @@ public class ReviewServiceTest {
 		when(reviewRepository.save(any())).thenReturn(review);
 		assertEquals(ReviewMemberResponse.of(review),
 			reviewService.registerReview(reviewRequest, member.getId()));
+	}
+
+	@Test
+	public void updateFailed() {
+		when(reviewRepository.findById(anyLong())).thenReturn(Optional.empty());
+		assertThrows(ReviewNotFoundException.class,
+			() -> reviewService.updateReview(reviewRequest, review.getId(), member.getId()));
+	}
+
+	@Test
+	public void updateSuccess() {
+		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
+		when(reviewRepository.save(any())).thenReturn(review).thenReturn(review);
+		assertEquals(ReviewMemberResponse.of(review),
+			reviewService.updateReview(reviewRequest, review.getId(), member.getId()));
 	}
 }
