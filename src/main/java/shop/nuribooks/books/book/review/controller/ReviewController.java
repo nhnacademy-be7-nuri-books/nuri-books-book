@@ -2,7 +2,9 @@ package shop.nuribooks.books.book.review.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,5 +37,21 @@ public class ReviewController {
 	) {
 		ReviewMemberResponse response = this.reviewService.registerReview(reviewRequest, memberId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	}
+
+	@Operation(summary = "리뷰 업데이트", description = "리뷰를 업데이트합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "리뷰 업데이트 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+		@ApiResponse(responseCode = "404", description = "id 발견 못함"),
+	})
+	@PutMapping("/{reviewId}")
+	public ResponseEntity<ReviewMemberResponse> updateReview(
+		@Valid @RequestBody ReviewRequest reviewRequest,
+		@PathVariable long reviewId,
+		@RequestHeader("X-USER-ID") long memberId
+	) {
+		ReviewMemberResponse response = this.reviewService.updateReview(reviewRequest, reviewId, memberId);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 }
