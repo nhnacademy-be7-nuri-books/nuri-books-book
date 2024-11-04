@@ -76,37 +76,37 @@ class CustomerCartRepositoryImplTest extends TestRedisContainer {
         // then
         assertThat(cart).containsEntry("1", 1);
     }
-//
-//    @DisplayName("카트 전체를 삭제한다.")
-//    @Test
-//    void removeCart() {
-//        // given
-//        String sessionId = "sessionId";
-//
-//        hashOperations.put(sessionId, "1", 1);
-//
-//        // when
-//        customerCartRepository.removeCart(sessionId);
-//
-//        // then
-//       assertThat(redisTemplate.hasKey(sessionId)).isFalse();
-//    }
-//
-//    @DisplayName("장바구니의 특정한 아이템을 삭제한다.")
-//    @Test
-//    void removeCartItem() {
-//        // given
-//        String sessionId = "sessionId";
-//        String bookId = "1";
-//
-//        hashOperations.put(sessionId, bookId, 1);
-//        hashOperations.put(sessionId, "2", 1);
-//
-//        // when
-//        customerCartRepository.removeCartItem(sessionId, bookId);
-//
-//        // then
-//        assertThat(hashOperations.hasKey(sessionId, bookId)).isFalse();
-//    }
+
+    @DisplayName("카트 전체를 삭제한다.")
+    @Test
+    void removeCart() {
+        // given
+        String sessionId = "sessionId";
+
+        hashOperations.put(sessionId, "1", 1);
+
+        // when
+        customerCartRepository.removeCart(sessionId);
+
+        // then
+       assertThat(redisTemplate.hasKey(sessionId)).isFalse();
+    }
+
+    @DisplayName("장바구니의 특정한 아이템을 삭제한다.")
+    @Test
+    void removeCartItem() {
+        // given
+        String sessionId = "sessionId";
+        String bookId = "1";
+
+        hashOperations.put(sessionId, bookId, 1);
+        hashOperations.put(sessionId, "2", 1);
+
+        // when
+        customerCartRepository.removeCartItem(sessionId, bookId);
+
+        // then
+        assertThat(hashOperations.hasKey(sessionId, bookId)).isFalse();
+    }
   
 }
