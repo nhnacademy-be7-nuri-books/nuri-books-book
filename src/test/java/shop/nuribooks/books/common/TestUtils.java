@@ -7,10 +7,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
+import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.entity.ReviewImage;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
+import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusType;
 
@@ -38,6 +41,7 @@ public class TestUtils {
 
 	public static Member createMember(Customer customer, Grade grade) {
 		return Member.builder()
+			.gender(GenderType.MALE)
 			.customer(customer)
 			.authority(MEMBER)
 			.grade(grade)
@@ -66,6 +70,30 @@ public class TestUtils {
 			.name("STANDARD")
 			.pointRate(3)
 			.requirement(BigDecimal.valueOf(100_000))
+			.build();
+	}
+
+	public static Publisher createPublisher() {
+		return new Publisher("Publisher Name");
+	}
+
+	public static Book createBook(Publisher publisher) {
+		return Book.builder()
+			.state(BookStateEnum.OUT_OF_PRINT)
+			.publisherId(publisher)
+			.title("Test Book Title")
+			.thumbnailImageUrl("thumbnail.jpg")
+			.detailImageUrl("detail.jpg")
+			.publicationDate(LocalDate.now())
+			.price(BigDecimal.valueOf(10000))
+			.discountRate(10)
+			.description("Test Book Description")
+			.contents("Test Book Contents")
+			.isbn("1234567890123")
+			.isPackageable(true)
+			.likeCount(0)
+			.stock(100)
+			.viewCount(0L)
 			.build();
 	}
 }
