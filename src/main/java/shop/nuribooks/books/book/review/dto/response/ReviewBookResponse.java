@@ -3,7 +3,7 @@ package shop.nuribooks.books.book.review.dto.response;
 import java.util.List;
 
 import lombok.Builder;
-import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.book.dto.BookBriefResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 
 /**
@@ -31,19 +31,5 @@ public record ReviewBookResponse(
 			.score(review.getScore())
 			.book(BookBriefResponse.of(review.getBook()))
 			.build();
-	}
-
-	@Builder
-	public record BookBriefResponse(Long id,
-									String title,
-									String thumbnailImageUrl) {
-
-		public static BookBriefResponse of(Book book) {
-			return BookBriefResponse.builder()
-				.id(book.getId())
-				.title(book.getTitle())
-				.thumbnailImageUrl(book.getThumbnailImageUrl())
-				.build();
-		}
 	}
 }
