@@ -12,8 +12,8 @@ import jakarta.validation.constraints.Size;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 
 public record AladinBookSaveRequest(
-	@NotNull(message = "출판사 ID는 필수입니다.")
-	Long publisherId,
+	@NotBlank(message = "출판사명은 필수입니다.")
+	String publisherName,
 
 	@NotNull(message = "도서 상태는 필수 입력 항목입니다.")
 	BookStateEnum state,
