@@ -9,17 +9,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 @Table(name = "review_images")
 public class ReviewImage {
 	@Id
@@ -35,7 +31,7 @@ public class ReviewImage {
 	private Review review;
 
 	@Builder
-	public ReviewImage(String imageUrl, Review review) {
+	private ReviewImage(String imageUrl, Review review) {
 		this.imageUrl = imageUrl;
 		this.review = review;
 	}
