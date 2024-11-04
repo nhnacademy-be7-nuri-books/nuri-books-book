@@ -27,58 +27,77 @@ public class ContributorController {
 
 	private final ContributorService contributorService;
 
-	@Operation(summary = "Register a new contributor",
-		description = "This endpoint allows you to register a new contributor.")
+	/**
+	 * 기여자 등록하는 controller
+	 *
+	 * @param request 등록할 기여자 이름을 담은 요청 객체
+	 * @return 등록된 기여자 정보와 상태코드 201 포함한 응답 ResponseEntity
+	 */
+	@Operation(summary = "새 기여자 등록", description = "새로운 기여자를 등록합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "registered successfully"),
-		@ApiResponse(responseCode = "400", description = "Invalid request data"),
-		@ApiResponse(responseCode = "500", description = "Internal server error")
+		@ApiResponse(responseCode = "201", description = "기여자 등록 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+		@ApiResponse(responseCode = "500", description = "서버 내부 오류")
 	})
-
 	@PostMapping
 	public ResponseEntity<ContributorResponse> registerContributor(@Valid @RequestBody ContributorRequest request) {
-		ContributorResponse resDto = contributorService.registerContributor(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
+		ContributorResponse response = contributorService.registerContributor(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@Operation(summary = "Update an existing contributor",
-		description = "This endpoint allows you to update the details of an existing contributor.")
+	/**
+	 * 특정 기여자 정보 수정하는 controller
+	 *
+	 * @param contributorId 수정할 기여자 id
+	 * @param request 수정할 기여자 정보를 담은 요청 객체
+	 * @return 수정된 기여자 정보와 상태코드 201 포함한 응답 ResponseEntity
+	 */
+	@Operation(summary = "기여자 정보 수정", description = "기존 기여자의 정보를 수정합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "Contributor updated successfully"),
-		@ApiResponse(responseCode = "400", description = "Invalid request data"),
-		@ApiResponse(responseCode = "404", description = "Contributor not found"),
-		@ApiResponse(responseCode = "500", description = "Internal server error")
+		@ApiResponse(responseCode = "200", description = "기여자 정보 수정 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+		@ApiResponse(responseCode = "404", description = "기여자를 찾을 수 없음"),
+		@ApiResponse(responseCode = "500", description = "서버 내부 오류")
 	})
 	@PutMapping("/{contributorId}")
-	public ResponseEntity<ContributorResponse> updateContributor(@PathVariable Long contributorId,
-		@Valid @RequestBody ContributorRequest request) {
-		ContributorResponse resDto = contributorService.updateContributor(contributorId, request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
+	public ResponseEntity<ContributorResponse> updateContributor(
+		@PathVariable Long contributorId, @Valid @RequestBody ContributorRequest request) {
+		ContributorResponse response = contributorService.updateContributor(contributorId, request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@Operation(summary = "Get a contributor by ID",
-		description = "This endpoint retrieves a contributor's details by their unique ID.")
+	/**
+	 * 특정 기여자 조회하는 controller
+	 *
+	 * @param contributorId 조회할 기여자 id
+	 * @return 기여자 정보와 상태코드 201 포함한 응답 ResponseEntity
+	 */
+	@Operation(summary = "기여자 정보 조회", description = "ID를 사용해 특정 기여자의 정보를 조회합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "Contributor found successfully")
+		@ApiResponse(responseCode = "200", description = "기여자 조회 성공")
 	})
 	@GetMapping("/{contributorId}")
 	public ResponseEntity<ContributorResponse> getContributor(
 		@PathVariable Long contributorId) {
-		ContributorResponse resDto = contributorService.getContributor(contributorId);
-		return ResponseEntity.status(HttpStatus.OK).body(resDto);
+		ContributorResponse response = contributorService.getContributor(contributorId);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
-	@Operation(summary = "Delete a contributor",
-		description = "This endpoint allows you to delete an existing contributor by their ID.")
+	/**
+	 * 특정 기여자 삭제하는 controller
+	 *
+	 * @param contributorId 삭제할 기여자 id
+	 * @return 상태코드 200 포함한 응답 ResponseEntity
+	 */
+	@Operation(summary = "기여자 삭제", description = "ID를 사용해 기존 기여자를 삭제합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "204", description = "Contributor deleted successfully"),
-		@ApiResponse(responseCode = "404", description = "Contributor not found"),
-		@ApiResponse(responseCode = "500", description = "Internal server error")
+		@ApiResponse(responseCode = "204", description = "기여자 삭제 성공"),
+		@ApiResponse(responseCode = "404", description = "기여자를 찾을 수 없음"),
+		@ApiResponse(responseCode = "500", description = "서버 내부 오류")
 	})
 	@DeleteMapping("{contributorId}")
 	public ResponseEntity<HttpStatus> deleteContributor(@PathVariable Long contributorId) {
 		contributorService.deleteContributor(contributorId);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
-
 }

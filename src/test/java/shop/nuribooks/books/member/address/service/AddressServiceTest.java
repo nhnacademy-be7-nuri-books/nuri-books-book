@@ -72,7 +72,7 @@ class AddressServiceTest {
         AddressResponse response = addressService.registerAddress(request);
 
         // then
-        assertThat(response.getName()).isEqualTo("test");
+        assertThat(response.name()).isEqualTo("test");
     }
 
     @DisplayName("회원의 주소 리스트를 조회한다.")

@@ -86,6 +86,20 @@ public class TagServiceImpl implements TagService {
 	}
 
 	/**
+	 * deleteTag : 태그 정보 삭제
+	 *
+	 * @param id id로 태그 정보 조회
+	 *           존재하지 않는 태그일 경우 TagNotFoundException 발생
+	 */
+	@Override
+	public void deleteTag(Long id) {
+		Tag tag = tagRepository.findById(id)
+			.orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
+
+		tagRepository.delete(tag);
+	}
+
+	/**
 	 * getTagEditor : 태그 편집 빌더
 	 *
 	 * @param request 요청된 태그 정보 담긴 객체
