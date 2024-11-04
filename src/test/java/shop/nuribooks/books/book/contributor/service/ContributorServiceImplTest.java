@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.contributor.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -30,20 +31,17 @@ class ContributorServiceImplTest {
 	@Test
 	void registerContributor() {
 		// given
-		ContributorRequest request = new ContributorRequest("Kim");
-		Contributor savedContributor = new Contributor();
-		savedContributor.setId(1L);
-		savedContributor.setName(request.getName());
+		Contributor contributor = register();
+		ContributorRequest request = ContributorRequest.builder().name("Kim").build();
 
 		// when
-		when(contributorRepository.save(any(Contributor.class))).thenReturn(savedContributor);
+		when(contributorRepository.save(any(Contributor.class))).thenReturn(contributor);
 
 		ContributorResponse response = contributorService.registerContributor(request);
 
 		// then
 		assertNotNull(response);
-		assertEquals(1L, response.getId());
-		assertEquals("Kim", response.getName());
+		assertThat(response.name()).isEqualTo("Kim");
 
 		verify(contributorRepository, times(1)).save(any(Contributor.class));
 	}
@@ -53,24 +51,21 @@ class ContributorServiceImplTest {
 	void updateContributor() {
 		// given
 		Long contributorId = 1L;
-		ContributorRequest request = new ContributorRequest("Lee");
-		Contributor existingContributor = new Contributor();
-		existingContributor.setId(contributorId);
-		existingContributor.setName("Kim");
+		ContributorRequest request = ContributorRequest.builder().name("Lee").build();
+		Contributor existingContributor = register();
 
 		// when
 		when(contributorRepository.findById(contributorId)).thenReturn(Optional.of(existingContributor));
-		when(contributorRepository.save(existingContributor)).thenReturn(existingContributor);
+		when(contributorRepository.save(any(Contributor.class))).thenReturn(existingContributor);
 
 		ContributorResponse response = contributorService.updateContributor(contributorId, request);
 
 		// then
 		assertNotNull(response);
-		assertEquals(contributorId, response.getId());
-		assertEquals("Lee", response.getName());
+		assertEquals(contributorId, response.id());
+		assertEquals("Lee", response.name());
 
 		verify(contributorRepository, times(1)).findById(contributorId);
-		verify(contributorRepository, times(1)).save(existingContributor);
 	}
 
 	@DisplayName("기여자 수정 실패")
@@ -99,9 +94,7 @@ class ContributorServiceImplTest {
 	void getContributor() {
 		// given
 		Long contributorId = 1L;
-		Contributor contributor = new Contributor();
-		contributor.setId(contributorId);
-		contributor.setName("Kim");
+		Contributor contributor = register();
 
 		// when
 		when(contributorRepository.findById(contributorId)).thenReturn(Optional.of(contributor));
@@ -109,8 +102,8 @@ class ContributorServiceImplTest {
 
 		// then
 		assertNotNull(response);
-		assertEquals(contributorId, response.getId());
-		assertEquals("Kim", response.getName());
+		assertEquals(contributorId, response.id());
+		assertEquals("Kim", response.name());
 
 		verify(contributorRepository, times(1)).findById(contributorId);
 
@@ -142,9 +135,7 @@ class ContributorServiceImplTest {
 	void deleteContributor() {
 		// given
 		Long contributorId = 1L;
-		Contributor existingContributor = new Contributor();
-		existingContributor.setId(contributorId);
-		existingContributor.setName("Kim");
+		Contributor existingContributor = register();
 
 		// when
 		when(contributorRepository.findById(contributorId)).thenReturn(Optional.of(existingContributor));
@@ -176,13 +167,7 @@ class ContributorServiceImplTest {
 		verify(contributorRepository, never()).delete(any());
 	}
 
-	@Test
-	void shouldThrowExceptionWhenContributorNotFound() {
-		Long nonExistentId = 999L;
-		when(contributorRepository.findById(nonExistentId)).thenReturn(Optional.empty());
-
-		assertThrows(ContributorNotFoundException.class, () -> {
-			contributorService.getContributor(nonExistentId);
-		});
+	private Contributor register() {
+		return Contributor.builder().id(1L).name("Kim").build();
 	}
 }

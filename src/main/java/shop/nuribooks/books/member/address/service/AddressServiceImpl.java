@@ -27,7 +27,7 @@ public class AddressServiceImpl implements AddressService{
 
     public AddressResponse registerAddress(AddressRegisterRequest request) {
         //TODO: 회원 주소가 10개 넘어가는 경우 예외처리
-        Member member = memberRepository.findById(request.getMemberId())
+        Member member = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new UserIdNotFoundException("유저를 찾을 수 없습니다."));
 
         Address address = request.toEntity(member);
@@ -51,7 +51,7 @@ public class AddressServiceImpl implements AddressService{
 
     @Transactional
     public AddressResponse modifyAddress(AddressEditRequest request) {
-        Address address = addressRepository.findById(request.getId())
+        Address address = addressRepository.findById(request.id())
                 .orElseThrow(() -> new AddressNotFoundException("주소를 찾을 수 없습니다."));
 
         AddressEditor addressEditor = getAddressEditor(request, address);
@@ -62,9 +62,9 @@ public class AddressServiceImpl implements AddressService{
     private static AddressEditor getAddressEditor(AddressEditRequest request, Address address) {
         AddressEditorBuilder addressEditorBuilder = address.toEditor();
         return addressEditorBuilder
-                .name(request.getName())
-                .address(request.getAddress())
-                .addressDetail(request.getAddressDetail())
+                .name(request.name())
+                .address(request.address())
+                .addressDetail(request.addressDetail())
                 .isDefault(request.isDefault())
                 .build();
     }
