@@ -3,37 +3,16 @@ package shop.nuribooks.books.member.address.dto.requset;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.member.entity.Member;
 
-@Getter
-@NoArgsConstructor
-public class AddressRegisterRequest {
-
-    @NotNull
-    private Long memberId;
-
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    private String address;
-
-    @NotBlank
-    private String addressDetail;
-
-    private boolean isDefault;
-
-    @Builder
-    private AddressRegisterRequest(Long memberId, String name, String address, String addressDetail, boolean isDefault) {
-        this.memberId = memberId;
-        this.name = name;
-        this.address = address;
-        this.addressDetail = addressDetail;
-        this.isDefault = isDefault;
-    }
+@Builder
+public record AddressRegisterRequest(
+        @NotNull Long memberId,
+        @NotBlank String name,
+        @NotBlank String address,
+        @NotBlank String addressDetail,
+        boolean isDefault) {
 
     public Address toEntity(Member member) {
         return Address.builder()

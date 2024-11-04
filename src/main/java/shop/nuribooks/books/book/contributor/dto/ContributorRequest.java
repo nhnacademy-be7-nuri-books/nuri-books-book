@@ -2,18 +2,16 @@ package shop.nuribooks.books.book.contributor.dto;
 
 import org.hibernate.validator.constraints.Length;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class ContributorRequest {
-	@Length(min = 1, max = 50)
-	@NotNull(message = "Name cannot be null")
-	private String name;
+import shop.nuribooks.books.book.contributor.entitiy.Contributor;
+
+@Builder
+public record ContributorRequest(@NotBlank @Length(min = 1, max = 50) String name) {
+	public Contributor toEntity() {
+		return Contributor.builder()
+			.name(name)
+			.build();
+	}
 }

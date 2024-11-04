@@ -3,15 +3,18 @@ package shop.nuribooks.books.book.tag.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.tag.dto.TagRequest;
 import shop.nuribooks.books.book.tag.dto.TagResponse;
 import shop.nuribooks.books.book.tag.entity.Tag;
+import shop.nuribooks.books.book.tag.entity.TagEditor;
 import shop.nuribooks.books.book.tag.repository.TagRepository;
 import shop.nuribooks.books.exception.tag.TagAlreadyExistsException;
 import shop.nuribooks.books.exception.tag.TagNotFoundException;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class TagServiceImpl implements TagService {
@@ -35,7 +38,6 @@ public class TagServiceImpl implements TagService {
 
 		return TagResponse.of(savedTag);
 	}
-
 
 	/**
 	 * getAllTags : 등록 되어있는 모든 태그 조회
@@ -63,6 +65,52 @@ public class TagServiceImpl implements TagService {
 			.orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
 
 		return TagResponse.of(tag);
+	}
+
+	/**
+	 * updateTag : 태그 수정
+	 *
+	 * @param id id로 태그 정보 조회
+	 *           존재하지 않는 태그일 경우 TagNotFoundException 발생
+	 * @param request 수정할 태그 정보를 담은 객체
+	 * @return id에 해당하는 수정된 태그 정보 TagResponse
+	 */
+	@Override
+	public TagResponse updateTag(Long id, TagRequest request) {
+		Tag tag = tagRepository.findById(id)
+			.orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
+
+		TagEditor tagEditor = getTagEditor(request, tag);
+		tag.edit(tagEditor);
+		return TagResponse.of(tag);
+	}
+
+	/**
+	 * deleteTag : 태그 정보 삭제
+	 *
+	 * @param id id로 태그 정보 조회
+	 *           존재하지 않는 태그일 경우 TagNotFoundException 발생
+	 */
+	@Override
+	public void deleteTag(Long id) {
+		Tag tag = tagRepository.findById(id)
+			.orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
+
+		tagRepository.delete(tag);
+	}
+
+	/**
+	 * getTagEditor : 태그 편집 빌더
+	 *
+	 * @param request 요청된 태그 정보 담긴 객체
+	 * @param tag 기존 태그 정보를 담은 객체
+	 * @return 수정된 정보를 포함한 객체
+	 */
+	private static TagEditor getTagEditor(TagRequest request, Tag tag) {
+		TagEditor.TagEditorBuilder builder = tag.toEditor();
+		return builder
+			.name(request.name())
+			.build();
 	}
 
 }
