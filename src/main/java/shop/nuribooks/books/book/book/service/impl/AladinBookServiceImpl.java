@@ -105,7 +105,6 @@ public class AladinBookServiceImpl implements AladinBookService {
 			});
 			currentParentCategory = category;
 		}
-
 		return BookResponse.of(book);
 	}
 }

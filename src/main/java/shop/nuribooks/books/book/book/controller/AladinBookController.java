@@ -38,6 +38,11 @@ public class AladinBookController {
 		return ResponseEntity.ok(books);
 	}
 
+	@Operation(summary = "Save a book from Aladin", description = "Saves a book based on data retrieved from the Aladin API.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "Book successfully created"),
+		@ApiResponse(responseCode = "400", description = "Invalid input data")
+	})
 	@PostMapping("/save")
 	public ResponseEntity<BookResponse> saveAladinBook(@Valid @RequestBody AladinBookSaveRequest aladinBookSaveReq) {
 		BookResponse bookResponse = aladinBookService.saveBook(aladinBookSaveReq);
