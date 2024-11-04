@@ -29,6 +29,9 @@ import shop.nuribooks.books.member.grade.dto.response.GradeRegisterResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeUpdateResponse;
 import shop.nuribooks.books.member.grade.service.GradeService;
 
+/**
+ * @author Jprotection
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/member/grade")

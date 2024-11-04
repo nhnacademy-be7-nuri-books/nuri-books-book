@@ -11,4 +11,8 @@ public interface TagService {
 	List<TagResponse> getAllTags();
 
 	TagResponse getTag(Long id);
+
+	TagResponse updateTag(Long id, TagRequest request);
+
+	void deleteTag(Long id);
 }

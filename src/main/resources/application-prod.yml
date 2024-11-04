@@ -5,6 +5,8 @@ spring:
     password: ENC(udeUrEU3cfiVaNkqv4zwgEhifPvD2iRzsL5Jr/E2/u4=)
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
+    hibernate:
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true

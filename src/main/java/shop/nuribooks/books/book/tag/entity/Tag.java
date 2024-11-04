@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,5 +28,13 @@ public class Tag {
 	public Tag(Long id, String name) {
 		this.id = id;
 		this.name = name;
+	}
+
+	public TagEditor.TagEditorBuilder toEditor() {
+		return TagEditor.builder().name(name);
+	}
+
+	public void edit(TagEditor editor) {
+		name = editor.getName();
 	}
 }
