@@ -2,9 +2,7 @@ package shop.nuribooks.books.cart.customer.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.redis.testcontainers.RedisContainer;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,19 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.junit.jupiter.Container;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
-import shop.nuribooks.books.cart.customer.AbstractContainerBaseTest;
+import shop.nuribooks.books.cart.customer.TestRedisContainer;
 import shop.nuribooks.books.cart.customer.entitiy.CustomerCart;
 
 @SpringBootTest
 @Testcontainers(disabledWithoutDocker = true)
-class CustomerCartRepositoryImplTest extends AbstractContainerBaseTest {
-
-    public static final String CART_KEY = "cart:";
+class CustomerCartRepositoryImplTest extends TestRedisContainer {
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
