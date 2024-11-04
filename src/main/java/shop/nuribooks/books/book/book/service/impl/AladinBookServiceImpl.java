@@ -22,6 +22,7 @@ import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.client.AladinFeignClient;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
+import shop.nuribooks.books.exception.ResourceNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 
 @Slf4j
@@ -48,6 +49,19 @@ public class AladinBookServiceImpl implements AladinBookService {
 			log.error("Error: ", ex);
 			throw new RuntimeException("Failed to retrieve new books from Aladin");
 		}
+	}
+
+	//isbn13이 없으면 isbn으로 비교함
+	@Override
+	public AladinBookListItemResponse getBookByIsbn(String isbn) {
+		List<AladinBookListItemResponse> books = getNewBooks();
+		return books.stream()
+			.filter(book ->
+				(book.isbn13() != null && book.isbn13().equals(isbn)) ||
+				(book.isbn13() == null && book.isbn().equals(isbn))
+			)
+			.findFirst()
+			.orElseThrow(() -> new ResourceNotFoundException("도서를 찾을 수 없습니다."));
 	}
 
 	@Transactional
