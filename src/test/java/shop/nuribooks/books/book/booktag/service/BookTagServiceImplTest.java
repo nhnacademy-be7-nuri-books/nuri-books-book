@@ -132,7 +132,6 @@ class BookTagServiceImplTest {
 		verify(bookTagRepository, times(2)).save(any(BookTag.class));
 	}
 
-
 	@DisplayName("도서 태그 등록 실패 - 책 없음")
 	@Test
 	void failed_registerTagToBook() {
@@ -155,7 +154,6 @@ class BookTagServiceImplTest {
 		// When & Then
 		assertThrows(TagNotFoundException.class, () -> bookTagService.registerTagToBook(request));
 	}
-
 	@DisplayName("도서 태그 등록 실패 - 중복")
 	@Test
 	void failed_registerTagToBook_BookTagAlreadyExists() {

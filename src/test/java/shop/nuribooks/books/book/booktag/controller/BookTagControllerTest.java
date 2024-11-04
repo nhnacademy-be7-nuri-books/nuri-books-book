@@ -140,7 +140,6 @@ class BookTagControllerTest {
 	@Test
 	@DisplayName("유효성 검사 실패 - 음수 tagId")
 	void registerTagToBook_InvalidTagId() throws Exception {
-		//
 		BookTagRequest request = new BookTagRequest(1L, List.of(-1L, 2L));
 
 		// When & Then
@@ -154,7 +153,6 @@ class BookTagControllerTest {
 	@Test
 	@DisplayName("유효성 검사 실패 - Null bookId")
 	void registerTagToBook_NullBookId() throws Exception {
-		//
 		BookTagRequest request = new BookTagRequest(null, List.of(1L, 2L));
 
 		// When & Then
@@ -168,7 +166,6 @@ class BookTagControllerTest {
 	@Test
 	@DisplayName("유효성 검사 실패 - Null tagId")
 	void registerTagToBook_NullTagId() throws Exception {
-		//
 		BookTagRequest request = new BookTagRequest(1L, null);
 
 		// When & Then
@@ -255,5 +252,4 @@ class BookTagControllerTest {
 
 		verify(bookTagService, times(1)).deleteBookTag(bookTagId);
 	}
-
 }
