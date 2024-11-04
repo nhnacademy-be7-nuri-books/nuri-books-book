@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
 
@@ -30,10 +30,10 @@ public class ReviewController {
 	})
 	@PostMapping
 	public ResponseEntity<ReviewMemberResponse> registerReview(
-		@Valid @RequestBody ReviewRegisterRequest reviewRegisterRequest,
+		@Valid @RequestBody ReviewRequest reviewRequest,
 		@RequestHeader("X-USER-ID") long memberId
 	) {
-		ReviewMemberResponse response = this.reviewService.registerReview(reviewRegisterRequest, memberId);
+		ReviewMemberResponse response = this.reviewService.registerReview(reviewRequest, memberId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 }

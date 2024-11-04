@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
 
@@ -32,7 +32,7 @@ public class ReviewControllerTest {
 
 	@Test
 	void registerTest() throws Exception {
-		ReviewRegisterRequest reviewRequest = new ReviewRegisterRequest(
+		ReviewRequest reviewRequest = new ReviewRequest(
 			"title",
 			"contentcontent",
 			4,
@@ -48,7 +48,7 @@ public class ReviewControllerTest {
 			null
 		);
 
-		when(reviewService.registerReview(any(ReviewRegisterRequest.class), eq(1L))).thenReturn(response);
+		when(reviewService.registerReview(any(ReviewRequest.class), eq(1L))).thenReturn(response);
 
 		// Act & Assert
 		mockMvc.perform(post("/api/reviews")
