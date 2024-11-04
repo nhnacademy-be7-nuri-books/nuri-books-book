@@ -14,6 +14,9 @@ import shop.nuribooks.books.exception.publisher.PublisherAlreadyExistsException;
 import shop.nuribooks.books.exception.publisher.PublisherNotFoundException;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 
+/**
+ * @author kyongmin
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -22,7 +25,6 @@ public class PublisherServiceImpl implements PublisherService {
 
 	/**
 	 * registerPublisher : 출판사 이름 등록
-	 * @author kyongmin
 	 *
 	 * @param request 출판사 이름 등록
 	 *                이미 존재하는 출판사일 경우 PublisherAlreadyExistsException 발생
@@ -40,7 +42,6 @@ public class PublisherServiceImpl implements PublisherService {
 
 	/**
 	 * getAllPublisher : 등록 되어있는 모든 출판사 정보 조회
-	 * @author kyongmin
 	 *
 	 * @return 등록된 출판사 정보를 포함한 PublisherResponse List
 	 */
@@ -54,7 +55,6 @@ public class PublisherServiceImpl implements PublisherService {
 
 	/**
 	 * getPublisher : 출판사 정보 조회
-	 * @author kyongmin
 	 *
 	 * @param id id로 출판사 정보 조회
 	 *             존재하지 않는 출판사일 경우 PublisherNotFoundException 발생

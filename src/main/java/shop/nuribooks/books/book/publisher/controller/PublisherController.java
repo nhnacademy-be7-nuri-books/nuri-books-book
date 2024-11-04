@@ -21,6 +21,9 @@ import shop.nuribooks.books.book.publisher.dto.PublisherRequest;
 import shop.nuribooks.books.book.publisher.dto.PublisherResponse;
 import shop.nuribooks.books.book.publisher.service.PublisherService;
 
+/**
+ * @author kyongmin
+ */
 @RestController
 @RequiredArgsConstructor
 public class PublisherController {
@@ -29,7 +32,6 @@ public class PublisherController {
 	/**
 	 * 출판사 이름 등록하는 controller
 	 *
-	 * @author kyongmin
 	 * @param request 등록할 출판사 이름
 	 * @return ResponseEntity
 	 */
@@ -48,7 +50,6 @@ public class PublisherController {
 
 	/**
 	 * 모든 출판사 정보 조회하는 controller
-	 * @author kyongmin
 	 *
 	 * @return 모든 출판사 목록이 담긴 ResponseEntity
 	 */
@@ -65,7 +66,6 @@ public class PublisherController {
 
 	/**
 	 * 요청받은 이름에 해당하는 출판사 정보 조회하는 controller
-	 * @author kyongmin
 	 *
 	 * @param publisherId 조회할 출판사 id
 	 * @return 해당 이름의 출판사 정보가 담긴 ResponseEntity
@@ -104,7 +104,6 @@ public class PublisherController {
 
 	/**
 	 * 요청받은 이름에 해당하는 출판사 정보 수정하는 controller
-	 * @author kyongmin
 	 *
 	 * @param publisherId 수정할 출판사 id
 	 * @param request 수정할 출판사 이름이 포함된 요청 객체
