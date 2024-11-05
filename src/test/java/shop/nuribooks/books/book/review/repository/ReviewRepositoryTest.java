@@ -78,21 +78,18 @@ public class ReviewRepositoryTest {
 	@Test
 	void getReviewWithBookIdTest() {
 		List<ReviewMemberResponse> response = reviewRepository.findReviewsByBookId(book.getId());
-		System.out.println(response);
 		assertEquals(response.size(), 1);
 	}
 
 	@Test
 	void getScoreWithBookIdTest() {
 		double response = reviewRepository.findScoreByBookId(book.getId());
-		System.out.println(response);
 		assertEquals(response, reviews.get(0).getScore());
 	}
 
 	@Test
 	void getReviewWithMemberIdTest() {
 		List<ReviewBookResponse> response = reviewRepository.findReviewsByMemberId(member.getId());
-		System.out.println(response);
 		assertEquals(response.size(), reviews.size());
 	}
 }

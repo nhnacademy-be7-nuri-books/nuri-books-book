@@ -1,11 +1,14 @@
 package shop.nuribooks.books.book.review.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
+import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
@@ -40,5 +43,44 @@ public class ReviewServiceImpl implements ReviewService {
 		Review result = this.reviewRepository.save(review);
 
 		return ReviewMemberResponse.of(result);
+	}
+
+	/**
+	 * 도서의 평균 평점 반환
+	 *
+	 * @param bookId
+	 * @return
+	 */
+	@Override
+	public double getScoreByBookId(long bookId) {
+		if (!bookRepository.existsById(bookId))
+			throw new BookIdNotFoundException();
+		return this.reviewRepository.findScoreByBookId(bookId);
+	}
+
+	/**
+	 * 도서와 관련된 review 목록 반환
+	 *
+	 * @param bookId
+	 * @return
+	 */
+	@Override
+	public List<ReviewMemberResponse> getReviewsWithMember(long bookId) {
+		if (!bookRepository.existsById(bookId))
+			throw new BookIdNotFoundException();
+		return this.reviewRepository.findReviewsByBookId(bookId);
+	}
+
+	/**
+	 * 회원과 관련된 review 목록 반환
+	 *
+	 * @param memberId
+	 * @return
+	 */
+	@Override
+	public List<ReviewBookResponse> getReviewsWithBook(long memberId) {
+		if (!memberRepository.existsById(memberId))
+			throw new MemberNotFoundException("유저를 찾을 수 없습니다.");
+		return this.reviewRepository.findReviewsByMemberId(memberId);
 	}
 }
