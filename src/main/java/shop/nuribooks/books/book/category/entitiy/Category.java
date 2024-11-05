@@ -19,7 +19,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @AllArgsConstructor
@@ -31,11 +30,7 @@ public class Category {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Setter
 	private String name;
-
-	@Setter
-	private String path;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_category_id")
@@ -49,6 +44,14 @@ public class Category {
 	public Category(String name, Category parentCategory) {
 		this.name = name;
 		this.parentCategory = parentCategory;
+	}
+
+	public CategoryEditor.CategoryEditorBuilder toEditor() {
+		return CategoryEditor.builder().name(name);
+	}
+
+	public void edit(CategoryEditor editor) {
+		name = editor.getName();
 	}
 
 }

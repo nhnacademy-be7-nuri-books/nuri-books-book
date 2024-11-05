@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.nuribooks.books.book.category.dto.CategoryRequest;
 import shop.nuribooks.books.book.category.dto.CategoryResponse;
 import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.entitiy.CategoryEditor;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.CategoryService;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
@@ -56,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
 	/**
 	 * 기존 대분류 아래에 새로운 하위 분류 카테고리를 등록합니다.
 	 *
-	 * @param dto 하위 분류 등록 요청 DTO
+	 * @param categoryRequest 하위 분류 등록 요청 DTO
 	 * @param parentCategoryId 부모 카테고리의 ID
 	 * @return 등록된 하위 카테고리 엔티티
 	 * @throws CategoryNotFoundException 부모 카테고리를 찾을 수 없는 경우
@@ -64,19 +65,19 @@ public class CategoryServiceImpl implements CategoryService {
 	 */
 	@Override
 	@Transactional
-	public Category registerSubCategory(CategoryRequest dto, Long parentCategoryId) {
+	public Category registerSubCategory(CategoryRequest categoryRequest, Long parentCategoryId) {
 		Category parentCategory = categoryRepository.findById(parentCategoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
 
 		boolean isDuplicate = parentCategory.getSubCategory().stream()
-			.anyMatch(subCategory -> subCategory.getName().equals(dto.name()));
+			.anyMatch(subCategory -> subCategory.getName().equals(categoryRequest.name()));
 
 		if (isDuplicate) {
-			throw new CategoryAlreadyExistException(dto.name());
+			throw new CategoryAlreadyExistException(categoryRequest.name());
 		}
 
 		Category category = Category.builder()
-			.name(dto.name())
+			.name(categoryRequest.name())
 			.parentCategory(parentCategory)
 			.build();
 
@@ -118,31 +119,30 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 주어진 ID에 해당하는 카테고리를 업데이트합니다.
 	 * 카테고리가 존재하지 않을 경우 CategoryNotFoundException을 발생시킵니다.
 	 *
-	 * @param dto        업데이트할 카테고리의 정보가 담긴 객체
+	 * @param categoryRequest        업데이트할 카테고리의 정보가 담긴 객체
 	 * @param categoryId 업데이트할 카테고리의 ID
 	 * @throws CategoryNotFoundException 주어진 ID에 해당하는 카테고리가 존재하지 않을 경우
 	 */
 	@Override
 	@Transactional
-	public void updateCategory(CategoryRequest dto, Long categoryId) {
+	public void updateCategory(CategoryRequest categoryRequest, Long categoryId) {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
 		Category parentCategory = category.getParentCategory();
 
 		if (parentCategory == null) {
-			if (categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())) {
-				throw new CategoryAlreadyExistException(dto.name());
+			if (categoryRepository.existsByNameAndParentCategoryIsNull(categoryRequest.name())) {
+				throw new CategoryAlreadyExistException(categoryRequest.name());
 			}
 		} else {
 			if (parentCategory.getSubCategory().stream()
-				.anyMatch(subCategory -> subCategory.getName().equals(dto.name()))) {
-				throw new CategoryAlreadyExistException(dto.name());
+				.anyMatch(subCategory -> subCategory.getName().equals(categoryRequest.name()))) {
+				throw new CategoryAlreadyExistException(categoryRequest.name());
 			}
 		}
-
-		category.setName(dto.name());
-		categoryRepository.save(category);
+		CategoryEditor categoryEditor = getCategoryEditor(categoryRequest, category);
+		category.edit(categoryEditor);
 	}
 
 	/**
@@ -157,6 +157,20 @@ public class CategoryServiceImpl implements CategoryService {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(CategoryNotFoundException::new);
 		categoryRepository.delete(category);
+	}
+
+	/**
+	 * getCategoryEditor : 카테고리 편집 빌더
+	 *
+	 * @param categoryRequest 요청된 태그 정보 담긴 객체
+	 * @param category 기존 태그 정보를 담은 객체
+	 * @return 수정된 정보를 포함한 객체
+	 */
+	private static CategoryEditor getCategoryEditor(CategoryRequest categoryRequest, Category category) {
+		CategoryEditor.CategoryEditorBuilder builder = category.toEditor();
+		return builder
+			.name(categoryRequest.name())
+			.build();
 	}
 
 }
