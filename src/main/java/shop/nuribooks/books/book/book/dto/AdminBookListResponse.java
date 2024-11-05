@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 
-//TODO: Publisher 엔티티를 직접 포함하지않고 String으로 출판사명으로 교체해야될듯
+//TODO: 관리자 전용 dto라 생각했는데 회원과 공통으로 사용해도 될듯하여 이름변경 생각해보자
 public record AdminBookListResponse(
 	Long id,
 	String publisherName,
