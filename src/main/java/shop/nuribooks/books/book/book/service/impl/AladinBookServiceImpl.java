@@ -75,6 +75,8 @@ public class AladinBookServiceImpl implements AladinBookService {
 				return publisherRepository.save(newPublisher);
 			});
 
+
+
 		BookStateEnum bookStateEnum = BookStateEnum.fromString(String.valueOf(reqDto.state()));
 		//BookStateEnum bookStateEnum = reqDto.state() == null ? BookStateEnum.NORMAL_DISTRIBUTION : reqDto.state();
 
