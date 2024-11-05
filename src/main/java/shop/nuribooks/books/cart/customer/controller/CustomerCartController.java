@@ -23,13 +23,13 @@ public class CustomerCartController {
 
     private final CustomerCartService customerCartService;
 
-    @PostMapping("api/customer/cart")
+    @PostMapping("/api/customer/cart")
     private ResponseEntity addToCart(@RequestBody @Valid CustomerCartAddRequest request) {
         customerCartService.addToCart(request);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("api/customer/cart")
+    @GetMapping("/api/customer/cart")
     private ResponseEntity<List<CustomerCartResponse>> getCustomerCartList(HttpServletRequest request) {
         HttpSession session = request.getSession();
         String id = session.getId();
@@ -37,7 +37,7 @@ public class CustomerCartController {
         return ResponseEntity.ok().body(customerCartList);
     }
 
-    @DeleteMapping("api/customer/cart")
+    @DeleteMapping("/api/customer/cart")
     private ResponseEntity removeCustomerCart(HttpServletRequest request) {
         HttpSession session = request.getSession();
         String id = session.getId();
@@ -45,7 +45,7 @@ public class CustomerCartController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("api/customer/cart/{bookId}")
+    @DeleteMapping("/api/customer/cart/{bookId}")
     private ResponseEntity removeCustomerCartItem(@PathVariable Long bookId,
                                                   HttpServletRequest request) {
         HttpSession session = request.getSession();

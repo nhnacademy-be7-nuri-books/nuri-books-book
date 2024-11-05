@@ -3,6 +3,7 @@ package shop.nuribooks.books.cart.customer.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +37,7 @@ class CustomerCartRepositoryImplTest extends TestRedisContainer {
     @AfterEach
     public void tearDown() {
         // Redis 데이터 비우기
-        redisTemplate.getConnectionFactory().getConnection().flushDb();
+        Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().flushDb();
     }
 
     @DisplayName("장바구니에 아이템을 추가한다.")

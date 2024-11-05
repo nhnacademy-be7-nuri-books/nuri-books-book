@@ -9,7 +9,7 @@ import org.testcontainers.containers.GenericContainer;
 @ActiveProfiles("test")
 public abstract class TestRedisContainer {
 
-    static final String REDIS_IMAGE = "redis:6-alpine";
+    static final String REDIS_IMAGE = "redis:7-alpine";
     static final GenericContainer REDIS_CONTAINER;
 
     static {
