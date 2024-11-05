@@ -1,4 +1,5 @@
 package shop.nuribooks.books.book.review.service;
+
 import java.util.List;
 
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
@@ -6,7 +7,7 @@ import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 
 public interface ReviewService {
-	ReviewMemberResponse registerReview(ReviewRegisterRequest reviewRegisterRequest, long memberId);
+	ReviewMemberResponse registerReview(ReviewRequest reviewRegisterRequest, long memberId);
 
 	/**
 	 * 도서의 평균 평점 반환
@@ -28,6 +29,6 @@ public interface ReviewService {
 	 * @return
 	 */
 	List<ReviewBookResponse> getReviewsWithBook(long memberId);
-  
+
 	ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId, long memberId);
 }

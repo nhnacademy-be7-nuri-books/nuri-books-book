@@ -16,9 +16,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
-import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
 
@@ -102,9 +102,9 @@ public class ReviewControllerTest {
 		mockMvc.perform(get("/api/reviews/members/" + memberId))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.*", Matchers.hasSize(1)));
-  }
-    
-  @Test
+	}
+
+	@Test
 	void updateTest() throws Exception {
 		ReviewRequest reviewRequest = new ReviewRequest(
 			"title",
@@ -119,7 +119,9 @@ public class ReviewControllerTest {
 			"title",
 			"contentnew",
 			4,
-			null
+			null,
+			List.of(new ReviewImageResponse(1, "http://example.com/image1.jpg"),
+				new ReviewImageResponse(2, "http://example.com/image2.jpg"))
 		);
 
 		when(reviewService.updateReview(any(ReviewRequest.class), anyLong(), eq(1L))).thenReturn(response);

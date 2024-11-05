@@ -18,8 +18,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
+import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
 
@@ -66,6 +66,8 @@ public class ReviewController {
 		@PathVariable("memberId") long memberId
 	) {
 		List<ReviewBookResponse> response = this.reviewService.getReviewsWithBook(memberId);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
 
 	@Operation(summary = "리뷰 업데이트", description = "리뷰를 업데이트합니다.")
 	@ApiResponses(value = {
