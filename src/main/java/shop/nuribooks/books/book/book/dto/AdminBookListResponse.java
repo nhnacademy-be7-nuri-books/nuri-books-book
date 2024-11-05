@@ -16,7 +16,8 @@ public record AdminBookListResponse(
 	BigDecimal salePrice,
 	int discountRate,
 	boolean isPackageable,
-	int stock
+	int stock,
+	String thumbnailImageUrl
 ) {
 	public static AdminBookListResponse of(Book book, BigDecimal salePrice) {
 		return new AdminBookListResponse(
@@ -28,7 +29,8 @@ public record AdminBookListResponse(
 			salePrice,
 			book.getDiscountRate(),
 			book.isPackageable(),
-			book.getStock()
+			book.getStock(),
+			book.getThumbnailImageUrl()
 		);
 	}
 }

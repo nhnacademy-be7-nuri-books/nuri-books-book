@@ -103,9 +103,8 @@ public class BookServiceImpl implements BookService {
 		List<AdminBookListResponse> bookListResponses = bookPage.stream()
 			.map(book -> {
 				BigDecimal salePrice = book.getPrice()
-					.subtract(book.getPrice()
-						.multiply(BigDecimal.valueOf(book.getDiscountRate()))
-						.divide(BigDecimal.valueOf(100), RoundingMode.DOWN));
+					.multiply(BigDecimal.valueOf(100 - book.getDiscountRate()))
+					.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
 				return AdminBookListResponse.of(book, salePrice);
 			})
 			.toList();
