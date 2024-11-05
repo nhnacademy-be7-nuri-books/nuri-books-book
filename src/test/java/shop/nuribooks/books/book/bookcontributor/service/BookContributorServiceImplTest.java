@@ -11,6 +11,7 @@ import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorRegisterRequest;
 import shop.nuribooks.books.book.bookcontributor.entity.BookContributor;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
@@ -157,6 +158,35 @@ class BookContributorServiceImplTest {
         verify(bookContributorRepository).findBookIdsByContributorId(contributor.getId());
         verify(bookRepository).findAllById(List.of(book.getId()));
     }
+
+    @DisplayName("도서 ID로 기여자와 기여자 역할 조회 성공")
+    @Test
+    void getContributorsAndRolesByBookId_ShouldReturnContributors_WhenBookExists() {
+        Long bookId = 1L;
+        BookContributorInfoResponse contributorInfoResponse =  BookContributorInfoResponse.of(
+                1L,
+                "contributor",
+                1L,
+                ContributorRoleEnum.AUTHOR
+        );
+        when(bookContributorRepository.findContributorsAndRolesByBookId(bookId))
+                .thenReturn(List.of(contributorInfoResponse));
+
+        // Act
+        List<BookContributorInfoResponse> result = bookContributorService.getContributorsAndRolesByBookId(bookId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(contributorInfoResponse.contributorId(), result.get(0).contributorId());
+        assertEquals(contributorInfoResponse.contributorName(), result.get(0).contributorName());
+        assertEquals(contributorInfoResponse.contributorRoleId(), result.get(0).contributorRoleId());
+        assertEquals(contributorInfoResponse.contributorRoleName(), result.get(0).contributorRoleName());
+
+
+        verify(bookContributorRepository).findContributorsAndRolesByBookId(bookId);
+    }
+
 
     @DisplayName("도서 기여자 조회 실패 - 기여자 not found")
     @Test

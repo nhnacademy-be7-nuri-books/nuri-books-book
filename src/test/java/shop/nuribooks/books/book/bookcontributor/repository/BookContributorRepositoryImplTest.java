@@ -61,8 +61,8 @@ class BookContributorRepositoryImplTest {
     void setUp() {
         // Publisher 저장
         Publisher publisher = new Publisher(1L, "Sample Publisher");
-
         publisher = publisherRepository.save(publisher);
+
         // Book 엔터티를 먼저 데이터베이스에 저장
         testBook = Book.builder()
                 .publisherId(publisher)  // Publisher 설정
@@ -81,15 +81,19 @@ class BookContributorRepositoryImplTest {
                 .likeCount(0)
                 .viewCount(0L)
                 .build();
-        bookRepository.save(testBook);  // 데이터베이스에 저장
+        testBook = bookRepository.save(testBook);  // 데이터베이스에 저장
 
         // Contributor 저장
         testContributor = Contributor.builder().name("contributor").build();
-        contributorRepository.save(testContributor);  // 데이터베이스에 저장
+        testContributor = contributorRepository.save(testContributor);  // 데이터베이스에 저장
 
-        // ContributorRole 저장
-        testContributorRole = new ContributorRole(1L, ContributorRoleEnum.AUTHOR);
-        contributorRoleRepository.save(testContributorRole);  // 데이터베이스에 저장
+        // ContributorRole 저장 without hardcoded ID
+        testContributorRole = new ContributorRole(null, ContributorRoleEnum.AUTHOR); // ID should be null for auto-generation
+        testContributorRole = contributorRoleRepository.save(testContributorRole);  // 데이터베이스에 저장
+
+        // Ensure ContributorRole is saved
+        assertThat(testContributorRole).isNotNull();
+        assertThat(testContributorRole.getId()).isNotNull(); // Check if ID is auto-generated
 
         // BookContributor 저장
         BookContributor bookContributor = BookContributor.builder()
@@ -115,5 +119,19 @@ class BookContributorRepositoryImplTest {
         assertThat(result.get(0).contributorName()).isEqualTo(testContributor.getName());
         assertThat(result.get(0).contributorRoleId()).isEqualTo(testContributorRole.getId());
         assertThat(result.get(0).contributorRoleName()).isEqualTo(testContributorRole.getName());
+    }
+
+    @Test
+    @DisplayName("기여자 ID로 도서 ID를 조회한다")
+    void findBookIdsByContributorId() {
+        // given
+        Long contributorId = testContributor.getId();
+
+        // when
+        List<Long> result = bookContributorRepository.findBookIdsByContributorId(contributorId);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result).contains(testBook.getId());
     }
 }
