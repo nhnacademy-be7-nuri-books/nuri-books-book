@@ -1,7 +1,10 @@
 package shop.nuribooks.books.book.book.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -126,6 +129,25 @@ public class AladinBookServiceImpl implements AladinBookService {
 			currentParentCategory = category;
 		}
 		return BookResponse.of(book);
+	}
+
+	/**
+	 * 알라딘 api 조회를 통해 author응답을 작가이름과 작가역할로 분리하기위한 메서드
+	 * ([^,]+?): 쉼표(,)가 나오기 전까지의 모든 문자열을 하나의 그룹으로 캡처 (Contributor)
+	 * \\(([^)]+)\\): 괄호 안에 있는 문자열을 또 다른 그룹으로 캡처 (Role)
+	 * @param author - ex) 모구랭 (지은이), 이르 (원작)
+	 * @return 기여자, 기여자역할 리스트
+	 */
+	private List<ParsedContributor> parseContributors(String author) {
+		List<ParsedContributor> contributors = new ArrayList<>();
+		Matcher matcher = Pattern.compile("([^,]+?) \\(([^)]+)\\)").matcher(author);
+
+		while (matcher.find()) {
+			String name = matcher.group(1).trim();
+			String role = matcher.group(2).trim();
+			contributors.add(new ParsedContributor(name,role));
+		}
+		return contributors;
 	}
 
 	/**
