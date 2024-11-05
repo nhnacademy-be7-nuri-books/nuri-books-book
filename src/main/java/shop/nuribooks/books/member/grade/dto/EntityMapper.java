@@ -13,7 +13,7 @@ public class EntityMapper {
 	 */
 	public static Grade toGradeEntity(GradeRegisterRequest request) {
 		return Grade.builder()
-			.name(request.name())
+			.name(request.name().toUpperCase())
 			.pointRate(request.pointRate())
 			.requirement(request.requirement())
 			.build();

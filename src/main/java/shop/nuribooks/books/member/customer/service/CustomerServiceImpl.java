@@ -31,6 +31,7 @@ public class CustomerServiceImpl implements CustomerService {
 	 * 이메일로 비회원 조회 후 이미 존재하는 이메일이면 예외 던짐
 	 * @return customer 등록 후 입력한 이름, 전화번호, 이메일을 그대로 CustomerCreateResponse에 담아서 반환
 	 */
+	@Override
 	@Transactional
 	public CustomerRegisterResponse registerCustomer(CustomerRegisterRequest request) {
 		if (customerRepository.existsByEmail(request.email())) {

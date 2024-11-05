@@ -17,7 +17,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Import;
 
+import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.dto.EntityMapper;
@@ -44,6 +46,7 @@ import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
+@Import(QuerydslConfiguration.class)
 class MemberServiceImplTest {
 
 	@InjectMocks
@@ -367,6 +370,27 @@ class MemberServiceImplTest {
 		//then
 		assertThat(scheduledInactiveMember.getStatus()).isEqualTo(StatusType.INACTIVE);
 		verify(scheduledInactiveMember, times(1)).changeToInactive();
+	}
+
+	@DisplayName("탈퇴 후 1년이 지난 회원을 soft delete")
+	@Test
+	void removeWithdrawnMembers() {
+		//given
+		Customer savedCustomer = spy(getSavedCustomer());
+		Member savedMember = spy(getSavedMember(savedCustomer));
+		savedMember.changeToWithdrawn();
+
+		when(memberRepository.findAllByWithdrawnAtBefore(any(LocalDateTime.class)))
+			.thenReturn(List.of(savedMember));
+		when(customerRepository.findById(savedMember.getId())).thenReturn(Optional.of(savedCustomer));
+
+		//when
+		memberServiceImpl.removeWithdrawnMembers();
+
+		//then
+		verify(savedCustomer, times(1)).changeToSoftDeleted();
+		verify(savedMember, times(1)).changeToSoftDeleted();
+		assertThat(savedMember.getAuthority()).isNull();
 	}
 
 

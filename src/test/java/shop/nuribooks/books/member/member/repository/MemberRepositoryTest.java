@@ -12,8 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
 import org.springframework.context.annotation.Import;
+
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
@@ -78,12 +78,13 @@ class MemberRepositoryTest {
 		assertThat(exists).isTrue();
 	}
 
-	@DisplayName("마지막 로그인 날짜가 입력된 날짜보다 이전인 회원들을 조회")
+	@DisplayName("마지막 로그인 후 90일이 지난 회원들을 조회")
 	@Test
 	void findAllByLatestLoginAtBefore() {
 		//given
 		Member savedMember = getSavedMember();
-		LocalDateTime thresholdDate = LocalDateTime.now().minusDays(90);
+		savedMember.changeToInactive();
+		LocalDateTime thresholdDate = LocalDateTime.now().plusYears(90);
 
 		//when
 		List<Member> inactiveMembers = memberRepository.findAllByLatestLoginAtBefore(thresholdDate);
@@ -91,7 +92,24 @@ class MemberRepositoryTest {
 		//then
 		assertThat(inactiveMembers).hasSize(1);
 		assertThat(inactiveMembers).extracting(Member::getUserId)
-			.containsExactlyInAnyOrder(savedMember.getUserId());
+			.containsExactly(savedMember.getUserId());
+	}
+
+	@DisplayName("탈퇴 후 1년이 지난 회원들을 조회")
+	@Test
+	void findAllByWithdrawnAtBefore() {
+		//given
+		Member savedMember = getSavedMember();
+		savedMember.changeToWithdrawn();
+		LocalDateTime thresholdDate = LocalDateTime.now().plusYears(1);
+
+		//when
+		List<Member> withdrawnMembers = memberRepository.findAllByWithdrawnAtBefore(thresholdDate);
+
+		//then
+		assertThat(withdrawnMembers).hasSize(1);
+		assertThat(withdrawnMembers).extracting(Member::getUserId)
+			.containsExactly(savedMember.getUserId());
 	}
 
 
@@ -136,14 +154,14 @@ class MemberRepositoryTest {
 			.customer(savedCustomer)
 			.authority(AuthorityType.MEMBER)
 			.grade(savedGrade)
-			.status(StatusType.INACTIVE)
+			.status(StatusType.ACTIVE)
 			.gender(GenderType.MALE)
 			.userId("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
-			.latestLoginAt(LocalDateTime.of(2024,2,22,22,22,22))
+			.latestLoginAt(LocalDateTime.now())
 			.build();
 	}
 }
