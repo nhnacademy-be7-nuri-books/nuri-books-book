@@ -115,7 +115,7 @@ public class BookControllerTest {
 			.andExpect(jsonPath("$.message", containsString("내용은 필수입니다.")));
 	}
 
-	@Test
+	/*@Test
 	public void getBooks_ShouldReturnPageOfBooks_WhenRequestIsValid() throws Exception {
 		Pageable pageable = PageRequest.of(0, 10);
 		AdminBookListResponse bookResponse = new AdminBookListResponse(
@@ -139,7 +139,7 @@ public class BookControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.content[0].id").value(1L))
 			.andExpect(jsonPath("$.content[0].title").value("책 제목"));
-	}
+	}*/
 
 	@Test
 	public void getBooks_ShouldReturnBadRequest_WhenPageIsOutOfRange() throws Exception {

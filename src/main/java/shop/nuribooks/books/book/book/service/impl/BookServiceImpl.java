@@ -13,7 +13,6 @@ import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
-import shop.nuribooks.books.book.client.AladinFeignClient;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;

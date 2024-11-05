@@ -13,17 +13,19 @@ public record AdminBookListResponse(
 	String state,
 	String title,
 	BigDecimal price,
+	BigDecimal salePrice,
 	int discountRate,
 	boolean isPackageable,
 	int stock
 ) {
-	public static AdminBookListResponse of(Book book) {
+	public static AdminBookListResponse of(Book book, BigDecimal salePrice) {
 		return new AdminBookListResponse(
 			book.getId(),
 			book.getPublisherId().getName(),
 			book.getState().getKorName(),
 			book.getTitle(),
 			book.getPrice(),
+			salePrice,
 			book.getDiscountRate(),
 			book.isPackageable(),
 			book.getStock()
