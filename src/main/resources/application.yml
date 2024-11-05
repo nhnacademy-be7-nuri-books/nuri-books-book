@@ -5,6 +5,14 @@ spring:
   profiles:
     active: local
 
+  data:
+    redis:
+      host: 133.186.241.167
+      port: 6379
+      password: "*N2vya7H@muDTwdNMR!"
+      database: 140
+
+
 server:
   port: 8083
 
