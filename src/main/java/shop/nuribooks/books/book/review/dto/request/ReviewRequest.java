@@ -12,7 +12,7 @@ import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.entity.ReviewImage;
 import shop.nuribooks.books.member.member.entity.Member;
 
-public record ReviewRegisterRequest(
+public record ReviewRequest(
 	@NotBlank(message = "리뷰 제목은 필수입니다.")
 	@Size(max = 255, message = "리뷰 제목은 최대 255자까지 가능합니다.")
 	String title,

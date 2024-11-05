@@ -1,0 +1,33 @@
+### 도서태그 등록 1
+POST localhost:8083/api/book-tags
+Content-Type:application/json
+
+{
+  "bookId": 1,
+  "tagId": [
+    1,2
+  ]
+}
+### 도서태그 등록 2
+POST localhost:8083/api/book-tags
+Content-Type:application/json
+
+{
+  "bookId": 2,
+  "tagId": [
+    1
+  ]
+}
+
+### 도서태그 등록 3
+POST localhost:8083/api/book-tags
+Content-Type:application/json
+
+{
+  "bookId": 3,
+  "tagId": [
+    2
+  ]
+}
+
+

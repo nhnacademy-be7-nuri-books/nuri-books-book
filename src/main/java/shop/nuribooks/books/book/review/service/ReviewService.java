@@ -1,8 +1,7 @@
 package shop.nuribooks.books.book.review.service;
-
 import java.util.List;
 
-import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 
@@ -29,4 +28,6 @@ public interface ReviewService {
 	 * @return
 	 */
 	List<ReviewBookResponse> getReviewsWithBook(long memberId);
+  
+	ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId, long memberId);
 }
