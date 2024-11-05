@@ -2,6 +2,8 @@ package shop.nuribooks.books.member.member.controller;
 
 import static org.springframework.http.HttpStatus.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,18 +19,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.common.message.ResponseMessage;
-import shop.nuribooks.books.exception.member.CustomerNotFoundException;
-import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.member.dto.request.MemberDetailsRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
+import shop.nuribooks.books.member.member.dto.request.MemberSearchRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
+import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.member.service.MemberService;
-
 
 /**
  * @author Jprotection
@@ -140,4 +141,19 @@ public class MemberController {
 		return ResponseEntity.status(OK).body(response);
 	}
 
+	/**
+	 * 관리자가 다양한 검색 조건을 이용하여 회원 목록 조회
+	 */
+	@Operation(summary = "관리자가 다양한 검색 조건으로 회원 조회", description = "관리자가 다양한 검색 조건을 이용하여 회원 목록을 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "관리자가 회원 목록 조회 성공")
+	})
+	@GetMapping("/members")
+	public ResponseEntity<Page<MemberSearchResponse>> memberSearchWithPaging(
+		@RequestBody MemberSearchRequest request, Pageable pageable) {
+
+		Page<MemberSearchResponse> response = memberService.searchMembersWithPaing(request, pageable);
+
+		return ResponseEntity.status(OK).body(response);
+	}
 }

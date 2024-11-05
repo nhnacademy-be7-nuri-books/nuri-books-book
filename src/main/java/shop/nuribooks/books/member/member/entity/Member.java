@@ -2,6 +2,7 @@ package shop.nuribooks.books.member.member.entity;
 
 import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.FetchType.*;
+import static java.math.BigDecimal.*;
 import static shop.nuribooks.books.member.member.entity.StatusType.*;
 
 import java.math.BigDecimal;
@@ -26,6 +27,9 @@ import lombok.NoArgsConstructor;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
 
+/**
+ * @author Jprotection
+ */
 @Entity
 @Getter
 @Builder
@@ -47,14 +51,12 @@ public class Member {
 	/**
 	 * ADMIN, MEMBER, SELLER
 	 */
-	@NotNull
 	@Enumerated(STRING)
 	private AuthorityType authority;
 
 	/**
 	 * STANDARD, GOLD, PLATINUM, ROYAL
 	 */
-	@NotNull
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "grade_id")
 	private Grade grade;
@@ -62,14 +64,12 @@ public class Member {
 	/**
 	 * ACTIVE, INACTIVE, WITHDRAWN
 	 */
-	@NotNull
 	@Enumerated(STRING)
 	private StatusType status;
 
 	/**
 	 * MALE, FEMALE
 	 */
-	@NotNull
 	@Enumerated(STRING)
 	private GenderType gender;
 
@@ -77,10 +77,8 @@ public class Member {
 	@Size(min = 8, max = 20)
 	private String userId;
 
-	@NotNull
 	private LocalDate birthday;
 
-	@NotNull
 	private LocalDateTime createdAt;
 
 	@Column(precision = 10, scale = 2)
@@ -102,6 +100,13 @@ public class Member {
 	private LocalDateTime withdrawnAt = null;
 
 	/**
+	 * 마지막 로그일 날짜로부터 90일이 지나면 상태를 INACTIVE로 변경
+	 */
+	public void changeToInactive() {
+		this.status = INACTIVE;
+	}
+
+	/**
 	 * 회원 탈퇴 시 상태를 탈퇴됨으로, 탈퇴 일시를 현재 시간으로 초기화
 	 */
 	public void changeToWithdrawn() {
@@ -110,9 +115,17 @@ public class Member {
 	}
 
 	/**
-	 * 마지막 로그일 날짜로부터 90일이 지나면 상태를 INACTIVE로 변경
+	 * 회원 탈퇴 후 1년이 지나면 userId, status, withdrawnAt을 제외한 나머지 필드 soft delete
 	 */
-	public void changeToInactive() {
-		this.status = INACTIVE;
+	public void changeToSoftDeleted() {
+		this.authority = null;
+		this.grade = null;
+		this.status = null;
+		this.gender = null;
+		this.birthday = null;
+		this.createdAt = null;
+		this.point = ZERO;
+		this.totalPaymentAmount = ZERO;
+		this.latestLoginAt = null;
 	}
 }
