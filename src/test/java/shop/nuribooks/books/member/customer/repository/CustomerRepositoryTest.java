@@ -14,7 +14,6 @@ import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.customer.entity.Customer;
 
 @DataJpaTest
-@Import(QuerydslConfiguration.class)
 public class CustomerRepositoryTest {
 
 	@Autowired
