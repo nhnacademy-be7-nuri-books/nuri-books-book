@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.book.service.impl;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -94,7 +96,11 @@ public class BookServiceImpl implements BookService {
 			throw new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다.");
 		}
 
-		return bookPage.map(AdminBookListResponse::of);
+		return bookPage.map(book -> {
+			BigDecimal salePrice = book.getPrice()
+				.subtract(book.getPrice().multiply(BigDecimal.valueOf(book.getDiscountRate())).divide(BigDecimal.valueOf(100)));
+			return AdminBookListResponse.of(book, salePrice);
+		});
 	}
 
 	//TODO: 좋아요나 조회수에 대한 업데이트는 따로 메서드를 구현할 계획입니다.
