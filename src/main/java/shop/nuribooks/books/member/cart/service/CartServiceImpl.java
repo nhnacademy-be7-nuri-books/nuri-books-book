@@ -1,7 +1,6 @@
 package shop.nuribooks.books.member.cart.service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -53,8 +52,8 @@ public class CartServiceImpl implements CartService {
 					return DtoMapper.toCartNullDto();
 				}
 
-				Cart quantityIncreasedCart = cartRepository.save(cart);
-				return DtoMapper.toCartAddDto(quantityIncreasedCart);
+				Cart quantityUpdatedCart = cartRepository.save(cart);
+				return DtoMapper.toCartAddDto(quantityUpdatedCart);
 			})
 			.orElseGet(() -> {
 				Member foundMember = memberRepository.findById(request.memberId())
@@ -63,6 +62,7 @@ public class CartServiceImpl implements CartService {
 					.orElseThrow(() -> new BookNotFoundException(request.bookId())); // "해당 도서를 찾을 수 없습니다. Id : "
 
 				Cart newCart = Cart.builder()
+					.id(cartId)
 					.member(foundMember)
 					.book(foundBook)
 					.quantity(request.quantity())

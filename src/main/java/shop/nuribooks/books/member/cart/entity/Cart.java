@@ -30,12 +30,12 @@ public class Cart {
 	private CartId id;
 
 	@ManyToOne(fetch = LAZY)
-	@MapsId
+	@MapsId("memberId")
 	@JoinColumn(name = "member_id")
 	private Member member;
 
 	@ManyToOne(fetch = LAZY)
-	@MapsId
+	@MapsId("bookId")
 	@JoinColumn(name = "book_id")
 	private Book book;
 

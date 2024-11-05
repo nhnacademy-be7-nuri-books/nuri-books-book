@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,15 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import com.netflix.discovery.converters.Auto;
-import com.querydsl.apt.jpa.JPAConfiguration;
-
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
+import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.cart.entity.Cart;
+import shop.nuribooks.books.member.cart.entity.CartId;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
@@ -35,7 +33,7 @@ import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @DataJpaTest
-@Import(JPAConfiguration.class)
+@Import(QuerydslConfiguration.class)
 public class CartRepositoryTest {
 
 	@Autowired
@@ -124,10 +122,14 @@ public class CartRepositoryTest {
 
 		savedBook = bookRepository.save(book);
 
+		CartId cartId = new CartId(savedMember.getId(), savedBook.getId());
+
 		Cart cart = Cart.builder()
+			.id(cartId)
 			.member(savedMember)
 			.book(savedBook)
 			.quantity(3)
+			.updatedAt(LocalDateTime.now())
 			.build();
 
 		savedCart = cartRepository.save(cart);
@@ -136,9 +138,7 @@ public class CartRepositoryTest {
 	@DisplayName("회원 아이디로 장바구니 목록 조회")
 	@Test
 	void findAllByMemberId() {
-	    //given
-
-	    //when
+		//given / when
 		List<Cart> result = cartRepository.findAllByMemberId(savedMember.getId());
 
 		//then
