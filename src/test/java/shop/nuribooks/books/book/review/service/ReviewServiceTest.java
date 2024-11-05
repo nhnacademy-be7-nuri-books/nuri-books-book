@@ -18,13 +18,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -42,7 +43,7 @@ public class ReviewServiceTest {
 	private Book book;
 	private Member member;
 	private Review review;
-	private ReviewRegisterRequest reviewRegisterRequest;
+	private ReviewRequest reviewRequest;
 
 	@BeforeEach
 	public void setUp() {
@@ -64,7 +65,7 @@ public class ReviewServiceTest {
 
 		ReflectionTestUtils.setField(book, "id", 1L);
 
-		reviewRegisterRequest = new ReviewRegisterRequest(
+		reviewRequest = new ReviewRequest(
 			"title",
 			"content",
 			4,
@@ -92,7 +93,7 @@ public class ReviewServiceTest {
 	public void registerMemberNotFound() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 		assertThrows(MemberNotFoundException.class,
-			() -> reviewService.registerReview(reviewRegisterRequest, member.getId()));
+			() -> reviewService.registerReview(reviewRequest, member.getId()));
 	}
 
 	@Test
@@ -100,7 +101,7 @@ public class ReviewServiceTest {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.empty());
 		assertThrows(BookIdNotFoundException.class,
-			() -> reviewService.registerReview(reviewRegisterRequest, member.getId()));
+			() -> reviewService.registerReview(reviewRequest, member.getId()));
 	}
 
 	@Test
@@ -109,6 +110,21 @@ public class ReviewServiceTest {
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(reviewRepository.save(any())).thenReturn(review);
 		assertEquals(ReviewMemberResponse.of(review),
-			reviewService.registerReview(reviewRegisterRequest, member.getId()));
+			reviewService.registerReview(reviewRequest, member.getId()));
+	}
+
+	@Test
+	public void updateFailed() {
+		when(reviewRepository.findById(anyLong())).thenReturn(Optional.empty());
+		assertThrows(ReviewNotFoundException.class,
+			() -> reviewService.updateReview(reviewRequest, review.getId(), member.getId()));
+	}
+
+	@Test
+	public void updateSuccess() {
+		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
+		when(reviewRepository.save(any())).thenReturn(review).thenReturn(review);
+		assertEquals(ReviewMemberResponse.of(review),
+			reviewService.updateReview(reviewRequest, review.getId(), member.getId()));
 	}
 }

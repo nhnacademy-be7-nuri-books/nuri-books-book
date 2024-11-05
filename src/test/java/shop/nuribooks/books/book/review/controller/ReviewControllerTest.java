@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
 
@@ -32,7 +32,7 @@ public class ReviewControllerTest {
 
 	@Test
 	void registerTest() throws Exception {
-		ReviewRegisterRequest reviewRequest = new ReviewRegisterRequest(
+		ReviewRequest reviewRequest = new ReviewRequest(
 			"title",
 			"contentcontent",
 			4,
@@ -48,7 +48,7 @@ public class ReviewControllerTest {
 			null
 		);
 
-		when(reviewService.registerReview(any(ReviewRegisterRequest.class), eq(1L))).thenReturn(response);
+		when(reviewService.registerReview(any(ReviewRequest.class), eq(1L))).thenReturn(response);
 
 		// Act & Assert
 		mockMvc.perform(post("/api/reviews")
@@ -57,6 +57,36 @@ public class ReviewControllerTest {
 				.content(objectMapper.writeValueAsString(reviewRequest)))
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.title").value("title"));
+	}
+
+	@Test
+	void updateTest() throws Exception {
+		ReviewRequest reviewRequest = new ReviewRequest(
+			"title",
+			"contentnew",
+			4,
+			1L,
+			List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
+		);
+
+		ReviewMemberResponse response = new ReviewMemberResponse(
+			0,
+			"title",
+			"contentnew",
+			4,
+			null
+		);
+
+		when(reviewService.updateReview(any(ReviewRequest.class), anyLong(), eq(1L))).thenReturn(response);
+
+		// Act & Assert
+		mockMvc.perform(put("/api/reviews/1")
+				.header("X-USER-ID", "1")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(reviewRequest)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.title").value("title"))
+			.andExpect(jsonPath("$.content").value("contentnew"));
 	}
 }
 
