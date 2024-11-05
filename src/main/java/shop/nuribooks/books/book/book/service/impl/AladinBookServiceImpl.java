@@ -15,12 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.dto.AladinBookListItemResponse;
 import shop.nuribooks.books.book.book.dto.AladinBookListResponse;
 import shop.nuribooks.books.book.book.dto.AladinBookSaveRequest;
-import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.book.service.AladinBookService;
+import shop.nuribooks.books.book.category.entitiy.BookCategory;
 import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.client.AladinFeignClient;
 import shop.nuribooks.books.book.contributor.entitiy.BookContributor;
@@ -46,6 +47,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 	private final ContributorRepository contributorRepository;
 	private final ContributorRoleRepository contributorRoleRepository;
 	private final BookContributorRepository bookContributorRepository;
+	private final BookCategoryRepository bookCategoryRepository;
 
 	@Value("${aladin.api.key}")
 	private String ttbKey;
@@ -111,7 +113,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 
 		List<ParsedContributor> parsedContributors = parseContributors(reqDto.author());
 		saveContributors(parsedContributors, book);
-		saveCategories(reqDto.categoryName());
+		saveCategories(reqDto.categoryName() ,book);
 	}
 
 	//Contributor 저장 메서드
@@ -124,7 +126,6 @@ public class AladinBookServiceImpl implements AladinBookService {
 						.build()
 				));
 
-			//TODO: 여기서 터짐 젠장
 			ContributorRoleEnum contributorRoleEnum = ContributorRoleEnum.fromStringKor(parsedContributor.getRole());
 			ContributorRole contributorRole = contributorRoleRepository.findByName(contributorRoleEnum)
 				.orElseGet(() -> contributorRoleRepository.save(
@@ -137,11 +138,12 @@ public class AladinBookServiceImpl implements AladinBookService {
 			bookContributor.setBook(book);
 			bookContributor.setContributor(contributor);
 			bookContributor.setContributorRole(contributorRole);
+			bookContributorRepository.save(bookContributor);
 		}
 	}
 
 	//category 저장 메서드
-	private List<Category> saveCategories(String categoryName) {
+	private List<Category> saveCategories(String categoryName, Book book) {
 		String[] categoryNames = categoryName.split(">");
 		Category currentParentCategory = null;
 		List<Category> categories = new ArrayList<>();
@@ -154,7 +156,13 @@ public class AladinBookServiceImpl implements AladinBookService {
 					.name(name.trim())
 					.parentCategory(parent)
 					.build();
-				return categoryRepository.save(newCategory);
+
+				Category savedCategory = categoryRepository.save(newCategory);
+
+				BookCategory bookCategory = BookCategory.builder().book(book).category(newCategory).build();
+				bookCategoryRepository.save(bookCategory);
+
+				return savedCategory;
 			});
 			categories.add(currentParentCategory);
 		}
