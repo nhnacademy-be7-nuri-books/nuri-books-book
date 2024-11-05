@@ -23,7 +23,6 @@ import shop.nuribooks.books.book.book.service.AladinBookService;
 import shop.nuribooks.books.book.category.entitiy.Category;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.client.AladinFeignClient;
-import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.entitiy.BookContributor;
 import shop.nuribooks.books.book.contributor.entitiy.Contributor;
 import shop.nuribooks.books.book.contributor.entitiy.ContributorRole;
@@ -87,6 +86,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 				return publisherRepository.save(newPublisher);
 			});
 
+		//중복코드 추후 수정 예정
 		BookStateEnum bookStateEnum = BookStateEnum.fromString(String.valueOf(reqDto.state()));
 
 		Book book = Book.builder()
