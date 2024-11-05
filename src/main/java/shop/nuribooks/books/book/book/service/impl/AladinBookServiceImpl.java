@@ -20,6 +20,8 @@ import shop.nuribooks.books.book.book.service.AladinBookService;
 import shop.nuribooks.books.book.category.entitiy.Category;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.client.AladinFeignClient;
+import shop.nuribooks.books.book.contributor.entitiy.Contributor;
+import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
@@ -33,6 +35,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
 	private final CategoryRepository categoryRepository;
+	private final ContributorRepository contributorRepository;
 
 	@Value("${aladin.api.key}")
 	private String ttbKey;
@@ -74,7 +77,6 @@ public class AladinBookServiceImpl implements AladinBookService {
 					.build();
 				return publisherRepository.save(newPublisher);
 			});
-
 
 
 		BookStateEnum bookStateEnum = BookStateEnum.fromString(String.valueOf(reqDto.state()));
