@@ -8,6 +8,5 @@ import shop.nuribooks.books.book.contributor.entitiy.Contributor;
 
 public interface ContributorRepository extends JpaRepository<Contributor, Long> {
 	Optional<Contributor> findByName(String name);
-	boolean existsByName(String name);
 }
 

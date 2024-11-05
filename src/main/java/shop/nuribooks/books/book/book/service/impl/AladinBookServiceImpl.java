@@ -20,6 +20,8 @@ import shop.nuribooks.books.book.book.service.AladinBookService;
 import shop.nuribooks.books.book.category.entitiy.Category;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.client.AladinFeignClient;
+import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
+import shop.nuribooks.books.book.contributor.entitiy.BookContributor;
 import shop.nuribooks.books.book.contributor.entitiy.Contributor;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
@@ -78,6 +80,11 @@ public class AladinBookServiceImpl implements AladinBookService {
 				return publisherRepository.save(newPublisher);
 			});
 
+		Contributor contributor = contributorRepository.findByName(reqDto.author())
+			.orElseGet(() -> {
+				Contributor newContributor = Contributor.builder().name(reqDto.author()).build();
+				return contributorRepository.save(newContributor);
+			});
 
 		BookStateEnum bookStateEnum = BookStateEnum.fromString(String.valueOf(reqDto.state()));
 		//BookStateEnum bookStateEnum = reqDto.state() == null ? BookStateEnum.NORMAL_DISTRIBUTION : reqDto.state();
@@ -102,6 +109,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 
 		bookRepository.save(book);
 
+
 		String[] categoryNames = reqDto.categoryName().split(">");
 		Category currentParentCategory = null;
 
@@ -118,5 +126,28 @@ public class AladinBookServiceImpl implements AladinBookService {
 			currentParentCategory = category;
 		}
 		return BookResponse.of(book);
+	}
+
+	/**
+	 * 도서 저장과 밀접하게 관련되었다 생각하여 서비스 내부에 해당 클래스를 선언했습니다.
+	 * 알라딘 api에서는 기여자에 대한 내용이 <author>모구랭 (지은이), 이르 (원작)</author> 이런식으로 응답이 오기 때문에
+	 * 파싱해서 저장하려는 용도입니다.
+	 */
+	private static class ParsedContributor {
+		private final String name;
+		private final String role;
+
+		public ParsedContributor(String name, String role) {
+			this.name = name;
+			this.role = role;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getRole() {
+			return role;
+		}
 	}
 }
