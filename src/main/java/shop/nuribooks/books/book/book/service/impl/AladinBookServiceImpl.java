@@ -26,7 +26,10 @@ import shop.nuribooks.books.book.client.AladinFeignClient;
 import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.entitiy.BookContributor;
 import shop.nuribooks.books.book.contributor.entitiy.Contributor;
+import shop.nuribooks.books.book.contributor.entitiy.ContributorRole;
+import shop.nuribooks.books.book.contributor.entitiy.ContributorRoleEnum;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
+import shop.nuribooks.books.book.contributor.repository.role.ContributorRoleRepository;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
@@ -41,6 +44,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 	private final PublisherRepository publisherRepository;
 	private final CategoryRepository categoryRepository;
 	private final ContributorRepository contributorRepository;
+	private final ContributorRoleRepository contributorRoleRepository;
 
 	@Value("${aladin.api.key}")
 	private String ttbKey;
@@ -83,14 +87,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 				return publisherRepository.save(newPublisher);
 			});
 
-		Contributor contributor = contributorRepository.findByName(reqDto.author())
-			.orElseGet(() -> {
-				Contributor newContributor = Contributor.builder().name(reqDto.author()).build();
-				return contributorRepository.save(newContributor);
-			});
-
 		BookStateEnum bookStateEnum = BookStateEnum.fromString(String.valueOf(reqDto.state()));
-		//BookStateEnum bookStateEnum = reqDto.state() == null ? BookStateEnum.NORMAL_DISTRIBUTION : reqDto.state();
 
 		Book book = Book.builder()
 			.publisherId(publisher)
@@ -112,6 +109,27 @@ public class AladinBookServiceImpl implements AladinBookService {
 
 		bookRepository.save(book);
 
+		List<ParsedContributor> parsedContributors = parseContributors(reqDto.author());
+
+		for(ParsedContributor parsedContributor : parsedContributors) {
+			Contributor contributor = contributorRepository.findByName(parsedContributor.getName())
+				.orElseGet(() -> {
+					Contributor newContributor = Contributor.builder().name(parsedContributor.getName()).build();
+					return contributorRepository.save(newContributor);
+				});
+
+			ContributorRoleEnum contributorRoleEnum = ContributorRoleEnum.fromString(parsedContributor.getRole());
+			ContributorRole contributorRole = contributorRoleRepository.findByName(contributorRoleEnum)
+				.orElseGet(() -> {
+					ContributorRole newContributorRole = ContributorRole.builder().name(contributorRoleEnum).build();
+					return contributorRoleRepository.save(newContributorRole);
+				});
+
+			BookContributor bookContributor = new BookContributor();
+			bookContributor.setBook(book);
+			bookContributor.setContributor(contributor);
+			bookContributor.setContributorRole(contributorRole);
+		}
 
 		String[] categoryNames = reqDto.categoryName().split(">");
 		Category currentParentCategory = null;
@@ -119,14 +137,13 @@ public class AladinBookServiceImpl implements AladinBookService {
 		for (String categoryName : categoryNames) {
 			final Category parent = currentParentCategory;
 			Optional<Category> categoryOpt = categoryRepository.findByNameAndParentCategory(categoryName.trim(), parent);
-			Category category = categoryOpt.orElseGet(() -> {
+			currentParentCategory = categoryOpt.orElseGet(() -> {
 				Category newCategory = Category.builder()
 					.name(categoryName.trim())
 					.parentCategory(parent)
 					.build();
 				return categoryRepository.save(newCategory);
 			});
-			currentParentCategory = category;
 		}
 		return BookResponse.of(book);
 	}

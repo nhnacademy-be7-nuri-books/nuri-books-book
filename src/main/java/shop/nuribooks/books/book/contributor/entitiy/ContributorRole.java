@@ -8,7 +8,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,4 +29,9 @@ public class ContributorRole {
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	private ContributorRoleEnum name;
+
+	@Builder
+	private ContributorRole(ContributorRoleEnum name) {
+		this.name = name;
+	}
 }
