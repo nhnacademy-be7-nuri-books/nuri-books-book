@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
 	/**
 	 * 새로운 대분류 카테고리를 등록합니다.
 	 *
-	 * @param dto 카테고리 등록 요청 DTO
+	 * @param categoryRequest 카테고리 등록 요청 DTO
 	 * @return 등록된 카테고리 엔티티
 	 * @throws CategoryAlreadyExistException 동일한 이름의 대분류 카테고리가 이미 존재하는 경우
 	 */
