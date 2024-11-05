@@ -124,17 +124,19 @@ public class AladinBookServiceImpl implements AladinBookService {
 	private void saveContributors(List<ParsedContributor> parsedContributors, Book book) {
 		for(ParsedContributor parsedContributor : parsedContributors) {
 			Contributor contributor = contributorRepository.findByName(parsedContributor.getName())
-				.orElseGet(() -> {
-					Contributor newContributor = Contributor.builder().name(parsedContributor.getName()).build();
-					return contributorRepository.save(newContributor);
-				});
+				.orElseGet(() -> contributorRepository.save(
+					Contributor.builder()
+						.name(parsedContributor.getName())
+						.build()
+				));
 
 			ContributorRoleEnum contributorRoleEnum = ContributorRoleEnum.fromString(parsedContributor.getRole());
 			ContributorRole contributorRole = contributorRoleRepository.findByName(contributorRoleEnum)
-				.orElseGet(() -> {
-					ContributorRole newContributorRole = ContributorRole.builder().name(contributorRoleEnum).build();
-					return contributorRoleRepository.save(newContributorRole);
-				});
+				.orElseGet(() -> contributorRoleRepository.save(
+					ContributorRole.builder()
+						.name(contributorRoleEnum)
+						.build()
+				));
 
 			BookContributor bookContributor = new BookContributor();
 			bookContributor.setBook(book);
