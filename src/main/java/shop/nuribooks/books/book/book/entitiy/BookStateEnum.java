@@ -3,7 +3,7 @@ package shop.nuribooks.books.book.book.entitiy;
 import shop.nuribooks.books.exception.book.InvalidBookStateException;
 
 public enum BookStateEnum {
-	NORMAL_DISTRIBUTION("정상판매"),
+	NORMAL("정상판매"),
 	PREORDER("예약판매"),
 	NEW("신간"),
 	NOT_PUBLISHED("미출간"),

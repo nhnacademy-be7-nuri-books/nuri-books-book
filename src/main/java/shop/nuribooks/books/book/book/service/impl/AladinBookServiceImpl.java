@@ -45,6 +45,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 	private final ContributorRepository contributorRepository;
 	private final ContributorRoleRepository contributorRoleRepository;
 
+
 	@Value("${aladin.api.key}")
 	private String ttbKey;
 
