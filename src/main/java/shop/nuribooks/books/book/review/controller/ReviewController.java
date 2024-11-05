@@ -1,7 +1,11 @@
 package shop.nuribooks.books.book.review.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -14,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.review.dto.request.ReviewRegisterRequest;
+import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
 
@@ -35,5 +40,31 @@ public class ReviewController {
 	) {
 		ReviewMemberResponse response = this.reviewService.registerReview(reviewRegisterRequest, memberId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	}
+
+	@Operation(summary = "리뷰 조회", description = "도서에 관련된 리뷰를 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+	})
+	@GetMapping("/books/{bookId}")
+	public ResponseEntity<List<ReviewMemberResponse>> getReviewMember(
+		@PathVariable("bookId") long bookId
+	) {
+		List<ReviewMemberResponse> response = this.reviewService.getReviewsWithMember(bookId);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	@Operation(summary = "리뷰 조회", description = "도서에 관련된 리뷰를 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+	})
+	@GetMapping("/members/{memberId}")
+	public ResponseEntity<List<ReviewBookResponse>> getReviewBook(
+		@PathVariable("memberId") long memberId
+	) {
+		List<ReviewBookResponse> response = this.reviewService.getReviewsWithBook(memberId);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 }

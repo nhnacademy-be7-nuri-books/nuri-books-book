@@ -4,7 +4,6 @@ import java.util.List;
 
 import lombok.Builder;
 import shop.nuribooks.books.book.book.dto.BookBriefResponse;
-import shop.nuribooks.books.book.review.entity.Review;
 
 /**
  * 도서 정보를 함께 담은 review dto
@@ -23,13 +22,4 @@ public record ReviewBookResponse(
 	BookBriefResponse book,
 	List<ReviewImageResponse> reviewImages
 ) {
-	public static ReviewBookResponse of(Review review) {
-		return ReviewBookResponse.builder()
-			.id(review.getId())
-			.title(review.getTitle())
-			.content(review.getContent())
-			.score(review.getScore())
-			.book(BookBriefResponse.of(review.getBook()))
-			.build();
-	}
 }
