@@ -11,8 +11,8 @@ public record AladinBookListItemResponse(
 	@JsonProperty("pubDate") String pubDate,
 	@JsonProperty("description") String description,
 	@JsonProperty("isbn") String isbn,
-	@JsonProperty("isbn13") String isbn13,
-	@JsonProperty("priceSales") BigDecimal priceSales, //판매가
+	//@JsonProperty("isbn13") String isbn13,
+	//@JsonProperty("priceSales") BigDecimal priceSales, //판매가
 	@JsonProperty("priceStandard") BigDecimal priceStandard, //정가
 	//@JsonProperty("mallType") String mallType,
 	@JsonProperty("stockStatus") String stockStatus, //재고상태(정상유통일 경우 비어있음, 품절/절판 등)

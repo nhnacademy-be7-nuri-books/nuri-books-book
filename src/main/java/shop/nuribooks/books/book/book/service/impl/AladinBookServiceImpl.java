@@ -51,15 +51,11 @@ public class AladinBookServiceImpl implements AladinBookService {
 		}
 	}
 
-	//isbn13이 없으면 isbn으로 비교함
 	@Override
 	public AladinBookListItemResponse getBookByIsbn(String isbn) {
 		List<AladinBookListItemResponse> books = getNewBooks();
 		return books.stream()
-			.filter(book ->
-				(book.isbn13() != null && book.isbn13().equals(isbn)) ||
-				(book.isbn13() == null && book.isbn().equals(isbn))
-			)
+			.filter(book -> book.isbn().equals(isbn))
 			.findFirst()
 			.orElseThrow(() -> new ResourceNotFoundException("도서를 찾을 수 없습니다."));
 	}
@@ -80,6 +76,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 			});
 
 		BookStateEnum bookStateEnum = BookStateEnum.fromString(String.valueOf(reqDto.state()));
+		//BookStateEnum bookStateEnum = reqDto.state() == null ? BookStateEnum.NORMAL_DISTRIBUTION : reqDto.state();
 
 		Book book = Book.builder()
 			.publisherId(publisher)
