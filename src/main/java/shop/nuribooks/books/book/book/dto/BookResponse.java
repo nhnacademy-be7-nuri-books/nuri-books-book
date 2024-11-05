@@ -3,14 +3,10 @@ package shop.nuribooks.books.book.book.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.category.dto.CategoryResponse;
-import shop.nuribooks.books.book.category.entitiy.Category;
-import shop.nuribooks.books.book.contributor.entitiy.BookContributor;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 
 public record BookResponse(
@@ -30,22 +26,9 @@ public record BookResponse(
 	boolean isPackageable,
 	int likeCount,
 	int stock,
-	Long viewCount,
-	List<ContributorInfoResponse> contributors,
-	List<CategoryResponse> categories
+	Long viewCount
 ) {
-	public static BookResponse of(Book book, List<BookContributor> bookContributors, List<Category> categories) {
-		List<ContributorInfoResponse> contributorInfoResponses = bookContributors.stream()
-			.map(contributor -> new ContributorInfoResponse(
-				contributor.getContributor().getName(),
-				contributor.getContributorRole().getName().name()
-			))
-			.collect(Collectors.toList());
-
-		List<CategoryResponse> categoryResponses = categories.stream()
-			.map(CategoryResponse::new)
-			.collect(Collectors.toList());
-
+	public static BookResponse of(Book book) {
 		return new BookResponse(
 			book.getId(),
 			book.getPublisherId().getName(),
@@ -62,9 +45,7 @@ public record BookResponse(
 			book.isPackageable(),
 			book.getLikeCount(),
 			book.getStock(),
-			book.getViewCount(),
-			contributorInfoResponses,
-			categoryResponses
+			book.getViewCount()
 		);
 	}
 }

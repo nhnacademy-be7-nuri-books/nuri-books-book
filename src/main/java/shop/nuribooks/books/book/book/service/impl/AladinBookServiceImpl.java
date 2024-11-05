@@ -78,42 +78,51 @@ public class AladinBookServiceImpl implements AladinBookService {
 	@Transactional
 	@Override
 	public void saveBook(AladinBookSaveRequest reqDto) {
+		log.info("Attempting to save book with ISBN: {}", reqDto.isbn());
 		if (bookRepository.existsByIsbn(reqDto.isbn())) {
+			log.warn("Book with ISBN {} already exists.", reqDto.isbn());
 			throw new ResourceAlreadyExistIsbnException(reqDto.isbn());
 		}
 
-		Publisher publisher = publisherRepository.findByName(reqDto.publisherName())
-			.orElseGet(() -> publisherRepository.save(Publisher.builder()
-				.name(reqDto.publisherName())
-				.build()
-			));
+		try {
+			Publisher publisher = publisherRepository.findByName(reqDto.publisherName())
+				.orElseGet(() -> publisherRepository.save(Publisher.builder()
+					.name(reqDto.publisherName())
+					.build()
+				));
 
-		//TODO: 중복코드 추후 수정 예정
-		BookStateEnum bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.state()));
+			//TODO: 중복코드 추후 수정 예정
+			BookStateEnum bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.state()));
 
-		Book book = Book.builder()
-			.publisherId(publisher)
-			.state(bookStateEnum)
-			.title(reqDto.title())
-			.thumbnailImageUrl(reqDto.thumbnailImageUrl())
-			.detailImageUrl(reqDto.detailImageUrl())
-			.publicationDate(reqDto.publicationDate())
-			.price(reqDto.price())
-			.discountRate(reqDto.discountRate())
-			.description(reqDto.description())
-			.contents(reqDto.contents())
-			.isbn(reqDto.isbn())
-			.isPackageable(reqDto.isPackageable())
-			.likeCount(0)
-			.stock(reqDto.stock())
-			.viewCount(0L)
-			.build();
+			Book book = Book.builder()
+				.publisherId(publisher)
+				.state(bookStateEnum)
+				.title(reqDto.title())
+				.thumbnailImageUrl(reqDto.thumbnailImageUrl())
+				.detailImageUrl(reqDto.detailImageUrl())
+				.publicationDate(reqDto.publicationDate())
+				.price(reqDto.price())
+				.discountRate(reqDto.discountRate())
+				.description(reqDto.description())
+				.contents(reqDto.contents())
+				.isbn(reqDto.isbn())
+				.isPackageable(reqDto.isPackageable())
+				.likeCount(0)
+				.stock(reqDto.stock())
+				.viewCount(0L)
+				.build();
 
-		bookRepository.save(book);
+			log.info("Saving book entity: {}", book);
+			bookRepository.save(book);
 
-		List<ParsedContributor> parsedContributors = parseContributors(reqDto.author());
-		saveContributors(parsedContributors, book);
-		saveCategories(reqDto.categoryName() ,book);
+			List<ParsedContributor> parsedContributors = parseContributors(reqDto.author());
+			saveContributors(parsedContributors, book);
+			saveCategories(reqDto.categoryName(), book);
+			log.info("Book with ISBN {} successfully saved.", reqDto.isbn());
+		} catch (Exception ex) {
+			log.error("Error saving book with ISBN {}: {}", reqDto.isbn(), ex.getMessage(), ex);
+			throw ex;
+		}
 	}
 
 	//Contributor 저장 메서드

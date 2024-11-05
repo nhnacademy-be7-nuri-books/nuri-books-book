@@ -66,7 +66,7 @@ public class BookServiceImpl implements BookService {
 		return BookRegisterResponse.of(book);
 	}
 
-	/*//도서 상세 조회 시 조회수 증가 추가
+	//도서 상세 조회 시 조회수 증가 추가
 	//TODO:성능 고려한 비동기 업데이트나 조회기능과 독립적으로 관리하는 방안 생각중
 	@Transactional
 	@Override
@@ -78,7 +78,7 @@ public class BookServiceImpl implements BookService {
 		bookRepository.save(book);
 
 		return BookResponse.of(book);
-	}*/
+	}
 
 	//관리자페이지에서 도서 목록조회를 하여 도서를 관리하기 위한 메서드
 	//TODO: 추후 엘라스틱 서치 적용 시 사용자를 위한 도서 검색 기능을 따로 구현 예정

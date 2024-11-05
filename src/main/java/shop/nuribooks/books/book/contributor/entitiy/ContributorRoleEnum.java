@@ -7,7 +7,7 @@ public enum ContributorRoleEnum {
 	COAUTHOR("공저자"),
 	SUPERVISOR("감수자"),
 	COMPILER("편집자"),
-	TRANSLATOR("번역가"),
+	TRANSLATOR("옮긴이"),
 	TRANSCRIBER("필사자"),
 	TEXT("텍스트"),
 	ILLUSTRATION("삽화가"),

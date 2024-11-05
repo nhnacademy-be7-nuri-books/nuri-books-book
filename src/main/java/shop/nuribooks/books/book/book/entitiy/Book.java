@@ -48,9 +48,9 @@ public class Book {
 	@Column(nullable = false)
 	private BookStateEnum state;
 
-	@Column(nullable = false, length = 50)
+	@Column(nullable = false, length = 100)
 	@NotBlank
-	@Size(min = 1, max = 50)
+	@Size(min = 1, max = 100)
 	private String title;
 
 	@NotBlank

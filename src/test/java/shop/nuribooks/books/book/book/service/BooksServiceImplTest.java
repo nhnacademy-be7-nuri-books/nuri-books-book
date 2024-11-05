@@ -197,7 +197,7 @@ public class BooksServiceImplTest {
 		assertDoesNotThrow(() -> bookService.getBooks(pageable));
 	}
 
-	/*@Test
+	@Test
 	public void getBookById_ShouldReturnBookResponseAndIncrementViewCount_WhenBookExists() {
 		Long bookId = 1L;
 		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
@@ -210,16 +210,16 @@ public class BooksServiceImplTest {
 		assertEquals(1L, book.getViewCount());
 
 		verify(bookRepository, times(1)).save(book);
-	}*/
+	}
 
-	/*@Test
+	@Test
 	public void getBookById_ShouldThrowBookIdNotFoundException_WhenBookDoesNotExist() {
 		Long bookId = 9999L;
 		when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
 		assertThrows(BookIdNotFoundException.class, () -> bookService.getBookById(bookId));
 		verify(bookRepository, never()).save(any());
-	}*/
+	}
 
 	@Test
 	public void updateBook_ShouldUpdateBook_WhenValidRequest() {
