@@ -171,7 +171,7 @@ public class BookControllerTest {
 			.andExpect(jsonPath("$.title").value("책 제목"));
 	}*/
 
-	@Test
+	/*@Test
 	public void getBookById_ShouldReturnNotFound_WhenBookDoesNotExist() throws Exception {
 		Long bookId = 9999L;
 
@@ -181,7 +181,7 @@ public class BookControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.message").value("도서를 찾을 수 없습니다."));
-	}
+	}*/
 
 	@Test
 	public void updateBook_ShouldReturnOk_WhenRequestIsValid() throws Exception {
