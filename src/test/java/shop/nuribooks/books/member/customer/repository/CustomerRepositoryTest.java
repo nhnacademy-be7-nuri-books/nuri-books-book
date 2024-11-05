@@ -10,9 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import org.springframework.context.annotation.Import;
+import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.customer.entity.Customer;
 
 @DataJpaTest
+@Import(QuerydslConfiguration.class)
 public class CustomerRepositoryTest {
 
 	@Autowired
