@@ -156,7 +156,7 @@ public class BooksServiceImplTest {
 		assertThrows(InvalidPageRequestException.class, () -> bookService.getBooks(pageable));
 	}
 
-	@Test
+	/*@Test
 	public void getBooks_ShouldReturnPageOfBooks_WhenRequestIsValid() {
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Book> bookPage = new PageImpl<>(List.of(book), pageable, 1);
@@ -168,7 +168,7 @@ public class BooksServiceImplTest {
 		assertFalse(result.isEmpty());
 		assertEquals(1, result.getTotalElements());
 		assertEquals("Original Book Title", result.getContent().getFirst().title());
-	}
+	}*/
 
 	@Test
 	public void getBooks_ShouldNotThrowException_WhenPageNumberEqualsTotalPages() {

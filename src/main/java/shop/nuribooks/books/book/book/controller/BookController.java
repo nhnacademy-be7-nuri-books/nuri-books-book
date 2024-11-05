@@ -24,6 +24,7 @@ import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.service.BookService;
+import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.message.ResponseMessage;
 
 @RequestMapping("/api/books")
@@ -51,9 +52,9 @@ public class BookController {
 		@ApiResponse(responseCode = "400", description = "잘못된 페이징 요청")
 	})
 	@GetMapping
-	public ResponseEntity<Page<AdminBookListResponse>> getBooks(Pageable pageable) {
-		Page<AdminBookListResponse> adminBookListResponse = bookService.getBooks(pageable);
-		return ResponseEntity.status(HttpStatus.OK).body(adminBookListResponse);
+	public ResponseEntity<PagedResponse<AdminBookListResponse>> getBooks(Pageable pageable) {
+		PagedResponse<AdminBookListResponse> pagedResponse = bookService.getBooks(pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
 	}
 
 	@Operation(summary = "도서 상세 조회", description = "도서 ID를 통해 도서의 상세 정보를 조회하는 엔드포인트입니다.")
