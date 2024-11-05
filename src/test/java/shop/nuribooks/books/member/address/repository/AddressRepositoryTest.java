@@ -12,6 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
