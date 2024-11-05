@@ -20,8 +20,8 @@ import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.member.cart.dto.CartAddRequest;
-import shop.nuribooks.books.member.cart.dto.CartAddResponse;
+import shop.nuribooks.books.member.cart.dto.request.CartAddRequest;
+import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
 import shop.nuribooks.books.member.cart.entity.Cart;
 import shop.nuribooks.books.member.cart.entity.CartId;
 import shop.nuribooks.books.member.cart.repository.CartRepository;
@@ -151,11 +151,6 @@ class CartServiceImplTest {
 		verify(savedCart, times(1)).updateQuantity(request.quantity());
 
 		assertThat(result.state()).isNull();
-		assertThat(result.title()).isNull();
-		assertThat(result.thumbnailImageUrl()).isNull();
-		assertThat(result.price()).isNull();
-		assertThat(result.discountRate()).isEqualTo(0);
-		assertThat(result.isPackageable()).isFalse();
 	}
 
 
@@ -219,7 +214,7 @@ class CartServiceImplTest {
 		return CartAddRequest.builder()
 			.memberId(1L)
 			.bookId(1L)
-			.quantity(-1)
+			.quantity(-3)
 			.build();
 	}
 

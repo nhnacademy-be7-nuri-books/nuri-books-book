@@ -1,7 +1,10 @@
 package shop.nuribooks.books.member.cart.service;
 
-import shop.nuribooks.books.member.cart.dto.CartAddRequest;
-import shop.nuribooks.books.member.cart.dto.CartAddResponse;
+import java.util.List;
+
+import shop.nuribooks.books.member.cart.dto.request.CartAddRequest;
+import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
+import shop.nuribooks.books.member.cart.dto.response.CartListResponse;
 
 /**
  * @author Jprotection
@@ -9,4 +12,6 @@ import shop.nuribooks.books.member.cart.dto.CartAddResponse;
 public interface CartService {
 
 	CartAddResponse addToCart(CartAddRequest request);
+
+	List<CartListResponse> getCartList(Long memberId);
 }

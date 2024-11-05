@@ -1,4 +1,4 @@
-package shop.nuribooks.books.member.cart.dto;
+package shop.nuribooks.books.member.cart.dto.request;
 
 import lombok.Builder;
 

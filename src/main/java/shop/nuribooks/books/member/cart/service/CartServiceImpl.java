@@ -1,6 +1,8 @@
 package shop.nuribooks.books.member.cart.service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,9 +12,10 @@ import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.member.cart.dto.CartAddRequest;
-import shop.nuribooks.books.member.cart.dto.CartAddResponse;
+import shop.nuribooks.books.member.cart.dto.request.CartAddRequest;
+import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
 import shop.nuribooks.books.member.cart.dto.DtoMapper;
+import shop.nuribooks.books.member.cart.dto.response.CartListResponse;
 import shop.nuribooks.books.member.cart.entity.Cart;
 import shop.nuribooks.books.member.cart.entity.CartId;
 import shop.nuribooks.books.member.cart.repository.CartRepository;
@@ -63,12 +66,25 @@ public class CartServiceImpl implements CartService {
 					.member(foundMember)
 					.book(foundBook)
 					.quantity(request.quantity())
-					.createdAt(LocalDateTime.now())
+					.updatedAt(LocalDateTime.now())
 					.build();
 
 				Cart savedCart = cartRepository.save(newCart);
 
 				return DtoMapper.toCartAddDto(savedCart);
 			});
+	}
+
+	@Override
+	public List<CartListResponse> getCartList(Long memberId) {
+		List<Cart> carts = cartRepository.findAllByMemberId(memberId);
+
+		if (carts.isEmpty()) {
+			return List.of(DtoMapper.toCartListNullDto());
+		}
+
+		return carts.stream()
+			.map(DtoMapper::toCartListDto)
+			.toList();
 	}
 }

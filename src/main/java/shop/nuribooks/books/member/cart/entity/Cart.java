@@ -41,7 +41,6 @@ public class Cart {
 
 	private int quantity;
 
-	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 
 	/**

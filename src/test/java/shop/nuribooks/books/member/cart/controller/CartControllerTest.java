@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
-import shop.nuribooks.books.member.cart.dto.CartAddRequest;
-import shop.nuribooks.books.member.cart.dto.CartAddResponse;
+import shop.nuribooks.books.member.cart.dto.request.CartAddRequest;
+import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
 import shop.nuribooks.books.member.cart.entity.Cart;
 import shop.nuribooks.books.member.cart.service.CartService;
 import shop.nuribooks.books.member.member.entity.AuthorityType;

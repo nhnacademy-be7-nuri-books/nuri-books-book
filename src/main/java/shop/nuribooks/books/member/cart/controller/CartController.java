@@ -2,7 +2,11 @@ package shop.nuribooks.books.member.cart.controller;
 
 import static org.springframework.http.HttpStatus.*;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,8 +16,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.member.cart.dto.CartAddRequest;
-import shop.nuribooks.books.member.cart.dto.CartAddResponse;
+import shop.nuribooks.books.member.cart.dto.request.CartAddRequest;
+import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
+import shop.nuribooks.books.member.cart.dto.response.CartListResponse;
 import shop.nuribooks.books.member.cart.service.CartService;
 
 /**
@@ -42,4 +47,12 @@ public class CartController {
 
 		return ResponseEntity.status(CREATED).body(response);
 	}
+
+	@GetMapping("/{memberId}")
+	public ResponseEntity<List<CartListResponse>> getCartList(@PathVariable Long memberId) {
+		List<CartListResponse> response = cartService.getCartList(memberId);
+
+		return ResponseEntity.status(OK).body(response);
+	}
 }
+
