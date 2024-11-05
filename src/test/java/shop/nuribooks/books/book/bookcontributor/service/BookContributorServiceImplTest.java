@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import shop.nuribooks.books.book.TestUtils;
+import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -20,6 +21,7 @@ import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.book.contributor.repository.role.ContributorRoleRepository;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.contributor.BookContributorNotFoundException;
 import shop.nuribooks.books.exception.contributor.ContributorNotFoundException;
 import shop.nuribooks.books.exception.contributor.ContributorRoleNotFoundException;
 
@@ -52,6 +54,7 @@ class BookContributorServiceImplTest {
     private Contributor contributor;
     private ContributorRole contributorRole;
     private BookContributorRegisterRequest registerRequest;
+    private BookContributor bookContributor;
 
 
     @BeforeEach
@@ -80,6 +83,13 @@ class BookContributorServiceImplTest {
 
         contributor = Contributor.builder().id(1L).name("contributor").build();
         contributorRole = new ContributorRole(1L, ContributorRoleEnum.AUTHOR);
+
+        bookContributor = BookContributor.builder()
+                .book(book)
+                .contributor(contributor)
+                .build();
+
+        TestUtils.setIdForEntity(bookContributor, 1L);
 
         registerRequest = new BookContributorRegisterRequest(1L, 1L, List.of(1L));
 
@@ -128,4 +138,59 @@ class BookContributorServiceImplTest {
         verify(bookContributorRepository, never()).save(any(BookContributor.class));
     }
 
+    @DisplayName("도서 기여자 조회 성공")
+    @Test
+    void getAllBooksByContributorId_ShouldReturnBooks_WhenContributorExists() {
+        // Arrange
+        when(contributorRepository.findById(contributor.getId())).thenReturn(Optional.of(contributor));
+        when(bookContributorRepository.findBookIdsByContributorId(contributor.getId())).thenReturn(List.of(book.getId()));
+        when(bookRepository.findAllById(List.of(book.getId()))).thenReturn(List.of(book));
+
+        // Act
+        List<BookResponse> result = bookContributorService.getAllBooksByContributorId(contributor.getId());
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(book.getTitle(), result.get(0).title());
+        verify(contributorRepository).findById(contributor.getId());
+        verify(bookContributorRepository).findBookIdsByContributorId(contributor.getId());
+        verify(bookRepository).findAllById(List.of(book.getId()));
+    }
+
+    @DisplayName("도서 기여자 조회 실패 - 기여자 not found")
+    @Test
+    void getAllBooksByContributorId_ShouldThrowContributorNotFoundException_WhenContributorDoesNotExist() {
+        // Arrange
+        when(contributorRepository.findById(contributor.getId())).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ContributorNotFoundException.class, () -> bookContributorService.getAllBooksByContributorId(contributor.getId()));
+        verify(contributorRepository).findById(contributor.getId());
+    }
+
+    @DisplayName("도서 기여자 삭제 성공")
+    @Test
+    void deleteBookContributor_ShouldDeleteBookContributor_WhenExists() {
+        // Arrange
+        when(bookContributorRepository.findById(bookContributor.getId())).thenReturn(Optional.of(bookContributor));
+
+        // Act
+        bookContributorService.deleteBookContributor(bookContributor.getId());
+
+        // Assert
+        verify(bookContributorRepository).delete(bookContributor);
+    }
+
+    @DisplayName("도서 기여자 삭제 실패 - 도서 기여자 not found")
+
+    @Test
+    void deleteBookContributor_ShouldThrowBookContributorNotFoundException_WhenNotExists() {
+        // Arrange
+        when(bookContributorRepository.findById(bookContributor.getId())).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(BookContributorNotFoundException.class, () -> bookContributorService.deleteBookContributor(bookContributor.getId()));
+        verify(bookContributorRepository).findById(bookContributor.getId());
+    }
     }
