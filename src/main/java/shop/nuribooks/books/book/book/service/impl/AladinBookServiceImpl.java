@@ -75,18 +75,16 @@ public class AladinBookServiceImpl implements AladinBookService {
 
 	@Transactional
 	@Override
-	public BookResponse saveBook(AladinBookSaveRequest reqDto) {
+	public void saveBook(AladinBookSaveRequest reqDto) {
 		if (bookRepository.existsByIsbn(reqDto.isbn())) {
 			throw new ResourceAlreadyExistIsbnException(reqDto.isbn());
 		}
 
 		Publisher publisher = publisherRepository.findByName(reqDto.publisherName())
-			.orElseGet(() -> {
-				Publisher newPublisher = Publisher.builder()
-					.name(reqDto.publisherName())
-					.build();
-				return publisherRepository.save(newPublisher);
-			});
+			.orElseGet(() -> publisherRepository.save(Publisher.builder()
+				.name(reqDto.publisherName())
+				.build()
+			));
 
 		//중복코드 추후 수정 예정
 		BookStateEnum bookStateEnum = BookStateEnum.fromString(String.valueOf(reqDto.state()));
@@ -113,11 +111,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 
 		List<ParsedContributor> parsedContributors = parseContributors(reqDto.author());
 		saveContributors(parsedContributors, book);
-
-		List<BookContributor> bookContributors = bookContributorRepository.findByBook(book);
-		List<Category> categories = saveCategories(reqDto.categoryName());
-
-		return BookResponse.of(book, bookContributors, categories);
+		saveCategories(reqDto.categoryName());
 	}
 
 	//Contributor 저장 메서드

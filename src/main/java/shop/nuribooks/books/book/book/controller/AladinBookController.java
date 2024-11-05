@@ -20,6 +20,7 @@ import shop.nuribooks.books.book.book.dto.AladinBookListItemResponse;
 import shop.nuribooks.books.book.book.dto.AladinBookSaveRequest;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.service.AladinBookService;
+import shop.nuribooks.books.common.message.ResponseMessage;
 
 @RequestMapping("api/books/aladin")
 @RequiredArgsConstructor
@@ -45,14 +46,16 @@ public class AladinBookController {
 		return ResponseEntity.ok(selectedBook);
 	}
 
+	//반환값을 메세지만 주고 프론트서버에서 등록된 도서 정보를 확인하는것이 좋다고 판단
 	@Operation(summary = "Save a book from Aladin", description = "Saves a book based on data retrieved from the Aladin API.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "Book successfully created"),
 		@ApiResponse(responseCode = "400", description = "Invalid input data")
 	})
 	@PostMapping("/save")
-	public ResponseEntity<BookResponse> saveAladinBook(@Valid @RequestBody AladinBookSaveRequest aladinBookSaveReq) {
-		BookResponse bookResponse = aladinBookService.saveBook(aladinBookSaveReq);
-		return ResponseEntity.status(HttpStatus.CREATED).body(bookResponse);
+	public ResponseEntity<ResponseMessage> saveAladinBook(@Valid @RequestBody AladinBookSaveRequest aladinBookSaveReq) {
+		aladinBookService.saveBook(aladinBookSaveReq);
+		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서 등록 성공");
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
 	}
 }

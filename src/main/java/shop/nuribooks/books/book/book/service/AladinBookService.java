@@ -9,5 +9,5 @@ import shop.nuribooks.books.book.book.dto.BookResponse;
 public interface AladinBookService {
 	List<AladinBookListItemResponse> getNewBooks();
 	AladinBookListItemResponse getBookByIsbn(String isbn);
-	BookResponse saveBook(AladinBookSaveRequest bookRegisterRequest);
+	void saveBook(AladinBookSaveRequest bookRegisterRequest);
 }
