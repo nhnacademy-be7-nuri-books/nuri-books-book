@@ -114,21 +114,10 @@ public class AladinBookServiceImpl implements AladinBookService {
 		List<ParsedContributor> parsedContributors = parseContributors(reqDto.author());
 		saveContributors(parsedContributors, book);
 
-		String[] categoryNames = reqDto.categoryName().split(">");
-		Category currentParentCategory = null;
+		List<BookContributor> bookContributors = bookContributorRepository.findByBook(book);
+		List<Category> categories = saveCategories(reqDto.categoryName());
 
-		for (String categoryName : categoryNames) {
-			final Category parent = currentParentCategory;
-			Optional<Category> categoryOpt = categoryRepository.findByNameAndParentCategory(categoryName.trim(), parent);
-			currentParentCategory = categoryOpt.orElseGet(() -> {
-				Category newCategory = Category.builder()
-					.name(categoryName.trim())
-					.parentCategory(parent)
-					.build();
-				return categoryRepository.save(newCategory);
-			});
-		}
-		return BookResponse.of(book);
+		return BookResponse.of(book, bookContributors, categories);
 	}
 
 	//Contributor 저장 메서드
@@ -152,6 +141,27 @@ public class AladinBookServiceImpl implements AladinBookService {
 			bookContributor.setContributor(contributor);
 			bookContributor.setContributorRole(contributorRole);
 		}
+	}
+
+	//category 저장 메서드
+	private List<Category> saveCategories(String categoryName) {
+		String[] categoryNames = categoryName.split(">");
+		Category currentParentCategory = null;
+		List<Category> categories = new ArrayList<>();
+
+		for (String name : categoryNames) {
+			final Category parent = currentParentCategory;
+			Optional<Category> categoryOpt = categoryRepository.findByNameAndParentCategory(name.trim(), parent);
+			currentParentCategory = categoryOpt.orElseGet(() -> {
+				Category newCategory = Category.builder()
+					.name(name.trim())
+					.parentCategory(parent)
+					.build();
+				return categoryRepository.save(newCategory);
+			});
+			categories.add(currentParentCategory);
+		}
+		return categories;
 	}
 
 	/**
