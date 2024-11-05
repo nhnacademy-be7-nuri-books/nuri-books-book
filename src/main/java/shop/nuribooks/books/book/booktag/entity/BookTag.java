@@ -36,8 +36,7 @@ public class BookTag {
 	private Tag tag;
 
 	@Builder
-	public BookTag(Long id, Book book, Tag tag) {
-		this.id = id;
+	public BookTag(Book book, Tag tag) {
 		this.book = book;
 		this.tag = tag;
 	}

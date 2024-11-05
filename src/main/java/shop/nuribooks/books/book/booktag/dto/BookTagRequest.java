@@ -13,10 +13,4 @@ public record BookTagRequest(@NotNull(message = "bookId는 필수 입력 항목�
 
 							 @NotNull(message = "tagId는 필수 입력 항목입니다")
 							 List<@Positive(message = "tagId는 양수여야 합니다") Long> tagId) {
-	public BookTagRequest toEntity() {
-		return BookTagRequest.builder()
-			.bookId(bookId)
-			.tagId(tagId)
-			.build();
-	}
 }
