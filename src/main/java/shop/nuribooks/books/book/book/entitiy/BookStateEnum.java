@@ -29,5 +29,14 @@ public enum BookStateEnum {
 			throw new InvalidBookStateException(name);
 		}
 	}
+
+	public static BookStateEnum fromStringKor(String name) {
+		for(BookStateEnum state : BookStateEnum.values()) {
+			if(state.name().equalsIgnoreCase(name) || state.getKorName().equals(name)) {
+				return state;
+			}
+		}
+		throw new InvalidBookStateException(name);
+	}
 }
 

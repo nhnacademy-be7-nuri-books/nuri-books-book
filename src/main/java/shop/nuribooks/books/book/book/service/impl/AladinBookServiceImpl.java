@@ -87,7 +87,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 			));
 
 		//TODO: 중복코드 추후 수정 예정
-		BookStateEnum bookStateEnum = BookStateEnum.fromString(String.valueOf(reqDto.state()));
+		BookStateEnum bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.state()));
 
 		Book book = Book.builder()
 			.publisherId(publisher)
