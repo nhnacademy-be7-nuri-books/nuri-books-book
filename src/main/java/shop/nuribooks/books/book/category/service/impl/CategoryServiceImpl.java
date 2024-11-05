@@ -42,12 +42,12 @@ public class CategoryServiceImpl implements CategoryService {
 	 */
 	@Override
 	@Transactional
-	public Category registerMainCategory(CategoryRequest dto) {
-		if (categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())) {
-			throw new CategoryAlreadyExistException(dto.name());
+	public Category registerMainCategory(CategoryRequest categoryRequest) {
+		if (categoryRepository.existsByNameAndParentCategoryIsNull(categoryRequest.name())) {
+			throw new CategoryAlreadyExistException(categoryRequest.name());
 		}
 		Category category = Category.builder()
-			.name(dto.name())
+			.name(categoryRequest.name())
 			.build();
 
 		return categoryRepository.save(category);
