@@ -6,10 +6,10 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 
-@ActiveProfiles("test")
+@ActiveProfiles("local")
 public abstract class TestRedisContainer {
 
-    static final String REDIS_IMAGE = "redis:7-alpine";
+    static final String REDIS_IMAGE = "redis:6-alpine";
     static final GenericContainer REDIS_CONTAINER;
 
     static {
