@@ -17,6 +17,11 @@ import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 @DataJpaTest
 @Import(QuerydslConfiguration.class)
 public class BookRepositoryTest {
