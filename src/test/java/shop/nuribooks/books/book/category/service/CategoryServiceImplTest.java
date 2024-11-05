@@ -183,7 +183,7 @@ class CategoryServiceImplTest {
 			.hasMessageContaining("입력한 카테고리ID는 999 존재하지 않습니다.");
 		verify(categoryRepository, times(1)).findById(categoryId);
 	}
-	
+
 	@Test
 	void updateCategory_ShouldUpdateCategorySuccessfully() {
 		// Given
@@ -269,6 +269,44 @@ class CategoryServiceImplTest {
 		when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
 		assertThrows(CategoryNotFoundException.class, () -> categoryService.deleteCategory(categoryId));
+	}
+
+	@Test
+	void updateCategory_ShouldUpdateCategorySuccessfully_WhenParentCategoryIsNull() {
+		// Given
+		Long categoryId = 1L;
+		CategoryRequest dto = new CategoryRequest("Updated Category Name");
+		Category existingCategory = new Category("Old Category Name", null);
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
+		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(false);
+
+		// When
+		categoryService.updateCategory(dto, categoryId);
+
+		// Then
+		assertEquals("Updated Category Name", existingCategory.getName());
+		verify(categoryRepository).findById(categoryId);
+		verify(categoryRepository, never()).save(any(Category.class));
+	}
+
+	@Test
+	void updateCategory_ShouldUpdateCategorySuccessfully_WhenParentCategoryExists() {
+		// Given
+		Long categoryId = 1L;
+		Category parentCategory = new Category("Parent Category", null);
+		Category existingCategory = new Category("Old Category Name", parentCategory);
+		CategoryRequest dto = new CategoryRequest("Updated SubCategory Name");
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
+
+		// When
+		categoryService.updateCategory(dto, categoryId);
+
+		// Then
+		assertEquals("Updated SubCategory Name", existingCategory.getName());
+		verify(categoryRepository).findById(categoryId);
+		verify(categoryRepository, never()).save(any(Category.class));
 	}
 
 }
