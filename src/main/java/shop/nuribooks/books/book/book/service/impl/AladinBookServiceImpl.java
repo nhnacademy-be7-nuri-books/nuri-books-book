@@ -124,7 +124,8 @@ public class AladinBookServiceImpl implements AladinBookService {
 						.build()
 				));
 
-			ContributorRoleEnum contributorRoleEnum = ContributorRoleEnum.fromString(parsedContributor.getRole());
+			//TODO: 여기서 터짐 젠장
+			ContributorRoleEnum contributorRoleEnum = ContributorRoleEnum.fromStringKor(parsedContributor.getRole());
 			ContributorRole contributorRole = contributorRoleRepository.findByName(contributorRoleEnum)
 				.orElseGet(() -> contributorRoleRepository.save(
 					ContributorRole.builder()
@@ -170,12 +171,16 @@ public class AladinBookServiceImpl implements AladinBookService {
 	 */
 	private List<ParsedContributor> parseContributors(String author) {
 		List<ParsedContributor> contributors = new ArrayList<>();
-		Matcher matcher = Pattern.compile("([^,]+?)\\s*(?:\\(([^)]+)\\))?").matcher(author);
+		Matcher matcher = Pattern.compile("((?:[^,(]+(?:,\\s)?)+)(?:\\s*\\(([^)]+)\\))?").matcher(author);
 
 		while (matcher.find()) {
-			String name = matcher.group(1).trim();
+			String names = matcher.group(1).trim();
 			String role = matcher.group(2) != null ? matcher.group(2).trim() : "";
-			contributors.add(new ParsedContributor(name,role));
+
+			for (String name : names.split("\\s*,\\s*")) {
+
+				contributors.add(new ParsedContributor(name.trim(), role));
+			}
 		}
 		return contributors;
 	}
