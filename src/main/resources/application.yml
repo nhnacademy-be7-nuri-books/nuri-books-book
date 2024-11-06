@@ -16,10 +16,6 @@ spring:
             read-timeout: 5000
             logger-level: basic
 
-aladin:
-  api:
-    key: ENC(L6ztXJXEDUzurinyR6rhd9V99PEBzgxY0sI6S2Ptllw=)
-
   data:
     redis:
       host: 133.186.241.167
@@ -39,3 +35,7 @@ eureka:
       #,http://admin:1234@localhost:8762/eureka
   instance:
     prefer-ip-address: false
+
+aladin:
+  api:
+    key: ENC(L6ztXJXEDUzurinyR6rhd9V99PEBzgxY0sI6S2Ptllw=)
