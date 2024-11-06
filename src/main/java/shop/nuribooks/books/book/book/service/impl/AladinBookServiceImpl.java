@@ -58,7 +58,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 	public List<AladinBookListItemResponse> getNewBooks() {
 		try {
 			AladinBookListResponse response = aladinFeignClient.getNewBooks(ttbKey, "ItemNewAll", 10, 1, "Book", "JS", "20131101");
-			log.info("Received response: {}", response);
+			log.info("Received BookList response: {}", response);
 			return response.item();
 		} catch (Exception ex) {
 			log.error("Error: ", ex);
@@ -66,13 +66,17 @@ public class AladinBookServiceImpl implements AladinBookService {
 		}
 	}
 
+	//TODO: 도서목록 조회
 	@Override
-	public AladinBookListItemResponse getBookByIsbn(String isbn) {
-		List<AladinBookListItemResponse> books = getNewBooks();
-		return books.stream()
-			.filter(book -> book.isbn().equals(isbn))
-			.findFirst()
-			.orElseThrow(() -> new ResourceNotFoundException("도서를 찾을 수 없습니다."));
+	public AladinBookListItemResponse getBookByIsbnWithAladin(String isbn) {
+		try {
+			AladinBookListResponse response = aladinFeignClient.getBookDetails(ttbKey, "ISBN", isbn, "JS", "20131101");
+			log.info("Received Book response: {}", response);
+			return response.item().getFirst();
+		} catch (Exception ex) {
+			log.error("Error: ", ex);
+			throw new ResourceNotFoundException("도서를 찾을 수 없습니다.");
+		}
 	}
 
 	@Transactional

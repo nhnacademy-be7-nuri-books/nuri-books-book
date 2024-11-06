@@ -2,12 +2,10 @@ package shop.nuribooks.books.book.book.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
 
 public record BookResponse(
 	Long id,

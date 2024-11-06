@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.nuribooks.books.book.book.dto.AladinBookListResponse;
-import shop.nuribooks.books.book.book.dto.BookResponse;
 
 @FeignClient(name = "aladinClient", url = "https://aladin.co.kr")
 public interface AladinFeignClient {
@@ -22,10 +21,11 @@ public interface AladinFeignClient {
 	);
 
 	@GetMapping("/ttb/api/ItemLookUp.aspx")
-	BookResponse getBookDetails(
+	AladinBookListResponse getBookDetails(
 		@RequestParam("ttbkey") String ttbKey,
 		@RequestParam("itemIdType") String itemIdType,
 		@RequestParam("ItemId") String itemId,
-		@RequestParam("output") String output
+		@RequestParam("output") String output,
+		@RequestParam("Version") String version
 	);
 }

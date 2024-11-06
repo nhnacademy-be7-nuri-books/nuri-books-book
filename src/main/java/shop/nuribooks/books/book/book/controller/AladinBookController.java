@@ -18,7 +18,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.AladinBookListItemResponse;
 import shop.nuribooks.books.book.book.dto.AladinBookSaveRequest;
-import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.service.AladinBookService;
 import shop.nuribooks.books.common.message.ResponseMessage;
 
@@ -40,9 +39,10 @@ public class AladinBookController {
 		return ResponseEntity.ok(books);
 	}
 
+	//알라딘API를 통해 조회한 도서 리스트에서 선택한 도서의 정보를 가져오기위한 메서드
 	@GetMapping("/{isbn}")
 	public ResponseEntity<AladinBookListItemResponse> getBookByIsbn(@PathVariable String isbn) {
-		AladinBookListItemResponse selectedBook = aladinBookService.getBookByIsbn(isbn);
+		AladinBookListItemResponse selectedBook = aladinBookService.getBookByIsbnWithAladin(isbn);
 		return ResponseEntity.ok(selectedBook);
 	}
 
