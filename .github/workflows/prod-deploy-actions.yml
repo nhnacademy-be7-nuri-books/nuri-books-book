@@ -2,7 +2,7 @@ name: prod-deploy-actions
 on:
   push:
     branches:
-      - "main"
+      - main
 
 env:
   JASYPT_PASSWORD: ${{secrets.JASYPT_PASSWORD}}
