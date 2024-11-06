@@ -156,10 +156,10 @@ public class AladinBookServiceImpl implements AladinBookService {
 	}
 
 	//category 저장 메서드
-	private List<Category> saveCategories(String categoryName, Book book) {
+	private void saveCategories(String categoryName, Book book) {
 		String[] categoryNames = categoryName.split(">");
 		Category currentParentCategory = null;
-		List<Category> categories = new ArrayList<>();
+		//List<Category> categories = new ArrayList<>();
 
 		for (String name : categoryNames) {
 			final Category parent = currentParentCategory;
@@ -177,9 +177,9 @@ public class AladinBookServiceImpl implements AladinBookService {
 
 				return savedCategory;
 			});
-			categories.add(currentParentCategory);
+			//categories.add(currentParentCategory);
 		}
-		return categories;
+		//return categories;
 	}
 
 	/**
