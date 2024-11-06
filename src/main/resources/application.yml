@@ -1,17 +1,11 @@
 spring:
   application:
-    name: books
+    name: application
   #    기본 profile local. profile을 설정하면 설정 값으로 바뀜.
   profiles:
     active: local
-
-  data:
-    redis:
-      host: 133.186.241.167
-      port: 6379
-      password: "*N2vya7H@muDTwdNMR!"
-      database: 140
-
+  config:
+    import: optional:configserver:http://admin:1234@localhost:9000
 
 server:
   port: 8083
