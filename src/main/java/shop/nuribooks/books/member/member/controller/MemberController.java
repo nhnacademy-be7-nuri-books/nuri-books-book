@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,8 @@ import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
+import shop.nuribooks.books.member.member.entity.GenderType;
+import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.service.MemberService;
 
 /**
@@ -150,7 +153,20 @@ public class MemberController {
 	})
 	@GetMapping("/members")
 	public ResponseEntity<Page<MemberSearchResponse>> memberSearchWithPaging(
-		@RequestBody MemberSearchRequest request, Pageable pageable) {
+		@RequestParam(value = "name", required = false) String name,
+		@RequestParam(value = "email", required = false) String email,
+		@RequestParam(value = "phoneNumber", required = false) String phoneNumber,
+		@RequestParam(value = "gender", required = false) String gender,
+		@RequestParam(value = "status", required = false) String status,
+		Pageable pageable) {
+
+		MemberSearchRequest request = MemberSearchRequest.builder()
+			.name(name)
+			.email(email)
+			.phoneNumber(phoneNumber)
+			.gender(GenderType.fromValue(gender))
+			.status(StatusType.fromValue(status))
+			.build();
 
 		Page<MemberSearchResponse> response = memberService.searchMembersWithPaing(request, pageable);
 

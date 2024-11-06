@@ -37,7 +37,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 
 	// 터무니없이 큰 페이지 사이즈 요청에 대해 서버를 보호하기 위한 maxPageSize 설정
-	private static final int MAX_PAGE_SIZE = 50;
+	private static final int MAX_PAGE_SIZE = 100;
 
 	public Page<MemberSearchResponse> searchMembersWithPaging(MemberSearchRequest request, Pageable pageable) {
 
@@ -76,7 +76,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 				totalPaymentAmountGoe(request.totalPaymentAmountGoe()),
 				totalPaymentAmountLoe(request.totalPaymentAmountLoe()),
 				authorityEquals(request.authority()),
-				gradeNameContains(request.gradeName().toUpperCase()),
+				gradeNameContains(request.gradeName()),
 				statusEquals(request.status()),
 				createdAtGoe(request.createdAtGoe()),
 				createdAtLoe(request.createdAtLoe()),
@@ -166,7 +166,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 	}
 
 	private BooleanExpression gradeNameContains(String gradeName) {
-		return hasText(gradeName) ? grade.name.contains(gradeName) : null;
+		return hasText(gradeName) ? grade.name.contains(gradeName.toUpperCase()) : null;
 	}
 
 	private BooleanExpression statusEquals(StatusType status) {
