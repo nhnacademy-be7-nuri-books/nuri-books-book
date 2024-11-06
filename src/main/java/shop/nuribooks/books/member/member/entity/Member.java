@@ -75,6 +75,7 @@ public class Member {
 
 	@NotBlank
 	@Size(min = 8, max = 20)
+	@Column(unique = true)
 	private String userId;
 
 	private LocalDate birthday;

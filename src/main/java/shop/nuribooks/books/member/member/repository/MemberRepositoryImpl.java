@@ -37,7 +37,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 
 	// 터무니없이 큰 페이지 사이즈 요청에 대해 서버를 보호하기 위한 maxPageSize 설정
-	private static final int MAX_PAGE_SIZE = 100;
+	private static final int MAX_PAGE_SIZE = 50;
 
 	public Page<MemberSearchResponse> searchMembersWithPaging(MemberSearchRequest request, Pageable pageable) {
 
