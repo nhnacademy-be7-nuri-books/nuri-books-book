@@ -94,7 +94,6 @@ public class ReviewServiceImpl implements ReviewService {
 			throw new ReviewNotFoundException();
 		}
 		prevReview.updated();
-		reviewRepository.save(prevReview);
 
 		Review newReview = reviewRequest.toEntity(prevReview.getMember(), prevReview.getBook());
 		Review result = reviewRepository.save(newReview);
