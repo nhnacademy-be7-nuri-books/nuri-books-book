@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,8 +35,10 @@ public class AladinBookController {
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@GetMapping
-	public ResponseEntity<List<AladinBookListItemResponse>> getAladinBookList() {
-		List<AladinBookListItemResponse> books = aladinBookService.getNewBooks();
+	public ResponseEntity<List<AladinBookListItemResponse>> getAladinBookList(@RequestParam(defaultValue = "ItemNewAll") String queryType,
+																			@RequestParam(defaultValue = "ItemNewAll") String searchTarget,
+																			@RequestParam(defaultValue = "10") int maxResults) {
+		List<AladinBookListItemResponse> books = aladinBookService.getNewBooks(queryType, searchTarget, maxResults);
 		return ResponseEntity.ok(books);
 	}
 
