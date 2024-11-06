@@ -3,7 +3,7 @@ package shop.nuribooks.books.member.cart.dto.response;
 import java.math.BigDecimal;
 
 import lombok.Builder;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
+import shop.nuribooks.books.book.book.entity.BookStateEnum;
 
 @Builder
 public record CartListResponse(

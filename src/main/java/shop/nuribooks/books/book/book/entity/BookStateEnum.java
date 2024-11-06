@@ -1,4 +1,4 @@
-package shop.nuribooks.books.book.book.entitiy;
+package shop.nuribooks.books.book.book.entity;
 
 import shop.nuribooks.books.exception.book.InvalidBookStateException;
 

@@ -9,22 +9,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
+
 import shop.nuribooks.books.book.book.dto.BookResponse;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
 import shop.nuribooks.books.cart.customer.dto.request.CustomerCartAddRequest;
 import shop.nuribooks.books.cart.customer.dto.response.CustomerCartResponse;
 import shop.nuribooks.books.cart.customer.service.CustomerCartService;
