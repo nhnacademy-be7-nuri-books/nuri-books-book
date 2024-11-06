@@ -17,6 +17,13 @@ aladin:
   api:
     key: ENC(L6ztXJXEDUzurinyR6rhd9V99PEBzgxY0sI6S2Ptllw=)
 
+  data:
+    redis:
+      host: 133.186.241.167
+      port: 6379
+      password: "*N2vya7H@muDTwdNMR!"
+      database: 140
+
 server:
   port: 8083
 

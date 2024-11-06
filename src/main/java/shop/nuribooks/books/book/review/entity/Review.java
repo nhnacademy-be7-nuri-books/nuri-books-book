@@ -70,7 +70,7 @@ public class Review {
 	private List<ReviewImage> reviewImages;
 
 	@Builder
-	public Review(String title, String content, int score, Member member, Book book) {
+	private Review(String title, String content, int score, Member member, Book book) {
 		this.title = title;
 		this.content = content;
 		this.score = score;
@@ -78,5 +78,12 @@ public class Review {
 		this.member = member;
 		this.book = book;
 		this.reviewImages = new LinkedList<>();
+	}
+
+	/**
+	 * 기존 리뷰 업데이트 처리해주는 함수
+	 */
+	public void updated() {
+		this.updateAt = LocalDateTime.now();
 	}
 }
