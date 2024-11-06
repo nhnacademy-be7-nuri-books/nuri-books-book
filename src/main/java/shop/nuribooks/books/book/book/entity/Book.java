@@ -62,7 +62,8 @@ public class Book {
 	private LocalDate publicationDate;
 
 	@NotNull
-	@DecimalMin(value = "0.0", inclusive = false)
+	@DecimalMin(value = "0.0", inclusive = true)
+	@Column(precision = 8)
 	private BigDecimal price;
 
 	@NotNull
