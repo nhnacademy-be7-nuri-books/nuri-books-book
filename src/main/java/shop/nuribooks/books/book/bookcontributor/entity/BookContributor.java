@@ -24,7 +24,7 @@ public class BookContributor {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "book_contribuotr_id")
+	@Column(name = "book_contributor_id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
