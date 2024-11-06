@@ -18,7 +18,7 @@ import shop.nuribooks.books.book.booktag.service.BookTagService;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/book-tags")
+@RequestMapping("/api/books/book-tags")
 @RestController
 public class BookTagController {
 	private final BookTagService bookTagService;

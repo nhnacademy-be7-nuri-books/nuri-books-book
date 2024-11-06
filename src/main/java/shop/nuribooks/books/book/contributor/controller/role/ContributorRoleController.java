@@ -25,7 +25,7 @@ import shop.nuribooks.books.book.contributor.service.role.ContributorRoleService
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/contributors/roles")
+@RequestMapping("/api/books/contributors-role")
 public class ContributorRoleController {
 
 	private final ContributorRoleService contributorRoleService;

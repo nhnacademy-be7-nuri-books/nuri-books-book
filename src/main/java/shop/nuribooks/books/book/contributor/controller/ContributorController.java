@@ -22,7 +22,7 @@ import shop.nuribooks.books.book.contributor.service.ContributorService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/contributors")
+@RequestMapping("/api/books/contributors")
 public class ContributorController {
 
 	private final ContributorService contributorService;
