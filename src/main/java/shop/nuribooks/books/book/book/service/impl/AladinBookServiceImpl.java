@@ -159,27 +159,29 @@ public class AladinBookServiceImpl implements AladinBookService {
 	private void saveCategories(String categoryName, Book book) {
 		String[] categoryNames = categoryName.split(">");
 		Category currentParentCategory = null;
-		//List<Category> categories = new ArrayList<>();
 
-		for (String name : categoryNames) {
-			final Category parent = currentParentCategory;
-			Optional<Category> categoryOpt = categoryRepository.findByNameAndParentCategory(name.trim(), parent);
+		for (int i = 0; i < categoryNames.length; i++) {
+			final String name = categoryNames[i].trim();
+			final Category parentCategory = currentParentCategory;
+
+			Optional<Category> categoryOpt = categoryRepository.findByNameAndParentCategory(name, parentCategory);
+
 			currentParentCategory = categoryOpt.orElseGet(() -> {
-				Category newCategory = Category.builder()
-					.name(name.trim())
-					.parentCategory(parent)
+				Category category = Category.builder()
+					.name(name)
+					.parentCategory(parentCategory)
 					.build();
-
-				Category savedCategory = categoryRepository.save(newCategory);
-
-				BookCategory bookCategory = BookCategory.builder().book(book).category(newCategory).build();
-				bookCategoryRepository.save(bookCategory);
-
-				return savedCategory;
+				return categoryRepository.save(category);
 			});
-			//categories.add(currentParentCategory);
+
+			if (i == categoryNames.length - 1) {
+				BookCategory bookCategory = BookCategory.builder()
+					.book(book)
+					.category(currentParentCategory)
+					.build();
+				bookCategoryRepository.save(bookCategory);
+			}
 		}
-		//return categories;
 	}
 
 	/**
