@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.category.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +25,7 @@ import shop.nuribooks.books.book.book.entity.Book;
 public class BookCategory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "book_category_id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
