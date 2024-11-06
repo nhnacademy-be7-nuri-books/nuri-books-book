@@ -1,4 +1,4 @@
-package shop.nuribooks.books.book.publisher.entitiy;
+package shop.nuribooks.books.book.publisher.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

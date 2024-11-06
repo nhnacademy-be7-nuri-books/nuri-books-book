@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Import;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.cart.entity.Cart;

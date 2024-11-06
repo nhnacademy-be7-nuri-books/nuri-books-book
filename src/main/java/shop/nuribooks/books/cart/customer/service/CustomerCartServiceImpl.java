@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.cart.customer.dto.request.CustomerCartAddRequest;
 import shop.nuribooks.books.cart.customer.dto.response.CustomerCartResponse;
-import shop.nuribooks.books.cart.customer.entitiy.CustomerCart;
+import shop.nuribooks.books.cart.customer.entity.CustomerCart;
 import shop.nuribooks.books.cart.customer.repository.CustomerCartRepository;
 
 @RequiredArgsConstructor

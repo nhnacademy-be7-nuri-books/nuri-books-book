@@ -34,7 +34,7 @@ import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
 import shop.nuribooks.books.book.booktag.service.BookTagService;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(BookTagController.class)

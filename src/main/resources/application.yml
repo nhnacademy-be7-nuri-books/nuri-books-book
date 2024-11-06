@@ -4,6 +4,9 @@ spring:
   profiles:
     active: local
 
+  cache:
+    type: none
+
   cloud:
     openfeign:
       client:

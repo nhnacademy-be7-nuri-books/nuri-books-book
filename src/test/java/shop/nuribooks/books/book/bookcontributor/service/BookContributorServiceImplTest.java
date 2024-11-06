@@ -15,12 +15,12 @@ import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorRegisterRequest;
 import shop.nuribooks.books.book.bookcontributor.entity.BookContributor;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
-import shop.nuribooks.books.book.contributor.entitiy.Contributor;
-import shop.nuribooks.books.book.contributor.entitiy.ContributorRole;
-import shop.nuribooks.books.book.contributor.entitiy.ContributorRoleEnum;
+import shop.nuribooks.books.book.contributor.entity.Contributor;
+import shop.nuribooks.books.book.contributor.entity.ContributorRole;
+import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.book.contributor.repository.role.ContributorRoleRepository;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.contributor.BookContributorNotFoundException;
 import shop.nuribooks.books.exception.contributor.ContributorNotFoundException;

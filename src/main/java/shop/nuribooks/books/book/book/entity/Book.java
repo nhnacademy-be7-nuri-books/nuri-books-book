@@ -27,7 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

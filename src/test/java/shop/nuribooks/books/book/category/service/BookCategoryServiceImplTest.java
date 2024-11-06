@@ -17,8 +17,8 @@ import org.mockito.MockitoAnnotations;
 
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.category.entitiy.BookCategory;
-import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.entity.BookCategory;
+import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.impl.BookCategoryServiceImpl;

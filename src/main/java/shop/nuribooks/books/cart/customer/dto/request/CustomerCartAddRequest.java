@@ -3,9 +3,7 @@ package shop.nuribooks.books.cart.customer.dto.request;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import shop.nuribooks.books.cart.customer.entitiy.CustomerCart;
-import shop.nuribooks.books.member.address.entity.Address;
-import shop.nuribooks.books.member.member.entity.Member;
+import shop.nuribooks.books.cart.customer.entity.CustomerCart;
 
 public record CustomerCartAddRequest(@NotBlank String sessionId,
                                      @NotNull Long bookId,

@@ -17,7 +17,7 @@ import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;

@@ -12,10 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import shop.nuribooks.books.cart.customer.TestRedisContainer;
-import shop.nuribooks.books.cart.customer.entitiy.CustomerCart;
+import shop.nuribooks.books.cart.customer.entity.CustomerCart;
 
 @SpringBootTest
 @Testcontainers(disabledWithoutDocker = true)

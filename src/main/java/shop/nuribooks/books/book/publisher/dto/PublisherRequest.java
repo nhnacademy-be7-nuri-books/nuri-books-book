@@ -1,9 +1,8 @@
 package shop.nuribooks.books.book.publisher.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 
 @Builder
 public record PublisherRequest(@NotBlank String name) {
