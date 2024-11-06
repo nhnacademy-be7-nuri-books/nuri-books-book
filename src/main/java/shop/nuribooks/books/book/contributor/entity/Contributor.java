@@ -1,37 +1,45 @@
-package shop.nuribooks.books.book.contributor.entitiy;
+package shop.nuribooks.books.book.contributor.entity;
+
+import org.hibernate.validator.constraints.Length;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "contributor_roles")
-public class ContributorRole {
+@Table(name = "contributors")
+public class Contributor {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@NotNull
-	@Enumerated(EnumType.STRING)
-	private ContributorRoleEnum name;
+	@Length(min = 1, max = 50)
+	private String name;
 
 	@Builder
-	private ContributorRole(ContributorRoleEnum name) {
+	public Contributor(Long id, String name) {
+		this.id = id;
 		this.name = name;
 	}
+
+	public ContributorEditor.ContributorEditorBuilder toEditor() {
+		return ContributorEditor.builder()
+			.name(name);
+	}
+
+	public void edit(ContributorEditor editor) {
+		name = editor.getName();
+	}
+
 }

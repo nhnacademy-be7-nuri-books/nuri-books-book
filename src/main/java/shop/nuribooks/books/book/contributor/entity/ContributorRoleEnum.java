@@ -1,4 +1,4 @@
-package shop.nuribooks.books.book.contributor.entitiy;
+package shop.nuribooks.books.book.contributor.entity;
 
 import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
 

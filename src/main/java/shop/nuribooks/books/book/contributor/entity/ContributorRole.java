@@ -1,8 +1,8 @@
-package shop.nuribooks.books.book.contributor.entitiy;
-
-import org.hibernate.validator.constraints.Length;
+package shop.nuribooks.books.book.contributor.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,32 +15,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "contributors")
-public class Contributor {
+@Table(name = "contributor_roles")
+public class ContributorRole {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@NotNull
-	@Length(min = 1, max = 50)
-	private String name;
+	@Enumerated(EnumType.STRING)
+	private ContributorRoleEnum name;
 
 	@Builder
-	public Contributor(Long id, String name) {
-		this.id = id;
+	private ContributorRole(ContributorRoleEnum name) {
 		this.name = name;
 	}
-
-	public ContributorEditor.ContributorEditorBuilder toEditor() {
-		return ContributorEditor.builder()
-			.name(name);
-	}
-
-	public void edit(ContributorEditor editor) {
-		name = editor.getName();
-	}
-
 }

@@ -10,8 +10,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.*;
 import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.contributor.entitiy.Contributor;
-import shop.nuribooks.books.book.contributor.entitiy.ContributorRole;
+import shop.nuribooks.books.book.contributor.entity.Contributor;
+import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 
 @Entity
 @NoArgsConstructor

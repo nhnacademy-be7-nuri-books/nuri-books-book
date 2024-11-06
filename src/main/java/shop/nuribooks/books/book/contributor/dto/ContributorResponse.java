@@ -1,7 +1,7 @@
 package shop.nuribooks.books.book.contributor.dto;
 
 import lombok.Builder;
-import shop.nuribooks.books.book.contributor.entitiy.Contributor;
+import shop.nuribooks.books.book.contributor.entity.Contributor;
 
 @Builder
 public record ContributorResponse(Long id, String name) {
