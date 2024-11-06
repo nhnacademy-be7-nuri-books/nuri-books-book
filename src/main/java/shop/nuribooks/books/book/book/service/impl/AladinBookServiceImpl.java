@@ -55,9 +55,9 @@ public class AladinBookServiceImpl implements AladinBookService {
 	//도서 리스트 조회 메서드
 	//TODO: 추후 파라미터 추가 예정
 	@Override
-	public List<AladinBookListItemResponse> getNewBooks() {
+	public List<AladinBookListItemResponse> getNewBooks(String queryType, String searchTarget, int maxResults) {
 		try {
-			AladinBookListResponse response = aladinFeignClient.getNewBooks(ttbKey, "ItemNewAll", 10, 1, "Book", "JS", "20131101");
+			AladinBookListResponse response = aladinFeignClient.getNewBooks(ttbKey, queryType, maxResults, 1, "Book", "JS", "20131101");
 			log.info("Received BookList response: {}", response);
 			return response.item();
 		} catch (Exception ex) {
