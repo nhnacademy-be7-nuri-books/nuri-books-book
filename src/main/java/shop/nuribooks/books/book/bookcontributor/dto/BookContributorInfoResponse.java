@@ -1,7 +1,7 @@
 package shop.nuribooks.books.book.bookcontributor.dto;
 
 import lombok.Builder;
-import shop.nuribooks.books.book.contributor.entitiy.ContributorRoleEnum;
+import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
 
 @Builder
 public record BookContributorInfoResponse(Long contributorId,

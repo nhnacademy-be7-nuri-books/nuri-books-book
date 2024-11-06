@@ -2,14 +2,13 @@ package shop.nuribooks.books.cart.customer.repository;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Repository;
-import shop.nuribooks.books.cart.customer.entitiy.CustomerCart;
+import shop.nuribooks.books.cart.customer.entity.CustomerCart;
 
 @Repository
 public class CustomerCartRepositoryImpl implements CustomerCartRepository{

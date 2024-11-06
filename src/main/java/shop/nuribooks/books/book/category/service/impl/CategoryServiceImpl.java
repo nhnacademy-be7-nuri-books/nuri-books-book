@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import shop.nuribooks.books.book.category.dto.CategoryRequest;
 import shop.nuribooks.books.book.category.dto.CategoryResponse;
-import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.CategoryService;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;

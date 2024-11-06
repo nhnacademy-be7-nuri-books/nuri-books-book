@@ -8,10 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.*;
-import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.contributor.entitiy.Contributor;
-import shop.nuribooks.books.book.contributor.entitiy.ContributorRole;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.contributor.entity.Contributor;
+import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 
 @Entity
 @NoArgsConstructor
@@ -36,9 +38,10 @@ public class BookContributor {
 	private ContributorRole contributorRole;
 
 	@Builder
-	public BookContributor(Book book, Contributor contributor, ContributorRole contributorRole) {
+	public BookContributor (Book book, Contributor contributor, ContributorRole contributorRole) {
 		this.book = book;
 		this.contributor = contributor;
 		this.contributorRole = contributorRole;
 	}
+
 }

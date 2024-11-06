@@ -1,4 +1,4 @@
-package shop.nuribooks.books.book.category.entitiy;
+package shop.nuribooks.books.book.category.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,7 @@ import lombok.Setter;
 public class Category {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "category_id")
 	private Long id;
 
 	@NotNull

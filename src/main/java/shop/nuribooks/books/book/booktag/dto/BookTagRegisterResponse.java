@@ -3,7 +3,7 @@ package shop.nuribooks.books.book.booktag.dto;
 import java.util.List;
 
 import lombok.Builder;
-import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.book.entity.Book;
 
 @Builder
 public record BookTagRegisterResponse(Long bookTagId, Long bookId, List<Long> tagIds) {

@@ -1,13 +1,14 @@
-package shop.nuribooks.books.book.book.entitiy;
+package shop.nuribooks.books.book.book.entity;
 
 import shop.nuribooks.books.exception.book.InvalidBookStateException;
 
 public enum BookStateEnum {
+	NORMAL("정상판매"),
+	PREORDER("예약판매"),
 	NEW("신간"),
-	NORMAL("정가판매"),
+	NOT_PUBLISHED("미출간"),
 	OUT_OF_PRINT("절판"),
 	SOLD_OUT("품절"),
-	PREORDER("예약판매"),
 	USED("중고");
 
 	private final String korName;
@@ -27,6 +28,15 @@ public enum BookStateEnum {
 		} catch (IllegalArgumentException e) {
 			throw new InvalidBookStateException(name);
 		}
+	}
+
+	public static BookStateEnum fromStringKor(String name) {
+		for(BookStateEnum state : BookStateEnum.values()) {
+			if(state.name().equalsIgnoreCase(name) || state.getKorName().equals(name)) {
+				return state;
+			}
+		}
+		throw new InvalidBookStateException(name);
 	}
 }
 

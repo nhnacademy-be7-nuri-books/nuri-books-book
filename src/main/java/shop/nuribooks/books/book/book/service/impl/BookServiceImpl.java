@@ -1,5 +1,9 @@
 package shop.nuribooks.books.book.book.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,9 +15,10 @@ import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.entity.BookStateEnum;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
+import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
@@ -79,11 +84,11 @@ public class BookServiceImpl implements BookService {
 		return BookResponse.of(book);
 	}
 
-	//관리자페이지에서 도서 목록조회를 하여 도서를 관리하기 위한 메서드
+	//TODO: 도서 목록조회를 하여 도서를 관리하기 위한 메서드 (관리자로 로그인 했을때는 수정버튼을 보이게해서 수정하도록 하는게 좋을까?)
 	//TODO: 추후 엘라스틱 서치 적용 시 사용자를 위한 도서 검색 기능을 따로 구현 예정
 	@Transactional(readOnly = true)
 	@Override
-	public Page<AdminBookListResponse> getBooks(Pageable pageable) {
+	public PagedResponse<AdminBookListResponse> getBooks(Pageable pageable) {
 		if(pageable.getPageNumber() < 0) {
 			throw new InvalidPageRequestException("페이지 번호는 0 이상이어야 합니다.");
 		}
@@ -94,7 +99,23 @@ public class BookServiceImpl implements BookService {
 			throw new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다.");
 		}
 
-		return bookPage.map(AdminBookListResponse::of);
+		//소수점 버리기 (1원 단위로 계산 위해)
+		List<AdminBookListResponse> bookListResponses = bookPage.stream()
+			.map(book -> {
+				BigDecimal salePrice = book.getPrice()
+					.multiply(BigDecimal.valueOf(100 - book.getDiscountRate()))
+					.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
+				return AdminBookListResponse.of(book, salePrice);
+			})
+			.toList();
+
+		return new PagedResponse<>(
+			bookListResponses,
+			bookPage.getNumber(),
+			bookPage.getSize(),
+			bookPage.getTotalPages(),
+			bookPage.getTotalElements()
+		);
 	}
 
 	//TODO: 좋아요나 조회수에 대한 업데이트는 따로 메서드를 구현할 계획입니다.

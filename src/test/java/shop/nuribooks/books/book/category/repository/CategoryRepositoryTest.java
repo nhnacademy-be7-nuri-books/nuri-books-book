@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 
 /**

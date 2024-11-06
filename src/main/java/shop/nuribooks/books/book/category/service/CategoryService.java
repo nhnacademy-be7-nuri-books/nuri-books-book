@@ -4,7 +4,7 @@ import java.util.List;
 
 import shop.nuribooks.books.book.category.dto.CategoryRequest;
 import shop.nuribooks.books.book.category.dto.CategoryResponse;
-import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.entity.Category;
 
 /**
  * 카테고리 관련 서비스 인터페이스.

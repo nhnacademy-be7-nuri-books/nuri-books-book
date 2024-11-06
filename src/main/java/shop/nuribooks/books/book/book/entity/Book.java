@@ -1,4 +1,4 @@
-package shop.nuribooks.books.book.book.entitiy;
+package shop.nuribooks.books.book.book.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,7 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,6 +37,7 @@ public class Book {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "book_id")
 	private Long id;
 
 	@ManyToOne
@@ -47,9 +48,9 @@ public class Book {
 	@Column(nullable = false)
 	private BookStateEnum state;
 
-	@Column(nullable = false, length = 50)
+	@Column(nullable = false, length = 100)
 	@NotBlank
-	@Size(min = 1, max = 50)
+	@Size(min = 1, max = 100)
 	private String title;
 
 	@NotBlank

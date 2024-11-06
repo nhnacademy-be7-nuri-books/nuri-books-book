@@ -5,8 +5,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.entity.QBookContributor;
-import shop.nuribooks.books.book.contributor.entitiy.QContributor;
-import shop.nuribooks.books.book.contributor.entitiy.QContributorRole;
+import shop.nuribooks.books.book.contributor.entity.QContributor;
+import shop.nuribooks.books.book.contributor.entity.QContributorRole;
 
 
 import java.util.List;
