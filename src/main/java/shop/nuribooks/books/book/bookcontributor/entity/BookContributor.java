@@ -8,17 +8,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.contributor.entity.Contributor;
+import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 @Table(name = "book_contributors")
 public class BookContributor {
 
@@ -37,4 +36,12 @@ public class BookContributor {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "contributor_role_id", nullable = false)
 	private ContributorRole contributorRole;
+
+	@Builder
+	public BookContributor (Book book, Contributor contributor, ContributorRole contributorRole) {
+		this.book = book;
+		this.contributor = contributor;
+		this.contributorRole = contributorRole;
+	}
+
 }
