@@ -24,11 +24,11 @@ import shop.nuribooks.books.book.category.entitiy.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.client.AladinFeignClient;
-import shop.nuribooks.books.book.contributor.entity.BookContributor;
+import shop.nuribooks.books.book.bookcontributor.entity.BookContributor;
 import shop.nuribooks.books.book.contributor.entity.Contributor;
 import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
-import shop.nuribooks.books.book.contributor.repository.BookContributorRepository;
+import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.book.contributor.repository.role.ContributorRoleRepository;
 import shop.nuribooks.books.book.publisher.entitiy.Publisher;
@@ -147,10 +147,12 @@ public class AladinBookServiceImpl implements AladinBookService {
 						.build()
 				));
 
-			BookContributor bookContributor = new BookContributor();
-			bookContributor.setBook(book);
-			bookContributor.setContributor(contributor);
-			bookContributor.setContributorRole(contributorRole);
+			BookContributor bookContributor = BookContributor.builder()
+				.book(book)
+				.contributor(contributor)
+				.contributorRole(contributorRole)
+				.build();
+
 			bookContributorRepository.save(bookContributor);
 		}
 	}
