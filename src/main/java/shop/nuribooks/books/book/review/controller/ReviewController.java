@@ -25,7 +25,7 @@ import shop.nuribooks.books.book.review.service.ReviewService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/reviews")
+@RequestMapping()
 public class ReviewController {
 	private final ReviewService reviewService;
 
@@ -34,21 +34,21 @@ public class ReviewController {
 		@ApiResponse(responseCode = "201", description = "리뷰 생성 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
-	@PostMapping
+	@PostMapping("/api/reviews")
 	public ResponseEntity<ReviewMemberResponse> registerReview(
 		@Valid @RequestBody ReviewRequest reviewRequest,
-		@RequestHeader("X-USER-ID") long memberId
+		@RequestHeader("X-USER-ID") long ownerId
 	) {
-		ReviewMemberResponse response = this.reviewService.registerReview(reviewRequest, memberId);
+		ReviewMemberResponse response = this.reviewService.registerReview(reviewRequest, ownerId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@Operation(summary = "리뷰 조회", description = "도서에 관련된 리뷰를 조회합니다.")
+	@Operation(summary = "도서 상세 리뷰 조회", description = "도서에 관련된 리뷰를 조회합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
-	@GetMapping("/books/{bookId}")
+	@GetMapping("/api/books/{bookId}/reviews")
 	public ResponseEntity<List<ReviewMemberResponse>> getReviewMember(
 		@PathVariable("bookId") long bookId
 	) {
@@ -56,12 +56,12 @@ public class ReviewController {
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
-	@Operation(summary = "리뷰 조회", description = "도서에 관련된 리뷰를 조회합니다.")
+	@Operation(summary = "유저 상세 리뷰 조회", description = "유저에 관련된 리뷰를 조회합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
-	@GetMapping("/members/{memberId}")
+	@GetMapping("/api/members/{memberId}/reviews")
 	public ResponseEntity<List<ReviewBookResponse>> getReviewBook(
 		@PathVariable("memberId") long memberId
 	) {
@@ -75,13 +75,13 @@ public class ReviewController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 		@ApiResponse(responseCode = "404", description = "id 발견 못함"),
 	})
-	@PutMapping("/{reviewId}")
+	@PutMapping("/api/reviews/{reviewId}")
 	public ResponseEntity<ReviewMemberResponse> updateReview(
 		@Valid @RequestBody ReviewRequest reviewRequest,
 		@PathVariable long reviewId,
-		@RequestHeader("X-USER-ID") long memberId
+		@RequestHeader("X-USER-ID") long ownerId
 	) {
-		ReviewMemberResponse response = this.reviewService.updateReview(reviewRequest, reviewId, memberId);
+		ReviewMemberResponse response = this.reviewService.updateReview(reviewRequest, reviewId, ownerId);
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}

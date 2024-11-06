@@ -19,8 +19,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.book.entitiy.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
+import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
@@ -120,6 +120,13 @@ public class ReviewServiceTest {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.empty());
 		assertThrows(ReviewNotFoundException.class,
 			() -> reviewService.updateReview(reviewRequest, review.getId(), member.getId()));
+	}
+
+	@Test
+	public void updatedByOtherUser() {
+		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
+		assertThrows(ReviewNotFoundException.class,
+			() -> reviewService.updateReview(reviewRequest, review.getId(), 2));
 	}
 
 	@Test

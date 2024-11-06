@@ -7,7 +7,7 @@ import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 
 public interface ReviewService {
-	ReviewMemberResponse registerReview(ReviewRequest reviewRegisterRequest, long memberId);
+	ReviewMemberResponse registerReview(ReviewRequest reviewRegisterRequest, long ownerId);
 
 	/**
 	 * 도서의 평균 평점 반환
@@ -30,5 +30,5 @@ public interface ReviewService {
 	 */
 	List<ReviewBookResponse> getReviewsWithBook(long memberId);
 
-	ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId, long memberId);
+	ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId, long ownerId);
 }

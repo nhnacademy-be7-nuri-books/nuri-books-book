@@ -79,7 +79,7 @@ public class ReviewControllerTest {
 
 		when(reviewService.getReviewsWithMember(anyLong())).thenReturn(List.of(review));
 
-		mockMvc.perform(get("/api/reviews/books/" + bookId))
+		mockMvc.perform(get("/api/books/" + bookId + "/reviews"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.*", Matchers.hasSize(1)));
 	}
@@ -99,7 +99,7 @@ public class ReviewControllerTest {
 
 		when(reviewService.getReviewsWithBook(anyLong())).thenReturn(List.of(review));
 
-		mockMvc.perform(get("/api/reviews/members/" + memberId))
+		mockMvc.perform(get("/api/members/" + memberId + "/reviews"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.*", Matchers.hasSize(1)));
 	}
