@@ -167,7 +167,7 @@ class BookContributorServiceImplTest {
                 1L,
                 "contributor",
                 1L,
-                ContributorRoleEnum.AUTHOR.getKorName()
+                ContributorRoleEnum.AUTHOR
         );
         when(bookContributorRepository.findContributorsAndRolesByBookId(bookId))
                 .thenReturn(List.of(contributorInfoResponse));

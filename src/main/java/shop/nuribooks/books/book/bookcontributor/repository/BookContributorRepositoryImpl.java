@@ -3,13 +3,16 @@ package shop.nuribooks.books.book.bookcontributor.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.entity.QBookContributor;
+import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
 import shop.nuribooks.books.book.contributor.entity.QContributor;
 import shop.nuribooks.books.book.contributor.entity.QContributorRole;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -45,6 +48,18 @@ public class BookContributorRepositoryImpl implements BookContributorCustomRepos
             .join(bookContributor.contributor, contributor)
             .join(bookContributor.contributorRole, contributorRole)
             .where(bookContributor.book.id.eq(bookId))
-            .fetch();
+            .fetch()
+            .stream()
+            .map(contributorInfo -> {
+                String roleName = contributorInfo.contributorRoleName();
+                ContributorRoleEnum roleEnum = ContributorRoleEnum.fromString(roleName);
+                return BookContributorInfoResponse.of(
+                    contributorInfo.contributorId(),
+                    contributorInfo.contributorName(),
+                    contributorInfo.contributorRoleId(),
+                    roleEnum.getKorName()
+                );
+            })
+            .collect(Collectors.toList());
     }
 }
