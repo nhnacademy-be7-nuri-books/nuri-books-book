@@ -39,8 +39,8 @@ import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.InvalidPasswordException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
-import shop.nuribooks.books.exception.member.UserIdNotFoundException;
+import shop.nuribooks.books.exception.member.UsernameAlreadyExistsException;
+import shop.nuribooks.books.exception.member.UsernameNotFoundException;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -71,7 +71,7 @@ class MemberServiceImplTest {
 		Member savedMember = getSavedMember(savedCustomer);
 
 		when(customerRepository.existsByEmail(request.email())).thenReturn(false);
-		when(memberRepository.existsByUsername(request.userId())).thenReturn(false);
+		when(memberRepository.existsByUsername(request.username())).thenReturn(false);
 		when(customerRepository.save(any(Customer.class)))
 			.thenReturn(savedCustomer);
 		when(gradeRepository.findByName("STANDARD")).thenReturn(Optional.of(standard));
@@ -82,7 +82,7 @@ class MemberServiceImplTest {
 		MemberRegisterResponse response = memberServiceImpl.registerMember(request);
 
 		// then
-		assertThat(response.userId()).isEqualTo(request.userId());
+		assertThat(response.username()).isEqualTo(request.username());
 		assertThat(response.phoneNumber()).isEqualTo(request.phoneNumber());
 		assertThat(response.email()).isEqualTo(request.email());
 		assertThat(response.gender()).isEqualTo(request.gender());
@@ -108,15 +108,15 @@ class MemberServiceImplTest {
 
 	@DisplayName("회원 등록 실패 - 중복된 아이디")
 	@Test
-	void registerMember_UserIdAlreadyExists() {
+	void registerMember_UsernameAlreadyExists() {
 	    //given
 		MemberRegisterRequest request = getMemberCreateRequest();
 
 		when(customerRepository.existsByEmail(request.email())).thenReturn(false);
-		when(memberRepository.existsByUsername(request.userId())).thenReturn(true);
+		when(memberRepository.existsByUsername(request.username())).thenReturn(true);
 
 		//when / then
-		UserIdAlreadyExistsException exception = assertThrows(UserIdAlreadyExistsException.class,
+		UsernameAlreadyExistsException exception = assertThrows(UsernameAlreadyExistsException.class,
 			() -> memberServiceImpl.registerMember(request));
 		assertThat(exception.getMessage()).isEqualTo("이미 존재하는 아이디입니다.");
 	}
@@ -144,14 +144,14 @@ class MemberServiceImplTest {
 
 	@DisplayName("회원 탈퇴 실패 - 존재하지 않는 아이디")
 	@Test
-	void withdrawMember_UserIdNotFound() {
+	void withdrawMember_UsernameNotFound() {
 	    //given
 		MemberWithdrawRequest request = getMemberWithdrawRequest();
 
 		when(memberRepository.findByUsername(request.userId())).thenReturn(Optional.empty());
 
 	    //when / then
-		UserIdNotFoundException exception = assertThrows(UserIdNotFoundException.class,
+		UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
 			() -> memberServiceImpl.withdrawMember(request));
 		assertThat(exception.getMessage()).isEqualTo("존재하지 않는 아이디입니다.");
 	}
@@ -219,14 +219,14 @@ class MemberServiceImplTest {
 		Customer existingCustomer = getSavedCustomer();
 		Member existingMember = getSavedMember(existingCustomer);
 
-		String requestUserId = "nhnacademy";
+		String requestUsername = "nhnacademy";
 
-		when(memberRepository.findByUsername(requestUserId)).thenReturn(Optional.of(existingMember));
+		when(memberRepository.findByUsername(requestUsername)).thenReturn(Optional.of(existingMember));
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.empty());
 
 		//when / then
 		CustomerNotFoundException exception = assertThrows(CustomerNotFoundException.class,
-			() -> memberServiceImpl.updateMember(requestUserId, request));
+			() -> memberServiceImpl.updateMember(requestUsername, request));
 		assertThat(exception.getMessage()).isEqualTo("존재하지 않는 고객입니다.");
 	}
 
@@ -251,14 +251,14 @@ class MemberServiceImplTest {
 
 	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 회원이 존재하지 않을 때")
 	@Test
-	void getMember_AuthInfo_UserIdNotFound() {
+	void getMember_AuthInfo_UsernameNotFound() {
 		//given
-		String requestUserid = "nhnacademy";
+		String requestUsername = "nhnacademy";
 
-		when(memberRepository.findByUsername(requestUserid)).thenReturn(Optional.empty());
+		when(memberRepository.findByUsername(requestUsername)).thenReturn(Optional.empty());
 
 		//when
-		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(requestUserid);
+		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(requestUsername);
 
 		//then
 		assertNotNull(response);
@@ -309,7 +309,7 @@ class MemberServiceImplTest {
 			assertThat(response.phoneNumber()).isEqualTo(savedCustomer.getPhoneNumber());
 			assertThat(response.email()).isEqualTo(savedCustomer.getEmail());
 			assertThat(response.birthday()).isEqualTo(savedMember.getBirthday());
-			assertThat(response.userId()).isEqualTo(savedMember.getUsername());
+			assertThat(response.username()).isEqualTo(savedMember.getUsername());
 			assertThat(response.password()).isEqualTo(savedCustomer.getPassword());
 			assertThat(response.point()).isEqualTo(savedMember.getPoint());
 			assertThat(response.totalPaymentAmount()).isEqualTo(savedMember.getTotalPaymentAmount());
@@ -330,7 +330,7 @@ class MemberServiceImplTest {
 
 		//when / then
 		assertThatThrownBy(() -> memberServiceImpl.getMemberDetails(request))
-			.isInstanceOf(UserIdNotFoundException.class)
+			.isInstanceOf(UsernameNotFoundException.class)
 			.hasMessage("존재하지 않는 아이디입니다.");
 	}
 
@@ -401,7 +401,7 @@ class MemberServiceImplTest {
 		return MemberRegisterRequest.builder()
 			.name("boho")
 			.gender(GenderType.MALE)
-			.userId("nuribooks95")
+			.username("nuribooks95")
 			.password("abc123")
 			.phoneNumber("042-8282-8282")
 			.email("nhnacademy@nuriBooks.com")

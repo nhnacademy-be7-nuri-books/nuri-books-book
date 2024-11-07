@@ -12,7 +12,7 @@ import shop.nuribooks.books.member.address.entity.AddressEditor;
 import shop.nuribooks.books.member.address.entity.AddressEditor.AddressEditorBuilder;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.exception.address.AddressNotFoundException;
-import shop.nuribooks.books.exception.member.UserIdNotFoundException;
+import shop.nuribooks.books.exception.member.UsernameNotFoundException;
 import shop.nuribooks.books.member.address.repository.AddressRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -28,7 +28,7 @@ public class AddressServiceImpl implements AddressService{
     public AddressResponse registerAddress(AddressRegisterRequest request) {
         //TODO: 회원 주소가 10개 넘어가는 경우 예외처리
         Member member = memberRepository.findById(request.memberId())
-                .orElseThrow(() -> new UserIdNotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
 
         Address address = request.toEntity(member);
         Address saved = addressRepository.save(address);

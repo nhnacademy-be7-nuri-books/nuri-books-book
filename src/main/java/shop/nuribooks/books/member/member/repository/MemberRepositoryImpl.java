@@ -70,7 +70,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 				emailContains(request.email()),
 				birthdayGoe(request.birthdayGoe()),
 				birthdayLoe(request.birthdayLoe()),
-				userIdContains(request.userId()),
+				usernameContains(request.username()),
 				pointGoe(request.pointGoe()),
 				pointLoe(request.pointLoe()),
 				totalPaymentAmountGoe(request.totalPaymentAmountGoe()),
@@ -98,7 +98,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 				emailContains(request.email()),
 				birthdayGoe(request.birthdayGoe()),
 				birthdayLoe(request.birthdayLoe()),
-				userIdContains(request.userId()),
+				usernameContains(request.username()),
 				pointGoe(request.pointGoe()),
 				pointLoe(request.pointLoe()),
 				totalPaymentAmountGoe(request.totalPaymentAmountGoe()),
@@ -141,8 +141,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 		return birthdayLoe != null	? member.birthday.loe(birthdayLoe) : null;
 	}
 
-	private BooleanExpression userIdContains(String userId) {
-		return hasText(userId) ? member.username.contains(userId) : null;
+	private BooleanExpression usernameContains(String username) {
+		return hasText(username) ? member.username.contains(username) : null;
 	}
 
 	private BooleanExpression pointGoe(BigDecimal pointGoe) {

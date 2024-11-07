@@ -37,9 +37,9 @@ class MemberRepositoryTest {
 	@Autowired
 	private GradeRepository gradeRepository;
 
-	@DisplayName("입력된 userId로 회원 등록 여부 확인")
+	@DisplayName("입력된 username으로 회원 등록 여부 확인")
 	@Test
-	void existsByUserId() {
+	void existsByUsername() {
 		//given
 		Member savedMember = getSavedMember();
 
@@ -50,9 +50,9 @@ class MemberRepositoryTest {
 		assertThat(exists).isTrue();
 	}
 
-	@DisplayName("입력된 userId로 회원 조회")
+	@DisplayName("입력된 username으로 회원 조회")
 	@Test
-	void findByUserId() {
+	void findByUsername() {
 		//given
 		Member savedMember = getSavedMember();
 

@@ -33,8 +33,8 @@ import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.InvalidPasswordException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.exception.member.UserIdAlreadyExistsException;
-import shop.nuribooks.books.exception.member.UserIdNotFoundException;
+import shop.nuribooks.books.exception.member.UsernameAlreadyExistsException;
+import shop.nuribooks.books.exception.member.UsernameNotFoundException;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -57,9 +57,9 @@ public class MemberServiceImpl implements MemberService {
 	 * 고객(customer) 생성 후 customerRepository에 저장 <br>
 	 * 그 후, 회원(member) 생성 후 memberRepository에 저장
 	 * @throws EmailAlreadyExistsException 이미 존재하는 이메일입니다.
-	 * @throws UserIdAlreadyExistsException 이미 존재하는 아이디입니다.
+	 * @throws UsernameAlreadyExistsException 이미 존재하는 아이디입니다.
 	 * @param request
-	 * MemberRegisterRequest로 name, userId, password, phoneNumber, email, birthday를 받는다. <br>
+	 * MemberRegisterRequest로 name, username, password, phoneNumber, email, birthday를 받는다. <br>
 	 * 생성일자(createdAt)는 현재 시간, point와 totalPaymentAmount는 0으로 초기화 <br>
 	 * 권한은 MEMBER, 등급은 STANDARD, 상태는 ACTIVE로 초기화 <br>
 	 * @return MemberRegisterResponse에 이름, 성별, 유저 아이디, 전화번호, 이메일, 생일을 담아서 반환
@@ -70,8 +70,8 @@ public class MemberServiceImpl implements MemberService {
 		if (customerRepository.existsByEmail(request.email())) {
 			throw new EmailAlreadyExistsException("이미 존재하는 이메일입니다.");
 		}
-		if (memberRepository.existsByUsername(request.userId())) {
-			throw new UserIdAlreadyExistsException("이미 존재하는 아이디입니다.");
+		if (memberRepository.existsByUsername(request.username())) {
+			throw new UsernameAlreadyExistsException("이미 존재하는 아이디입니다.");
 		}
 
 		Customer newCustomer = EntityMapper.toCustomerEntity(request);
@@ -83,7 +83,7 @@ public class MemberServiceImpl implements MemberService {
 			.grade(standard())
 			.status(StatusType.ACTIVE)
 			.gender(request.gender())
-			.username(request.userId())
+			.username(request.username())
 			.birthday(request.birthday())
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
@@ -98,7 +98,7 @@ public class MemberServiceImpl implements MemberService {
 	/**
 	 * 회원탈퇴 <br>
 	 * 아이디와 비밀번호로 회원 검증 후 회원을 휴면 상태로 전환 <br>
-	 * @throws UserIdNotFoundException 존재하지 않는 아이디입니다.
+	 * @throws UsernameNotFoundException 존재하지 않는 아이디입니다.
 	 * @throws InvalidPasswordException 비밀번호가 일치하지 않습니다.
 	 * @param request
 	 * MemberResignReq로 아이디와 비밀번호를 받아서 확인 <br>
@@ -111,7 +111,7 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	public void withdrawMember(MemberWithdrawRequest request) {
 		Member foundMember = memberRepository.findByUsername(request.userId())
-			.orElseThrow(() -> new UserIdNotFoundException("존재하지 않는 아이디입니다."));
+			.orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 아이디입니다."));
 
 		if (!customerRepository.existsByIdAndPassword(
 			foundMember.getId(), request.password())) {
@@ -151,14 +151,14 @@ public class MemberServiceImpl implements MemberService {
 
 	/**
 	 * 입력받은 아이디로 회원의 이름, 비밀번호, 권한을 조회
-	 * @param userId 아이디
+	 * @param username "abc123" 형식의 유저 아이디
 	 * @return 회원이 존재하면 이름, 비밀번호, 권한을 MemberAuthInfoResponse에 담아서 반환 <br>
 	 * 회원이 존재하지 않는다면 이름, 비밀번호, 권한이 모두 null인 MemberAuthInfoResponse를 반환
 	 */
 	@Override
-	public MemberAuthInfoResponse getMemberAuthInfo(String userId) {
+	public MemberAuthInfoResponse getMemberAuthInfo(String username) {
 
-		return memberRepository.findByUsername(userId)
+		return memberRepository.findByUsername(username)
 			.flatMap(foundMember -> customerRepository.findById(foundMember.getId())
 				.map(foundCustomer -> DtoMapper.toAuthInfoDto(foundCustomer, foundMember))
 			)
@@ -176,7 +176,7 @@ public class MemberServiceImpl implements MemberService {
 	public MemberDetailsResponse getMemberDetails(MemberDetailsRequest request) {
 
 		Member foundMember = memberRepository.findByUsername(request.userId())
-			.orElseThrow(() -> new UserIdNotFoundException("존재하지 않는 아이디입니다."));
+			.orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 아이디입니다."));
 
 		Customer foundCustomer = customerRepository.findByIdAndPassword(foundMember.getId(), request.password())
 			.orElseThrow(() -> new InvalidPasswordException("비밀번호가 일치하지 않습니다."));

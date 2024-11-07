@@ -28,7 +28,7 @@ public record MemberDetailsResponse(
 	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	LocalDate birthday,
 
-	String userId,
+	String username,
 	String password,
 	BigDecimal point,
 	BigDecimal totalPaymentAmount,

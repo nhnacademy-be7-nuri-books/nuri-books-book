@@ -6,17 +6,17 @@ import shop.nuribooks.books.member.member.entity.Member;
 /**
  * member의 간단한 정보를 담은 dto
  * @param id
- * @param userId
+ * @param username
  */
 @Builder
 public record MemberBriefResponse(
 	long id,
-	String userId
+	String username
 ) {
 	public static MemberBriefResponse of(Member member) {
 		return MemberBriefResponse.builder()
 			.id(member.getId())
-			.userId(member.getUsername())
+			.username(member.getUsername())
 			.build();
 	}
 }

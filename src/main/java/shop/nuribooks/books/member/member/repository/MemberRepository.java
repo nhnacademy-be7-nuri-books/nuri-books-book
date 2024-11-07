@@ -13,9 +13,9 @@ import shop.nuribooks.books.member.member.entity.Member;
  */
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
-	boolean existsByUsername(String userId);
+	boolean existsByUsername(String username);
 
-	Optional<Member> findByUsername(String userId);
+	Optional<Member> findByUsername(String username);
 
 	boolean existsByGradeId(Integer gradeId);
 
