@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.nuribooks.books.book.category.dto.CategoryRequest;
 import shop.nuribooks.books.book.category.dto.CategoryResponse;
 import shop.nuribooks.books.book.category.entity.Category;
+import shop.nuribooks.books.book.category.entity.CategoryEditor;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.CategoryService;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
@@ -140,7 +141,8 @@ public class CategoryServiceImpl implements CategoryService {
 			}
 		}
 
-		category.setName(dto.name());
+		CategoryEditor categoryEditor = getCategoryEditor(dto, category);
+		category.edit(categoryEditor);
 
 		return new CategoryResponse(categoryRepository.save(category));
 	}
@@ -157,6 +159,21 @@ public class CategoryServiceImpl implements CategoryService {
 			.orElseThrow(CategoryNotFoundException::new);
 		categoryRepository.delete(category);
 	}
+
+	/**
+	 * getCategoryEditor : 카테고리 편집 빌더
+	 *
+	 * @param categoryRequest 요청된 태그 정보 담긴 객체
+	 * @param category 기존 태그 정보를 담은 객체
+	 * @return 수정된 정보를 포함한 객체
+	 */
+	private static CategoryEditor getCategoryEditor(CategoryRequest categoryRequest, Category category) {
+		CategoryEditor.CategoryEditorBuilder builder = category.toEditor();
+		return builder
+			.name(categoryRequest.name())
+			.build();
+	}
+
 
 }
 
