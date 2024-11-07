@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.contributor.entity;
 
 import org.hibernate.validator.constraints.Length;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +22,7 @@ import lombok.Setter;
 public class Contributor {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "contributor_id")
 	private Long id;
 
 	@NotNull

@@ -7,15 +7,6 @@ spring:
   cache:
     type: none
 
-  #cloud:
-  #  openfeign:
-  #    client:
-  #      config:
-  #        aladinClient:
-  #          connect-timeout: 5000
-  #          read-timeout: 5000
-  #          logger-level: basic
-
   data:
     redis:
       host: 133.186.241.167

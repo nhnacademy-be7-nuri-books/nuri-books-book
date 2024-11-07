@@ -115,7 +115,7 @@ class BookContributorRepositoryImplTest {
         assertThat(result.get(0).contributorId()).isEqualTo(testContributor.getId());
         assertThat(result.get(0).contributorName()).isEqualTo(testContributor.getName());
         assertThat(result.get(0).contributorRoleId()).isEqualTo(testContributorRole.getId());
-        assertThat(result.get(0).contributorRoleName()).isEqualTo(testContributorRole.getName());
+        assertThat(result.get(0).contributorRoleName()).isEqualTo(ContributorRoleEnum.AUTHOR.getKorName());
     }
 
     @Test

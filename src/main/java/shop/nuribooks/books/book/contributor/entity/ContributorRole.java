@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.contributor.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -23,6 +24,7 @@ import lombok.Setter;
 public class ContributorRole {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "contributor_role_id")
 	private Long id;
 
 	@NotNull
