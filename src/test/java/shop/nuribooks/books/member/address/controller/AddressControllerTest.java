@@ -58,7 +58,7 @@ class AddressControllerTest {
     void registerAddress() throws Exception {
         // given
         Member member = createMember(createCustomer(), creategrade());
-        when(memberRepository.findByUserId(any())).thenReturn(Optional.of(member));
+        when(memberRepository.findById(any())).thenReturn(Optional.of(member));
 
         AddressRegisterRequest request = AddressRegisterRequest.builder()
                 .name("test")
@@ -172,7 +172,7 @@ class AddressControllerTest {
                 .authority(MEMBER)
                 .grade(grade)
                 .gender(GenderType.MALE)
-                .userId("nuriaaaaaa")
+                .username("nuriaaaaaaa")
                 .status(StatusType.ACTIVE)
                 .birthday(LocalDate.of(1988, 8, 12))
                 .createdAt(LocalDateTime.now())

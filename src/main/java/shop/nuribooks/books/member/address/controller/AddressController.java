@@ -35,6 +35,7 @@ public class AddressController {
 
     // 관리자가 회원의 주소들을 조회하는 엔드포인트는 따로 생각해야한다.
 
+    @HasRole(role = AuthorityType.MEMBER)
     @GetMapping("/api/member/me/address")
     public ResponseEntity<List<AddressResponse>> addressList() {
         Long memberId = MemberIdContext.getMemberId();

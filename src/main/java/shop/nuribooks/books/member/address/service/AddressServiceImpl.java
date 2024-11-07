@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shop.nuribooks.books.exception.address.AddressOverMaximumSizeException;
 import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
 import shop.nuribooks.books.member.address.dto.requset.AddressEditRequest;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;

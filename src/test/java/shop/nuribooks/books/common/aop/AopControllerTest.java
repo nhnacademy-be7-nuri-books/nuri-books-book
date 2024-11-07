@@ -85,7 +85,7 @@ public class AopControllerTest {
         Customer customer = createCustomer();
         Customer savedCustomer = customerRepository.saveAndFlush(customer);
 
-        Member member = createMember(savedCustomer, savedGrade);
+        Member member = createAdmin(savedCustomer, savedGrade);
         Member saved = memberRepository.saveAndFlush(member);
 
         // when
@@ -99,10 +99,27 @@ public class AopControllerTest {
     private Member createMember(Customer customer, Grade grade) {
         return Member.builder()
                 .customer(customer)
+                .authority(MEMBER)
+                .grade(grade)
+                .gender(GenderType.MALE)
+                .username("nuriaaaaaa")
+                .status(StatusType.ACTIVE)
+                .birthday(LocalDate.of(1988, 8, 12))
+                .createdAt(LocalDateTime.now())
+                .point(ZERO)
+                .totalPaymentAmount(ZERO)
+                .latestLoginAt(null)
+                .withdrawnAt(null)
+                .build();
+    }
+
+    private Member createAdmin(Customer customer, Grade grade) {
+        return Member.builder()
+                .customer(customer)
                 .authority(AuthorityType.SELLER)
                 .grade(grade)
                 .gender(GenderType.MALE)
-                .userId("nuriaaaaaa")
+                .username("nuriaaaaaa")
                 .status(StatusType.ACTIVE)
                 .birthday(LocalDate.of(1988, 8, 12))
                 .createdAt(LocalDateTime.now())

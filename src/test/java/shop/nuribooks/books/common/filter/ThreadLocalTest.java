@@ -86,7 +86,7 @@ public class ThreadLocalTest {
                 .authority(MEMBER)
                 .grade(grade)
                 .gender(GenderType.MALE)
-                .userId("nuriaaaaaa")
+                .username("nuriaaaaaa")
                 .status(StatusType.ACTIVE)
                 .birthday(LocalDate.of(1988, 8, 12))
                 .createdAt(LocalDateTime.now())
