@@ -56,11 +56,11 @@ public class CategoryController {
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	@PostMapping
-	public ResponseEntity<CategoryResponse> registerMainCategory(@Valid @RequestBody CategoryRequest dto) {
-		CategoryResponse categoryResponse = new CategoryResponse(
-			categoryService.registerMainCategory(dto));
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(categoryResponse);
+	public ResponseEntity<ResponseMessage> registerMainCategory(@Valid @RequestBody CategoryRequest dto) {
+		categoryService.registerMainCategory(dto);
+
+		ResponseMessage responseMessage = new ResponseMessage(201, "카테고리가 성공적으로 생성되었습니다.");
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
 	}
 
 	/**
@@ -78,12 +78,14 @@ public class CategoryController {
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	@PostMapping("/{categoryId}")
-	public ResponseEntity<CategoryResponse> registerSubCategory(@Valid @RequestBody CategoryRequest dto,
+	public ResponseEntity<ResponseMessage> registerSubCategory(@Valid @RequestBody CategoryRequest dto,
 		@PathVariable Long categoryId) {
-		CategoryResponse categoryResponse = new CategoryResponse(
-			categoryService.registerSubCategory(dto, categoryId));
+		categoryService.registerSubCategory(dto, categoryId);
+
+		ResponseMessage responseMessage = new ResponseMessage(201, "카테고리가 성공적으로 생성되었습니다.");
+
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(categoryResponse);
+			.body(responseMessage);
 	}
 
 	/**
@@ -133,14 +135,18 @@ public class CategoryController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
 	})
 	@PutMapping("/{categoryId}")
-	public ResponseEntity<CategoryResponse> updateCategory(
+	public ResponseEntity<ResponseMessage> updateCategory(
 		@Valid
 		@Parameter(description = "업데이트할 카테고리의 정보", required = true)
 		@RequestBody CategoryRequest dto,
 		@Parameter(description = "업데이트할 카테고리의 ID", required = true)
 		@PathVariable Long categoryId) {
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.updateCategory(dto, categoryId));
+		categoryService.updateCategory(dto, categoryId);
+
+		ResponseMessage responseMessage = new ResponseMessage(200, "카테고리가 성공적으로 수정되었습니다.");
+
+		return ResponseEntity.ok().body(responseMessage);
 	}
 
 	/**
@@ -151,7 +157,7 @@ public class CategoryController {
 	 */
 	@Operation(summary = "카테고리 삭제", description = "주어진 ID에 해당하는 카테고리를 삭제합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "성공적으로 카테고리를 삭제하였습니다."),
+		@ApiResponse(responseCode = "204", description = "성공적으로 카테고리를 삭제하였습니다."),
 		@ApiResponse(responseCode = "404", description = "해당 ID의 카테고리를 찾을 수 없습니다."),
 	})
 	@DeleteMapping("/{categoryId}")
@@ -161,7 +167,7 @@ public class CategoryController {
 	) {
 		categoryService.deleteCategory(categoryId);
 
-		return ResponseEntity.ok().body(new ResponseMessage(200, "카테고리가 성공적으로 삭제 되었습니다."));
+		return ResponseEntity.noContent().build();
 	}
 
 }
