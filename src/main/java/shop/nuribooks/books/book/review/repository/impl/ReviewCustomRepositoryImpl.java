@@ -1,7 +1,7 @@
 package shop.nuribooks.books.book.review.repository.impl;
 
 import static com.querydsl.core.group.GroupBy.*;
-import static shop.nuribooks.books.book.book.entitiy.QBook.*;
+import static shop.nuribooks.books.book.book.entity.QBook.*;
 import static shop.nuribooks.books.book.review.entity.QReview.*;
 import static shop.nuribooks.books.book.review.entity.QReviewImage.*;
 import static shop.nuribooks.books.member.member.entity.QMember.*;
@@ -41,7 +41,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 						Projections.constructor(
 							MemberBriefResponse.class,
 							member.id,
-							member.userId
+							member.username
 						),
 						list(
 							Projections.constructor(
