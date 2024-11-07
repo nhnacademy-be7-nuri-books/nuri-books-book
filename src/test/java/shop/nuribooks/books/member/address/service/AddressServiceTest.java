@@ -62,14 +62,13 @@ class AddressServiceTest {
         memberRepository.save(member);
 
         AddressRegisterRequest request = AddressRegisterRequest.builder()
-                .memberId(member.getId())
                 .name("test")
                 .address("장말로")
                 .addressDetail("103호")
                 .isDefault(true)
                 .build();
         // when
-        AddressResponse response = addressService.registerAddress(request);
+        AddressResponse response = addressService.registerAddress(request, member.getId());
 
         // then
         assertThat(response.name()).isEqualTo("test");
@@ -142,14 +141,13 @@ class AddressServiceTest {
         Address saved = addressRepository.save(address);
 
         AddressEditRequest addressEditRequest = AddressEditRequest.builder()
-                .id(saved.getId())
                 .name("test")
                 .address("장말로")
                 .addressDetail("103호")
                 .isDefault(false)
                 .build();
         // when
-        addressService.modifyAddress(addressEditRequest);
+        addressService.modifyAddress(saved.getId(), addressEditRequest);
 
         // then
         Address changedAddress = addressRepository.findById(saved.getId())
@@ -158,13 +156,14 @@ class AddressServiceTest {
     }
 
     private Address createAddress(Member member) {
-        return Address.builder()
-                .member(member)
+        Address address = Address.builder()
                 .name("test")
                 .address("장말로")
                 .addressDetail("103호")
                 .isDefault(true)
                 .build();
+        address.setMember(member);
+        return address;
     }
 
     private Member createMember(Customer customer, Grade grade) {
@@ -193,9 +192,6 @@ class AddressServiceTest {
                 .build();
     }
 
-    /**
-     * 테스트를 위한 Grade 생성
-     */
     private Grade creategrade() {
         return Grade.builder()
             .name("STANDARD")

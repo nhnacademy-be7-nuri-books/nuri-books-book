@@ -42,7 +42,7 @@ class AddressRepositoryTest {
 
     @DisplayName("유저의 주소를 가져온다.")
     @Test
-    void findAllByMemberId() {
+    void findAllByMember_UserId() {
         // given
         Grade grade = creategrade();
         gradeRepository.save(grade);
@@ -63,13 +63,14 @@ class AddressRepositoryTest {
     }
 
     private Address createAddress(Member member) {
-        return Address.builder()
-                .member(member)
+        Address address = Address.builder()
                 .name("test")
                 .address("장말로")
                 .addressDetail("103호")
                 .isDefault(true)
                 .build();
+        address.setMember(member);
+        return address;
     }
 
     private Member createMember(Customer customer, Grade grade) {

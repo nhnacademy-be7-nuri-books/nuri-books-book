@@ -24,7 +24,6 @@ class AddressEditorTest {
                 .build();
 
         AddressEditRequest request = AddressEditRequest.builder()
-                .id(1L)
                 .name("name2")
                 .address(null)
                 .addressDetail(null)
