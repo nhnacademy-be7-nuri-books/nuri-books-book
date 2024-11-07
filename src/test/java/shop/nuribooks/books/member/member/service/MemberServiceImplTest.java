@@ -71,7 +71,7 @@ class MemberServiceImplTest {
 		Member savedMember = getSavedMember(savedCustomer);
 
 		when(customerRepository.existsByEmail(request.email())).thenReturn(false);
-		when(memberRepository.existsByUserId(request.userId())).thenReturn(false);
+		when(memberRepository.existsByUsername(request.userId())).thenReturn(false);
 		when(customerRepository.save(any(Customer.class)))
 			.thenReturn(savedCustomer);
 		when(gradeRepository.findByName("STANDARD")).thenReturn(Optional.of(standard));
@@ -113,7 +113,7 @@ class MemberServiceImplTest {
 		MemberRegisterRequest request = getMemberCreateRequest();
 
 		when(customerRepository.existsByEmail(request.email())).thenReturn(false);
-		when(memberRepository.existsByUserId(request.userId())).thenReturn(true);
+		when(memberRepository.existsByUsername(request.userId())).thenReturn(true);
 
 		//when / then
 		UserIdAlreadyExistsException exception = assertThrows(UserIdAlreadyExistsException.class,
@@ -130,7 +130,7 @@ class MemberServiceImplTest {
 		Customer existingCustomer = getSavedCustomer();
 		Member existingMember = spy(getSavedMember(existingCustomer));
 
-		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.of(existingMember));
+		when(memberRepository.findByUsername(request.userId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.password())).thenReturn(true);
 
 		//when
@@ -148,7 +148,7 @@ class MemberServiceImplTest {
 	    //given
 		MemberWithdrawRequest request = getMemberWithdrawRequest();
 
-		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.empty());
+		when(memberRepository.findByUsername(request.userId())).thenReturn(Optional.empty());
 
 	    //when / then
 		UserIdNotFoundException exception = assertThrows(UserIdNotFoundException.class,
@@ -165,7 +165,7 @@ class MemberServiceImplTest {
 		Customer existingCustomer = getSavedCustomer();
 		Member existingMember = getSavedMember(existingCustomer);
 
-		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.of(existingMember));
+		when(memberRepository.findByUsername(request.userId())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.password()))
 			.thenReturn(false);
 
@@ -183,11 +183,11 @@ class MemberServiceImplTest {
 		Customer existingCustomer = spy(getSavedCustomer());
 		Member existingMember = getSavedMember(existingCustomer);
 
-		when(memberRepository.findByUserId(existingMember.getUserId())).thenReturn(Optional.of(existingMember));
+		when(memberRepository.findByUsername(existingMember.getUsername())).thenReturn(Optional.of(existingMember));
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.of(existingCustomer));
 
 	    //when
-		MemberUpdateResponse response = memberServiceImpl.updateMember(existingMember.getUserId(), request);
+		MemberUpdateResponse response = memberServiceImpl.updateMember(existingMember.getUsername(), request);
 
 	    //then
 		verify(existingCustomer, times(1))
@@ -203,7 +203,7 @@ class MemberServiceImplTest {
 		MemberUpdateRequest request = getMemberUpdateRequest();
 		String requestUserId = "nhnacademy";
 
-		when(memberRepository.findByUserId(requestUserId)).thenReturn(Optional.empty());
+		when(memberRepository.findByUsername(requestUserId)).thenReturn(Optional.empty());
 
 	    //when / then
 		MemberNotFoundException exception = assertThrows(MemberNotFoundException.class,
@@ -221,7 +221,7 @@ class MemberServiceImplTest {
 
 		String requestUserId = "nhnacademy";
 
-		when(memberRepository.findByUserId(requestUserId)).thenReturn(Optional.of(existingMember));
+		when(memberRepository.findByUsername(requestUserId)).thenReturn(Optional.of(existingMember));
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.empty());
 
 		//when / then
@@ -237,14 +237,14 @@ class MemberServiceImplTest {
 		Customer savedCustomer = getSavedCustomer();
 		Member savedMember = getSavedMember(savedCustomer);
 
-		when(memberRepository.findByUserId(savedMember.getUserId())).thenReturn(Optional.of(savedMember));
+		when(memberRepository.findByUsername(savedMember.getUsername())).thenReturn(Optional.of(savedMember));
 		when(customerRepository.findById(savedMember.getId())).thenReturn(Optional.of(savedCustomer));
 
 	    //when
-		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(savedMember.getUserId());
+		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(savedMember.getUsername());
 
 		//then
-		assertThat(response.username()).isEqualTo(savedMember.getUserId());
+		assertThat(response.username()).isEqualTo(savedMember.getUsername());
 		assertThat(response.password()).isEqualTo(savedCustomer.getPassword());
 		assertThat(response.role()).isEqualTo("ROLE_" + savedMember.getAuthority().name());
 	}
@@ -255,7 +255,7 @@ class MemberServiceImplTest {
 		//given
 		String requestUserid = "nhnacademy";
 
-		when(memberRepository.findByUserId(requestUserid)).thenReturn(Optional.empty());
+		when(memberRepository.findByUsername(requestUserid)).thenReturn(Optional.empty());
 
 		//when
 		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(requestUserid);
@@ -275,7 +275,7 @@ class MemberServiceImplTest {
 		Member existingMember = getSavedMember(existingCustomer);
 		String requestUserid = "nhnacademy";
 
-		when(memberRepository.findByUserId(requestUserid)).thenReturn(Optional.of(existingMember));
+		when(memberRepository.findByUsername(requestUserid)).thenReturn(Optional.of(existingMember));
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.empty());
 
 		//when
@@ -296,7 +296,7 @@ class MemberServiceImplTest {
 		Member savedMember = getSavedMember(savedCustomer);
 		MemberDetailsRequest request = getMemberDetailsRequest();
 
-		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.of(savedMember));
+		when(memberRepository.findByUsername(request.userId())).thenReturn(Optional.of(savedMember));
 		when(customerRepository.findByIdAndPassword(savedMember.getId(), request.password()))
 			.thenReturn(Optional.of(savedCustomer));
 
@@ -309,7 +309,7 @@ class MemberServiceImplTest {
 			assertThat(response.phoneNumber()).isEqualTo(savedCustomer.getPhoneNumber());
 			assertThat(response.email()).isEqualTo(savedCustomer.getEmail());
 			assertThat(response.birthday()).isEqualTo(savedMember.getBirthday());
-			assertThat(response.userId()).isEqualTo(savedMember.getUserId());
+			assertThat(response.userId()).isEqualTo(savedMember.getUsername());
 			assertThat(response.password()).isEqualTo(savedCustomer.getPassword());
 			assertThat(response.point()).isEqualTo(savedMember.getPoint());
 			assertThat(response.totalPaymentAmount()).isEqualTo(savedMember.getTotalPaymentAmount());
@@ -326,7 +326,7 @@ class MemberServiceImplTest {
 		//given
 		MemberDetailsRequest request = getNonexistentMemberDetailsRequest();
 
-		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.empty());
+		when(memberRepository.findByUsername(request.userId())).thenReturn(Optional.empty());
 
 		//when / then
 		assertThatThrownBy(() -> memberServiceImpl.getMemberDetails(request))
@@ -342,7 +342,7 @@ class MemberServiceImplTest {
 		Member savedMember = getSavedMember(savedCustomer);
 		MemberDetailsRequest request = getNonexistentMemberDetailsRequest();
 
-		when(memberRepository.findByUserId(request.userId())).thenReturn(Optional.of(savedMember));
+		when(memberRepository.findByUsername(request.userId())).thenReturn(Optional.of(savedMember));
 		when(customerRepository.findByIdAndPassword(savedMember.getId(), request.password()))
 			.thenReturn(Optional.empty());
 
@@ -485,7 +485,7 @@ class MemberServiceImplTest {
 			.grade(getGrade())
 			.status(StatusType.ACTIVE)
 			.gender(GenderType.MALE)
-			.userId("nuribooks95")
+			.username("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
@@ -503,7 +503,7 @@ class MemberServiceImplTest {
 			.grade(getGrade())
 			.status(StatusType.INACTIVE)
 			.gender(GenderType.MALE)
-			.userId("nuribooks95")
+			.username("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
@@ -522,7 +522,7 @@ class MemberServiceImplTest {
 			.grade(getGrade())
 			.status(StatusType.ACTIVE)
 			.gender(GenderType.MALE)
-			.userId("nuribooks95")
+			.username("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)

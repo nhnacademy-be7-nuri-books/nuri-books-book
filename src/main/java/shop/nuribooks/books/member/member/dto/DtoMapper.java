@@ -19,7 +19,7 @@ public class DtoMapper {
 		return MemberRegisterResponse.builder()
 			.name(customer.getName())
 			.gender(member.getGender())
-			.userId(member.getUserId())
+			.userId(member.getUsername())
 			.phoneNumber(customer.getPhoneNumber())
 			.email(customer.getEmail())
 			.birthday(member.getBirthday())
@@ -48,7 +48,7 @@ public class DtoMapper {
 	 */
 	public static MemberAuthInfoResponse toAuthInfoDto(Customer customer, Member member) {
 		return MemberAuthInfoResponse.builder()
-			.username(member.getUserId())
+			.username(member.getUsername())
 			.password(customer.getPassword())
 			.role("ROLE_" + member.getAuthority().name())
 			.build();
@@ -64,7 +64,7 @@ public class DtoMapper {
 			.phoneNumber(customer.getPhoneNumber())
 			.email(customer.getEmail())
 			.birthday(member.getBirthday())
-			.userId(member.getUserId())
+			.userId(member.getUsername())
 			.password(customer.getPassword())
 			.point(member.getPoint())
 			.totalPaymentAmount(member.getTotalPaymentAmount())

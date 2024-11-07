@@ -70,7 +70,7 @@ public class MemberServiceImpl implements MemberService {
 		if (customerRepository.existsByEmail(request.email())) {
 			throw new EmailAlreadyExistsException("이미 존재하는 이메일입니다.");
 		}
-		if (memberRepository.existsByUserId(request.userId())) {
+		if (memberRepository.existsByUsername(request.userId())) {
 			throw new UserIdAlreadyExistsException("이미 존재하는 아이디입니다.");
 		}
 
@@ -83,7 +83,7 @@ public class MemberServiceImpl implements MemberService {
 			.grade(standard())
 			.status(StatusType.ACTIVE)
 			.gender(request.gender())
-			.userId(request.userId())
+			.username(request.userId())
 			.birthday(request.birthday())
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
@@ -110,7 +110,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public void withdrawMember(MemberWithdrawRequest request) {
-		Member foundMember = memberRepository.findByUserId(request.userId())
+		Member foundMember = memberRepository.findByUsername(request.userId())
 			.orElseThrow(() -> new UserIdNotFoundException("존재하지 않는 아이디입니다."));
 
 		if (!customerRepository.existsByIdAndPassword(
@@ -137,7 +137,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public MemberUpdateResponse updateMember(String userId, MemberUpdateRequest request) {
-		Member foundMember = memberRepository.findByUserId(userId)
+		Member foundMember = memberRepository.findByUsername(userId)
 			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
 		Customer foundCustomer = customerRepository.findById(foundMember.getId())
@@ -158,7 +158,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public MemberAuthInfoResponse getMemberAuthInfo(String userId) {
 
-		return memberRepository.findByUserId(userId)
+		return memberRepository.findByUsername(userId)
 			.flatMap(foundMember -> customerRepository.findById(foundMember.getId())
 				.map(foundCustomer -> DtoMapper.toAuthInfoDto(foundCustomer, foundMember))
 			)
@@ -175,7 +175,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public MemberDetailsResponse getMemberDetails(MemberDetailsRequest request) {
 
-		Member foundMember = memberRepository.findByUserId(request.userId())
+		Member foundMember = memberRepository.findByUsername(request.userId())
 			.orElseThrow(() -> new UserIdNotFoundException("존재하지 않는 아이디입니다."));
 
 		Customer foundCustomer = customerRepository.findByIdAndPassword(foundMember.getId(), request.password())
@@ -205,7 +205,7 @@ public class MemberServiceImpl implements MemberService {
 			.stream()
 			.filter(foundMember -> foundMember.getStatus() == StatusType.ACTIVE)
 			.forEach(foundMember -> {
-				log.info("신규 휴면 회원이 발생하였습니다. - 회원 아이디: {}", foundMember.getUserId());
+				log.info("신규 휴면 회원이 발생하였습니다. - 회원 아이디: {}", foundMember.getUsername());
 
 				foundMember.changeToInactive();
 			});
@@ -223,7 +223,7 @@ public class MemberServiceImpl implements MemberService {
 		memberRepository.findAllByWithdrawnAtBefore(thresholdDate)
 			.forEach(foundMember -> {
 				log.info("탈퇴 후 1년이 지나 SOFT DELETE의 대상이 되는 회원을 발견했습니다. - 회원 아이디: {}",
-					foundMember.getUserId());
+					foundMember.getUsername());
 
 				Customer foundCustomer = customerRepository.findById(foundMember.getId())
 					.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));

@@ -44,7 +44,7 @@ class MemberRepositoryTest {
 		Member savedMember = getSavedMember();
 
 		//when
-		boolean exists = memberRepository.existsByUserId(savedMember.getUserId());
+		boolean exists = memberRepository.existsByUsername(savedMember.getUsername());
 
 		//then
 		assertThat(exists).isTrue();
@@ -57,12 +57,12 @@ class MemberRepositoryTest {
 		Member savedMember = getSavedMember();
 
 		//when
-		Optional<Member> foundMember = memberRepository.findByUserId(savedMember.getUserId());
+		Optional<Member> foundMember = memberRepository.findByUsername(savedMember.getUsername());
 
 		//then
 		assertThat(foundMember).isPresent(); // 회원이 존재함을 확인
 		assertThat(foundMember.get().getId()).isEqualTo(savedMember.getId());
-		assertThat(foundMember.get().getUserId()).isEqualTo(savedMember.getUserId());
+		assertThat(foundMember.get().getUsername()).isEqualTo(savedMember.getUsername());
 	}
 
 	@DisplayName("등급의 id로 회원 등록 여부 확인")
@@ -91,8 +91,8 @@ class MemberRepositoryTest {
 
 		//then
 		assertThat(inactiveMembers).hasSize(1);
-		assertThat(inactiveMembers).extracting(Member::getUserId)
-			.containsExactly(savedMember.getUserId());
+		assertThat(inactiveMembers).extracting(Member::getUsername)
+			.containsExactly(savedMember.getUsername());
 	}
 
 	@DisplayName("탈퇴 후 1년이 지난 회원들을 조회")
@@ -108,8 +108,8 @@ class MemberRepositoryTest {
 
 		//then
 		assertThat(withdrawnMembers).hasSize(1);
-		assertThat(withdrawnMembers).extracting(Member::getUserId)
-			.containsExactly(savedMember.getUserId());
+		assertThat(withdrawnMembers).extracting(Member::getUsername)
+			.containsExactly(savedMember.getUsername());
 	}
 
 
@@ -156,7 +156,7 @@ class MemberRepositoryTest {
 			.grade(savedGrade)
 			.status(StatusType.ACTIVE)
 			.gender(GenderType.MALE)
-			.userId("nuribooks95")
+			.username("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)

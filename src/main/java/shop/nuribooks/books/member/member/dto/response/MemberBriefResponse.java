@@ -16,7 +16,7 @@ public record MemberBriefResponse(
 	public static MemberBriefResponse of(Member member) {
 		return MemberBriefResponse.builder()
 			.id(member.getId())
-			.userId(member.getUserId())
+			.userId(member.getUsername())
 			.build();
 	}
 }
