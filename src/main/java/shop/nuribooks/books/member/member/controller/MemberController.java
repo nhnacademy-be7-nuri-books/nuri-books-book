@@ -1,6 +1,7 @@
 package shop.nuribooks.books.member.member.controller;
 
 import static org.springframework.http.HttpStatus.*;
+import static shop.nuribooks.books.member.member.entity.AuthorityType.*;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
@@ -71,7 +73,7 @@ public class MemberController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "회원 인증 조회 성공")
 	})
-	@GetMapping("/api/member/{username}")
+	@GetMapping("/api/member/username/{username}")
 	public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfoByUsername(@PathVariable String username) {
 		MemberAuthInfoResponse response = memberService.getMemberAuthInfoByUsername(username);
 
@@ -87,7 +89,7 @@ public class MemberController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "회원 인증 조회 성공")
 	})
-	@GetMapping("/api/member/{email}")
+	@GetMapping("/api/member/email/{email}")
 	public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfoByEmail(@PathVariable String email) {
 		MemberAuthInfoResponse response = memberService.getMemberAuthInfoByEmail(email);
 
@@ -160,6 +162,7 @@ public class MemberController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "관리자가 회원 목록 조회 성공")
 	})
+	@HasRole(role = ADMIN)
 	@GetMapping("/admin/api/member/members")
 	public ResponseEntity<Page<MemberSearchResponse>> memberSearchWithPaging(
 		@RequestParam(value = "name", required = false) String name,

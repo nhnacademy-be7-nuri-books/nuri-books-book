@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -17,6 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -26,14 +30,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.grade.entity.Grade;
-import shop.nuribooks.books.member.member.dto.request.MemberDetailsRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
+import shop.nuribooks.books.member.member.dto.request.MemberSearchRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
-import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
-import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
+import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.StatusType;
@@ -50,9 +53,6 @@ class MemberControllerTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
-
-	@Autowired
-	MemberIdContext memberIdContext;
 
 	@PostConstruct
 	public void init() {
@@ -124,15 +124,15 @@ class MemberControllerTest {
 
 	@DisplayName("username으로 회원 PK id, username, 비밀번호, 권한 조회 성공")
 	@Test
-	void getMemberAuthInfo() throws Exception {
+	void getMemberAuthInfoByUsername() throws Exception {
 		//given
 		MemberAuthInfoResponse response = getGetMemberAuthInfoResponse();
-		String requestUsername = "nuribooks";
+		String username = "nuribooks";
 
-		when(memberService.getMemberAuthInfoByUsername(requestUsername)).thenReturn(response);
+		when(memberService.getMemberAuthInfoByUsername(username)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(get("/api/member/{username}", requestUsername));
+		ResultActions result = mockMvc.perform(get("/api/member/username/{username}", username));
 
 		//then
 		result.andExpect(status().isOk())
@@ -142,7 +142,27 @@ class MemberControllerTest {
 			.andExpect(jsonPath("role").value(response.role()));
 	}
 
-	@DisplayName("아이디로 비밀번호로 회원 상세 조회 성공")
+	@DisplayName("이메일로 회원 PK id, username, 비밀번호, 권한 조회 성공")
+	@Test
+	void getMemberAuthInfoByEmail() throws Exception {
+		//given
+		MemberAuthInfoResponse response = getGetMemberAuthInfoResponse();
+		String email = "nuribooks@nhnacademy.com";
+
+		when(memberService.getMemberAuthInfoByEmail(email)).thenReturn(response);
+
+		//when
+		ResultActions result = mockMvc.perform(get("/api/member/email/{email}", email));
+
+		//then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("customerId").value(response.customerId()))
+			.andExpect(jsonPath("username").value(response.username()))
+			.andExpect(jsonPath("password").value(response.password()))
+			.andExpect(jsonPath("role").value(response.role()));
+	}
+
+	@DisplayName("회원 PK id로 회원 상세 조회 성공")
 	@Test
 	void getMemberDetails() throws Exception {
 		//given
@@ -173,17 +193,14 @@ class MemberControllerTest {
 			.andExpect(jsonPath("latestLoginAt").value(response.latestLoginAt().toString()));
 	}
 
-	@DisplayName("아이디와 비밀번호로 회원 탈퇴 성공")
+	@DisplayName("회원 PK id로 회원 탈퇴 성공")
 	@Test
 	void memberWithdraw() throws Exception {
 		//given
-		MemberWithdrawRequest request = getMemberWithdrawRequest();
-		doNothing().when(memberService).withdrawMember(any(MemberWithdrawRequest.class));
+		doNothing().when(memberService).withdrawMember(anyLong());
 
 		//when
-		ResultActions result = mockMvc.perform(delete("/api/member/me")
-			.contentType(APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(request)));
+		ResultActions result = mockMvc.perform(delete("/api/member/me"));
 
 		//then
 		result.andExpect(status().isOk())
@@ -192,26 +209,25 @@ class MemberControllerTest {
 				.value("탈퇴가 성공적으로 완료되었습니다. 귀하의 앞날에 무궁한 발전이 있기를 진심으로 기원하겠습니다."));
 	}
 
-	@DisplayName("회원 정보 수정 성공")
+	@DisplayName("회원 PK id로 회원 정보 수정 성공")
 	@Test
 	void memberUpdate() throws Exception {
 		//given
+		Long memberId = MemberIdContext.getMemberId();
 		MemberUpdateRequest request = getMemberUpdateRequest();
-		MemberUpdateResponse response = getMemberUpdateResponse();
-		String requestUserId = "nuribooks";
 
-		// 단일 원시 값에 대해서만 Mockito는 매처 없이도 작동하지만 여러 인자에 대해서는 모든 인자를 매처로 제공해야 함
-		when(memberService.updateMember(eq(requestUserId), any(MemberUpdateRequest.class))).thenReturn(response);
+		doNothing().when(memberService).updateMember(eq(memberId), any(MemberUpdateRequest.class));
 
 		//when
-		ResultActions result = mockMvc.perform(post("/api/member/{userId}", requestUserId)
+		ResultActions result = mockMvc.perform(post("/api/member/me")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
 		//then
 		result.andExpect(status().isOk())
-			.andExpect(jsonPath("name").value(response.name()))
-			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()));
+			.andExpect(jsonPath("statusCode").value("200"))
+			.andExpect(jsonPath("message")
+				.value("회원 정보가 수정되었습니다."));
 	}
 
 	@DisplayName("회원 정보 수정 실패 - validation 에러")
@@ -219,10 +235,9 @@ class MemberControllerTest {
 	void memberUpdate_invalidRequest() throws Exception {
 	    //given
 		MemberUpdateRequest badRequest = getBadMemberUpdateRequest();
-		String requiredUserId = "nuribooks";
 
 		//when
-		ResultActions badResult = mockMvc.perform(post("/api/member/{userId}", requiredUserId)
+		ResultActions badResult = mockMvc.perform(post("/api/member/me")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 
@@ -231,11 +246,36 @@ class MemberControllerTest {
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("이름은 반드시 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
-				.value(Matchers.containsString("비밀번호는 반드시 입력해야 합니다.")))
-			.andExpect(jsonPath("$.message")
-				.value(Matchers.containsString("전화번호는 반드시 입력해야 합니다.")));
+				.value(Matchers.containsString("비밀번호는 반드시 입력해야 합니다.")));
 	}
 
+	@DisplayName("관리자가 다양한 검색 조건을 이용하여 회원 목록 조회")
+	@Test
+	void memberSearchWithPaging() throws Exception {
+	    //given
+		MemberSearchResponse response = getMemberSearchResponse();
+		Page<MemberSearchResponse> pageResponse = new PageImpl<>(List.of(response));
+
+		when(memberService.searchMembersWithPaging(any(MemberSearchRequest.class), any(Pageable.class)))
+			.thenReturn(pageResponse);
+
+	    //when
+		ResultActions result = mockMvc.perform(get("/admin/api/member/members")
+				.param("name", "김")
+				.param("email", "nuri")
+				.param("phoneNumber","010")
+				.param("gender", "MALE")
+				.param("status", "ACTIVE")
+				.param("page", "0") // Pageable에 필요한 page 파라미터
+				.param("size", "10")); // Pageable에 필요한 size 파라미터
+
+	    //then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.content[0].customerId").value(response.customerId()))
+			.andExpect(jsonPath("$.content[0].username").value(response.username()))
+			.andExpect(jsonPath("$.content[0].email").value(response.email()))
+			.andExpect(jsonPath("$.content.length()").value(1));
+	}
 
 	/**
 	 * 테스트를 위한 MemberRegisterRequest 생성
@@ -294,16 +334,6 @@ class MemberControllerTest {
 	}
 
 	/**
-	 * 테스트를 위한 MemberDetailsRequest 생성
-	 */
-	private MemberDetailsRequest getMemberDetailsRequest() {
-		return MemberDetailsRequest.builder()
-			.userId("nuribooks95")
-			.password("abc123")
-			.build();
-	}
-
-	/**
 	 * 테스트를 위한 MemberDetailsResponse 생성
 	 */
 	private MemberDetailsResponse getMemberDetailsResponse() {
@@ -336,32 +366,12 @@ class MemberControllerTest {
 	}
 
 	/**
-	 * 테스트를 위한 MemberWithdrawRequest 생성
-	 */
-	private MemberWithdrawRequest getMemberWithdrawRequest() {
-		return MemberWithdrawRequest.builder()
-			.userId("nuribooks")
-			.password("abc123")
-			.build();
-	}
-
-	/**
 	 * 테스트를 위한 MemberUpdateRequest 생성
 	 */
 	private MemberUpdateRequest getMemberUpdateRequest() {
 		return MemberUpdateRequest.builder()
 			.name("수정하고 싶은 이름")
 			.password("수정하고 싶은 비밀번호")
-			.build();
-	}
-
-	/**
-	 * 테스트를 위한 MemberUpdateResponse 생성
-	 */
-	private MemberUpdateResponse getMemberUpdateResponse() {
-		return MemberUpdateResponse.builder()
-			.name("수정된 이름")
-			.phoneNumber("010-0000-0000")
 			.build();
 	}
 
@@ -375,4 +385,25 @@ class MemberControllerTest {
 			.build();
 	}
 
+	/**
+	 * 테스트를 위한 MemberSearchResponse 생성
+	 */
+	private MemberSearchResponse getMemberSearchResponse() {
+		return MemberSearchResponse.builder()
+			.customerId(1L)
+			.name("곽홍섭")
+			.gender(GenderType.MALE)
+			.phoneNumber("042-8282-8282")
+			.email("hongsup@nhnacademy.com")
+			.birthday(LocalDate.of(1987, 11, 28))
+			.username("abcd1234")
+			.point(BigDecimal.ZERO)
+			.totalPaymentAmount(BigDecimal.ZERO)
+			.authority(AuthorityType.MEMBER)
+			.gradeName("STANDARD")
+			.status(StatusType.ACTIVE)
+			.createdAt(LocalDateTime.now())
+			.latestLoginAt(null)
+			.build();
+	}
 }

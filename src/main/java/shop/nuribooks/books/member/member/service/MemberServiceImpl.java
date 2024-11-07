@@ -108,25 +108,15 @@ public class MemberServiceImpl implements MemberService {
 		Member foundMember = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
-		if (!customerRepository.existsById(memberId)) {
-			throw new CustomerNotFoundException("존재하지 않는 고객입니다.");
-		}
-
 		foundMember.changeToWithdrawn();
 	}
 
 	/**
 	 * 회원 정보 수정 <br>
-	 * 변경 가능한 정보는 name, password, phoneNumber
-	 * @throws MemberNotFoundException 존재하지 않는 회원입니다.
+	 * 변경 가능한 정보는 name, password
 	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
-	 * @param userId  아이디
-	 * @param request MemberUpdateRequest로 수정하고 싶은 이름과 비밀번호, 전화번호를 받음 <br>
-	 * 로그인 상태의 사용자만이 회원 정보를 수정할 수 있기 때문에 <br>
-	 * 입력받은 userId의 member가 반드시 존재하는 상황이다. <br>
-	 * 그러므로 userId를 통해 customerRepository에서 해당 customer를 찾고 정보 수정을 진행 <br>
-	 * 입력받은 각각의 이름, 비밀번호, 전화번호로 customer의 정보 수정
-	 * @return MemberUpdateResponse에 변경한 이름과 전화번호 담아서 반환
+	 * @param memberId 회원 PK id
+	 * @param request MemberUpdateRequest로 수정하고 싶은 이름과 비밀번호를 받음
 	 */
 	@Override
 	@Transactional
@@ -171,7 +161,7 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	/**
-	 * 입력받은 아이디와 비밀번호로 회원 상세 정보 조회
+	 * 회원 PK id로 상세 정보 조회
 	 * @throws MemberNotFoundException 존재하지 않는 회원입니다.
 	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
 	 * @param memberId 요청 회원의 PK id

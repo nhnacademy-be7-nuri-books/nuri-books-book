@@ -4,7 +4,6 @@ import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
-import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.member.entity.Member;
 
 /**
@@ -23,16 +22,6 @@ public class DtoMapper {
 			.phoneNumber(customer.getPhoneNumber())
 			.email(customer.getEmail())
 			.birthday(member.getBirthday())
-			.build();
-	}
-
-	/**
-	 * Customer를 MemberUpdateResponse로 변환
-	 */
-	public static MemberUpdateResponse toUpdateDto(Customer customer) {
-		return MemberUpdateResponse.builder()
-			.name(customer.getName())
-			.phoneNumber(customer.getPhoneNumber())
 			.build();
 	}
 

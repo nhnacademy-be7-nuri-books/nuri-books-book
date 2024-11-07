@@ -12,7 +12,6 @@ import lombok.Builder;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.GenderType;
-import shop.nuribooks.books.member.member.entity.StatusType;
 
 /**
  * ISO 8601 형식에서 날짜와 시간을 표현할 때, 날짜 부분과 시간 부분을 구분하기 위해 'T'를 사용

@@ -65,7 +65,7 @@ public class Member {
 	@JoinColumn(name = "grade_id")
 	private Grade grade;
 
-	@OneToMany(mappedBy = "id", fetch = LAZY)
+	@OneToMany(mappedBy = "member", fetch = LAZY)
 	@Builder.Default
 	private List<Address> addressList = new ArrayList<>();
 
@@ -76,7 +76,7 @@ public class Member {
 	private StatusType status;
 
 	/**
-	 * MALE, FEMALE
+	 * MALE, FEMALE, OTHER
 	 */
 	@Enumerated(STRING)
 	private GenderType gender;
