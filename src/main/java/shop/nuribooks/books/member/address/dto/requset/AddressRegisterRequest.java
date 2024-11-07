@@ -8,15 +8,13 @@ import shop.nuribooks.books.member.member.entity.Member;
 
 @Builder
 public record AddressRegisterRequest(
-        @NotNull Long memberId,
         @NotBlank String name,
         @NotBlank String address,
         @NotBlank String addressDetail,
         boolean isDefault) {
 
-    public Address toEntity(Member member) {
+    public Address toEntity() {
         return Address.builder()
-                .member(member)
                 .name(name)
                 .address(address)
                 .addressDetail(addressDetail)

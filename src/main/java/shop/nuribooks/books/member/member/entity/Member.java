@@ -5,6 +5,7 @@ import static jakarta.persistence.FetchType.*;
 import static java.math.BigDecimal.*;
 import static shop.nuribooks.books.member.member.entity.StatusType.*;
 
+import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,10 +21,13 @@ import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
 
@@ -60,6 +64,10 @@ public class Member {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "grade_id")
 	private Grade grade;
+
+	@OneToMany(mappedBy = "id", fetch = LAZY)
+	@Builder.Default
+	private List<Address> addressList = new ArrayList<>();
 
 	/**
 	 * ACTIVE, INACTIVE, WITHDRAWN
@@ -128,4 +136,10 @@ public class Member {
 		this.totalPaymentAmount = ZERO;
 		this.latestLoginAt = null;
 	}
+
+	public void addAddress(Address address) {
+		address.setMember(this);
+		addressList.add(address);
+	}
+
 }
