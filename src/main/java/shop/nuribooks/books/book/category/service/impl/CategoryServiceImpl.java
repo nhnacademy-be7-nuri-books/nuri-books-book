@@ -35,19 +35,19 @@ public class CategoryServiceImpl implements CategoryService {
 	/**
 	 * 새로운 대분류 카테고리를 등록합니다.
 	 *
-	 * @param dto 카테고리 등록 요청 DTO
+	 * @param categoryRequest 카테고리 등록 요청 DTO
 	 * @return 등록된 카테고리 엔티티
 	 * @throws CategoryAlreadyExistException 동일한 이름의 대분류 카테고리가 이미 존재하는 경우
 	 */
 	@Override
 	@Transactional
-	public Category registerMainCategory(CategoryRequest dto) {
-		boolean isDuplicate = categoryRepository.existsByNameAndParentCategoryIsNull(dto.name());
+	public Category registerMainCategory(CategoryRequest categoryRequest) {
+		boolean isDuplicate = categoryRepository.existsByNameAndParentCategoryIsNull(categoryRequest.name());
 		if (isDuplicate) {
-			throw new CategoryAlreadyExistException(dto.name());
+			throw new CategoryAlreadyExistException(categoryRequest.name());
 		}
 		Category category = Category.builder()
-			.name(dto.name())
+			.name(categoryRequest.name())
 			.build();
 		return categoryRepository.save(category);
 	}
@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
 	/**
 	 * 기존 대분류 아래에 새로운 하위 분류 카테고리를 등록합니다.
 	 * @author janghyun
-	 * @param dto 하위 분류 등록 요청 DTO
+	 * @param categoryRequest 하위 분류 등록 요청 DTO
 	 * @param parentCategoryId 부모 카테고리의 ID
 	 * @return 등록된 하위 카테고리 엔티티
 	 * @throws CategoryNotFoundException 부모 카테고리를 찾을 수 없는 경우
@@ -63,19 +63,19 @@ public class CategoryServiceImpl implements CategoryService {
 	 */
 	@Override
 	@Transactional
-	public Category registerSubCategory(CategoryRequest dto, Long parentCategoryId) {
+	public Category registerSubCategory(CategoryRequest categoryRequest, Long parentCategoryId) {
 		Category parentCategory = categoryRepository.findById(parentCategoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
 
 		boolean isDuplicate = parentCategory.getSubCategory().stream()
-			.anyMatch(subCategory -> subCategory.getName().equals(dto.name()));
+			.anyMatch(subCategory -> subCategory.getName().equals(categoryRequest.name()));
 
 		if (isDuplicate) {
-			throw new CategoryAlreadyExistException(dto.name());
+			throw new CategoryAlreadyExistException(categoryRequest.name());
 		}
 
 		Category category = Category.builder()
-			.name(dto.name())
+			.name(categoryRequest.name())
 			.parentCategory(parentCategory)
 			.build();
 		return categoryRepository.save(category);
@@ -117,31 +117,31 @@ public class CategoryServiceImpl implements CategoryService {
 	 * 카테고리가 존재하지 않을 경우 CategoryNotFoundException을 발생시킵니다.
 	 *
 	 * @author janghyun
-	 * @param dto 업데이트할 카테고리의 정보가 담긴 객체
+	 * @param categoryRequest 업데이트할 카테고리의 정보가 담긴 객체
 	 * @param categoryId 업데이트할 카테고리의 ID
 	 * @return 업데이트된 카테고리의 응답 객체
 	 * @throws CategoryNotFoundException 주어진 ID에 해당하는 카테고리가 존재하지 않을 경우
 	 */
 	@Override
 	@Transactional
-	public CategoryResponse updateCategory(CategoryRequest dto, Long categoryId) {
+	public CategoryResponse updateCategory(CategoryRequest categoryRequest, Long categoryId) {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
 		Category parentCategory = category.getParentCategory();
 
 		if (parentCategory == null) {
-			if (categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())) {
-				throw new CategoryAlreadyExistException(dto.name());
+			if (categoryRepository.existsByNameAndParentCategoryIsNull(categoryRequest.name())) {
+				throw new CategoryAlreadyExistException(categoryRequest.name());
 			}
 		} else {
 			if (parentCategory.getSubCategory().stream()
-				.anyMatch(subCategory -> subCategory.getName().equals(dto.name()))) {
-				throw new CategoryAlreadyExistException(dto.name());
+				.anyMatch(subCategory -> subCategory.getName().equals(categoryRequest.name()))) {
+				throw new CategoryAlreadyExistException(categoryRequest.name());
 			}
 		}
 
-		CategoryEditor categoryEditor = getCategoryEditor(dto, category);
+		CategoryEditor categoryEditor = getCategoryEditor(categoryRequest, category);
 		category.edit(categoryEditor);
 
 		return new CategoryResponse(categoryRepository.save(category));
