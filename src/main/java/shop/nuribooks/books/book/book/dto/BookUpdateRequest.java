@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
+import shop.nuribooks.books.book.book.entity.BookStateEnum;
 
 public record BookUpdateRequest(
 	@NotNull(message = "출판사 ID는 필수 입력 항목입니다.")

@@ -1,7 +1,7 @@
 package shop.nuribooks.books.book.book.entity;
 
 import org.junit.jupiter.api.Test;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
+
 import shop.nuribooks.books.exception.book.InvalidBookStateException;
 
 import static org.junit.jupiter.api.Assertions.*;

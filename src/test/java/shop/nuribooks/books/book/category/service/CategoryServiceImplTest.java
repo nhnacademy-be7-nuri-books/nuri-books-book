@@ -15,7 +15,7 @@ import org.mockito.MockitoAnnotations;
 
 import shop.nuribooks.books.book.category.dto.CategoryRequest;
 import shop.nuribooks.books.book.category.dto.CategoryResponse;
-import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.impl.CategoryServiceImpl;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;

@@ -14,10 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
+import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.cart.entity.Cart;
@@ -86,7 +86,7 @@ public class CartRepositoryTest {
 			.grade(savedGrade)
 			.status(StatusType.ACTIVE)
 			.gender(GenderType.MALE)
-			.userId("nuribooks95")
+			.username("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)

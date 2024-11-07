@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.entity.ReviewImage;
 import shop.nuribooks.books.member.member.entity.Member;

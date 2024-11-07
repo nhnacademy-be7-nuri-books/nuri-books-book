@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,9 +17,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
+import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
@@ -74,7 +76,7 @@ public class ReviewServiceTest {
 		);
 
 		member = Member.builder()
-			.userId("nuribooks95")
+			.username("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.build();
 		ReflectionTestUtils.setField(member, "id", 1L);
@@ -121,10 +123,62 @@ public class ReviewServiceTest {
 	}
 
 	@Test
+	public void updatedByOtherUser() {
+		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
+		assertThrows(ReviewNotFoundException.class,
+			() -> reviewService.updateReview(reviewRequest, review.getId(), 2));
+	}
+
+	@Test
 	public void updateSuccess() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
 		when(reviewRepository.save(any())).thenReturn(review).thenReturn(review);
 		assertEquals(ReviewMemberResponse.of(review),
 			reviewService.updateReview(reviewRequest, review.getId(), member.getId()));
+	}
+
+	@Test
+	public void getScoreFail() {
+		when(bookRepository.existsById(anyLong())).thenReturn(false);
+		assertThrows(BookIdNotFoundException.class,
+			() -> this.reviewService.getScoreByBookId(1));
+	}
+
+	@Test
+	public void getScoreSuccess() {
+		double score = 4.1;
+		when(bookRepository.existsById(anyLong())).thenReturn(true);
+		when(reviewRepository.findScoreByBookId(1)).thenReturn(score);
+		assertEquals(reviewService.getScoreByBookId(1), score);
+	}
+
+	@Test
+	public void getReviewsAndMemFail() {
+		when(bookRepository.existsById(anyLong())).thenReturn(false);
+		assertThrows(BookIdNotFoundException.class,
+			() -> this.reviewService.getReviewsWithMember(1));
+	}
+
+	@Test
+	public void getReviewsAndMemSuccess() {
+		List<ReviewMemberResponse> res = new LinkedList<>();
+		when(bookRepository.existsById(anyLong())).thenReturn(true);
+		when(reviewRepository.findReviewsByBookId(1)).thenReturn(res);
+		assertEquals(reviewService.getReviewsWithMember(1).size(), 0);
+	}
+
+	@Test
+	public void getReviewsAndBookFail() {
+		when(memberRepository.existsById(anyLong())).thenReturn(false);
+		assertThrows(MemberNotFoundException.class,
+			() -> this.reviewService.getReviewsWithBook(1));
+	}
+
+	@Test
+	public void getReviewsAndBookSuccess() {
+		List<ReviewBookResponse> res = new LinkedList<>();
+		when(memberRepository.existsById(anyLong())).thenReturn(true);
+		when(reviewRepository.findReviewsByMemberId(1)).thenReturn(res);
+		assertEquals(reviewService.getReviewsWithBook(1).size(), 0);
 	}
 }

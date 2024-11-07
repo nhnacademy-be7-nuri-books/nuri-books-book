@@ -8,9 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 
 public class BookTest {
 

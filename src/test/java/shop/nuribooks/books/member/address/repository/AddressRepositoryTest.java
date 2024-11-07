@@ -78,7 +78,7 @@ class AddressRepositoryTest {
                 .customer(customer)
                 .authority(MEMBER)
                 .grade(grade)
-                .userId("nuriaaaaaa")
+                .username("nuriaaaaaa")
                 .gender(GenderType.MALE)
                 .status(StatusType.ACTIVE)
                 .birthday(LocalDate.of(1988, 8, 12))

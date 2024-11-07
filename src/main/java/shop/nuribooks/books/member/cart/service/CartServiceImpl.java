@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
@@ -34,10 +34,11 @@ public class CartServiceImpl implements CartService {
 	private final BookRepository bookRepository;
 
 	/**
-	 * 장바구니 상세 생성 <br>
+	 * 장바구니 생성 <br>
 	 * memberId와 bookId를 복합키로 가지고 있는 cart 생성 후, <br>
 	 * 해당 도서의 상세 정보들을 CartAddResponse에 담아서 반환 <br>
-	 * 기존 장바구니가 존재한다면 수량만 하나 증가시켜 다시 CartAddResponse로 반환
+	 * 기존 장바구니가 존재한다면 수량만 변화시켜 다시 CartAddResponse로 반환 <br>
+	 * 장바구니의 도서 수량이 0이하면 장바구니 삭제
 	 */
 	@Transactional
 	public CartAddResponse addToCart(CartAddRequest request) {
@@ -75,6 +76,10 @@ public class CartServiceImpl implements CartService {
 			});
 	}
 
+	/**
+	 * memberId로 모든 장바구니 조회 <br>
+	 * 해당 회원의 장바구니가 없다면 모든 필드가 null인 CartListResponse 반환
+	 */
 	@Override
 	public List<CartListResponse> getCartList(Long memberId) {
 		List<Cart> carts = cartRepository.findAllByMemberId(memberId);

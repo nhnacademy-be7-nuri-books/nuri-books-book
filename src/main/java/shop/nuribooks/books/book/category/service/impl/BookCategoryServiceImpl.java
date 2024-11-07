@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.category.entitiy.BookCategory;
-import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.entity.BookCategory;
+import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.BookCategoryService;

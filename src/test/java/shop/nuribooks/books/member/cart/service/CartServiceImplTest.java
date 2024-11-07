@@ -15,8 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
+import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
@@ -165,7 +165,7 @@ class CartServiceImplTest {
 			.grade(null)
 			.status(StatusType.ACTIVE)
 			.gender(GenderType.MALE)
-			.userId("nuribooks95")
+			.username("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)

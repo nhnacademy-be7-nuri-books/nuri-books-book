@@ -31,9 +31,11 @@ public class Customer {
 	private String password;
 
 	@NotNull
+	@Column(unique = true)
 	private String phoneNumber;
 
 	@NotNull
+	@Column(unique = true)
 	private String email;
 
 	public void changeCustomerInformation(String name, String password, String phoneNumber) {

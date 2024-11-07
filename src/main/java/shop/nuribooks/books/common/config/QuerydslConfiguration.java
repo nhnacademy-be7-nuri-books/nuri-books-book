@@ -3,6 +3,7 @@ package shop.nuribooks.books.common.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
@@ -16,7 +17,7 @@ public class QuerydslConfiguration {
 
 	@Bean
 	public JPAQueryFactory jpaQueryFactory() {
-		return new JPAQueryFactory(entityManager);
+		return new JPAQueryFactory(JPQLTemplates.DEFAULT, entityManager);
 	}
 }
 

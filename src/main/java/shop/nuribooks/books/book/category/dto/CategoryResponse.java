@@ -3,7 +3,7 @@ package shop.nuribooks.books.book.category.dto;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.entity.Category;
 
 /**
  * 카테고리 등록 응답을 나타내는 DTO 클래스.

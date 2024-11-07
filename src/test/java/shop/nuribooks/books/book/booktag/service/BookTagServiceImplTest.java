@@ -20,15 +20,15 @@ import org.mockito.MockitoAnnotations;
 
 import shop.nuribooks.books.book.TestUtils;
 import shop.nuribooks.books.book.book.dto.BookResponse;
-import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
+import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
 import shop.nuribooks.books.book.booktag.entity.BookTag;
 import shop.nuribooks.books.book.booktag.repository.BookTagRepository;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.tag.entity.Tag;
 import shop.nuribooks.books.book.tag.repository.TagRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;

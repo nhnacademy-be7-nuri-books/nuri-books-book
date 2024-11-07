@@ -4,7 +4,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.nuribooks.books.exception.address.AddressOverMaximumSizeException;
 import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
 import shop.nuribooks.books.member.address.dto.requset.AddressEditRequest;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
@@ -13,6 +12,7 @@ import shop.nuribooks.books.member.address.entity.AddressEditor;
 import shop.nuribooks.books.member.address.entity.AddressEditor.AddressEditorBuilder;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.exception.address.AddressNotFoundException;
+import shop.nuribooks.books.exception.member.UsernameNotFoundException;
 import shop.nuribooks.books.member.address.repository.AddressRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -40,6 +40,7 @@ public class AddressServiceImpl implements AddressService{
 
     @Transactional(readOnly = true)
     public List<AddressResponse> findAddressesByMemberId(Long memberId) {
+        //TODO: 주소 없는 경우 예외처리
         List<Address> addressesByMemberId = addressRepository.findAllByMemberId(memberId);
         return addressesByMemberId.stream()
                 .map(AddressResponse::of)

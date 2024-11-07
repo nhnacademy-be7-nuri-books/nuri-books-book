@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.contributor.dto.role.ContributorRoleRequest;
 import shop.nuribooks.books.book.contributor.dto.role.ContributorRoleResponse;
-import shop.nuribooks.books.book.contributor.entitiy.ContributorRole;
+import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 import shop.nuribooks.books.book.contributor.service.role.ContributorRoleService;
 
 @RestController

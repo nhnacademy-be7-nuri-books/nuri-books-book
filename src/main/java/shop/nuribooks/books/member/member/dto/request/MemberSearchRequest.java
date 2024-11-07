@@ -27,7 +27,7 @@ public record MemberSearchRequest (
 	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	LocalDate birthdayLoe,
 
-	String userId,
+	String username,
 	BigDecimal pointGoe,
 	BigDecimal pointLoe,
 	BigDecimal totalPaymentAmountGoe,

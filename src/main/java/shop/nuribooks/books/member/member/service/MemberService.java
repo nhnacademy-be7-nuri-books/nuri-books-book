@@ -37,7 +37,7 @@ public interface MemberService {
 	/**
 	 * 회원 인증 정보 조회
 	 */
-	MemberAuthInfoResponse getMemberAuthInfo(String userId);
+	MemberAuthInfoResponse getMemberAuthInfo(String username);
 
 	/**
 	 * 회원 상세 조회
