@@ -101,12 +101,12 @@ public class Member {
 	/**
 	 * 마지막 로그인 일시
 	 */
-	private LocalDateTime latestLoginAt = null;
+	private LocalDateTime latestLoginAt;
 
 	/**
 	 * 탈퇴 일시
 	 */
-	private LocalDateTime withdrawnAt = null;
+	private LocalDateTime withdrawnAt;
 
 	/**
 	 * 마지막 로그일 날짜로부터 90일이 지나면 상태를 INACTIVE로 변경

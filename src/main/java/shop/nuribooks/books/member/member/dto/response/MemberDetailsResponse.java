@@ -29,12 +29,10 @@ public record MemberDetailsResponse(
 	LocalDate birthday,
 
 	String username,
-	String password,
 	BigDecimal point,
 	BigDecimal totalPaymentAmount,
 	AuthorityType authority,
 	Grade grade,
-	StatusType status,
 
 	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
 	LocalDateTime createdAt,

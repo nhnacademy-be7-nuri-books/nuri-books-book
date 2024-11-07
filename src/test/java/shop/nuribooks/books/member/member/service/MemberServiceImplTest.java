@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
 
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
+import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.dto.EntityMapper;
@@ -60,6 +63,16 @@ class MemberServiceImplTest {
 
 	@Mock
 	private MemberRepository memberRepository;
+
+	@BeforeEach
+	void setUp() {
+		MemberIdContext.setMemberId(1L);
+	}
+
+	@AfterEach
+	void tearDown() {
+		MemberIdContext.clear();
+	}
 
 	@DisplayName("회원 등록 성공")
 	@Test
@@ -125,16 +138,16 @@ class MemberServiceImplTest {
 	@Test
 	void withdrawMember() {
 	    //given
-		MemberWithdrawRequest request = getMemberWithdrawRequest();
+		Long memberId = MemberIdContext.getMemberId();
 
 		Customer existingCustomer = getSavedCustomer();
 		Member existingMember = spy(getSavedMember(existingCustomer));
 
-		when(memberRepository.findByUsername(request.userId())).thenReturn(Optional.of(existingMember));
-		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.password())).thenReturn(true);
+		when(memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
+		when(customerRepository.existsById(memberId)).thenReturn(true);
 
 		//when
-		memberServiceImpl.withdrawMember(request);
+		memberServiceImpl.withdrawMember(memberId);
 
 	    //then
 		verify(existingMember, times(1)).changeToWithdrawn(); // 메서드 호출 확인
@@ -142,58 +155,57 @@ class MemberServiceImplTest {
 		assertThat(existingMember.getWithdrawnAt()).isNotNull(); // withdrawnAt이 현재 시간으로 설정되었는지 확인
 	}
 
-	@DisplayName("회원 탈퇴 실패 - 존재하지 않는 아이디")
+	@DisplayName("회원 탈퇴 실패 - 존재하지 않는 회원")
 	@Test
 	void withdrawMember_UsernameNotFound() {
 	    //given
-		MemberWithdrawRequest request = getMemberWithdrawRequest();
+		Long memberId = MemberIdContext.getMemberId();
 
-		when(memberRepository.findByUsername(request.userId())).thenReturn(Optional.empty());
+		when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
 	    //when / then
-		UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
-			() -> memberServiceImpl.withdrawMember(request));
-		assertThat(exception.getMessage()).isEqualTo("존재하지 않는 아이디입니다.");
+		MemberNotFoundException exception = assertThrows(MemberNotFoundException.class,
+			() -> memberServiceImpl.withdrawMember(memberId));
+		assertThat(exception.getMessage()).isEqualTo("존재하지 않는 회원입니다.");
 	}
 
 	@DisplayName("회원 탈퇴 실패 - 비밀번호 불일치")
 	@Test
 	void withdrawMember_InvalidPassword() {
 		//given
-		MemberWithdrawRequest request = getMemberWithdrawRequest();
+		Long memberId = MemberIdContext.getMemberId();
 
 		Customer existingCustomer = getSavedCustomer();
 		Member existingMember = getSavedMember(existingCustomer);
 
-		when(memberRepository.findByUsername(request.userId())).thenReturn(Optional.of(existingMember));
-		when(customerRepository.existsByIdAndPassword(existingMember.getId(), request.password()))
-			.thenReturn(false);
+		when(memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
+		when(customerRepository.existsById(memberId)).thenReturn(false);
 
 		//when / then
-		InvalidPasswordException exception = assertThrows(InvalidPasswordException.class,
-			() -> memberServiceImpl.withdrawMember(request));
-		assertThat(exception.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
+		CustomerNotFoundException exception = assertThrows(CustomerNotFoundException.class,
+			() -> memberServiceImpl.withdrawMember(memberId));
+		assertThat(exception.getMessage()).isEqualTo("고객이 존재하지 않습니다.");
 	}
 
 	@DisplayName("회원 정보 수정 성공")
 	@Test
 	void updateMember() {
 	    //given
+		Long memberId = MemberIdContext.getMemberId();
 		MemberUpdateRequest request = getMemberUpdateRequest();
 		Customer existingCustomer = spy(getSavedCustomer());
 		Member existingMember = getSavedMember(existingCustomer);
 
-		when(memberRepository.findByUsername(existingMember.getUsername())).thenReturn(Optional.of(existingMember));
-		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.of(existingCustomer));
+		when(customerRepository.findById(memberId)).thenReturn(Optional.of(existingCustomer));
 
 	    //when
-		MemberUpdateResponse response = memberServiceImpl.updateMember(existingMember.getUsername(), request);
+		memberServiceImpl.updateMember(memberId, request);
 
 	    //then
 		verify(existingCustomer, times(1))
-			.changeCustomerInformation(request.name(), request.password(), request.phoneNumber());
-		assertThat(response.name()).isEqualTo(existingCustomer.getName());
-		assertThat(response.phoneNumber()).isEqualTo(existingCustomer.getPhoneNumber());
+			.changeCustomerInformation(request.name(), request.password());
+		assertThat(existingCustomer.getName()).isEqualTo(request.name());
+		assertThat(existingCustomer.getPassword()).isEqualTo(request.password());
 	}
 
 	@DisplayName("회원 정보 수정 실패 - 존재하지 않는 회원")
@@ -230,9 +242,9 @@ class MemberServiceImplTest {
 		assertThat(exception.getMessage()).isEqualTo("존재하지 않는 고객입니다.");
 	}
 
-	@DisplayName("회원 이름, 비밀번호, 권한 조회 성공")
+	@DisplayName("회원 PK id, username, 비밀번호, 권한 조회 성공")
 	@Test
-	void getMemberAuthInfo() {
+	void getMemberAuthInfoByUsername() {
 	    //given
 		Customer savedCustomer = getSavedCustomer();
 		Member savedMember = getSavedMember(savedCustomer);
@@ -241,15 +253,16 @@ class MemberServiceImplTest {
 		when(customerRepository.findById(savedMember.getId())).thenReturn(Optional.of(savedCustomer));
 
 	    //when
-		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(savedMember.getUsername());
+		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfoByUsername(savedMember.getUsername());
 
 		//then
+		assertThat(response.customerId()).isEqualTo(savedCustomer.getId());
 		assertThat(response.username()).isEqualTo(savedMember.getUsername());
 		assertThat(response.password()).isEqualTo(savedCustomer.getPassword());
 		assertThat(response.role()).isEqualTo("ROLE_" + savedMember.getAuthority().name());
 	}
 
-	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 회원이 존재하지 않을 때")
+	@DisplayName("회원 PK id, username, 비밀번호, 권한 조회 실패 - 회원이 존재하지 않을 때")
 	@Test
 	void getMember_AuthInfo_UsernameNotFound() {
 		//given
@@ -258,16 +271,17 @@ class MemberServiceImplTest {
 		when(memberRepository.findByUsername(requestUsername)).thenReturn(Optional.empty());
 
 		//when
-		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(requestUsername);
+		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfoByUsername(requestUsername);
 
 		//then
 		assertNotNull(response);
+		assertNull(response.customerId());
 		assertNull(response.username());
 		assertNull(response.password());
 		assertNull(response.role());
 	}
 
-	@DisplayName("회원 이름, 비밀번호, 권한 조회 실패 - 고객이 존재하지 않을 때")
+	@DisplayName("회원 PK id, username, 비밀번호, 권한 조회 실패 - 고객이 존재하지 않을 때")
 	@Test
 	void getMember_AuthInfo_CustomerNotFound() {
 		//given
@@ -279,10 +293,11 @@ class MemberServiceImplTest {
 		when(customerRepository.findById(existingMember.getId())).thenReturn(Optional.empty());
 
 		//when
-		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfo(requestUserid);
+		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfoByUsername(requestUserid);
 
 		//then
 		assertNotNull(response);
+		assertNull(response.customerId());
 		assertNull(response.username());
 		assertNull(response.password());
 		assertNull(response.role());
@@ -416,17 +431,6 @@ class MemberServiceImplTest {
 		return MemberUpdateRequest.builder()
 			.name("수정된 이름")
 			.password("수정된 비밀번호")
-			.phoneNumber("010-0000-000")
-			.build();
-	}
-
-	/**
-	 * 테스트를 위한 MemberWithdrawRequest 생성
-	 */
-	private MemberWithdrawRequest getMemberWithdrawRequest() {
-		return MemberWithdrawRequest.builder()
-			.userId("nuribooks95")
-			.password("abc123")
 			.build();
 	}
 

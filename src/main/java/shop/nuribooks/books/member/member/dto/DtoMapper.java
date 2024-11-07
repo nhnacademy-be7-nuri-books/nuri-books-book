@@ -39,7 +39,7 @@ public class DtoMapper {
 	/**
 	 * 모든 필드가 null인 MemberAuthInfoResponse를 반환
 	 */
-	public static MemberAuthInfoResponse toNullDto() {
+	public static MemberAuthInfoResponse toNullAuthInfoDto() {
 		return MemberAuthInfoResponse.builder().build();
 	}
 
@@ -48,6 +48,7 @@ public class DtoMapper {
 	 */
 	public static MemberAuthInfoResponse toAuthInfoDto(Customer customer, Member member) {
 		return MemberAuthInfoResponse.builder()
+			.customerId(customer.getId())
 			.username(member.getUsername())
 			.password(customer.getPassword())
 			.role("ROLE_" + member.getAuthority().name())
@@ -65,15 +66,12 @@ public class DtoMapper {
 			.email(customer.getEmail())
 			.birthday(member.getBirthday())
 			.username(member.getUsername())
-			.password(customer.getPassword())
 			.point(member.getPoint())
 			.totalPaymentAmount(member.getTotalPaymentAmount())
 			.authority(member.getAuthority())
 			.grade(member.getGrade())
-			.status(member.getStatus())
 			.createdAt(member.getCreatedAt())
 			.latestLoginAt(member.getLatestLoginAt())
 			.build();
-
 	}
 }

@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.annotation.PostConstruct;
+import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.member.dto.request.MemberDetailsRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
@@ -48,9 +51,22 @@ class MemberControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@Autowired
+	MemberIdContext memberIdContext;
+
 	@PostConstruct
 	public void init() {
 		objectMapper.registerModule(new JavaTimeModule());
+	}
+
+	@BeforeEach
+	public void setUp() {
+		MemberIdContext.setMemberId(1L);
+	}
+
+	@AfterEach
+	void tearDown() {
+		MemberIdContext.clear();
 	}
 
 	@DisplayName("회원 등록 성공")
@@ -106,20 +122,21 @@ class MemberControllerTest {
 				.value(Matchers.containsString("생일은 반드시 입력해야 합니다.")));
 	}
 
-	@DisplayName("아이디로 회원 이름, 비밀번호, 권한 조회 성공")
+	@DisplayName("username으로 회원 PK id, username, 비밀번호, 권한 조회 성공")
 	@Test
 	void getMemberAuthInfo() throws Exception {
 		//given
 		MemberAuthInfoResponse response = getGetMemberAuthInfoResponse();
 		String requestUsername = "nuribooks";
 
-		when(memberService.getMemberAuthInfo(requestUsername)).thenReturn(response);
+		when(memberService.getMemberAuthInfoByUsername(requestUsername)).thenReturn(response);
 
 		//when
 		ResultActions result = mockMvc.perform(get("/api/member/{username}", requestUsername));
 
 		//then
 		result.andExpect(status().isOk())
+			.andExpect(jsonPath("customerId").value(response.customerId()))
 			.andExpect(jsonPath("username").value(response.username()))
 			.andExpect(jsonPath("password").value(response.password()))
 			.andExpect(jsonPath("role").value(response.role()));
@@ -129,15 +146,13 @@ class MemberControllerTest {
 	@Test
 	void getMemberDetails() throws Exception {
 		//given
-		MemberDetailsRequest request = getMemberDetailsRequest();
+		Long memberId = MemberIdContext.getMemberId();
 		MemberDetailsResponse response = getMemberDetailsResponse();
 
-		when(memberService.getMemberDetails(request)).thenReturn(response);
+		when(memberService.getMemberDetails(memberId)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(get("/api/member")
-			.contentType(APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(request)));
+		ResultActions result = mockMvc.perform(get("/api/member/me"));
 
 		//then
 		result.andExpect(status().isOk())
@@ -147,7 +162,6 @@ class MemberControllerTest {
 			.andExpect(jsonPath("email").value(response.email()))
 			.andExpect(jsonPath("birthday").value(response.birthday().toString()))
 			.andExpect(jsonPath("username").value(response.username()))
-			.andExpect(jsonPath("password").value(response.password()))
 			.andExpect(jsonPath("point").value(response.point()))
 			.andExpect(jsonPath("totalPaymentAmount").value(response.totalPaymentAmount()))
 			.andExpect(jsonPath("authority").value(response.authority().name()))
@@ -155,7 +169,6 @@ class MemberControllerTest {
 			.andExpect(jsonPath("grade.name").value(response.grade().getName()))
 			.andExpect(jsonPath("grade.pointRate").value(response.grade().getPointRate()))
 			.andExpect(jsonPath("grade.requirement").value(response.grade().getRequirement()))
-			.andExpect(jsonPath("status").value(response.status().name()))
 			.andExpect(jsonPath("createdAt").value(response.createdAt().toString()))
 			.andExpect(jsonPath("latestLoginAt").value(response.latestLoginAt().toString()));
 	}
@@ -168,7 +181,7 @@ class MemberControllerTest {
 		doNothing().when(memberService).withdrawMember(any(MemberWithdrawRequest.class));
 
 		//when
-		ResultActions result = mockMvc.perform(delete("/api/member")
+		ResultActions result = mockMvc.perform(delete("/api/member/me")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -273,6 +286,7 @@ class MemberControllerTest {
 	 */
 	private MemberAuthInfoResponse getGetMemberAuthInfoResponse() {
 		return MemberAuthInfoResponse.builder()
+			.customerId(1L)
 			.username("nuribooks")
 			.password("abc123")
 			.role("ROLE_MEMBER")
@@ -300,12 +314,10 @@ class MemberControllerTest {
 			.email("boho@nhnacademy.com")
 			.birthday(LocalDate.of(2000, 2, 22))
 			.username("nuribooks")
-			.password("abc123")
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
 			.authority(AuthorityType.MEMBER)
 			.grade(getStandardGrade())
-			.status(StatusType.ACTIVE)
 			.createdAt(LocalDateTime.of(2020, 2, 22, 22, 22 ,22))
 			.latestLoginAt(LocalDateTime.of(2022,2,22,22,22,22))
 			.build();
@@ -340,7 +352,6 @@ class MemberControllerTest {
 		return MemberUpdateRequest.builder()
 			.name("수정하고 싶은 이름")
 			.password("수정하고 싶은 비밀번호")
-			.phoneNumber("010-0000-0000")
 			.build();
 	}
 
@@ -361,7 +372,6 @@ class MemberControllerTest {
 		return MemberUpdateRequest.builder()
 			.name("   ")
 			.password("   ")
-			.phoneNumber(null)
 			.build();
 	}
 
