@@ -11,6 +11,9 @@ import shop.nuribooks.books.book.contributor.entity.QContributorRole;
 
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 @RequiredArgsConstructor
 public class BookContributorRepositoryImpl implements BookContributorCustomRepository{
     private final JPAQueryFactory queryFactory;
@@ -36,11 +39,12 @@ public class BookContributorRepositoryImpl implements BookContributorCustomRepos
                         contributor.id,
                         contributor.name,
                         contributorRole.id,
-                        contributorRole.name))
-                .from(bookContributor)
-                .join(bookContributor.contributor, contributor)
-                .join(bookContributor.contributorRole, contributorRole)
-                .where(bookContributor.book.id.eq(bookId))
-                .fetch();
+                        contributorRole.name.stringValue()
+            ))
+            .from(bookContributor)
+            .join(bookContributor.contributor, contributor)
+            .join(bookContributor.contributorRole, contributorRole)
+            .where(bookContributor.book.id.eq(bookId))
+            .fetch();
     }
 }
