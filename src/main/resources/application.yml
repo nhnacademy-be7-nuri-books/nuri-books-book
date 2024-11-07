@@ -1,9 +1,27 @@
 spring:
   application:
     name: books
-  #    기본 profile local. profile을 설정하면 설정 값으로 바뀜.
   profiles:
     active: local
+
+  cache:
+    type: none
+
+  #cloud:
+  #  openfeign:
+  #    client:
+  #      config:
+  #        aladinClient:
+  #          connect-timeout: 5000
+  #          read-timeout: 5000
+  #          logger-level: basic
+
+  data:
+    redis:
+      host: 133.186.241.167
+      port: 6379
+      password: "*N2vya7H@muDTwdNMR!"
+      database: 140
 
 server:
   port: 8083
@@ -17,3 +35,7 @@ eureka:
       #,http://admin:1234@localhost:8762/eureka
   instance:
     prefer-ip-address: false
+
+aladin:
+  api:
+    key: ttbljb06271100001

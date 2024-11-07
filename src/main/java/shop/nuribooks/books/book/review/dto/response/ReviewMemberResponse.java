@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.review.dto.response;
 
+import java.util.List;
+
 import lombok.Builder;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.member.member.dto.response.MemberBriefResponse;
@@ -18,15 +20,17 @@ public record ReviewMemberResponse(
 	String title,
 	String content,
 	int score,
-	MemberBriefResponse member
+	MemberBriefResponse member,
+	List<ReviewImageResponse> reviewImages
 ) {
 	public static ReviewMemberResponse of(Review review) {
-		return ReviewMemberResponse.builder()
+		ReviewMemberResponse response = ReviewMemberResponse.builder()
 			.id(review.getId())
 			.title(review.getTitle())
 			.content(review.getContent())
 			.score(review.getScore())
 			.member(MemberBriefResponse.of(review.getMember()))
 			.build();
+		return response;
 	}
 }

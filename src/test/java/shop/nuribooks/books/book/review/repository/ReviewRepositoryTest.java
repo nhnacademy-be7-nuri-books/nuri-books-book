@@ -1,102 +1,95 @@
-// package shop.nuribooks.books.book.review.repository;
-//
-// import static java.math.BigDecimal.*;
-// import static shop.nuribooks.books.member.member.entity.AuthorityEnum.*;
-//
-// import java.math.BigDecimal;
-// import java.time.LocalDate;
-// import java.time.LocalDateTime;
-//
-// import org.junit.jupiter.api.Test;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-//
-// import shop.nuribooks.books.book.book.entitiy.Book;
-// import shop.nuribooks.books.book.book.repository.BookRepository;
-// import shop.nuribooks.books.book.review.entity.Review;
-// import shop.nuribooks.books.book.review.entity.ReviewImage;
-// import shop.nuribooks.books.member.customer.entity.Customer;
-// import shop.nuribooks.books.member.customer.repository.CustomerRepository;
-// import shop.nuribooks.books.member.grade.entity.Grade;
-// import shop.nuribooks.books.member.grade.repository.GradeRepository;
-// import shop.nuribooks.books.member.member.entity.Member;
-// import shop.nuribooks.books.member.member.entity.StatusEnum;
-// import shop.nuribooks.books.member.member.repository.MemberRepository;
-//
-// @DataJpaTest
-// public class ReviewRepositoryTest {
-// 	@Autowired
-// 	private CustomerRepository customerRepository;
-//
-// 	@Autowired
-// 	private MemberRepository memberRepository;
-//
-// 	@Autowired
-// 	private GradeRepository gradeRepository;
-//
-// 	@Autowired
-// 	private BookRepository bookRepository;
-//
-// 	@Autowired
-// 	private ReviewRepository reviewRepository;
-//
-// 	@Test
-// 	void createReviewTest() {
-// 		Customer customer = this.createCustomer();
-// 		Grade grade = this.creategrade();
-// 		Member member = this.createMember(customer, grade);
-// 	}
-//
-// 	private Review createReview(Member member, Book book) {
-// 		return Review.builder()
-// 			.title("제목")
-// 			.content("내용")
-// 			.score(5)
-// 			.member(member)
-// 			.book(book)
-// 			.build();
-// 	}
-//
-// 	private ReviewImage createReviewImage(Review review) {
-// 		return ReviewImage.builder()
-// 			.imageUrl("hihihi")
-// 			.review(review)
-// 			.build();
-// 	}
-//
-// 	private Member createMember(Customer customer, Grade grade) {
-// 		Member member = Member.builder()
-// 			.customer(customer)
-// 			.authority(MEMBER)
-// 			.grade(grade)
-// 			.userId("nuriaaaaaa")
-// 			.status(StatusEnum.ACTIVE)
-// 			.birthday(LocalDate.of(1988, 8, 12))
-// 			.createdAt(LocalDateTime.now())
-// 			.point(ZERO)
-// 			.totalPaymentAmount(ZERO)
-// 			.latestLoginAt(null)
-// 			.withdrawnAt(null)
-// 			.build();
-// 		return memberRepository.save(member);
-// 	}
-//
-// 	private Customer createCustomer() {
-// 		Customer customer = Customer.builder()
-// 			.name("name")
-// 			.password("password")
-// 			.phoneNumber("042-8282-8282")
-// 			.email("nhnacademy@nuriBooks.com")
-// 			.build();
-// 		return customerRepository.save(customer);
-// 	}
-//
-// 	private Grade creategrade() {
-// 		Grade grade = Grade.builder()
-// 			.name("STANDARD")
-// 			.pointRate(3)
-// 			.requirement(BigDecimal.valueOf(100_000))
-// 			.build();
-// 		return gradeRepository.save(grade);
-// 	}
-// }
+package shop.nuribooks.books.book.review.repository;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
+import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
+import shop.nuribooks.books.book.review.entity.Review;
+import shop.nuribooks.books.common.TestUtils;
+import shop.nuribooks.books.common.config.QuerydslConfiguration;
+import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.grade.entity.Grade;
+import shop.nuribooks.books.member.grade.repository.GradeRepository;
+import shop.nuribooks.books.member.member.entity.Member;
+import shop.nuribooks.books.member.member.repository.MemberRepository;
+
+@DataJpaTest
+@Import({QuerydslConfiguration.class})
+public class ReviewRepositoryTest {
+	@Autowired
+	private MemberRepository memberRepository;
+
+	@Autowired
+	private BookRepository bookRepository;
+
+	@Autowired
+	private ReviewRepository reviewRepository;
+	@Autowired
+	private PublisherRepository publisherRepository;
+	@Autowired
+	private GradeRepository gradeRepository;
+
+	private Member member;
+	private Book book;
+	private List<Review> reviews = new LinkedList<>();
+
+	@BeforeEach
+	void setUp() {
+		Customer customer = TestUtils.createCustomer();
+		Grade grade = TestUtils.creategrade();
+		gradeRepository.save(grade);
+		member = TestUtils.createMember(customer, grade);
+		memberRepository.save(member);
+
+		Publisher publisher = TestUtils.createPublisher();
+		publisherRepository.save(publisher);
+
+		book = TestUtils.createBook(publisher);
+		bookRepository.save(book);
+		Book book2 = TestUtils.createBook(publisher);
+		bookRepository.save(book2);
+
+		reviews.add(TestUtils.createReview(member, book));
+		reviews.add(TestUtils.createReview(member, book2));
+		Review updatedReview = TestUtils.createReview(member, book2);
+		ReflectionTestUtils.setField(updatedReview, "updateAt", LocalDateTime.now());
+		reviews.add(updatedReview);
+		for (Review review : reviews) {
+			reviewRepository.save(review);
+		}
+		reviews.removeLast();
+	}
+
+	@Test
+	void getReviewWithBookIdTest() {
+		List<ReviewMemberResponse> response = reviewRepository.findReviewsByBookId(book.getId());
+		assertEquals(response.size(), 1);
+	}
+
+	@Test
+	void getScoreWithBookIdTest() {
+		double response = reviewRepository.findScoreByBookId(book.getId());
+		assertEquals(response, reviews.get(0).getScore());
+	}
+
+	@Test
+	void getReviewWithMemberIdTest() {
+		List<ReviewBookResponse> response = reviewRepository.findReviewsByMemberId(member.getId());
+		assertEquals(response.size(), reviews.size());
+	}
+}

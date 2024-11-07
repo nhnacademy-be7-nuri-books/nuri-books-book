@@ -17,10 +17,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.querydsl.jpa.impl.JPAQuery;
 import shop.nuribooks.books.book.TestUtils;
-import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
+import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.booktag.entity.QBookTag;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.tag.entity.QTag;
 import shop.nuribooks.books.book.tag.entity.Tag;
 

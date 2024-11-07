@@ -19,8 +19,8 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
+import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.member.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
 import shop.nuribooks.books.member.cart.entity.Cart;

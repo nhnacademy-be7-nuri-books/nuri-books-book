@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.dto.ContributorResponse;
-import shop.nuribooks.books.book.contributor.entitiy.Contributor;
+import shop.nuribooks.books.book.contributor.entity.Contributor;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.exception.contributor.ContributorNotFoundException;
 
