@@ -76,7 +76,7 @@ public class ReviewServiceTest {
 		);
 
 		member = Member.builder()
-			.userId("nuribooks95")
+			.username("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.build();
 		ReflectionTestUtils.setField(member, "id", 1L);

@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Builder;
-import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.StatusType;
@@ -26,7 +25,7 @@ public record MemberSearchResponse (
 	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	LocalDate birthday,
 
-	String userId,
+	String username,
 	BigDecimal point,
 	BigDecimal totalPaymentAmount,
 	AuthorityType authority,

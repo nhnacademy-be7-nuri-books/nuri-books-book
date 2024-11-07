@@ -48,6 +48,14 @@ public class CartController {
 		return ResponseEntity.status(CREATED).body(response);
 	}
 
+	/**
+	 * 장바구니 조회 <br>
+	 * PathVariable로 memberId를 담아서 요청
+	 */
+	@Operation(summary = "장바구니 조회", description = "회원의 id로 장바구니를 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "장바구니 조회 성공")
+	})
 	@GetMapping("/{memberId}")
 	public ResponseEntity<List<CartListResponse>> getCartList(@PathVariable Long memberId) {
 		List<CartListResponse> response = cartService.getCartList(memberId);

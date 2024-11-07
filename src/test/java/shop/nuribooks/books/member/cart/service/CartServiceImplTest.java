@@ -165,7 +165,7 @@ class CartServiceImplTest {
 			.grade(null)
 			.status(StatusType.ACTIVE)
 			.gender(GenderType.MALE)
-			.userId("nuribooks95")
+			.username("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)

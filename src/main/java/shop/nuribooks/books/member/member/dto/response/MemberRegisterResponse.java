@@ -14,7 +14,7 @@ public record MemberRegisterResponse (
 
 	String name,
 	GenderType gender,
-	String userId,
+	String username,
 	String phoneNumber,
 	String email,
 

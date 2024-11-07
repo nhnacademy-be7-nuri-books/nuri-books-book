@@ -5,7 +5,7 @@ import lombok.Builder;
 @Builder
 public record MemberAuthInfoResponse(
 
-	String username, // -> userId
+	String username,
 	String password,
 	String role // "ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SELLER"
 ) {}

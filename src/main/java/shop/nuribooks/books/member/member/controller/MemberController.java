@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,8 @@ import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
+import shop.nuribooks.books.member.member.entity.GenderType;
+import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.service.MemberService;
 
 /**
@@ -44,8 +47,8 @@ public class MemberController {
 	/**
 	 * 회원등록 <br>
 	 * MemberCreateReq의 모든 필드 즉, <br>
-	 * name, userId, password, phoneNumber, email, birthday에 대해서 검증 후 회원가입 진행
-	 * 등록에 성공하면 name, userId, phoneNumber, email, birthday를 <br>
+	 * name, username, password, phoneNumber, email, birthday에 대해서 검증 후 회원가입 진행
+	 * 등록에 성공하면 name, username, phoneNumber, email, birthday를 <br>
 	 * MemberRegisterResponse에 담아서 반환
 	 */
 	@Operation(summary = "신규 회원 등록", description = "신규 회원을 등록합니다.")
@@ -65,7 +68,7 @@ public class MemberController {
 
 	/**
 	 * 아이디로 회원의 이름과 비밀번호, 권한을 조회 <br>
-	 * pathVariable로 입력된 userId 길이 검사 후 회원 확인 진행 <br>
+	 * pathVariable로 입력된 username 길이 검사 후 회원 확인 진행 <br>
 	 * 회원이 존재하면 이름, 비밀번호, 권한을 MemberAuthInfoResponse에 담아서 반환 <br>
 	 * 회원이 존재하지 않는다면 이름, 비밀번호, 권한이 모두 null인 MemberAuthInfoResponse를 반환
 	 */
@@ -74,9 +77,9 @@ public class MemberController {
 		@ApiResponse(responseCode = "200", description = "회원 인증 조회 성공"),
 		@ApiResponse(responseCode = "404", description = "회원이 존재하지 않음")
 	})
-	@GetMapping("/{userId}")
-	public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfo(@PathVariable String userId) {
-		MemberAuthInfoResponse response = memberService.getMemberAuthInfo(userId);
+	@GetMapping("/{username}")
+	public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfo(@PathVariable String username) {
+		MemberAuthInfoResponse response = memberService.getMemberAuthInfo(username);
 
 		return ResponseEntity.status(OK).body(response);
 	}
@@ -150,7 +153,20 @@ public class MemberController {
 	})
 	@GetMapping("/members")
 	public ResponseEntity<Page<MemberSearchResponse>> memberSearchWithPaging(
-		@RequestBody MemberSearchRequest request, Pageable pageable) {
+		@RequestParam(value = "name", required = false) String name,
+		@RequestParam(value = "email", required = false) String email,
+		@RequestParam(value = "phoneNumber", required = false) String phoneNumber,
+		@RequestParam(value = "gender", required = false) String gender,
+		@RequestParam(value = "status", required = false) String status,
+		Pageable pageable) {
+
+		MemberSearchRequest request = MemberSearchRequest.builder()
+			.name(name)
+			.email(email)
+			.phoneNumber(phoneNumber)
+			.gender(GenderType.fromValue(gender))
+			.status(StatusType.fromValue(status))
+			.build();
 
 		Page<MemberSearchResponse> response = memberService.searchMembersWithPaing(request, pageable);
 

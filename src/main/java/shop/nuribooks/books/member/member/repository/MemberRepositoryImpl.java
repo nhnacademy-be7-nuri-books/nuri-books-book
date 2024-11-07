@@ -52,7 +52,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 				customer.phoneNumber,
 				customer.email,
 				member.birthday,
-				member.userId,
+				member.username,
 				member.point,
 				member.totalPaymentAmount,
 				member.authority,
@@ -70,13 +70,13 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 				emailContains(request.email()),
 				birthdayGoe(request.birthdayGoe()),
 				birthdayLoe(request.birthdayLoe()),
-				userIdContains(request.userId()),
+				usernameContains(request.username()),
 				pointGoe(request.pointGoe()),
 				pointLoe(request.pointLoe()),
 				totalPaymentAmountGoe(request.totalPaymentAmountGoe()),
 				totalPaymentAmountLoe(request.totalPaymentAmountLoe()),
 				authorityEquals(request.authority()),
-				gradeNameContains(request.gradeName().toUpperCase()),
+				gradeNameContains(request.gradeName()),
 				statusEquals(request.status()),
 				createdAtGoe(request.createdAtGoe()),
 				createdAtLoe(request.createdAtLoe()),
@@ -98,7 +98,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 				emailContains(request.email()),
 				birthdayGoe(request.birthdayGoe()),
 				birthdayLoe(request.birthdayLoe()),
-				userIdContains(request.userId()),
+				usernameContains(request.username()),
 				pointGoe(request.pointGoe()),
 				pointLoe(request.pointLoe()),
 				totalPaymentAmountGoe(request.totalPaymentAmountGoe()),
@@ -141,8 +141,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 		return birthdayLoe != null	? member.birthday.loe(birthdayLoe) : null;
 	}
 
-	private BooleanExpression userIdContains(String userId) {
-		return hasText(userId) ? member.userId.contains(userId) : null;
+	private BooleanExpression usernameContains(String username) {
+		return hasText(username) ? member.username.contains(username) : null;
 	}
 
 	private BooleanExpression pointGoe(BigDecimal pointGoe) {
@@ -166,7 +166,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 	}
 
 	private BooleanExpression gradeNameContains(String gradeName) {
-		return hasText(gradeName) ? grade.name.contains(gradeName) : null;
+		return hasText(gradeName) ? grade.name.contains(gradeName.toUpperCase()) : null;
 	}
 
 	private BooleanExpression statusEquals(StatusType status) {

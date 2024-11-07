@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.entity.BookStateEnum;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.entity.ReviewImage;
 import shop.nuribooks.books.member.customer.entity.Customer;
@@ -45,7 +45,7 @@ public class TestUtils {
 			.customer(customer)
 			.authority(MEMBER)
 			.grade(grade)
-			.userId("nuriaaaaaa")
+			.username("nuriaaaaaa")
 			.status(StatusType.ACTIVE)
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())

@@ -75,7 +75,8 @@ public class Member {
 
 	@NotBlank
 	@Size(min = 8, max = 20)
-	private String userId;
+	@Column(unique = true)
+	private String username;
 
 	private LocalDate birthday;
 
@@ -115,7 +116,7 @@ public class Member {
 	}
 
 	/**
-	 * 회원 탈퇴 후 1년이 지나면 userId, status, withdrawnAt을 제외한 나머지 필드 soft delete
+	 * 회원 탈퇴 후 1년이 지나면 username, status, withdrawnAt을 제외한 나머지 필드 soft delete
 	 */
 	public void changeToSoftDeleted() {
 		this.authority = null;

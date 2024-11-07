@@ -71,7 +71,7 @@ class MemberControllerTest {
 		result.andExpect(status().isCreated())
 			.andExpect(jsonPath("name").value(response.name()))
 			.andExpect(jsonPath("gender").value(response.gender().name()))
-			.andExpect(jsonPath("userId").value(response.userId()))
+			.andExpect(jsonPath("username").value(response.username()))
 			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
 			.andExpect(jsonPath("email").value(response.email()))
 			.andExpect(jsonPath("birthday").value(response.birthday().toString()));
@@ -111,12 +111,12 @@ class MemberControllerTest {
 	void getMemberAuthInfo() throws Exception {
 		//given
 		MemberAuthInfoResponse response = getGetMemberAuthInfoResponse();
-		String requestUserId = "nuribooks";
+		String requestUsername = "nuribooks";
 
-		when(memberService.getMemberAuthInfo(requestUserId)).thenReturn(response);
+		when(memberService.getMemberAuthInfo(requestUsername)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(get("/api/member/{userId}", requestUserId));
+		ResultActions result = mockMvc.perform(get("/api/member/{username}", requestUsername));
 
 		//then
 		result.andExpect(status().isOk())
@@ -146,7 +146,7 @@ class MemberControllerTest {
 			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
 			.andExpect(jsonPath("email").value(response.email()))
 			.andExpect(jsonPath("birthday").value(response.birthday().toString()))
-			.andExpect(jsonPath("userId").value(response.userId()))
+			.andExpect(jsonPath("username").value(response.username()))
 			.andExpect(jsonPath("password").value(response.password()))
 			.andExpect(jsonPath("point").value(response.point()))
 			.andExpect(jsonPath("totalPaymentAmount").value(response.totalPaymentAmount()))
@@ -231,7 +231,7 @@ class MemberControllerTest {
 		return MemberRegisterRequest.builder()
 			.name("boho")
 			.gender(GenderType.MALE)
-			.userId("nuribooks")
+			.username("nuribooks")
 			.password("abc123")
 			.phoneNumber("042-8282-8282")
 			.email("nhnacademy@nuriBooks.com")
@@ -246,7 +246,7 @@ class MemberControllerTest {
 		return MemberRegisterResponse.builder()
 			.name("boho")
 			.gender(GenderType.MALE)
-			.userId("nuribooks")
+			.username("nuribooks")
 			.phoneNumber("042-8282-8282")
 			.email("nhnacademy@nuriBooks.com")
 			.birthday(LocalDate.of(1988, 8, 12))
@@ -260,7 +260,7 @@ class MemberControllerTest {
 		return MemberRegisterRequest.builder()
 			.name("  ")
 			.gender(null)
-			.userId("a")
+			.username("a")
 			.password(null)
 			.phoneNumber("")
 			.email("nhnacademy")
@@ -299,7 +299,7 @@ class MemberControllerTest {
 			.phoneNumber("042-8282-8282")
 			.email("boho@nhnacademy.com")
 			.birthday(LocalDate.of(2000, 2, 22))
-			.userId("nuribooks")
+			.username("nuribooks")
 			.password("abc123")
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
