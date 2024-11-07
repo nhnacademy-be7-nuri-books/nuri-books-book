@@ -52,7 +52,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 				customer.phoneNumber,
 				customer.email,
 				member.birthday,
-				member.userId,
+				member.username,
 				member.point,
 				member.totalPaymentAmount,
 				member.authority,
@@ -142,7 +142,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 	}
 
 	private BooleanExpression userIdContains(String userId) {
-		return hasText(userId) ? member.userId.contains(userId) : null;
+		return hasText(userId) ? member.username.contains(userId) : null;
 	}
 
 	private BooleanExpression pointGoe(BigDecimal pointGoe) {
