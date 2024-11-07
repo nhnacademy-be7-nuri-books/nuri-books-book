@@ -57,7 +57,7 @@ class CategoryControllerTest {
 		// given
 		CategoryRequest dto = new CategoryRequest("여행");
 		Category category = Category.builder().name("여행").build();
-		CategoryResponse response = new CategoryResponse(category);
+		CategoryResponse response = CategoryResponse.from(category);
 		when(categoryService.registerMainCategory(any(CategoryRequest.class))).thenReturn(category);
 
 		// when & then
@@ -78,7 +78,7 @@ class CategoryControllerTest {
 		CategoryRequest dto = new CategoryRequest("국내 여행");
 		Category parentCategory = Category.builder().name("여행").build();
 		Category subCategory = Category.builder().name("국내 여행").parentCategory(parentCategory).build();
-		CategoryResponse response = new CategoryResponse(subCategory);
+		CategoryResponse response = CategoryResponse.from(subCategory);
 		when(categoryService.registerSubCategory(any(CategoryRequest.class), eq(parentCategoryId))).thenReturn(
 			subCategory);
 
@@ -153,8 +153,8 @@ class CategoryControllerTest {
 	void getAllCategories_whenCalled_thenReturnsOk() throws Exception {
 		// given
 		List<CategoryResponse> categories = List.of(
-			new CategoryResponse(Category.builder().name("여행").build()),
-			new CategoryResponse(Category.builder().name("국내 여행").build())
+			CategoryResponse.from(Category.builder().name("여행").build()),
+			CategoryResponse.from(Category.builder().name("국내 여행").build())
 		);
 		when(categoryService.getAllCategory()).thenReturn(categories);
 
@@ -175,7 +175,7 @@ class CategoryControllerTest {
 		// given
 		Long categoryId = 1L;
 		Category category = Category.builder().name("여행").build();
-		CategoryResponse response = new CategoryResponse(category);
+		CategoryResponse response = CategoryResponse.from(category);
 		when(categoryService.getCategoryById(categoryId)).thenReturn(response);
 
 		// when & then
@@ -210,7 +210,7 @@ class CategoryControllerTest {
 		// given
 		Long categoryId = 1L;
 		CategoryRequest dto = new CategoryRequest("여행 업데이트");
-		CategoryResponse response = new CategoryResponse(Category.builder().name("여행 업데이트").build());
+		CategoryResponse response = CategoryResponse.from(Category.builder().name("여행 업데이트").build());
 		when(categoryService.updateCategory(any(CategoryRequest.class), eq(categoryId))).thenReturn(response);
 
 		// when & then

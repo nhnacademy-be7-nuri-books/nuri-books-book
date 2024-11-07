@@ -93,7 +93,7 @@ public class CategoryServiceImpl implements CategoryService {
 		List<Category> categoryList = categoryRepository.findAllByParentCategoryIsNull();
 		List<CategoryResponse> categoryResponseList = new ArrayList<>();
 		for (Category category : categoryList) {
-			categoryResponseList.add(new CategoryResponse(category));
+			categoryResponseList.add(CategoryResponse.from(category));
 		}
 		return categoryResponseList;
 	}
@@ -110,7 +110,7 @@ public class CategoryServiceImpl implements CategoryService {
 	public CategoryResponse getCategoryById(Long categoryId) {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
-		return new CategoryResponse(category);
+		return CategoryResponse.from(category);
 	}
 
 	/**
@@ -144,7 +144,7 @@ public class CategoryServiceImpl implements CategoryService {
 		CategoryEditor categoryEditor = getCategoryEditor(categoryRequest, category);
 		category.edit(categoryEditor);
 
-		return new CategoryResponse(categoryRepository.save(category));
+		return CategoryResponse.from(categoryRepository.save(category));
 	}
 
 	/**
