@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,8 +65,7 @@ class CategoryControllerTest {
 		mockMvc.perform(post("/api/categories")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.name").value("여행"));
+			.andExpect(status().isCreated());
 	}
 
 	/**
@@ -86,8 +86,7 @@ class CategoryControllerTest {
 		mockMvc.perform(post("/api/categories/{categoryId}", parentCategoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.name").value("국내 여행"));
+			.andExpect(status().isCreated());
 	}
 
 	/**
@@ -214,30 +213,31 @@ class CategoryControllerTest {
 		when(categoryService.updateCategory(any(CategoryRequest.class), eq(categoryId))).thenReturn(response);
 
 		// when & then
-		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
+		mockMvc.perform(patch("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.name").value("여행 업데이트"));
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.message").value("카테고리가 성공적으로 수정되었습니다."));
 	}
 
 	/**
 	 * 유효하지 않은 ID로 카테고리를 업데이트할 때, HTTP 상태 코드 404(Not Found)를 반환하는지 테스트합니다.
 	 */
 	@Test
-	void updateCategory_whenInvalidId_thenReturnsNotFound() throws Exception {
+	@DisplayName("존재하지 않는 카테고리를 업데이트할 때, HTTP 상태 코드 404(Not Found)를 반환하는지 테스트합니다.")
+	void updateCategory_whenCategoryNotFound_thenReturnsNotFound() throws Exception {
 		// given
-		Long categoryId = 999L;
-		CategoryRequest dto = new CategoryRequest("여행 업데이트");
-		doThrow(new CategoryNotFoundException("Category not found with ID: " + categoryId)).when(categoryService)
-			.updateCategory(any(CategoryRequest.class), eq(categoryId));
+		Long categoryId = 1L;
+		CategoryRequest dto = new CategoryRequest("여행 수정");
+		doThrow(new CategoryNotFoundException("카테고리를 찾을 수 없습니다.")).when(categoryService)
+			.updateCategory(any(CategoryRequest.class), any(Long.class));
 
 		// when & then
-		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
+		mockMvc.perform(patch("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
 			.andExpect(status().isNotFound())
-			.andExpect(jsonPath("$.message").value("Category not found with ID: " + categoryId));
+			.andExpect(jsonPath("$.message").value("카테고리를 찾을 수 없습니다."));
 	}
 
 	/**
@@ -250,10 +250,11 @@ class CategoryControllerTest {
 		CategoryRequest dto = new CategoryRequest(""); // 빈 이름으로 잘못된 요청
 
 		// when & then
-		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
+		mockMvc.perform(patch("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
-			.andExpect(status().isBadRequest());
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("카테고리 이름은 필수입니다."));
 	}
 
 	/**
@@ -270,8 +271,7 @@ class CategoryControllerTest {
 		// when & then
 		mockMvc.perform(delete("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.message").value("카테고리가 성공적으로 삭제 되었습니다."));
+			.andExpect(status().isNoContent());
 	}
 
 	/**

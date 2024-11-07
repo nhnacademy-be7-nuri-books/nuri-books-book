@@ -274,4 +274,23 @@ class CategoryServiceImplTest {
 		assertThrows(CategoryNotFoundException.class, () -> categoryService.deleteCategory(categoryId));
 	}
 
+	@Test
+	void updateCategory_ShouldUpdateCategorySuccessfully_WhenParentCategoryExists() {
+		// Given
+		Long categoryId = 1L;
+		Category parentCategory = new Category("Parent Category", null);
+		Category existingCategory = new Category("Old Category Name", parentCategory);
+		CategoryRequest dto = new CategoryRequest("Updated SubCategory Name");
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
+
+		// When
+		categoryService.updateCategory(dto, categoryId);
+
+		// Then
+		assertEquals("Updated SubCategory Name", existingCategory.getName());
+		verify(categoryRepository).findById(categoryId);
+		verify(categoryRepository, never()).save(any(Category.class));
+	}
+
 }
