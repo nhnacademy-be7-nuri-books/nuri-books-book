@@ -26,6 +26,8 @@ import shop.nuribooks.books.common.message.ResponseMessage;
 /**
  * 카테고리와 관련된 작업을 처리하는 컨트롤러.
  * 대분류와 하위 분류를 생성하는 엔드포인트를 제공합니다.
+ *
+ * @author janghyun
  */
 @RestController
 @RequestMapping("/api/categories")
@@ -43,7 +45,7 @@ public class CategoryController {
 
 	/**
 	 * 새로운 대분류를 등록합니다.
-	 * @author janghyun
+	 *
 	 * @param dto 카테고리 등록 세부 정보를 포함한 요청 본문
 	 * @return 생성된 카테고리 정보를 담은 ResponseEntity
 	 */
@@ -63,7 +65,7 @@ public class CategoryController {
 
 	/**
 	 * 기존 대분류 아래에 새로운 하위 분류를 등록합니다.
-	 * @author janghyun
+	 *
 	 * @param dto 하위 분류 등록 세부 정보를 포함한 요청 본문
 	 * @param categoryId 하위 분류가 등록될 대분류의 ID
 	 * @return 생성된 하위 분류 정보를 담은 ResponseEntity
@@ -87,7 +89,6 @@ public class CategoryController {
 	/**
 	 * 모든 카테고리를 조회합니다.
 	 *
-	 * @author janghyun
 	 * @return 모든 카테고리의 응답 리스트
 	 */
 	@Operation(summary = "모든 카테고리 조회", description = "모든 카테고리를 조회합니다.")
@@ -104,7 +105,6 @@ public class CategoryController {
 	/**
 	 * 주어진 ID에 해당하는 카테고리를 조회합니다.
 	 *
-	 * @author janghyun
 	 * @param categoryId 조회할 카테고리의 ID
 	 * @return 조회된 카테고리의 응답 객체와 그 하위 카테고리
 	 */
@@ -122,7 +122,6 @@ public class CategoryController {
 	/**
 	 * 특정 카테고리를 업데이트합니다.
 	 *
-	 * @author janghyun
 	 * @param dto 업데이트할 카테고리의 정보
 	 * @param categoryId 업데이트할 카테고리의 ID
 	 * @return 업데이트된 카테고리의 응답 DTO
@@ -147,7 +146,6 @@ public class CategoryController {
 	/**
 	 * 특정 카테고리를 삭제합니다.
 	 *
-	 * @author janghyun
 	 * @param categoryId 삭제할 카테고리의 ID
 	 * @return 삭제 결과를 나타내는 응답 메시지
 	 */
