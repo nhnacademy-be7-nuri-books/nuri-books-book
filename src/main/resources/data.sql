@@ -213,7 +213,7 @@
 --     ('정서영', 'password202', '010-0202-0026', 'seoyeong2@example.com'),
 --     ('유하은', 'password203', '010-0203-0027', 'haeun5@example.com');
 
--- INSERT INTO Member (customer_id, authority, grade_id, status, gender, user_id, birthday, created_at, point, total_payment_amount, latest_login_at, withdrawn_at) VALUES
+-- INSERT INTO Member (customer_id, authority, grade_id, status, gender, username, birthday, created_at, point, total_payment_amount, latest_login_at, withdrawn_at) VALUES
 --     (60, 'MEMBER', 1, 'ACTIVE', 'MALE', 'userId01', '1990-01-01', '2024-08-01', 0, 0, NULL, NULL),
 --     (61, 'MEMBER', 1, 'ACTIVE', 'FEMALE', 'userId02', '1990-01-29', '2024-08-15', 0, 0, NULL, NULL),
 --     (62, 'MEMBER', 1, 'ACTIVE', 'MALE', 'userId03', '1990-02-26', '2024-09-01', 0, 0, NULL, NULL),
