@@ -55,13 +55,13 @@ public class ThreadLocalTest {
     void registerAddress() throws Exception {
         // given
         Grade creategrade = creategrade();
-        Grade savedGrade = gradeRepository.saveAndFlush(creategrade);
+        Grade savedGrade = gradeRepository.save(creategrade);
 
         Customer customer = createCustomer();
-        Customer savedCustomer = customerRepository.saveAndFlush(customer);
+        Customer savedCustomer = customerRepository.save(customer);
 
         Member member = createMember(savedCustomer, savedGrade);
-        memberRepository.saveAndFlush(member);
+        Member saved = memberRepository.save(member);
 
         AddressRegisterRequest request = AddressRegisterRequest.builder()
                 .name("test")
@@ -73,7 +73,7 @@ public class ThreadLocalTest {
         // when
         mockMvc.perform(post("/api/member/address")
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-USER-ID", "1")
+                        .header("X-USER-ID", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isCreated());
