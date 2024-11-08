@@ -1,7 +1,6 @@
 package shop.nuribooks.books.book.review.service.impl;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -76,27 +75,32 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public PagedResponse<ReviewMemberResponse> getReviewsWithMember(long bookId, Pageable pageable) {
+	public PagedResponse<ReviewMemberResponse> getReviewsByBookId(long bookId, Pageable pageable) {
 		if (!bookRepository.existsById(bookId))
 			throw new BookIdNotFoundException();
+		// review만 가져오기
 		List<ReviewMemberResponse> reviews = this.reviewRepository.findReviewsByBookId(bookId, pageable);
-		List<Long> reviewIds = new LinkedList<>();
-		Map<Long, ReviewMemberResponse> reviewMap = new LinkedHashMap<>();
-		for (ReviewMemberResponse rmr : reviews) {
-			reviewIds.add(rmr.id());
-			reviewMap.put(rmr.id(), rmr);
-		}
-		if (reviewIds.size() > 0) {
-			List<ReviewImageResponse> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(reviewIds);
+		// 리뷰가 있다면, 이미지 조합하기
+		if (reviews.size() > 0) {
+			// review id가 key인 map 생성 및 초기화
+			Map<Long, ReviewMemberResponse> reviewMap = new LinkedHashMap<>();
+			for (ReviewMemberResponse rmr : reviews) {
+				reviewMap.put(rmr.id(), rmr);
+			}
+
+			// 리뷰 아이디별 리뷰 이미지 가져오기. query의 in을 사용하기 위해 리뷰 아이디의 리스트를 전달함.
+			List<ReviewImageResponse> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(
+				reviewMap.keySet().stream().toList());
+
+			// 리뷰 이미지 목록을 리뷰에 넣어주기.
 			for (ReviewImageResponse rir : reviewImages) {
 				reviewMap.get(rir.id()).reviewImages().add(rir);
 			}
 		}
+
 		int totalElement = (int)this.reviewRepository.countByBookId(bookId);
-		int totalPage = totalElement / pageable.getPageSize() + totalElement % pageable.getPageSize() == 0 ? 0 : 1;
-		PagedResponse pagedResponse = new PagedResponse(reviews, pageable.getPageNumber(), pageable.getPageSize(),
-			totalPage
-			, totalElement);
+
+		PagedResponse pagedResponse = PagedResponse.of(reviews, pageable, totalElement);
 
 		return pagedResponse;
 	}
@@ -108,10 +112,35 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public List<ReviewBookResponse> getReviewsWithBook(long memberId, Pageable pageable) {
+	public PagedResponse<ReviewBookResponse> getReviewsByMemberId(long memberId, Pageable pageable) {
 		if (!memberRepository.existsById(memberId))
 			throw new MemberNotFoundException("유저를 찾을 수 없습니다.");
-		return this.reviewRepository.findReviewsByMemberId(memberId, pageable);
+		// review만 가져오기
+		List<ReviewBookResponse> reviews = this.reviewRepository.findReviewsByMemberId(memberId, pageable);
+
+		// 리뷰가 있다면, 이미지 조합하기
+		if (reviews.size() > 0) {
+			// review id가 key인 map 생성 및 초기화
+			Map<Long, ReviewBookResponse> reviewMap = new LinkedHashMap<>();
+			for (ReviewBookResponse rbr : reviews) {
+				reviewMap.put(rbr.id(), rbr);
+			}
+
+			// 리뷰 아이디별 리뷰 이미지 가져오기. query의 in을 사용하기 위해 리뷰 아이디의 리스트를 전달함.
+			List<ReviewImageResponse> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(
+				reviewMap.keySet().stream().toList());
+
+			// 리뷰 이미지 목록을 리뷰에 넣어주기.
+			for (ReviewImageResponse rir : reviewImages) {
+				reviewMap.get(rir.id()).reviewImages().add(rir);
+			}
+		}
+
+		int totalElement = (int)this.reviewRepository.countByMemberId(memberId);
+
+		PagedResponse pagedResponse = PagedResponse.of(reviews, pageable, totalElement);
+
+		return pagedResponse;
 	}
 
 	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId, long ownerId) {

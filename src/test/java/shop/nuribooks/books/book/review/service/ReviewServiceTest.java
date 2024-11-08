@@ -26,6 +26,7 @@ import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
+import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
@@ -157,7 +158,7 @@ public class ReviewServiceTest {
 	public void getReviewsAndMemFail() {
 		when(bookRepository.existsById(anyLong())).thenReturn(false);
 		assertThrows(BookIdNotFoundException.class,
-			() -> this.reviewService.getReviewsWithMember(1, PageRequest.of(0, 1)));
+			() -> this.reviewService.getReviewsByBookId(1, PageRequest.of(0, 1)));
 	}
 
 	@Test
@@ -165,14 +166,17 @@ public class ReviewServiceTest {
 		List<ReviewMemberResponse> res = new LinkedList<>();
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByBookId(anyLong(), any())).thenReturn(res);
-		assertEquals(reviewService.getReviewsWithMember(1, PageRequest.of(0, 1)).size(), 0);
+		PagedResponse<ReviewMemberResponse> reviews = reviewService.getReviewsByBookId(1, PageRequest.of(0, 1));
+		assertEquals(0, reviews.content().size());
+		assertEquals(0, reviews.page());
+		assertEquals(1, reviews.size());
 	}
 
 	@Test
 	public void getReviewsAndBookFail() {
 		when(memberRepository.existsById(anyLong())).thenReturn(false);
 		assertThrows(MemberNotFoundException.class,
-			() -> this.reviewService.getReviewsWithBook(1, PageRequest.of(0, 2)));
+			() -> this.reviewService.getReviewsByMemberId(1, PageRequest.of(0, 2)));
 	}
 
 	@Test
@@ -180,6 +184,6 @@ public class ReviewServiceTest {
 		List<ReviewBookResponse> res = new LinkedList<>();
 		when(memberRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByMemberId(1, PageRequest.of(0, 2))).thenReturn(res);
-		assertEquals(reviewService.getReviewsWithBook(1, PageRequest.of(0, 2)).size(), 0);
+		assertEquals(0, reviewService.getReviewsByMemberId(1, PageRequest.of(0, 2)).size());
 	}
 }

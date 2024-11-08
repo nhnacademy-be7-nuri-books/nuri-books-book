@@ -1,7 +1,5 @@
 package shop.nuribooks.books.book.review.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
@@ -24,7 +22,7 @@ public interface ReviewService {
 	 * @param bookId
 	 * @return
 	 */
-	PagedResponse<ReviewMemberResponse> getReviewsWithMember(long bookId, Pageable pageable);
+	PagedResponse<ReviewMemberResponse> getReviewsByBookId(long bookId, Pageable pageable);
 
 	/**
 	 * 회원과 관련된 review 목록 반환
@@ -32,7 +30,7 @@ public interface ReviewService {
 	 * @param memberId
 	 * @return
 	 */
-	List<ReviewBookResponse> getReviewsWithBook(long memberId, Pageable pageable);
+	PagedResponse<ReviewBookResponse> getReviewsByMemberId(long memberId, Pageable pageable);
 
 	ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId, long ownerId);
 }

@@ -14,12 +14,12 @@ public record PagedResponse<T>(
 	int totalPages, //전체 페이지 수
 	long totalElements //전체 요소 수
 ) {
-	public PagedResponse of(List content, Pageable pageable, int totalElement) {
+	public static PagedResponse of(List content, Pageable pageable, int totalElement) {
 		return PagedResponse.builder().content(content)
 			.page(pageable.getPageNumber())
 			.size(pageable.getPageSize())
 			.totalPages(totalElement / pageable.getPageSize() + totalElement % pageable.getPageSize() == 0 ? 0 : 1)
-			.totalElements(totalElements)
+			.totalElements(totalElement)
 			.build();
 	}
 }

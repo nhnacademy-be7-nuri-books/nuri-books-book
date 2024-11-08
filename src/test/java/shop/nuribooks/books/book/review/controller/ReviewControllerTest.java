@@ -78,12 +78,12 @@ public class ReviewControllerTest {
 				new ReviewImageResponse(2, "http://example.com/image2.jpg"))
 		);
 
-		when(reviewService.getReviewsWithMember(anyLong(), any())).thenReturn(
-			new PagedResponse<>(List.of(), 1, 1, 1, 1));
+		when(reviewService.getReviewsByBookId(anyLong(), any())).thenReturn(
+			new PagedResponse<>(List.of(review), 1, 1, 1, 1));
 
 		mockMvc.perform(get("/api/books/" + bookId + "/reviews"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.*", Matchers.hasSize(1)));
+			.andExpect(jsonPath("$.*", Matchers.hasSize(5)));
 	}
 
 	@Test
@@ -99,11 +99,12 @@ public class ReviewControllerTest {
 				new ReviewImageResponse(2, "http://example.com/image2.jpg"))
 		);
 
-		when(reviewService.getReviewsWithBook(anyLong(), any())).thenReturn(List.of(review));
+		when(reviewService.getReviewsByMemberId(anyLong(), any())).thenReturn(
+			new PagedResponse<>(List.of(review), 1, 1, 1, 1));
 
 		mockMvc.perform(get("/api/members/" + memberId + "/reviews"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.*", Matchers.hasSize(1)));
+			.andExpect(jsonPath("$.*", Matchers.hasSize(5)));
 	}
 
 	@Test
