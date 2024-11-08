@@ -11,8 +11,7 @@ import shop.nuribooks.books.book.category.entity.Category;
  */
 public record CategoryResponse(Long id,
                                String name,
-                               List<CategoryResponse> children,
-                               Long parentId) {
+                               List<CategoryResponse> subCategories) {
 
 	/**
 	 * Category 엔티티를 기반으로 응답 DTO를 생성합니다.
@@ -32,8 +31,8 @@ public record CategoryResponse(Long id,
 		return new CategoryResponse(
 			category.getId(),
 			category.getName(),
-			subCategoryResponses,
-			category.getParentCategory() != null ? category.getParentCategory().getId() : null
+			subCategoryResponses
+			// category.getParentCategory() != null ? category.getParentCategory().getId() : null
 		);
 	}
 }
