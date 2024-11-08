@@ -100,6 +100,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 		return queryFactory.select(review.count())
 			.from(review)
 			.where(review.book.id.eq(bookId))
+			.where(review.updateAt.isNull())
 			.fetchOne();
 	}
 
@@ -108,6 +109,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 		return queryFactory.select(review.count())
 			.from(review)
 			.where(review.member.id.eq(memberId))
+			.where(review.updateAt.isNull())
 			.fetchOne();
 	}
 }

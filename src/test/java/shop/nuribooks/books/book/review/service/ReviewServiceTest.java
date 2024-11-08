@@ -166,10 +166,10 @@ public class ReviewServiceTest {
 		List<ReviewMemberResponse> res = new LinkedList<>();
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByBookId(anyLong(), any())).thenReturn(res);
-		PagedResponse<ReviewMemberResponse> reviews = reviewService.getReviewsByBookId(1, PageRequest.of(0, 1));
-		assertEquals(0, reviews.content().size());
-		assertEquals(0, reviews.page());
-		assertEquals(1, reviews.size());
+		PagedResponse<ReviewMemberResponse> pageRes = reviewService.getReviewsByBookId(1, PageRequest.of(0, 1));
+		assertEquals(0, pageRes.content().size());
+		assertEquals(0, pageRes.page());
+		assertEquals(1, pageRes.size());
 	}
 
 	@Test
@@ -184,6 +184,9 @@ public class ReviewServiceTest {
 		List<ReviewBookResponse> res = new LinkedList<>();
 		when(memberRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByMemberId(1, PageRequest.of(0, 2))).thenReturn(res);
-		assertEquals(0, reviewService.getReviewsByMemberId(1, PageRequest.of(0, 2)).size());
+		PagedResponse<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
+		assertEquals(0, pageRes.content().size());
+		assertEquals(0, pageRes.page());
+		assertEquals(1, pageRes.size());
 	}
 }

@@ -2,8 +2,8 @@ package shop.nuribooks.books.book.review.repository;
 
 import java.util.List;
 
-import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
+import com.querydsl.core.Tuple;
 
 public interface ReviewImageCustomRepository {
-	List<ReviewImageResponse> findReviewImagesByReviewIds(List<Long> reviewIds);
+	List<Tuple> findReviewImagesByReviewIds(List<Long> reviewIds);
 }
