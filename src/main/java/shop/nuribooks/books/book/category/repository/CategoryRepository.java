@@ -10,6 +10,8 @@ import shop.nuribooks.books.book.category.entity.Category;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 	boolean existsByNameAndParentCategoryIsNull(String name);
 
+	boolean existsByNameAndParentCategoryId(String name, Long parentCategoryId);
+
 	List<Category> findAllByParentCategoryIsNull();
 
 	Optional<Category> findByNameAndParentCategory(String name, Category parentCategory);

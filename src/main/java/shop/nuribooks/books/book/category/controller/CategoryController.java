@@ -44,48 +44,26 @@ public class CategoryController {
 	}
 
 	/**
-	 * 새로운 대분류를 등록합니다.
+	 * 새로운 카테고리를 등록합니다.
 	 *
 	 * @param dto 카테고리 등록 세부 정보를 포함한 요청 본문
+	 * @param categoryId 부모 카테고리의 ID (대분류 카테고리를 등록할 경우 생략 가능)
 	 * @return 생성된 카테고리 정보를 담은 ResponseEntity
 	 */
-	@Operation(summary = "새로운 대분류 등록", description = "새로운 대분류 카테고리를 등록합니다.")
+	@Operation(summary = "새로운 카테고리 등록", description = "새로운 대분류 또는 하위 분류 카테고리를 등록합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "카테고리 생성 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+		@ApiResponse(responseCode = "404", description = "부모 카테고리를 찾을 수 없음"),
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
-	@PostMapping
-	public ResponseEntity<ResponseMessage> registerMainCategory(@Valid @RequestBody CategoryRequest dto) {
-		categoryService.registerMainCategory(dto);
+	@PostMapping({"", "/{categoryId}"})
+	public ResponseEntity<ResponseMessage> registerCategory(@Valid @RequestBody CategoryRequest categoryRequest,
+		@PathVariable(required = false) Long categoryId) {
+		categoryService.registerCategory(categoryRequest, categoryId);
 
 		ResponseMessage responseMessage = new ResponseMessage(201, "카테고리가 성공적으로 생성되었습니다.");
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
-	}
-
-	/**
-	 * 기존 대분류 아래에 새로운 하위 분류를 등록합니다.
-	 *
-	 * @param dto 하위 분류 등록 세부 정보를 포함한 요청 본문
-	 * @param categoryId 하위 분류가 등록될 대분류의 ID
-	 * @return 생성된 하위 분류 정보를 담은 ResponseEntity
-	 */
-	@Operation(summary = "하위 분류 등록", description = "기존 대분류 아래에 새로운 하위 분류를 등록합니다.")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "하위 분류 생성 성공"),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-		@ApiResponse(responseCode = "404", description = "대분류를 찾을 수 없음"),
-		@ApiResponse(responseCode = "500", description = "서버 오류")
-	})
-	@PostMapping("/{categoryId}")
-	public ResponseEntity<ResponseMessage> registerSubCategory(@Valid @RequestBody CategoryRequest dto,
-		@PathVariable Long categoryId) {
-		categoryService.registerSubCategory(dto, categoryId);
-
-		ResponseMessage responseMessage = new ResponseMessage(201, "카테고리가 성공적으로 생성되었습니다.");
-
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(responseMessage);
 	}
 
 	/**

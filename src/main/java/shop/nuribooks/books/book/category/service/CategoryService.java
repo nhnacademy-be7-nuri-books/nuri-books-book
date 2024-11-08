@@ -12,22 +12,15 @@ import shop.nuribooks.books.book.category.entity.Category;
  * @author janghyun
  */
 public interface CategoryService {
-	/**
-	 * 새로운 대분류 카테고리를 등록합니다.
-	 *
-	 * @param categoryRequest 카테고리 등록 요청 DTO
-	 * @return 등록된 카테고리 엔티티
-	 */
-	Category registerMainCategory(CategoryRequest categoryRequest);
 
 	/**
-	 * 기존 대분류 아래에 새로운 하위 분류 카테고리를 등록합니다.
+	 * 카테고리 등록
 	 *
 	 * @param categoryRequest 하위 분류 등록 요청 DTO
 	 * @param parentCategoryId 부모 카테고리의 ID
 	 * @return 등록된 하위 카테고리 엔티티
 	 */
-	Category registerSubCategory(CategoryRequest categoryRequest, Long parentCategoryId);
+	Category registerCategory(CategoryRequest categoryRequest, Long parentCategoryId);
 
 	/**
 	 * 모든 카테고리 목록을 조회합니다.

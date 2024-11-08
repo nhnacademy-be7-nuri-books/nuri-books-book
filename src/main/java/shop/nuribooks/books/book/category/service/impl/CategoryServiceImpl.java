@@ -35,52 +35,56 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	/**
-	 * 새로운 대분류 카테고리를 등록합니다.
+	 * getCategoryEditor : 카테고리 편집 빌더
 	 *
-	 * @param categoryRequest 카테고리 등록 요청 DTO
-	 * @return 등록된 카테고리 엔티티
-	 * @throws CategoryAlreadyExistException 동일한 이름의 대분류 카테고리가 이미 존재하는 경우
+	 * @param categoryRequest 요청된 태그 정보 담긴 객체
+	 * @param category 기존 태그 정보를 담은 객체
+	 * @return 수정된 정보를 포함한 객체
 	 */
-	@Override
-	@Transactional
-	public Category registerMainCategory(CategoryRequest categoryRequest) {
-		boolean isDuplicate = categoryRepository.existsByNameAndParentCategoryIsNull(categoryRequest.name());
-		if (isDuplicate) {
-			throw new CategoryAlreadyExistException(categoryRequest.name());
-		}
-		Category category = Category.builder()
+	private static CategoryEditor getCategoryEditor(CategoryRequest categoryRequest, Category category) {
+		CategoryEditor.CategoryEditorBuilder builder = category.toEditor();
+		return builder
 			.name(categoryRequest.name())
 			.build();
-		return categoryRepository.save(category);
 	}
 
 	/**
-	 * 기존 대분류 아래에 새로운 하위 분류 카테고리를 등록합니다.
+	 * 새로운 카테고리를 등록합니다.
 	 *
-	 * @param categoryRequest 하위 분류 등록 요청 DTO
-	 * @param parentCategoryId 부모 카테고리의 ID
-	 * @return 등록된 하위 카테고리 엔티티
+	 * @param categoryRequest 카테고리 등록 요청 DTO
+	 * @param parentCategoryId 부모 카테고리의 ID (대분류 카테고리를 등록할 경우 null)
+	 * @return 등록된 카테고리 엔티티
 	 * @throws CategoryNotFoundException 부모 카테고리를 찾을 수 없는 경우
-	 * @throws CategoryAlreadyExistException 동일한 이름의 하위 카테고리가 이미 존재하는 경우
+	 * @throws CategoryAlreadyExistException 동일한 이름의 카테고리가 이미 존재하는 경우
 	 */
 	@Override
 	@Transactional
-	public Category registerSubCategory(CategoryRequest categoryRequest, Long parentCategoryId) {
-		Category parentCategory = categoryRepository.findById(parentCategoryId)
-			.orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
+	public Category registerCategory(CategoryRequest categoryRequest, Long parentCategoryId) {
+		if (parentCategoryId == null) {
+			// 대분류 카테고리 등록
+			boolean isDuplicate = categoryRepository.existsByNameAndParentCategoryIsNull(categoryRequest.name());
+			if (isDuplicate) {
+				throw new CategoryAlreadyExistException(categoryRequest.name());
+			}
+			Category category = Category.builder()
+				.name(categoryRequest.name())
+				.build();
+			return categoryRepository.save(category);
+		} else {
+			// 하위 분류 카테고리 등록
+			Category parentCategory = categoryRepository.findById(parentCategoryId)
+				.orElseThrow(CategoryNotFoundException::new);
 
-		boolean isDuplicate = parentCategory.getSubCategory().stream()
-			.anyMatch(subCategory -> subCategory.getName().equals(categoryRequest.name()));
+			if (categoryRepository.existsByNameAndParentCategoryId(categoryRequest.name(), parentCategoryId)) {
+				throw new CategoryAlreadyExistException();
+			}
 
-		if (isDuplicate) {
-			throw new CategoryAlreadyExistException(categoryRequest.name());
+			Category category = Category.builder()
+				.name(categoryRequest.name())
+				.parentCategory(parentCategory)
+				.build();
+			return categoryRepository.save(category);
 		}
-
-		Category category = Category.builder()
-			.name(categoryRequest.name())
-			.parentCategory(parentCategory)
-			.build();
-		return categoryRepository.save(category);
 	}
 
 	/**
@@ -144,7 +148,7 @@ public class CategoryServiceImpl implements CategoryService {
 		CategoryEditor categoryEditor = getCategoryEditor(categoryRequest, category);
 		category.edit(categoryEditor);
 
-		return CategoryResponse.from(categoryRepository.save(category));
+		return CategoryResponse.from(category);
 	}
 
 	/**
@@ -159,21 +163,6 @@ public class CategoryServiceImpl implements CategoryService {
 			.orElseThrow(CategoryNotFoundException::new);
 		categoryRepository.delete(category);
 	}
-
-	/**
-	 * getCategoryEditor : 카테고리 편집 빌더
-	 *
-	 * @param categoryRequest 요청된 태그 정보 담긴 객체
-	 * @param category 기존 태그 정보를 담은 객체
-	 * @return 수정된 정보를 포함한 객체
-	 */
-	private static CategoryEditor getCategoryEditor(CategoryRequest categoryRequest, Category category) {
-		CategoryEditor.CategoryEditorBuilder builder = category.toEditor();
-		return builder
-			.name(categoryRequest.name())
-			.build();
-	}
-
 
 }
 

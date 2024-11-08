@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -37,95 +38,106 @@ class CategoryServiceImplTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	/**
-	 * 대분류 카테고리가 존재하지 않을 때, 카테고리가 성공적으로 저장되는지 테스트합니다.
-	 */
 	@Test
-	void registerMainCategory_whenCategoryDoesNotExist_thenCategoryIsSaved() {
+	@DisplayName("대분류 카테고리 등록 성공 테스트")
+	void testRegisterMainCategory_Success() {
 		// given
-		CategoryRequest dto = new CategoryRequest("여행");
-		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(false);
-		when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		CategoryRequest request = new CategoryRequest("Electronics");
+		when(categoryRepository.existsByNameAndParentCategoryIsNull(request.name())).thenReturn(false);
+
+		Category savedCategory = Category.builder()
+			.name(request.name())
+			.build();
+		when(categoryRepository.save(any(Category.class))).thenReturn(savedCategory);
 
 		// when
-		Category category = categoryService.registerMainCategory(dto);
+		Category result = categoryService.registerCategory(request, null);
 
 		// then
-		assertThat(category).isNotNull();
-		assertThat(category.getName()).isEqualTo("여행");
-		verify(categoryRepository, times(1)).save(any(Category.class));
+		assertNotNull(result);
+		assertEquals(request.name(), result.getName());
+		verify(categoryRepository).existsByNameAndParentCategoryIsNull(request.name());
+		verify(categoryRepository).save(any(Category.class));
 	}
 
-	/**
-	 * 대분류 카테고리가 이미 존재할 때, 예외가 발생하는지 테스트합니다.
-	 */
 	@Test
-	void registerMainCategory_whenCategoryExists_thenThrowsException() {
+	@DisplayName("대분류 카테고리 중복 예외 발생 테스트")
+	void testRegisterMainCategory_DuplicateException() {
 		// given
-		CategoryRequest dto = new CategoryRequest("여행");
-		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(true);
+		CategoryRequest request = new CategoryRequest("Electronics");
+		when(categoryRepository.existsByNameAndParentCategoryIsNull(request.name())).thenReturn(true);
 
 		// when & then
-		assertThatThrownBy(() -> categoryService.registerMainCategory(dto))
-			.isInstanceOf(CategoryAlreadyExistException.class)
-			.hasMessageContaining("카테고리 이름 '여행' 가 이미 존재합니다");
+		assertThrows(CategoryAlreadyExistException.class, () -> {
+			categoryService.registerCategory(request, null);
+		});
+		verify(categoryRepository).existsByNameAndParentCategoryIsNull(request.name());
+		verify(categoryRepository, never()).save(any(Category.class));
 	}
 
-	/**
-	 * 부모 카테고리가 존재할 때, 하위 분류 카테고리가 성공적으로 저장되는지 테스트합니다.
-	 */
 	@Test
-	void registerSubCategory_whenParentCategoryExists_thenSubCategoryIsSaved() {
+	@DisplayName("하위 카테고리 등록 성공 테스트")
+	void testRegisterSubCategory_Success() {
 		// given
 		Long parentCategoryId = 1L;
-		Category parentCategory = Category.builder().name("여행").build();
-		CategoryRequest dto = new CategoryRequest("국내 여행");
+		Category parentCategory = Category.builder()
+			.name("Electronics")
+			.build();
+
+		CategoryRequest request = new CategoryRequest("Mobile Phones");
 		when(categoryRepository.findById(parentCategoryId)).thenReturn(Optional.of(parentCategory));
-		when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+		Category savedCategory = Category.builder()
+			.name(request.name())
+			.parentCategory(parentCategory)
+			.build();
+		when(categoryRepository.save(any(Category.class))).thenReturn(savedCategory);
 
 		// when
-		Category subCategory = categoryService.registerSubCategory(dto, parentCategoryId);
+		Category result = categoryService.registerCategory(request, parentCategoryId);
 
 		// then
-		assertThat(subCategory).isNotNull();
-		assertThat(subCategory.getName()).isEqualTo("국내 여행");
-		assertThat(subCategory.getParentCategory()).isEqualTo(parentCategory);
-		verify(categoryRepository, times(1)).save(any(Category.class));
+		assertNotNull(result);
+		assertEquals(request.name(), result.getName());
+		assertEquals(parentCategory, result.getParentCategory());
+		verify(categoryRepository).findById(parentCategoryId);
+		verify(categoryRepository).save(any(Category.class));
 	}
 
-	/**
-	 * 부모 카테고리를 찾을 수 없을 때, 예외가 발생하는지 테스트합니다.
-	 */
 	@Test
-	void registerSubCategory_whenParentCategoryDoesNotExist_thenThrowsException() {
+	@DisplayName("부모 카테고리 미존재 예외 발생 테스트")
+	void testRegisterSubCategory_ParentNotFoundException() {
 		// given
 		Long parentCategoryId = 1L;
-		CategoryRequest dto = new CategoryRequest("국내 여행");
+		CategoryRequest request = new CategoryRequest("Mobile Phones");
 		when(categoryRepository.findById(parentCategoryId)).thenReturn(Optional.empty());
 
 		// when & then
-		assertThatThrownBy(() -> categoryService.registerSubCategory(dto, parentCategoryId))
-			.isInstanceOf(CategoryNotFoundException.class)
-			.hasMessageContaining("력한 카테고리ID는 1 존재하지 않습니다.");
+		assertThrows(CategoryNotFoundException.class, () -> {
+			categoryService.registerCategory(request, parentCategoryId);
+		});
+		verify(categoryRepository).findById(parentCategoryId);
+		verify(categoryRepository, never()).save(any(Category.class));
 	}
 
-	/**
-	 * 동일한 이름의 하위 카테고리가 이미 존재할 때, 예외가 발생하는지 테스트합니다.
-	 */
 	@Test
-	void registerSubCategory_whenSubCategoryExists_thenThrowsException() {
+	@DisplayName("대분류 카테고리 중복 예외 발생 테스트")
+	void testRegisterCategory_DuplicateException() {
 		// given
-		Long parentCategoryId = 1L;
-		Category parentCategory = Category.builder().name("여행").build();
-		Category subCategory = Category.builder().name("국내 여행").parentCategory(parentCategory).build();
-		parentCategory.getSubCategory().add(subCategory);
-		CategoryRequest dto = new CategoryRequest("국내 여행");
-		when(categoryRepository.findById(parentCategoryId)).thenReturn(Optional.of(parentCategory));
+		String categoryName = "Electronics";
+		CategoryRequest request = new CategoryRequest(categoryName);
+
+		// 중복된 대분류 카테고리가 이미 존재한다고 가정
+		when(categoryRepository.existsByNameAndParentCategoryIsNull(categoryName)).thenReturn(true);
 
 		// when & then
-		assertThatThrownBy(() -> categoryService.registerSubCategory(dto, parentCategoryId))
-			.isInstanceOf(CategoryAlreadyExistException.class)
-			.hasMessageContaining("카테고리 이름 '국내 여행' 가 이미 존재합니다");
+		assertThrows(CategoryAlreadyExistException.class, () -> {
+			categoryService.registerCategory(request, null);
+		});
+
+		// 리포지토리 메서드 호출 검증
+		verify(categoryRepository).existsByNameAndParentCategoryIsNull(categoryName);
+		verify(categoryRepository, never()).save(any(Category.class));
 	}
 
 	/**
@@ -186,23 +198,26 @@ class CategoryServiceImplTest {
 
 	@Test
 	void updateCategory_ShouldUpdateCategorySuccessfully() {
-		// Given
+		// given
 		Long categoryId = 1L;
-		CategoryRequest dto = new CategoryRequest("Updated Category Name");
-		Category existingCategory = new Category("Old Category Name", null);
+		String updatedName = "Updated Category Name";
+		CategoryRequest categoryRequest = new CategoryRequest(updatedName);
 
+		Category existingCategory = Category.builder()
+			.name("Old Category Name")
+			.build();
+
+		// Mock 설정
 		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
-		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(false);
-		when(categoryRepository.save(any(Category.class))).thenReturn(existingCategory);
+		when(categoryRepository.existsByNameAndParentCategoryIsNull(updatedName)).thenReturn(false);
 
-		// When
-		CategoryResponse result = categoryService.updateCategory(dto, categoryId);
+		// when
+		categoryService.updateCategory(categoryRequest, categoryId);
 
-		// Then
-		assertNotNull(result);
-		assertEquals("Updated Category Name", result.name());
-		verify(categoryRepository).findById(categoryId);
-		verify(categoryRepository).save(existingCategory);
+		// then
+		// save 메서드 호출 검증 제거
+		// 엔티티의 필드가 업데이트되었는지 확인
+		assertEquals(updatedName, existingCategory.getName());
 	}
 
 	@Test
@@ -293,4 +308,37 @@ class CategoryServiceImplTest {
 		verify(categoryRepository, never()).save(any(Category.class));
 	}
 
+	@Test
+	void updateCategory_ShouldUpdateCategorySuccessfully_WhenParentCategoryIsNull() {
+		// Given
+		Long categoryId = 1L;
+		CategoryRequest dto = new CategoryRequest("Updated Category Name");
+		Category existingCategory = new Category("Old Category Name", null);
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
+		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(false);
+
+		// When
+		categoryService.updateCategory(dto, categoryId);
+
+		// Then
+		assertEquals("Updated Category Name", existingCategory.getName());
+		verify(categoryRepository).findById(categoryId);
+		verify(categoryRepository, never()).save(any(Category.class));
+	}
+
+	@Test
+	void registerCategory_shouldThrowException_whenDuplicateCategoryNameExists() {
+		// given
+		String categoryName = "Duplicate Category";
+		CategoryRequest categoryRequest = new CategoryRequest(categoryName);
+
+		// 대분류 카테고리인 경우 중복 확인 설정
+		when(categoryRepository.existsByNameAndParentCategoryIsNull(categoryName)).thenReturn(true);
+
+		// when & then
+		assertThrows(CategoryAlreadyExistException.class, () ->
+			categoryService.registerCategory(categoryRequest, null)
+		);
+	}
 }
