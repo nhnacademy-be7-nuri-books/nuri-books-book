@@ -13,12 +13,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.querydsl.core.Tuple;
-
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
+import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.common.TestUtils;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
@@ -82,7 +81,7 @@ public class ReviewImageRepositoryTest {
 
 	@Test
 	public void getReviewImageByReviewIdTest() {
-		List<Tuple> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(List.of(
+		List<ReviewImageDto> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(List.of(
 			reviews.get(0).getId()));
 		System.out.println(reviews.get(0).getReviewImages());
 		assertEquals(reviews.get(0).getReviewImages().size(), reviewImages.size());
@@ -90,13 +89,13 @@ public class ReviewImageRepositoryTest {
 
 	@Test
 	public void getReviewImageByReviewIdsZeroTest() {
-		List<Tuple> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(List.of());
+		List<ReviewImageDto> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(List.of());
 		assertEquals(0, reviewImages.size());
 	}
 
 	@Test
 	public void getReviewImageByReviewIdsTest() {
-		List<Tuple> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(
+		List<ReviewImageDto> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(
 			List.of(reviews.get(0).getId(), reviews.get(1).getId()));
 		assertEquals(4, reviewImages.size());
 	}

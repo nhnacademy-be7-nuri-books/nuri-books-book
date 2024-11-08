@@ -8,14 +8,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.querydsl.core.Tuple;
-
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
-import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
@@ -91,12 +89,12 @@ public class ReviewServiceImpl implements ReviewService {
 			}
 
 			// 리뷰 아이디별 리뷰 이미지 가져오기. query의 in을 사용하기 위해 리뷰 아이디의 리스트를 전달함.
-			List<Tuple> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(
+			List<ReviewImageDto> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(
 				reviewMap.keySet().stream().toList());
 
 			// 리뷰 이미지 목록을 리뷰에 넣어주기.
-			for (Tuple rir : reviewImages) {
-				reviewMap.get(rir.get(0, Long.class)).reviewImages().add(rir.get(1, ReviewImageResponse.class));
+			for (ReviewImageDto rir : reviewImages) {
+				reviewMap.get(rir.reviewId()).reviewImages().add(rir.reviewImageResponse());
 			}
 		}
 
@@ -129,12 +127,11 @@ public class ReviewServiceImpl implements ReviewService {
 			}
 
 			// 리뷰 아이디별 리뷰 이미지 가져오기. query의 in을 사용하기 위해 리뷰 아이디의 리스트를 전달함.
-			List<Tuple> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(
+			List<ReviewImageDto> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(
 				reviewMap.keySet().stream().toList());
-			System.out.println(reviewImages);
 			// 리뷰 이미지 목록을 리뷰에 넣어주기.
-			for (Tuple rir : reviewImages) {
-				reviewMap.get(rir.get(0, Long.class)).reviewImages().add(rir.get(1, ReviewImageResponse.class));
+			for (ReviewImageDto rir : reviewImages) {
+				reviewMap.get(rir.reviewId()).reviewImages().add(rir.reviewImageResponse());
 			}
 		}
 

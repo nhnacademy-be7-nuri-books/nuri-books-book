@@ -20,10 +20,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
+import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
 import shop.nuribooks.books.common.message.PagedResponse;
@@ -43,11 +46,14 @@ public class ReviewServiceTest {
 	private MemberRepository memberRepository;
 	@Mock
 	private ReviewRepository reviewRepository;
+	@Mock
+	private ReviewImageRepository reviewImageRepository;
 
 	private Book book;
 	private Member member;
 	private Review review;
 	private ReviewRequest reviewRequest;
+	private ReviewImageResponse reviewImageResponse;
 
 	@BeforeEach
 	public void setUp() {
@@ -91,6 +97,7 @@ public class ReviewServiceTest {
 			.book(book)
 			.build();
 		ReflectionTestUtils.setField(review, "id", 1L);
+		reviewImageResponse = ReviewImageResponse.builder().id(1L).imageUrl("good").build();
 	}
 
 	@Test
@@ -173,6 +180,19 @@ public class ReviewServiceTest {
 	}
 
 	@Test
+	public void getReviewsAndMemFullSuccess() {
+		List<ReviewMemberResponse> res = List.of(ReviewMemberResponse.of(review));
+		when(bookRepository.existsById(anyLong())).thenReturn(true);
+		when(reviewRepository.findReviewsByBookId(anyLong(), any())).thenReturn(res);
+		List<ReviewImageDto> reviewImages = List.of(new ReviewImageDto(1L, reviewImageResponse));
+		when(reviewImageRepository.findReviewImagesByReviewIds(anyList())).thenReturn(reviewImages);
+		PagedResponse<ReviewMemberResponse> pageRes = reviewService.getReviewsByBookId(1, PageRequest.of(0, 1));
+		assertEquals(1, pageRes.content().size());
+		assertEquals(0, pageRes.page());
+		assertEquals(1, pageRes.size());
+	}
+
+	@Test
 	public void getReviewsAndBookFail() {
 		when(memberRepository.existsById(anyLong())).thenReturn(false);
 		assertThrows(MemberNotFoundException.class,
@@ -183,9 +203,22 @@ public class ReviewServiceTest {
 	public void getReviewsAndBookSuccess() {
 		List<ReviewBookResponse> res = new LinkedList<>();
 		when(memberRepository.existsById(anyLong())).thenReturn(true);
-		when(reviewRepository.findReviewsByMemberId(1, PageRequest.of(0, 2))).thenReturn(res);
+		when(reviewRepository.findReviewsByMemberId(anyLong(), any())).thenReturn(res);
 		PagedResponse<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
 		assertEquals(0, pageRes.content().size());
+		assertEquals(0, pageRes.page());
+		assertEquals(1, pageRes.size());
+	}
+
+	@Test
+	public void getReviewsAndBookFullSuccess() {
+		List<ReviewBookResponse> res = List.of(ReviewBookResponse.of(review));
+		when(memberRepository.existsById(anyLong())).thenReturn(true);
+		when(reviewRepository.findReviewsByMemberId(anyLong(), any())).thenReturn(res);
+		List<ReviewImageDto> reviewImages = List.of(new ReviewImageDto(1L, reviewImageResponse));
+		when(reviewImageRepository.findReviewImagesByReviewIds(anyList())).thenReturn(reviewImages);
+		PagedResponse<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
+		assertEquals(1, pageRes.content().size());
 		assertEquals(0, pageRes.page());
 		assertEquals(1, pageRes.size());
 	}
