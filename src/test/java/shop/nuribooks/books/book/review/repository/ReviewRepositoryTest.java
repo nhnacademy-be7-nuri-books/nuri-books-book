@@ -97,7 +97,7 @@ public class ReviewRepositoryTest {
 
 	@Test
 	void getCountByBookId() {
-		long count = reviewRepository.countByBookId(1);
+		long count = reviewRepository.countByBookId(book.getId());
 		assertEquals(1, count);
 	}
 
