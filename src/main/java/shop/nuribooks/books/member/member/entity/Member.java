@@ -5,6 +5,7 @@ import static jakarta.persistence.FetchType.*;
 import static java.math.BigDecimal.*;
 import static shop.nuribooks.books.member.member.entity.StatusType.*;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -65,7 +66,8 @@ public class Member {
 	@JoinColumn(name = "grade_id")
 	private Grade grade;
 
-	@OneToMany(mappedBy = "member", fetch = LAZY)
+	@OneToMany(mappedBy = "member", fetch = LAZY, cascade = CascadeType.PERSIST)
+
 	@Builder.Default
 	private List<Address> addressList = new ArrayList<>();
 
