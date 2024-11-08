@@ -30,7 +30,9 @@ import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
 import shop.nuribooks.books.common.message.PagedResponse;
+import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
+import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
@@ -103,16 +105,18 @@ public class ReviewServiceTest {
 	@Test
 	public void registerMemberNotFound() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
+		MemberIdContext.setMemberId(member.getId());
 		assertThrows(MemberNotFoundException.class,
-			() -> reviewService.registerReview(reviewRequest, member.getId()));
+			() -> reviewService.registerReview(reviewRequest));
 	}
 
 	@Test
 	public void registerBookNotFound() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.empty());
+		MemberIdContext.setMemberId(member.getId());
 		assertThrows(BookIdNotFoundException.class,
-			() -> reviewService.registerReview(reviewRequest, member.getId()));
+			() -> reviewService.registerReview(reviewRequest));
 	}
 
 	@Test
@@ -120,30 +124,48 @@ public class ReviewServiceTest {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(reviewRepository.save(any())).thenReturn(review);
+		MemberIdContext.setMemberId(member.getId());
 		assertEquals(ReviewMemberResponse.of(review),
-			reviewService.registerReview(reviewRequest, member.getId()));
+			reviewService.registerReview(reviewRequest));
+	}
+
+	@Test
+	public void registerByNullUser() {
+		MemberIdContext.setMemberId(null);
+		assertThrows(RequiredHeaderIsNullException.class,
+			() -> reviewService.registerReview(reviewRequest));
 	}
 
 	@Test
 	public void updateFailed() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.empty());
+		MemberIdContext.setMemberId(member.getId());
 		assertThrows(ReviewNotFoundException.class,
-			() -> reviewService.updateReview(reviewRequest, review.getId(), member.getId()));
+			() -> reviewService.updateReview(reviewRequest, review.getId()));
 	}
 
 	@Test
 	public void updatedByOtherUser() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
+		MemberIdContext.setMemberId(member.getId() + 10);
 		assertThrows(ReviewNotFoundException.class,
-			() -> reviewService.updateReview(reviewRequest, review.getId(), 2));
+			() -> reviewService.updateReview(reviewRequest, review.getId()));
+	}
+
+	@Test
+	public void updatedByNullUser() {
+		MemberIdContext.setMemberId(null);
+		assertThrows(RequiredHeaderIsNullException.class,
+			() -> reviewService.updateReview(reviewRequest, review.getId()));
 	}
 
 	@Test
 	public void updateSuccess() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
 		when(reviewRepository.save(any())).thenReturn(review);
+		MemberIdContext.setMemberId(member.getId());
 		assertEquals(ReviewMemberResponse.of(review),
-			reviewService.updateReview(reviewRequest, review.getId(), member.getId()));
+			reviewService.updateReview(reviewRequest, review.getId()));
 	}
 
 	@Test

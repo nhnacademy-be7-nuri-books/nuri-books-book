@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,12 +16,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
 import shop.nuribooks.books.common.message.PagedResponse;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping()
@@ -36,11 +37,9 @@ public class ReviewController {
 	})
 	@PostMapping("/api/reviews")
 	public ResponseEntity<ReviewMemberResponse> registerReview(
-		@Valid @RequestBody ReviewRequest reviewRequest,
-		// TODO:: aop 저굥
-		@RequestHeader("X-USER-ID") long ownerId
+		@Valid @RequestBody ReviewRequest reviewRequest
 	) {
-		ReviewMemberResponse response = this.reviewService.registerReview(reviewRequest, ownerId);
+		ReviewMemberResponse response = this.reviewService.registerReview(reviewRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
@@ -81,10 +80,9 @@ public class ReviewController {
 	@PutMapping("/api/reviews/{reviewId}")
 	public ResponseEntity<ReviewMemberResponse> updateReview(
 		@Valid @RequestBody ReviewRequest reviewRequest,
-		@PathVariable long reviewId,
-		@RequestHeader("X-USER-ID") long ownerId
+		@PathVariable long reviewId
 	) {
-		ReviewMemberResponse response = this.reviewService.updateReview(reviewRequest, reviewId, ownerId);
+		ReviewMemberResponse response = this.reviewService.updateReview(reviewRequest, reviewId);
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}

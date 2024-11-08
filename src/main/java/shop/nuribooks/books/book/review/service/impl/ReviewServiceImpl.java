@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.review.service.impl;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,9 @@ import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.ReviewService;
 import shop.nuribooks.books.common.message.PagedResponse;
+import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
+import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
@@ -37,11 +40,12 @@ public class ReviewServiceImpl implements ReviewService {
 	/**
 	 * 리뷰 등록. 리뷰 이미지도 함께 등록합니다.
 	 * @param reviewRequest
-	 * @param ownerId
 	 * @return
 	 */
 	@Override
-	public ReviewMemberResponse registerReview(ReviewRequest reviewRequest, long ownerId) {
+	public ReviewMemberResponse registerReview(ReviewRequest reviewRequest) {
+		Long ownerId = Optional.ofNullable(MemberIdContext.getMemberId())
+			.orElseThrow(() -> new RequiredHeaderIsNullException());
 
 		Member member = this.memberRepository.findById(ownerId)
 			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 유저입니다."));
@@ -142,7 +146,9 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Transactional
-	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId, long ownerId) {
+	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId) {
+		Long ownerId = Optional.ofNullable(MemberIdContext.getMemberId())
+			.orElseThrow(() -> new RequiredHeaderIsNullException());
 		// 기존 review update 처리
 		Review prevReview = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException());
 		if (prevReview.getMember().getId() != ownerId) {

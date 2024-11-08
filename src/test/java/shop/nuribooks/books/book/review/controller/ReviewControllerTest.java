@@ -22,6 +22,7 @@ import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
 import shop.nuribooks.books.common.message.PagedResponse;
+import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 
 @WebMvcTest(ReviewController.class)
 public class ReviewControllerTest {
@@ -54,11 +55,12 @@ public class ReviewControllerTest {
 				new ReviewImageResponse(2, "http://example.com/image2.jpg"))
 		);
 
-		when(reviewService.registerReview(any(ReviewRequest.class), eq(1L))).thenReturn(response);
+		when(reviewService.registerReview(any(ReviewRequest.class))).thenReturn(response);
 
+		// header 추가 대신 set
+		MemberIdContext.setMemberId(1l);
 		// Act & Assert
 		mockMvc.perform(post("/api/reviews")
-				.header("X-USER-ID", "1")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(reviewRequest)))
 			.andExpect(status().isCreated())
@@ -127,11 +129,12 @@ public class ReviewControllerTest {
 				new ReviewImageResponse(2, "http://example.com/image2.jpg"))
 		);
 
-		when(reviewService.updateReview(any(ReviewRequest.class), anyLong(), eq(1L))).thenReturn(response);
+		when(reviewService.updateReview(any(ReviewRequest.class), anyLong())).thenReturn(response);
 
+		// header 추가 대신 set
+		MemberIdContext.setMemberId(1l);
 		// Act & Assert
 		mockMvc.perform(put("/api/reviews/1")
-				.header("X-USER-ID", "1")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(reviewRequest)))
 			.andExpect(status().isOk())
