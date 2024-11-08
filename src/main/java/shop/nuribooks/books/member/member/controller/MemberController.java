@@ -75,6 +75,7 @@ public class MemberController {
 	})
 	@GetMapping("/api/member/username/{username}")
 	public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfoByUsername(@PathVariable String username) {
+
 		MemberAuthInfoResponse response = memberService.getMemberAuthInfoByUsername(username);
 
 		return ResponseEntity.status(OK).body(response);
@@ -91,6 +92,7 @@ public class MemberController {
 	})
 	@GetMapping("/api/member/email/{email}")
 	public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfoByEmail(@PathVariable String email) {
+
 		MemberAuthInfoResponse response = memberService.getMemberAuthInfoByEmail(email);
 
 		return ResponseEntity.status(OK).body(response);
@@ -106,8 +108,8 @@ public class MemberController {
 	})
 	@DeleteMapping("/api/member/me")
 	public ResponseEntity<ResponseMessage> memberWithdraw() {
-		Long memberId = MemberIdContext.getMemberId();
 
+		Long memberId = MemberIdContext.getMemberId();
 		memberService.withdrawMember(memberId);
 
 		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),
@@ -125,8 +127,8 @@ public class MemberController {
 	})
 	@GetMapping("/api/member/me")
 	public ResponseEntity<MemberDetailsResponse> getMemberDetails() {
-		Long memberId = MemberIdContext.getMemberId();
 
+		Long memberId = MemberIdContext.getMemberId();
 		MemberDetailsResponse response = memberService.getMemberDetails(memberId);
 
 		return ResponseEntity.status(OK).body(response);
@@ -135,7 +137,7 @@ public class MemberController {
 	/**
 	 * 회원 정보 수정 <br>
 	 * MemberUpdateReq의 모든 필드 즉, <br>
-	 * name, password, phoneNumber에 대해서 검증 후 userId를 통해 수정 진행 <br>
+	 * name, password에 대해서 검증 후 userId를 통해 수정 진행 <br>
 	 * MemberUpdateResponse에 변경한 이름과 전화번호 담아서 반환
 	 */
 	@Operation(summary = "회원 정보 수정", description = "유저 아이디로 회원 정보를 수정합니다.")
@@ -147,8 +149,8 @@ public class MemberController {
 	@PostMapping("/api/member/me")
 	public ResponseEntity<ResponseMessage> memberUpdate(
 		@RequestBody @Valid MemberUpdateRequest request) {
-		Long memberId = MemberIdContext.getMemberId();
 
+		Long memberId = MemberIdContext.getMemberId();
 		memberService.updateMember(memberId, request);
 
 		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),

@@ -59,7 +59,7 @@ public class Member {
 	private AuthorityType authority;
 
 	/**
-	 * STANDARD, GOLD, PLATINUM, ROYAL
+	 * STANDARD, SILVER, GOLD, PLATINUM, ROYAL
 	 */
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "grade_id")
@@ -82,7 +82,7 @@ public class Member {
 	private GenderType gender;
 
 	@NotBlank
-	@Size(min = 8, max = 20)
+	@Size(min = 8, max = 200)
 	@Column(unique = true)
 	private String username;
 
