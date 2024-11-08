@@ -34,9 +34,6 @@ public class Category {
 	@Column(name = "category_id")
 	private Long id;
 
-	@NotNull
-	@Setter
-	@Column(length = 30, nullable = false)
 	private String name;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -51,5 +48,13 @@ public class Category {
 	public Category(String name, Category parentCategory) {
 		this.name = name;
 		this.parentCategory = parentCategory;
+	}
+
+	public CategoryEditor.CategoryEditorBuilder toEditor() {
+		return CategoryEditor.builder().name(name);
+	}
+
+	public void edit(CategoryEditor editor) {
+		name = editor.getName();
 	}
 }
