@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.category.dto;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,9 +22,12 @@ public record CategoryResponse(Long id,
 	 * @return 카테고리 응답 DTO
 	 */
 	public static CategoryResponse from(Category category) {
-		List<CategoryResponse> subCategoryResponses = category.getSubCategory().stream()
-			.map(CategoryResponse::from)
-			.collect(Collectors.toList());
+		List<CategoryResponse> subCategoryResponses = Collections.emptyList();
+		if (category.getSubCategory() != null && !category.getSubCategory().isEmpty()) {
+			subCategoryResponses = category.getSubCategory().stream()
+				.map(CategoryResponse::from)
+				.collect(Collectors.toList());
+		}
 
 		return new CategoryResponse(
 			category.getId(),

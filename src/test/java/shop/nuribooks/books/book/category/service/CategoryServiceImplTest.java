@@ -186,23 +186,21 @@ class CategoryServiceImplTest {
 
 	@Test
 	void updateCategory_ShouldUpdateCategorySuccessfully() {
-		// Given
 		Long categoryId = 1L;
-		CategoryRequest dto = new CategoryRequest("Updated Category Name");
-		Category existingCategory = new Category("Old Category Name", null);
+
+		String updatedName = "Updated Category Name";
+		CategoryRequest categoryRequest = new CategoryRequest(updatedName);
+
+		Category existingCategory = Category.builder()
+			.name("Old Category Name")
+			.build();
 
 		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
-		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(false);
-		when(categoryRepository.save(any(Category.class))).thenReturn(existingCategory);
+		when(categoryRepository.existsByNameAndParentCategoryIsNull(updatedName)).thenReturn(false);
+		// when
+		categoryService.updateCategory(categoryRequest, categoryId);
+		assertEquals(updatedName, existingCategory.getName());
 
-		// When
-		CategoryResponse result = categoryService.updateCategory(dto, categoryId);
-
-		// Then
-		assertNotNull(result);
-		assertEquals("Updated Category Name", result.name());
-		verify(categoryRepository).findById(categoryId);
-		verify(categoryRepository).save(existingCategory);
 	}
 
 	@Test

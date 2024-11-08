@@ -35,6 +35,20 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	/**
+	 * getCategoryEditor : 카테고리 편집 빌더
+	 *
+	 * @param categoryRequest 요청된 태그 정보 담긴 객체
+	 * @param category 기존 태그 정보를 담은 객체
+	 * @return 수정된 정보를 포함한 객체
+	 */
+	private static CategoryEditor getCategoryEditor(CategoryRequest categoryRequest, Category category) {
+		CategoryEditor.CategoryEditorBuilder builder = category.toEditor();
+		return builder
+			.name(categoryRequest.name())
+			.build();
+	}
+
+	/**
 	 * 새로운 대분류 카테고리를 등록합니다.
 	 *
 	 * @param categoryRequest 카테고리 등록 요청 DTO
@@ -142,9 +156,10 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 
 		CategoryEditor categoryEditor = getCategoryEditor(categoryRequest, category);
+
 		category.edit(categoryEditor);
 
-		return CategoryResponse.from(categoryRepository.save(category));
+		return CategoryResponse.from(category);
 	}
 
 	/**
@@ -159,21 +174,6 @@ public class CategoryServiceImpl implements CategoryService {
 			.orElseThrow(CategoryNotFoundException::new);
 		categoryRepository.delete(category);
 	}
-
-	/**
-	 * getCategoryEditor : 카테고리 편집 빌더
-	 *
-	 * @param categoryRequest 요청된 태그 정보 담긴 객체
-	 * @param category 기존 태그 정보를 담은 객체
-	 * @return 수정된 정보를 포함한 객체
-	 */
-	private static CategoryEditor getCategoryEditor(CategoryRequest categoryRequest, Category category) {
-		CategoryEditor.CategoryEditorBuilder builder = category.toEditor();
-		return builder
-			.name(categoryRequest.name())
-			.build();
-	}
-
 
 }
 
