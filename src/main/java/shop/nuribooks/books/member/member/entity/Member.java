@@ -59,13 +59,13 @@ public class Member {
 	private AuthorityType authority;
 
 	/**
-	 * STANDARD, GOLD, PLATINUM, ROYAL
+	 * STANDARD, SILVER, GOLD, PLATINUM, ROYAL
 	 */
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "grade_id")
 	private Grade grade;
 
-	@OneToMany(mappedBy = "id", fetch = LAZY)
+	@OneToMany(mappedBy = "member", fetch = LAZY)
 	@Builder.Default
 	private List<Address> addressList = new ArrayList<>();
 
@@ -76,13 +76,13 @@ public class Member {
 	private StatusType status;
 
 	/**
-	 * MALE, FEMALE
+	 * MALE, FEMALE, OTHER
 	 */
 	@Enumerated(STRING)
 	private GenderType gender;
 
 	@NotBlank
-	@Size(min = 8, max = 20)
+	@Size(min = 8, max = 200)
 	@Column(unique = true)
 	private String username;
 
@@ -101,12 +101,12 @@ public class Member {
 	/**
 	 * 마지막 로그인 일시
 	 */
-	private LocalDateTime latestLoginAt = null;
+	private LocalDateTime latestLoginAt;
 
 	/**
 	 * 탈퇴 일시
 	 */
-	private LocalDateTime withdrawnAt = null;
+	private LocalDateTime withdrawnAt;
 
 	/**
 	 * 마지막 로그일 날짜로부터 90일이 지나면 상태를 INACTIVE로 변경
