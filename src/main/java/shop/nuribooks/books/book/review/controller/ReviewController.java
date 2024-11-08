@@ -1,7 +1,6 @@
 package shop.nuribooks.books.book.review.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,11 +16,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
+import shop.nuribooks.books.common.message.PagedResponse;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping()
@@ -36,10 +37,9 @@ public class ReviewController {
 	})
 	@PostMapping("/api/reviews")
 	public ResponseEntity<ReviewMemberResponse> registerReview(
-		@Valid @RequestBody ReviewRequest reviewRequest,
-		@RequestHeader("X-USER-ID") long ownerId
+		@Valid @RequestBody ReviewRequest reviewRequest
 	) {
-		ReviewMemberResponse response = this.reviewService.registerReview(reviewRequest, ownerId);
+		ReviewMemberResponse response = this.reviewService.registerReview(reviewRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
@@ -49,10 +49,11 @@ public class ReviewController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@GetMapping("/api/books/{bookId}/reviews")
-	public ResponseEntity<List<ReviewMemberResponse>> getReviewMember(
-		@PathVariable("bookId") long bookId
+	public ResponseEntity<PagedResponse<ReviewMemberResponse>> getReviewMember(
+		@PathVariable("bookId") long bookId,
+		Pageable pageable
 	) {
-		List<ReviewMemberResponse> response = this.reviewService.getReviewsWithMember(bookId);
+		PagedResponse<ReviewMemberResponse> response = this.reviewService.getReviewsByBookId(bookId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -62,10 +63,11 @@ public class ReviewController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@GetMapping("/api/members/{memberId}/reviews")
-	public ResponseEntity<List<ReviewBookResponse>> getReviewBook(
-		@PathVariable("memberId") long memberId
+	public ResponseEntity<PagedResponse<ReviewBookResponse>> getReviewBook(
+		@PathVariable("memberId") long memberId,
+		Pageable pageable
 	) {
-		List<ReviewBookResponse> response = this.reviewService.getReviewsWithBook(memberId);
+		PagedResponse<ReviewBookResponse> response = this.reviewService.getReviewsByMemberId(memberId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -78,10 +80,9 @@ public class ReviewController {
 	@PutMapping("/api/reviews/{reviewId}")
 	public ResponseEntity<ReviewMemberResponse> updateReview(
 		@Valid @RequestBody ReviewRequest reviewRequest,
-		@PathVariable long reviewId,
-		@RequestHeader("X-USER-ID") long ownerId
+		@PathVariable long reviewId
 	) {
-		ReviewMemberResponse response = this.reviewService.updateReview(reviewRequest, reviewId, ownerId);
+		ReviewMemberResponse response = this.reviewService.updateReview(reviewRequest, reviewId);
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}

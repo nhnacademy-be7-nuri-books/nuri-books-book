@@ -1,6 +1,5 @@
 package shop.nuribooks.books.book.booktag.controller;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -25,16 +24,15 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.book.TestUtils;
-import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
-import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
+import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.service.BookTagService;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
+import shop.nuribooks.books.common.TestUtils;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(BookTagController.class)
@@ -62,45 +60,46 @@ class BookTagControllerTest {
 		Publisher publisher = new Publisher(1L, "Sample Publisher");
 
 		book = Book.builder()
-				.publisherId(publisher)
-				.state(BookStateEnum.NEW)
-				.title("Sample Book")
-				.thumbnailImageUrl("https://example.com/thumbnail.jpg")
-				.detailImageUrl("https://example.com/detail.jpg")
-				.publicationDate(LocalDate.now())
-				.price(BigDecimal.valueOf(29.99))
-				.discountRate(10)
-				.description("Sample description.")
-				.contents("Sample contents.")
-				.isbn("978-3-16-148410-0")
-				.isPackageable(true)
-				.stock(100)
-				.likeCount(0)
-				.viewCount(0L)
-				.build();
+			.publisherId(publisher)
+			.state(BookStateEnum.NEW)
+			.title("Sample Book")
+			.thumbnailImageUrl("https://example.com/thumbnail.jpg")
+			.detailImageUrl("https://example.com/detail.jpg")
+			.publicationDate(LocalDate.now())
+			.price(BigDecimal.valueOf(29.99))
+			.discountRate(10)
+			.description("Sample description.")
+			.contents("Sample contents.")
+			.isbn("978-3-16-148410-0")
+			.isPackageable(true)
+			.stock(100)
+			.likeCount(0)
+			.viewCount(0L)
+			.build();
 
 		book1 = Book.builder()
-				.publisherId(publisher)
-				.state(BookStateEnum.NEW)
-				.title("Sample Book 1")
-				.thumbnailImageUrl("https://example.com/thumbnail1.jpg")
-				.detailImageUrl("https://example.com/detail1.jpg")
-				.publicationDate(LocalDate.now())
-				.price(BigDecimal.valueOf(19.99))
-				.discountRate(5)
-				.description("Sample description for book 1.")
-				.contents("Sample contents for book 1.")
-				.isbn("978-3-16-148410-1")
-				.isPackageable(true)
-				.stock(50)
-				.likeCount(0)
-				.viewCount(1L)
-				.build();
+			.publisherId(publisher)
+			.state(BookStateEnum.NEW)
+			.title("Sample Book 1")
+			.thumbnailImageUrl("https://example.com/thumbnail1.jpg")
+			.detailImageUrl("https://example.com/detail1.jpg")
+			.publicationDate(LocalDate.now())
+			.price(BigDecimal.valueOf(19.99))
+			.discountRate(5)
+			.description("Sample description for book 1.")
+			.contents("Sample contents for book 1.")
+			.isbn("978-3-16-148410-1")
+			.isPackageable(true)
+			.stock(50)
+			.likeCount(0)
+			.viewCount(1L)
+			.build();
 
 		TestUtils.setIdForEntity(book, 1L);
 		TestUtils.setIdForEntity(book1, 2L);
 
 	}
+
 	@DisplayName("도서 태그 등록")
 	@Test
 	void registerTagToBook() throws Exception {
@@ -110,17 +109,17 @@ class BookTagControllerTest {
 
 		// Mocking the service call
 		when(bookTagService.registerTagToBook(any(BookTagRequest.class)))
-				.thenReturn(response);
+			.thenReturn(response);
 
 		// When & Then
 		mockMvc.perform(post("/api/book-tags")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(new ObjectMapper().writeValueAsString(request)))
-				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.bookId").value(1L))
-				.andExpect(jsonPath("$.tagIds").isArray())
-				.andExpect(jsonPath("$.tagIds[0]").value(2L))
-				.andExpect(jsonPath("$.tagIds[1]").value(3L));
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(new ObjectMapper().writeValueAsString(request)))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.bookId").value(1L))
+			.andExpect(jsonPath("$.tagIds").isArray())
+			.andExpect(jsonPath("$.tagIds[0]").value(2L))
+			.andExpect(jsonPath("$.tagIds[1]").value(3L));
 	}
 
 	@Test
@@ -131,10 +130,10 @@ class BookTagControllerTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/book-tags")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("bookId는 양수여야 합니다"));
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("bookId는 양수여야 합니다"));
 	}
 
 	@Test
@@ -144,10 +143,10 @@ class BookTagControllerTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/book-tags")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("tagId는 양수여야 합니다"));
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("tagId는 양수여야 합니다"));
 	}
 
 	@Test
@@ -157,10 +156,10 @@ class BookTagControllerTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/book-tags")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("bookId는 필수 입력 항목입니다"));
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("bookId는 필수 입력 항목입니다"));
 	}
 
 	@Test
@@ -170,10 +169,10 @@ class BookTagControllerTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/book-tags")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value("tagId는 필수 입력 항목입니다"));
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("tagId는 필수 입력 항목입니다"));
 	}
 
 	@DisplayName("도서 태그 조회 성공")
@@ -189,12 +188,12 @@ class BookTagControllerTest {
 
 		// When & Then
 		mockMvc.perform(get("/api/book-tags/book/{bookId}", bookId)
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.bookTagId").value(bookTagId)) // bookTagId 확인
-				.andExpect(jsonPath("$.bookId").value(bookId)) // bookId 확인
-				.andExpect(jsonPath("$.tagNames[0]").value("Sample Tag")); // tagNames 확인
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.bookTagId").value(bookTagId)) // bookTagId 확인
+			.andExpect(jsonPath("$.bookId").value(bookId)) // bookId 확인
+			.andExpect(jsonPath("$.tagNames[0]").value("Sample Tag")); // tagNames 확인
 	}
 
 	/*@DisplayName("태그에 해당하는 도서 조회 성공")
@@ -247,8 +246,8 @@ class BookTagControllerTest {
 
 		// When & Then
 		mockMvc.perform(delete("/api/book-tags/{bookTagId}", bookTagId)
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isNoContent());
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNoContent());
 
 		verify(bookTagService, times(1)).deleteBookTag(bookTagId);
 	}
