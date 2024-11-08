@@ -5,6 +5,7 @@ import static jakarta.persistence.FetchType.*;
 import static java.math.BigDecimal.*;
 import static shop.nuribooks.books.member.member.entity.StatusType.*;
 
+import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,10 +21,13 @@ import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
 
@@ -55,11 +59,15 @@ public class Member {
 	private AuthorityType authority;
 
 	/**
-	 * STANDARD, GOLD, PLATINUM, ROYAL
+	 * STANDARD, SILVER, GOLD, PLATINUM, ROYAL
 	 */
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "grade_id")
 	private Grade grade;
+
+	@OneToMany(mappedBy = "member", fetch = LAZY)
+	@Builder.Default
+	private List<Address> addressList = new ArrayList<>();
 
 	/**
 	 * ACTIVE, INACTIVE, WITHDRAWN
@@ -68,13 +76,13 @@ public class Member {
 	private StatusType status;
 
 	/**
-	 * MALE, FEMALE
+	 * MALE, FEMALE, OTHER
 	 */
 	@Enumerated(STRING)
 	private GenderType gender;
 
 	@NotBlank
-	@Size(min = 8, max = 20)
+	@Size(min = 8, max = 200)
 	@Column(unique = true)
 	private String username;
 
@@ -93,12 +101,12 @@ public class Member {
 	/**
 	 * 마지막 로그인 일시
 	 */
-	private LocalDateTime latestLoginAt = null;
+	private LocalDateTime latestLoginAt;
 
 	/**
 	 * 탈퇴 일시
 	 */
-	private LocalDateTime withdrawnAt = null;
+	private LocalDateTime withdrawnAt;
 
 	/**
 	 * 마지막 로그일 날짜로부터 90일이 지나면 상태를 INACTIVE로 변경
@@ -129,4 +137,10 @@ public class Member {
 		this.totalPaymentAmount = ZERO;
 		this.latestLoginAt = null;
 	}
+
+	public void addAddress(Address address) {
+		address.setMember(this);
+		addressList.add(address);
+	}
+
 }

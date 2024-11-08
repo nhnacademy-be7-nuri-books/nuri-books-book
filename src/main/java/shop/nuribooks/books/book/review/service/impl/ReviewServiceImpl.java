@@ -27,7 +27,6 @@ import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
 	private final MemberRepository memberRepository;
@@ -142,6 +141,7 @@ public class ReviewServiceImpl implements ReviewService {
 		return pagedResponse;
 	}
 
+	@Transactional
 	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId, long ownerId) {
 		// 기존 review update 처리
 		Review prevReview = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException());

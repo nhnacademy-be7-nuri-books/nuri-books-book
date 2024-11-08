@@ -19,6 +19,8 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.book.service.AladinBookService;
+import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
+import shop.nuribooks.books.book.booktag.service.BookTagService;
 import shop.nuribooks.books.book.category.entity.BookCategory;
 import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
@@ -48,6 +50,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 	private final ContributorRoleRepository contributorRoleRepository;
 	private final BookContributorRepository bookContributorRepository;
 	private final BookCategoryRepository bookCategoryRepository;
+	private final BookTagService bookTagService;
 
 	@Value("${aladin.api.key}")
 	private String ttbKey;
@@ -122,6 +125,12 @@ public class AladinBookServiceImpl implements AladinBookService {
 			List<ParsedContributor> parsedContributors = parseContributors(reqDto.author());
 			saveContributors(parsedContributors, book);
 			saveCategories(reqDto.categoryName(), book);
+
+			if (reqDto.tagIds() != null && !reqDto.tagIds().isEmpty()) {
+				BookTagRequest bookTagRequest = new BookTagRequest(book.getId(), reqDto.tagIds());
+				bookTagService.registerTagToBook(bookTagRequest);
+			}
+
 			log.info("Book with ISBN {} successfully saved.", reqDto.isbn());
 		} catch (Exception ex) {
 			log.error("Error saving book with ISBN {}: {}", reqDto.isbn(), ex.getMessage(), ex);

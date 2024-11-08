@@ -3,6 +3,8 @@ package shop.nuribooks.books.book.bookcontributor.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class BookContributorServiceImpl implements BookContributorService {
 
     private final BookContributorRepository bookContributorRepository;
@@ -94,8 +97,15 @@ public class BookContributorServiceImpl implements BookContributorService {
      */
     @Override
     public List<BookContributorInfoResponse> getContributorsAndRolesByBookId(Long bookId) {
-        List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(bookId);
-        return contributors;
+        try {
+            log.info("Fetching contributors for bookId: {}", bookId);
+            List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(bookId);
+            log.info("Contributors fetched: {}", contributors);
+            return contributors;
+        } catch (Exception e) {
+            log.error("Error fetching contributors for bookId: {}", bookId, e);
+            throw e;
+        }
     }
 
     /**

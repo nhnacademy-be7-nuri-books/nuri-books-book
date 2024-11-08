@@ -7,7 +7,6 @@ import shop.nuribooks.books.member.address.entity.Address;
 
 @Builder
 public record AddressResponse(
-        @NotNull Long id,
         @NotBlank String name,
         @NotBlank String address,
         @NotBlank String addressDetail,
@@ -15,7 +14,6 @@ public record AddressResponse(
 
     public static AddressResponse of(Address address) {
         return AddressResponse.builder()
-                .id(address.getId())
                 .name(address.getName())
                 .address(address.getAddress())
                 .addressDetail(address.getAddressDetail())

@@ -7,12 +7,12 @@ import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 
 public interface AddressService {
 
-    AddressResponse registerAddress(AddressRegisterRequest request);
+    AddressResponse registerAddress(AddressRegisterRequest request, Long memberId);
 
     List<AddressResponse> findAddressesByMemberId(Long memberId);
 
     void removeAddress(Long addressId);
 
-    AddressResponse modifyAddress(AddressEditRequest request);
+    AddressResponse modifyAddress(Long addressId, AddressEditRequest request);
 
 }

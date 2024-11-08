@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 @Builder
 public record AddressEditRequest(
-        @NotNull Long id,
         @NotBlank String name,
         @NotBlank String address,
         @NotBlank String addressDetail,
