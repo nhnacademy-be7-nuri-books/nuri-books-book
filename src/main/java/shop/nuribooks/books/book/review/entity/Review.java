@@ -23,6 +23,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.member.member.entity.Member;
 
@@ -30,6 +31,7 @@ import shop.nuribooks.books.member.member.entity.Member;
 @NoArgsConstructor
 @Getter
 @Table(name = "reviews")
+@ToString
 public class Review {
 	@Id
 	@Column(name = "review_id")
@@ -56,7 +58,7 @@ public class Review {
 	private LocalDateTime updateAt;
 
 	@ManyToOne
-	@JoinColumn(name = "member_id", nullable = false)
+	@JoinColumn(name = "customer_id", nullable = false)
 	private Member member;
 
 	@ManyToOne

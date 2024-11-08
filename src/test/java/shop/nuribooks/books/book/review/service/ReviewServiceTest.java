@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.book.entity.Book;
@@ -132,7 +133,7 @@ public class ReviewServiceTest {
 	@Test
 	public void updateSuccess() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
-		when(reviewRepository.save(any())).thenReturn(review).thenReturn(review);
+		when(reviewRepository.save(any())).thenReturn(review);
 		assertEquals(ReviewMemberResponse.of(review),
 			reviewService.updateReview(reviewRequest, review.getId(), member.getId()));
 	}
@@ -156,29 +157,29 @@ public class ReviewServiceTest {
 	public void getReviewsAndMemFail() {
 		when(bookRepository.existsById(anyLong())).thenReturn(false);
 		assertThrows(BookIdNotFoundException.class,
-			() -> this.reviewService.getReviewsWithMember(1));
+			() -> this.reviewService.getReviewsWithMember(1, PageRequest.of(0, 1)));
 	}
 
 	@Test
 	public void getReviewsAndMemSuccess() {
 		List<ReviewMemberResponse> res = new LinkedList<>();
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
-		when(reviewRepository.findReviewsByBookId(1)).thenReturn(res);
-		assertEquals(reviewService.getReviewsWithMember(1).size(), 0);
+		when(reviewRepository.findReviewsByBookId(anyLong(), any())).thenReturn(res);
+		assertEquals(reviewService.getReviewsWithMember(1, PageRequest.of(0, 1)).size(), 0);
 	}
 
 	@Test
 	public void getReviewsAndBookFail() {
 		when(memberRepository.existsById(anyLong())).thenReturn(false);
 		assertThrows(MemberNotFoundException.class,
-			() -> this.reviewService.getReviewsWithBook(1));
+			() -> this.reviewService.getReviewsWithBook(1, PageRequest.of(0, 2)));
 	}
 
 	@Test
 	public void getReviewsAndBookSuccess() {
 		List<ReviewBookResponse> res = new LinkedList<>();
 		when(memberRepository.existsById(anyLong())).thenReturn(true);
-		when(reviewRepository.findReviewsByMemberId(1)).thenReturn(res);
-		assertEquals(reviewService.getReviewsWithBook(1).size(), 0);
+		when(reviewRepository.findReviewsByMemberId(1, PageRequest.of(0, 2))).thenReturn(res);
+		assertEquals(reviewService.getReviewsWithBook(1, PageRequest.of(0, 2)).size(), 0);
 	}
 }

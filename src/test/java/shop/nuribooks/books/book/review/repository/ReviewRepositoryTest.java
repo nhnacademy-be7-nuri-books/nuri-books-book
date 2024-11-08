@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.book.entity.Book;
@@ -77,7 +78,7 @@ public class ReviewRepositoryTest {
 
 	@Test
 	void getReviewWithBookIdTest() {
-		List<ReviewMemberResponse> response = reviewRepository.findReviewsByBookId(book.getId());
+		List<ReviewMemberResponse> response = reviewRepository.findReviewsByBookId(book.getId(), PageRequest.of(0, 2));
 		assertEquals(response.size(), 1);
 	}
 
@@ -89,7 +90,8 @@ public class ReviewRepositoryTest {
 
 	@Test
 	void getReviewWithMemberIdTest() {
-		List<ReviewBookResponse> response = reviewRepository.findReviewsByMemberId(member.getId());
+		List<ReviewBookResponse> response = reviewRepository.findReviewsByMemberId(member.getId(),
+			PageRequest.of(0, 2));
 		assertEquals(response.size(), reviews.size());
 	}
 }

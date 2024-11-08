@@ -1,7 +1,11 @@
 package shop.nuribooks.books.book.review.service.impl;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,10 +14,13 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
+import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.ReviewService;
+import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
@@ -27,6 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final MemberRepository memberRepository;
 	private final BookRepository bookRepository;
 	private final ReviewRepository reviewRepository;
+	private final ReviewImageRepository reviewImageRepository;
 
 	/**
 	 * 리뷰 등록. 리뷰 이미지도 함께 등록합니다.
@@ -68,10 +76,29 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public List<ReviewMemberResponse> getReviewsWithMember(long bookId) {
+	public PagedResponse<ReviewMemberResponse> getReviewsWithMember(long bookId, Pageable pageable) {
 		if (!bookRepository.existsById(bookId))
 			throw new BookIdNotFoundException();
-		return this.reviewRepository.findReviewsByBookId(bookId);
+		List<ReviewMemberResponse> reviews = this.reviewRepository.findReviewsByBookId(bookId, pageable);
+		List<Long> reviewIds = new LinkedList<>();
+		Map<Long, ReviewMemberResponse> reviewMap = new LinkedHashMap<>();
+		for (ReviewMemberResponse rmr : reviews) {
+			reviewIds.add(rmr.id());
+			reviewMap.put(rmr.id(), rmr);
+		}
+		if (reviewIds.size() > 0) {
+			List<ReviewImageResponse> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(reviewIds);
+			for (ReviewImageResponse rir : reviewImages) {
+				reviewMap.get(rir.id()).reviewImages().add(rir);
+			}
+		}
+		int totalElement = (int)this.reviewRepository.countByBookId(bookId);
+		int totalPage = totalElement / pageable.getPageSize() + totalElement % pageable.getPageSize() == 0 ? 0 : 1;
+		PagedResponse pagedResponse = new PagedResponse(reviews, pageable.getPageNumber(), pageable.getPageSize(),
+			totalPage
+			, totalElement);
+
+		return pagedResponse;
 	}
 
 	/**
@@ -81,10 +108,10 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public List<ReviewBookResponse> getReviewsWithBook(long memberId) {
+	public List<ReviewBookResponse> getReviewsWithBook(long memberId, Pageable pageable) {
 		if (!memberRepository.existsById(memberId))
 			throw new MemberNotFoundException("유저를 찾을 수 없습니다.");
-		return this.reviewRepository.findReviewsByMemberId(memberId);
+		return this.reviewRepository.findReviewsByMemberId(memberId, pageable);
 	}
 
 	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId, long ownerId) {

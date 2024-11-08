@@ -21,6 +21,7 @@ import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
+import shop.nuribooks.books.common.message.PagedResponse;
 
 @WebMvcTest(ReviewController.class)
 public class ReviewControllerTest {
@@ -77,7 +78,8 @@ public class ReviewControllerTest {
 				new ReviewImageResponse(2, "http://example.com/image2.jpg"))
 		);
 
-		when(reviewService.getReviewsWithMember(anyLong())).thenReturn(List.of(review));
+		when(reviewService.getReviewsWithMember(anyLong(), any())).thenReturn(
+			new PagedResponse<>(List.of(), 1, 1, 1, 1));
 
 		mockMvc.perform(get("/api/books/" + bookId + "/reviews"))
 			.andExpect(status().isOk())
@@ -97,7 +99,7 @@ public class ReviewControllerTest {
 				new ReviewImageResponse(2, "http://example.com/image2.jpg"))
 		);
 
-		when(reviewService.getReviewsWithBook(anyLong())).thenReturn(List.of(review));
+		when(reviewService.getReviewsWithBook(anyLong(), any())).thenReturn(List.of(review));
 
 		mockMvc.perform(get("/api/members/" + memberId + "/reviews"))
 			.andExpect(status().isOk())

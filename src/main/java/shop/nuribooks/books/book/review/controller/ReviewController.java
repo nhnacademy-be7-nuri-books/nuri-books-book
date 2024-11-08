@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.review.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
+import shop.nuribooks.books.common.message.PagedResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +39,7 @@ public class ReviewController {
 	@PostMapping("/api/reviews")
 	public ResponseEntity<ReviewMemberResponse> registerReview(
 		@Valid @RequestBody ReviewRequest reviewRequest,
+		// TODO:: aop 저굥
 		@RequestHeader("X-USER-ID") long ownerId
 	) {
 		ReviewMemberResponse response = this.reviewService.registerReview(reviewRequest, ownerId);
@@ -49,10 +52,11 @@ public class ReviewController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@GetMapping("/api/books/{bookId}/reviews")
-	public ResponseEntity<List<ReviewMemberResponse>> getReviewMember(
-		@PathVariable("bookId") long bookId
+	public ResponseEntity<PagedResponse<ReviewMemberResponse>> getReviewMember(
+		@PathVariable("bookId") long bookId,
+		Pageable pageable
 	) {
-		List<ReviewMemberResponse> response = this.reviewService.getReviewsWithMember(bookId);
+		PagedResponse<ReviewMemberResponse> response = this.reviewService.getReviewsWithMember(bookId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
@@ -63,9 +67,10 @@ public class ReviewController {
 	})
 	@GetMapping("/api/members/{memberId}/reviews")
 	public ResponseEntity<List<ReviewBookResponse>> getReviewBook(
-		@PathVariable("memberId") long memberId
+		@PathVariable("memberId") long memberId,
+		Pageable pageable
 	) {
-		List<ReviewBookResponse> response = this.reviewService.getReviewsWithBook(memberId);
+		List<ReviewBookResponse> response = this.reviewService.getReviewsWithBook(memberId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
