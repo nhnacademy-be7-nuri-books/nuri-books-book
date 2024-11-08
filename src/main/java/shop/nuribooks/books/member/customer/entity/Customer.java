@@ -6,8 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,22 +24,29 @@ public class Customer {
 	@Column(name = "customer_id")
 	private Long id;
 
-	@NotBlank
+	@NotNull
 	private String name;
 
-	@NotBlank
+	@NotNull
 	private String password;
 
-	@NotBlank
+	@NotNull
+	@Column(unique = true)
 	private String phoneNumber;
 
-	@NotBlank
-	@Email
+	@NotNull
+	@Column(unique = true)
 	private String email;
 
-	public void changeCustomerInformation(String name, String password, String phoneNumber) {
+	public void changeCustomerInformation(String name, String password) {
 		this.name = name;
 		this.password = password;
-		this.phoneNumber = phoneNumber;
+	}
+
+	public void changeToSoftDeleted() {
+		this.name = "";
+		this.password = "";
+		this.phoneNumber = "";
+		this.email = "";
 	}
 }

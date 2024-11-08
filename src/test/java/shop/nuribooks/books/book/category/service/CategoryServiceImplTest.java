@@ -15,7 +15,7 @@ import org.mockito.MockitoAnnotations;
 
 import shop.nuribooks.books.book.category.dto.CategoryRequest;
 import shop.nuribooks.books.book.category.dto.CategoryResponse;
-import shop.nuribooks.books.book.category.entitiy.Category;
+import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.impl.CategoryServiceImpl;
 import shop.nuribooks.books.exception.category.CategoryAlreadyExistException;
@@ -186,23 +186,21 @@ class CategoryServiceImplTest {
 
 	@Test
 	void updateCategory_ShouldUpdateCategorySuccessfully() {
-		// Given
 		Long categoryId = 1L;
-		CategoryRequest dto = new CategoryRequest("Updated Category Name");
-		Category existingCategory = new Category("Old Category Name", null);
+
+		String updatedName = "Updated Category Name";
+		CategoryRequest categoryRequest = new CategoryRequest(updatedName);
+
+		Category existingCategory = Category.builder()
+			.name("Old Category Name")
+			.build();
 
 		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
-		when(categoryRepository.existsByNameAndParentCategoryIsNull(dto.name())).thenReturn(false);
-		when(categoryRepository.save(any(Category.class))).thenReturn(existingCategory);
+		when(categoryRepository.existsByNameAndParentCategoryIsNull(updatedName)).thenReturn(false);
+		// when
+		categoryService.updateCategory(categoryRequest, categoryId);
+		assertEquals(updatedName, existingCategory.getName());
 
-		// When
-		CategoryResponse result = categoryService.updateCategory(dto, categoryId);
-
-		// Then
-		assertNotNull(result);
-		assertEquals("Updated Category Name", result.name());
-		verify(categoryRepository).findById(categoryId);
-		verify(categoryRepository).save(existingCategory);
 	}
 
 	@Test
@@ -272,6 +270,25 @@ class CategoryServiceImplTest {
 		when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
 		assertThrows(CategoryNotFoundException.class, () -> categoryService.deleteCategory(categoryId));
+	}
+
+	@Test
+	void updateCategory_ShouldUpdateCategorySuccessfully_WhenParentCategoryExists() {
+		// Given
+		Long categoryId = 1L;
+		Category parentCategory = new Category("Parent Category", null);
+		Category existingCategory = new Category("Old Category Name", parentCategory);
+		CategoryRequest dto = new CategoryRequest("Updated SubCategory Name");
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
+
+		// When
+		categoryService.updateCategory(dto, categoryId);
+
+		// Then
+		assertEquals("Updated SubCategory Name", existingCategory.getName());
+		verify(categoryRepository).findById(categoryId);
+		verify(categoryRepository, never()).save(any(Category.class));
 	}
 
 }

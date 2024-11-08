@@ -5,13 +5,13 @@ import lombok.Getter;
 @Getter
 public class AddressEditor {
 
-    private String name;
+    private final String name;
 
-    private String address;
+    private final String address;
 
-    private String addressDetail;
+    private final String addressDetail;
 
-    private boolean isDefault;
+    private final boolean isDefault;
 
     private AddressEditor(String name, String address, String addressDetail, boolean isDefault) {
         this.name = name;
@@ -63,10 +63,6 @@ public class AddressEditor {
             return new AddressEditor(this.name, this.address, this.addressDetail, this.isDefault);
         }
 
-        public String toString() {
-            return "AddressEditor.AddressEditorBuilder(name=" + this.name + ", address=" + this.address
-                    + ", addressDetail=" + this.addressDetail + ", isDefault=" + this.isDefault + ")";
-        }
     }
 
 

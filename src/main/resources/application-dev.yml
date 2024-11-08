@@ -1,12 +1,18 @@
 spring:
   datasource:
-    url: ENC(4dT7SywLidx3dSAGeNMmAFO9r4v5+NKxcGkQhrCyEsrCAAErk9mtsimvM+XYZkHP04maNVDqTLE59hkPE4crGBUe+3Efb5KU/UJHKZaL/XzE3zJlC5+TxGq4yZbZ/q+9/1vX4Y/yE8s=)
+    url: ENC(G/rh9H8G7vkNa2gWM40xVeBDfHcws8/a3d1RPpWULMKUtuGs2JptuCbARCNuVTkDXQr/dKqZaCqee/h35eVDFGpd2rSLRrDwAmcYZt9bAG74WrtOzZE6L6+HPClibGk3KZg5rQT1HSg=)
     username: ENC(E7wzC9kl4nVwfEV7JsZ09WVAXwAQhSwy)
     password: ENC(udeUrEU3cfiVaNkqv4zwgEhifPvD2iRzsL5Jr/E2/u4=)
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
+    hibernate:
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+
+logging:
+  level:
+    root: debug

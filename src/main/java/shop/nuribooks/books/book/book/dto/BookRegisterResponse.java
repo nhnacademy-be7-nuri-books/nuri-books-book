@@ -5,11 +5,11 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import shop.nuribooks.books.book.book.entitiy.Book;
+import shop.nuribooks.books.book.book.entity.Book;
 
 public record BookRegisterResponse(
 	Long id,
-	Long publisherId,
+	String publisherName,
 	String korName,
 	String title,
 	String thumbnailImageUrl,
@@ -23,7 +23,7 @@ public record BookRegisterResponse(
 	public static BookRegisterResponse of(Book book) {
 		return new BookRegisterResponse(
 			book.getId(),
-			book.getPublisherId().getId(),
+			book.getPublisherId().getName(),
 			book.getState().getKorName(),
 			book.getTitle(),
 			book.getThumbnailImageUrl(),

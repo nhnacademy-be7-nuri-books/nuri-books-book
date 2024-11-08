@@ -1,19 +1,30 @@
 package shop.nuribooks.books.book.book.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
+import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.book.entitiy.Book;
-import shop.nuribooks.books.book.book.entitiy.BookStateEnum;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.entity.BookStateEnum;
+import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
+import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
+import shop.nuribooks.books.book.bookcontributor.service.BookContributorService;
+import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
+import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
@@ -22,14 +33,16 @@ import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.book.book.service.BookService;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
+	private final BookContributorService bookContributorService;
 
 	//관리자 페이지에서 관리자의 직접 도서 등록을 위한 메서드
-	//TODO: 외부 api를 이용한 도서 등록기능 별도 구현 예정
+	//TODO: 알라딘서비스의 저장 메서드 같이 사용하면 될 듯 조금만 더 생각해보고 지우겠음
 	@Transactional
 	@Override
 	public BookRegisterResponse registerBook(BookRegisterRequest reqDto) {
@@ -79,22 +92,44 @@ public class BookServiceImpl implements BookService {
 		return BookResponse.of(book);
 	}
 
-	//관리자페이지에서 도서 목록조회를 하여 도서를 관리하기 위한 메서드
+	//TODO: 도서 목록조회를 하여 도서를 관리하기 위한 메서드 (관리자로 로그인 했을때는 수정버튼을 보이게해서 수정하도록 하는게 좋을까?)
 	//TODO: 추후 엘라스틱 서치 적용 시 사용자를 위한 도서 검색 기능을 따로 구현 예정
 	@Transactional(readOnly = true)
 	@Override
-	public Page<AdminBookListResponse> getBooks(Pageable pageable) {
+	public PagedResponse<BookContributorsResponse> getBooks(Pageable pageable) {
 		if(pageable.getPageNumber() < 0) {
 			throw new InvalidPageRequestException("페이지 번호는 0 이상이어야 합니다.");
 		}
 
-		Page<Book> bookPage = bookRepository.findAll(pageable);
+		Page<Book> bookPage = bookRepository.findAllWithPublisher(pageable);
 
 		if(pageable.getPageNumber() > bookPage.getTotalPages() - 1) {
 			throw new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다.");
 		}
 
-		return bookPage.map(AdminBookListResponse::of);
+		//소수점 버리기 (1원 단위로 계산 위해)
+		List<BookContributorsResponse> bookListResponses = bookPage.stream()
+			.map(book -> {
+				BigDecimal salePrice = book.getPrice()
+					.multiply(BigDecimal.valueOf(100 - book.getDiscountRate()))
+					.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
+
+				AdminBookListResponse bookDetails = AdminBookListResponse.of(book, salePrice);
+				log.info("Fetching contributors for bookId: {}", book.getId());
+				List<BookContributorInfoResponse> contributors = bookContributorService.getContributorsAndRolesByBookId(book.getId());
+				log.info("Contributors fetched: {}", contributors);
+
+				return new BookContributorsResponse(bookDetails, contributors);
+			})
+			.toList();
+
+		return new PagedResponse<>(
+			bookListResponses,
+			bookPage.getNumber(),
+			bookPage.getSize(),
+			bookPage.getTotalPages(),
+			bookPage.getTotalElements()
+		);
 	}
 
 	//TODO: 좋아요나 조회수에 대한 업데이트는 따로 메서드를 구현할 계획입니다.

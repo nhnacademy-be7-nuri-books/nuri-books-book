@@ -12,7 +12,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
+import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
@@ -23,6 +25,7 @@ import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusType;
 
 @DataJpaTest
+@Import(QuerydslConfiguration.class)
 class MemberRepositoryTest {
 
 	@Autowired
@@ -34,32 +37,32 @@ class MemberRepositoryTest {
 	@Autowired
 	private GradeRepository gradeRepository;
 
-	@DisplayName("입력된 userId로 회원 등록 여부 확인")
+	@DisplayName("입력된 username으로 회원 등록 여부 확인")
 	@Test
-	void existsByUserId() {
+	void existsByUsername() {
 		//given
 		Member savedMember = getSavedMember();
 
 		//when
-		boolean exists = memberRepository.existsByUserId(savedMember.getUserId());
+		boolean exists = memberRepository.existsByUsername(savedMember.getUsername());
 
 		//then
 		assertThat(exists).isTrue();
 	}
 
-	@DisplayName("입력된 userId로 회원 조회")
+	@DisplayName("입력된 username으로 회원 조회")
 	@Test
-	void findByUserId() {
+	void findByUsername() {
 		//given
 		Member savedMember = getSavedMember();
 
 		//when
-		Optional<Member> foundMember = memberRepository.findByUserId(savedMember.getUserId());
+		Optional<Member> foundMember = memberRepository.findByUsername(savedMember.getUsername());
 
 		//then
 		assertThat(foundMember).isPresent(); // 회원이 존재함을 확인
 		assertThat(foundMember.get().getId()).isEqualTo(savedMember.getId());
-		assertThat(foundMember.get().getUserId()).isEqualTo(savedMember.getUserId());
+		assertThat(foundMember.get().getUsername()).isEqualTo(savedMember.getUsername());
 	}
 
 	@DisplayName("등급의 id로 회원 등록 여부 확인")
@@ -75,20 +78,38 @@ class MemberRepositoryTest {
 		assertThat(exists).isTrue();
 	}
 
-	@DisplayName("마지막 로그인 날짜가 입력된 날짜보다 이전인 회원들을 조회")
+	@DisplayName("마지막 로그인 후 90일이 지난 회원들을 조회")
 	@Test
 	void findAllByLatestLoginAtBefore() {
 		//given
 		Member savedMember = getSavedMember();
-		LocalDateTime thresholdDate = LocalDateTime.now().minusDays(90);
+		savedMember.changeToInactive();
+		LocalDateTime thresholdDate = LocalDateTime.now().plusYears(90);
 
 		//when
 		List<Member> inactiveMembers = memberRepository.findAllByLatestLoginAtBefore(thresholdDate);
 
 		//then
 		assertThat(inactiveMembers).hasSize(1);
-		assertThat(inactiveMembers).extracting(Member::getUserId)
-			.containsExactlyInAnyOrder(savedMember.getUserId());
+		assertThat(inactiveMembers).extracting(Member::getUsername)
+			.containsExactly(savedMember.getUsername());
+	}
+
+	@DisplayName("탈퇴 후 1년이 지난 회원들을 조회")
+	@Test
+	void findAllByWithdrawnAtBefore() {
+		//given
+		Member savedMember = getSavedMember();
+		savedMember.changeToWithdrawn();
+		LocalDateTime thresholdDate = LocalDateTime.now().plusYears(1);
+
+		//when
+		List<Member> withdrawnMembers = memberRepository.findAllByWithdrawnAtBefore(thresholdDate);
+
+		//then
+		assertThat(withdrawnMembers).hasSize(1);
+		assertThat(withdrawnMembers).extracting(Member::getUsername)
+			.containsExactly(savedMember.getUsername());
 	}
 
 
@@ -133,14 +154,14 @@ class MemberRepositoryTest {
 			.customer(savedCustomer)
 			.authority(AuthorityType.MEMBER)
 			.grade(savedGrade)
-			.status(StatusType.INACTIVE)
+			.status(StatusType.ACTIVE)
 			.gender(GenderType.MALE)
-			.userId("nuribooks95")
+			.username("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
-			.latestLoginAt(LocalDateTime.of(2024,2,22,22,22,22))
+			.latestLoginAt(LocalDateTime.now())
 			.build();
 	}
 }

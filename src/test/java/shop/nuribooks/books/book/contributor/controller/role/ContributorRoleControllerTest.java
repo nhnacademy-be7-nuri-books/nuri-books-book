@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.book.contributor.dto.role.ContributorRoleRequest;
 import shop.nuribooks.books.book.contributor.dto.role.ContributorRoleResponse;
-import shop.nuribooks.books.book.contributor.entitiy.ContributorRole;
-import shop.nuribooks.books.book.contributor.entitiy.ContributorRoleEnum;
+import shop.nuribooks.books.book.contributor.entity.ContributorRole;
+import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
 import shop.nuribooks.books.book.contributor.service.role.ContributorRoleServiceImpl;
 
 @WebMvcTest(ContributorRoleController.class)

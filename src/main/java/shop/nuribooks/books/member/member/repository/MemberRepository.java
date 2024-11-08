@@ -11,13 +11,15 @@ import shop.nuribooks.books.member.member.entity.Member;
 /**
  * @author Jprotection
  */
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
-	boolean existsByUserId(String userId);
+	boolean existsByUsername(String username);
 
-	Optional<Member> findByUserId(String userId);
+	Optional<Member> findByUsername(String username);
 
 	boolean existsByGradeId(Integer gradeId);
 
-	List<Member> findAllByLatestLoginAtBefore(LocalDateTime dateTime);
+	List<Member> findAllByLatestLoginAtBefore(LocalDateTime thresholdDate);
+
+	List<Member> findAllByWithdrawnAtBefore(LocalDateTime thresholdDate);
 }

@@ -1,8 +1,8 @@
-name: deploy-actions
+name: prod-deploy-actions
 on:
   push:
     branches:
-      - "main"
+      - main
 
 env:
   JASYPT_PASSWORD: ${{secrets.JASYPT_PASSWORD}}
@@ -44,4 +44,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
-          script: "./startup.sh 8083 books"
+          script: "./startup.sh books 8083 8084"

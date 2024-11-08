@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import shop.nuribooks.books.book.publisher.dto.PublisherRequest;
 import shop.nuribooks.books.book.publisher.dto.PublisherResponse;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.exception.publisher.PublisherAlreadyExistsException;
 import shop.nuribooks.books.exception.publisher.PublisherNotFoundException;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
@@ -92,35 +92,35 @@ class PublisherServiceImplTest {
 	@Test
 	void getPublisher() {
 		// given
-		String publisherName = "publisher1";
-		Publisher publisher = new Publisher(1L, publisherName);
+		Long publisherId = 1L;
+		Publisher publisher = new Publisher(publisherId, "publisher1");
 
-		when(publisherRepository.findByName(publisherName)).thenReturn(Optional.of(publisher));
+		when(publisherRepository.findById(publisherId)).thenReturn(Optional.of(publisher));
 
 		// when
-		PublisherResponse response = publisherService.getPublisher(publisherName);
+		PublisherResponse response = publisherService.getPublisher(publisherId);
 
 		// then
 		assertThat(response).isNotNull();
-		assertThat(response.name()).isEqualTo(publisherName);
+		assertThat(response.id()).isEqualTo(publisherId);
 
 		// 메서드 호출 여부 검증
-		verify(publisherRepository).findByName(publisherName);
+		verify(publisherRepository).findById(publisherId);
 	}
 
 	@DisplayName("검색한 출판사 조회 실패 - 존재하지 않음")
 	@Test
 	void failed_getPublisher() {
 		// given
-		String publisherName = "unknownPublisher";
+		Long publisherId = 999L;
 
-		when(publisherRepository.findByName(publisherName)).thenReturn(Optional.empty());
+		when(publisherRepository.findById(publisherId)).thenReturn(Optional.empty());
 
 		// then
-		assertThatThrownBy(() -> publisherService.getPublisher(publisherName)).isInstanceOf(
+		assertThatThrownBy(() -> publisherService.getPublisher(publisherId)).isInstanceOf(
 			PublisherNotFoundException.class).hasMessageContaining("출판사가 존재하지 않습니다.");
 
-		verify(publisherRepository).findByName(publisherName);
+		verify(publisherRepository).findById(publisherId);
 
 	}
 
@@ -128,16 +128,16 @@ class PublisherServiceImplTest {
 	@Test
 	void deletePublisher() {
 		// given
-		String publisherName = "publisher1";
-		Publisher publisher = new Publisher(1L, publisherName);
+		Long publisherId = 1L;
+		Publisher publisher = new Publisher(publisherId, "publisher1");
 
-		when(publisherRepository.findByName(publisherName)).thenReturn(Optional.of(publisher));
+		when(publisherRepository.findById(publisherId)).thenReturn(Optional.of(publisher));
 
 		// when
-		publisherService.deletePublisher(publisherName);
+		publisherService.deletePublisher(publisherId);
 
 		// then
-		verify(publisherRepository).findByName(publisherName);
+		verify(publisherRepository).findById(publisherId);
 		verify(publisherRepository).delete(publisher);
 	}
 
@@ -145,34 +145,34 @@ class PublisherServiceImplTest {
 	@Test
 	void failed_deletePublisher() {
 		// given
-		String publisherName = "unknownPublisher";
+		Long publisherId = 999L;
 
-		when(publisherRepository.findByName(publisherName)).thenReturn(Optional.empty());
+		when(publisherRepository.findById(publisherId)).thenReturn(Optional.empty());
 
 		// then
-		assertThatThrownBy(() -> publisherService.deletePublisher(publisherName)).isInstanceOf(
+		assertThatThrownBy(() -> publisherService.deletePublisher(publisherId)).isInstanceOf(
 			PublisherNotFoundException.class).hasMessageContaining("출판사가 존재하지 않습니다.");
 
-		verify(publisherRepository).findByName(publisherName);
+		verify(publisherRepository).findById(publisherId);
 
 	}
 	@DisplayName("출판사 수정 성공")
 	@Test
 	void updatePublisher() {
 		// given
-		String publisherName = "publisher1";
-		Publisher publisher = new Publisher(1L, publisherName);
+		Long publisherId = 1L;
+		Publisher publisher = new Publisher(publisherId, "publisher1");
 		PublisherRequest editRequest = editPublisherRequest();
 
-		when(publisherRepository.findByName(publisherName)).thenReturn(Optional.of(publisher));
+		when(publisherRepository.findById(publisherId)).thenReturn(Optional.of(publisher));
 
 		// when
-		PublisherResponse response = publisherService.updatePublisher(publisherName, editRequest);
+		PublisherResponse response = publisherService.updatePublisher(publisherId, editRequest);
 
 		// then
 		assertThat(response).isNotNull();
 		assertThat(response.name()).isEqualTo("publisher2");
-		verify(publisherRepository, times(1)).findByName(publisherName);
+		verify(publisherRepository, times(1)).findById(publisherId);
 
 	}
 
@@ -180,13 +180,13 @@ class PublisherServiceImplTest {
 	@Test
 	void failed_updatePublisher() {
 		// given
-		String publisherName = "unknownPublisher";
+		Long publisherId = 999L;
 		PublisherRequest editRequest = editPublisherRequest();
 
-		when(publisherRepository.findByName(publisherName)).thenReturn(Optional.empty());
+		when(publisherRepository.findById(publisherId)).thenReturn(Optional.empty());
 
 		// when & then
-		assertThatThrownBy(() -> publisherService.updatePublisher(publisherName, editRequest)
+		assertThatThrownBy(() -> publisherService.updatePublisher(publisherId, editRequest)
 		).isInstanceOf(PublisherNotFoundException.class)
 			.hasMessage("출판사가 존재하지 않습니다.");
 

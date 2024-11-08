@@ -12,6 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
@@ -23,6 +25,7 @@ import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @DataJpaTest
+@Import(QuerydslConfiguration.class)
 class AddressRepositoryTest {
 
     @Autowired
@@ -39,7 +42,7 @@ class AddressRepositoryTest {
 
     @DisplayName("유저의 주소를 가져온다.")
     @Test
-    void findAllByMemberId() {
+    void findAllByMember_UserId() {
         // given
         Grade grade = creategrade();
         gradeRepository.save(grade);
@@ -60,13 +63,14 @@ class AddressRepositoryTest {
     }
 
     private Address createAddress(Member member) {
-        return Address.builder()
-                .member(member)
+        Address address = Address.builder()
                 .name("test")
                 .address("장말로")
                 .addressDetail("103호")
                 .isDefault(true)
                 .build();
+        address.setMember(member);
+        return address;
     }
 
     private Member createMember(Customer customer, Grade grade) {
@@ -74,7 +78,7 @@ class AddressRepositoryTest {
                 .customer(customer)
                 .authority(MEMBER)
                 .grade(grade)
-                .userId("nuriaaaaaa")
+                .username("nuriaaaaaa")
                 .gender(GenderType.MALE)
                 .status(StatusType.ACTIVE)
                 .birthday(LocalDate.of(1988, 8, 12))

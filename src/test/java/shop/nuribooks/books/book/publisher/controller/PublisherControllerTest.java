@@ -14,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -22,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.book.publisher.dto.PublisherRequest;
 import shop.nuribooks.books.book.publisher.dto.PublisherResponse;
-import shop.nuribooks.books.book.publisher.entitiy.Publisher;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.service.PublisherServiceImpl;
 
 @WebMvcTest(PublisherController.class)
@@ -88,54 +87,54 @@ class PublisherControllerTest {
 	@Test
 	void getPublisher() throws Exception {
 		// given
-		String publisherName = "publisher1";
-		PublisherResponse response = new PublisherResponse(1L, publisherName);
+		Long publisherId = 1L;
+		PublisherResponse response = new PublisherResponse(publisherId, "publisher1" );
 
-		when(publisherService.getPublisher(publisherName)).thenReturn(response);
+		when(publisherService.getPublisher(publisherId)).thenReturn(response);
 
 		// when & then
-		mockMvc.perform(get("/api/publishers/{publisherName}", publisherName)
+		mockMvc.perform(get("/api/publishers/{publisherId}", publisherId)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.name").value(publisherName));
+			.andExpect(jsonPath("$.id").value(publisherId));
 
-		verify(publisherService).getPublisher(publisherName);
+		verify(publisherService).getPublisher(publisherId);
 	}
 
 	@DisplayName("출판사 삭제 성공")
 	@Test
 	void deletePublisher() throws Exception {
 		// given
-		String publisherName = "publisher1";
+		Long publisherId = 1L;
 
 		// when & then
-		mockMvc.perform(delete("/api/publishers/{publisherName}", publisherName)
+		mockMvc.perform(delete("/api/publishers/{publisherId}", publisherId)
 				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk());
+			.andExpect(status().isNoContent());
 
-		verify(publisherService).deletePublisher(publisherName);
+		verify(publisherService).deletePublisher(publisherId);
 	}
 
 	@DisplayName("출판사 수정 성공")
 	@Test
 	void updatePublisher() throws Exception {
 		// given
-		String publisherName = "publisher1";
+		Long publisherId = 1L;
 		PublisherRequest request = editRequest();
-		PublisherResponse response = PublisherResponse.of(new Publisher(1L, "update"));
+		PublisherResponse response = PublisherResponse.of(new Publisher(publisherId, "update"));
 
-		when(publisherService.updatePublisher(eq(publisherName), any(PublisherRequest.class)))
+		when(publisherService.updatePublisher(eq(publisherId), any(PublisherRequest.class)))
 			.thenReturn(response);
 
 		// when & then
-		mockMvc.perform(put("/api/publishers/{publisherName}", publisherName)
+		mockMvc.perform(put("/api/publishers/{publisherId}", publisherId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isCreated())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(content().json("{\"name\":\"update\"}"));
 
-		verify(publisherService).updatePublisher(eq(publisherName), any(PublisherRequest.class));
+		verify(publisherService).updatePublisher(eq(publisherId), any(PublisherRequest.class));
 	}
 
 	private PublisherRequest registerRequest() {
