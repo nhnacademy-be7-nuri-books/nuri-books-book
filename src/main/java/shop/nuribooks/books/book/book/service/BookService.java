@@ -2,7 +2,6 @@ package shop.nuribooks.books.book.book.service;
 
 import org.springframework.data.domain.Pageable;
 
-import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
