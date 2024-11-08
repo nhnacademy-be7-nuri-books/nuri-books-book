@@ -111,7 +111,7 @@ class MemberControllerTest {
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("성별은 반드시 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
-				.value(Matchers.containsString("아이디는 반드시 8자 이상 20자 이하로 입력해야 합니다.")))
+				.value(Matchers.containsString("아이디는 반드시 8자 이상 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("비밀번호는 반드시 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
