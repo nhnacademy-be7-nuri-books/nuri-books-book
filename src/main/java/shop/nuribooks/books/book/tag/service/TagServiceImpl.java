@@ -80,6 +80,10 @@ public class TagServiceImpl implements TagService {
 		Tag tag = tagRepository.findById(id)
 			.orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
 
+		if (tagRepository.existsByName(request.name())) {
+			throw new TagAlreadyExistsException("태그가 이미 등록되어 있습니다.");
+		}
+
 		TagEditor tagEditor = getTagEditor(request, tag);
 		tag.edit(tagEditor);
 		return TagResponse.of(tag);

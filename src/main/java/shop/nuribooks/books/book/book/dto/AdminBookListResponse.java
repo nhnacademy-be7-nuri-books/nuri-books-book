@@ -1,8 +1,10 @@
 package shop.nuribooks.books.book.book.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 
 //TODO: 관리자 전용 dto라 생각했는데 회원과 공통으로 사용해도 될듯하여 이름변경 생각해보자
 public record AdminBookListResponse(

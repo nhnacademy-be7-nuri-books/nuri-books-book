@@ -12,29 +12,25 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
+import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.dto.DtoMapper;
 import shop.nuribooks.books.member.member.dto.EntityMapper;
-import shop.nuribooks.books.member.member.dto.request.MemberDetailsRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberSearchRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
-import shop.nuribooks.books.member.member.dto.request.MemberWithdrawRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
-import shop.nuribooks.books.member.member.dto.response.MemberUpdateResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
-import shop.nuribooks.books.exception.member.InvalidPasswordException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.member.UsernameAlreadyExistsException;
-import shop.nuribooks.books.exception.member.UsernameNotFoundException;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -70,6 +66,9 @@ public class MemberServiceImpl implements MemberService {
 		if (customerRepository.existsByEmail(request.email())) {
 			throw new EmailAlreadyExistsException("이미 존재하는 이메일입니다.");
 		}
+		if (customerRepository.existsByPhoneNumber(request.phoneNumber())) {
+			throw new PhoneNumberAlreadyExistsException("이미 존재하는 전화번호입니다.");
+		}
 		if (memberRepository.existsByUsername(request.username())) {
 			throw new UsernameAlreadyExistsException("이미 존재하는 아이디입니다.");
 		}
@@ -98,88 +97,84 @@ public class MemberServiceImpl implements MemberService {
 	/**
 	 * 회원탈퇴 <br>
 	 * 아이디와 비밀번호로 회원 검증 후 회원을 휴면 상태로 전환 <br>
-	 * @throws UsernameNotFoundException 존재하지 않는 아이디입니다.
-	 * @throws InvalidPasswordException 비밀번호가 일치하지 않습니다.
-	 * @param request
-	 * MemberResignReq로 아이디와 비밀번호를 받아서 확인 <br>
-	 * 아이디로 member 존재 여부 먼저 확인하고, <br>
-	 * member가 존재한다면 member의 PK인 id와 비밀번호 두 가지 값으로 customer 존재 여부 확인 <br>
-	 * customer까지 존재한다면 마지막으로 member의 status를 INACTIVE로, <br>
-	 * 탈퇴 일시인 withdrawnAt을 현재 시간으로 변경
+	 * @throws MemberNotFoundException 존재하지 않는 회원입니다.
+	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
+	 * @param memberId 요청 회원의 PK id
+	 * member의 status를 WITHDRAWN으로, 탈퇴 일시인 withdrawnAt을 현재 시간으로 변경
 	 */
 	@Override
 	@Transactional
-	public void withdrawMember(MemberWithdrawRequest request) {
-		Member foundMember = memberRepository.findByUsername(request.userId())
-			.orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 아이디입니다."));
-
-		if (!customerRepository.existsByIdAndPassword(
-			foundMember.getId(), request.password())) {
-			throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
-		}
+	public void withdrawMember(Long memberId) {
+		Member foundMember = memberRepository.findById(memberId)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
 		foundMember.changeToWithdrawn();
 	}
 
 	/**
 	 * 회원 정보 수정 <br>
-	 * 변경 가능한 정보는 name, password, phoneNumber
-	 * @throws MemberNotFoundException 존재하지 않는 회원입니다.
+	 * 변경 가능한 정보는 name, password
 	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
-	 * @param userId  아이디
-	 * @param request MemberUpdateRequest로 수정하고 싶은 이름과 비밀번호, 전화번호를 받음 <br>
-	 * 로그인 상태의 사용자만이 회원 정보를 수정할 수 있기 때문에 <br>
-	 * 입력받은 userId의 member가 반드시 존재하는 상황이다. <br>
-	 * 그러므로 userId를 통해 customerRepository에서 해당 customer를 찾고 정보 수정을 진행 <br>
-	 * 입력받은 각각의 이름, 비밀번호, 전화번호로 customer의 정보 수정
-	 * @return MemberUpdateResponse에 변경한 이름과 전화번호 담아서 반환
+	 * @param memberId 회원 PK id
+	 * @param request MemberUpdateRequest로 수정하고 싶은 이름과 비밀번호를 받음
 	 */
 	@Override
 	@Transactional
-	public MemberUpdateResponse updateMember(String userId, MemberUpdateRequest request) {
-		Member foundMember = memberRepository.findByUsername(userId)
-			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+	public void updateMember(Long memberId, MemberUpdateRequest request) {
 
-		Customer foundCustomer = customerRepository.findById(foundMember.getId())
+		Customer foundCustomer = customerRepository.findById(memberId)
 			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
 
-		foundCustomer.changeCustomerInformation(
-			request.name(), request.password(), request.phoneNumber());
-
-		return DtoMapper.toUpdateDto(foundCustomer);
+		foundCustomer.changeCustomerInformation(request.name(), request.password());
 	}
 
 	/**
-	 * 입력받은 아이디로 회원의 이름, 비밀번호, 권한을 조회
+	 * 입력받은 username으로 회원의 PK id, 비밀번호, 권한을 조회
 	 * @param username "abc123" 형식의 유저 아이디
-	 * @return 회원이 존재하면 이름, 비밀번호, 권한을 MemberAuthInfoResponse에 담아서 반환 <br>
-	 * 회원이 존재하지 않는다면 이름, 비밀번호, 권한이 모두 null인 MemberAuthInfoResponse를 반환
+	 * @return 회원이 존재하면 PK id, username, 비밀번호, 권한을 MemberAuthInfoResponse에 담아서 반환 <br>
+	 * 회원이 존재하지 않는다면 PK id, username, 비밀번호, 권한이 모두 null인 MemberAuthInfoResponse를 반환
 	 */
 	@Override
-	public MemberAuthInfoResponse getMemberAuthInfo(String username) {
+	public MemberAuthInfoResponse getMemberAuthInfoByUsername(String username) {
 
 		return memberRepository.findByUsername(username)
 			.flatMap(foundMember -> customerRepository.findById(foundMember.getId())
 				.map(foundCustomer -> DtoMapper.toAuthInfoDto(foundCustomer, foundMember))
 			)
-			.orElseGet(DtoMapper::toNullDto);
+			.orElseGet(DtoMapper::toNullAuthInfoDto);
 	}
 
 	/**
-	 * 입력받은 아이디와 비밀번호로 회원 상세 정보 조회
-	 * @throws MemberNotFoundException 존재하지 않는 회원입니다.
-	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
-	 * @param request MemberDetailsRequest로 상세 조회하고 싶은 userId와 password를 받음
-	 * @return MemberDetailsResponse에 회원의 모든 정보를 담아서 반환
+	 * 입력받은 이메일로 회원의 PK id, username, 비밀번호, 권한을 조회
+	 * @param email 유저 이메일
+	 * @return 회원이 존재하면 PK id, username, 비밀번호, 권한을 MemberAuthInfoResponse에 담아서 반환 <br>
+	 * 회원이 존재하지 않는다면 PK id, username, 비밀번호, 권한이 모두 null인 MemberAuthInfoResponse를 반환
 	 */
 	@Override
-	public MemberDetailsResponse getMemberDetails(MemberDetailsRequest request) {
+	public MemberAuthInfoResponse getMemberAuthInfoByEmail(String email) {
 
-		Member foundMember = memberRepository.findByUsername(request.userId())
-			.orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 아이디입니다."));
+		return customerRepository.findByEmail(email)
+			.flatMap(foundCustomer -> memberRepository.findById(foundCustomer.getId())
+				.map(foundMember -> DtoMapper.toAuthInfoDto(foundCustomer, foundMember))
+			)
+			.orElseGet(DtoMapper::toNullAuthInfoDto);
+	}
 
-		Customer foundCustomer = customerRepository.findByIdAndPassword(foundMember.getId(), request.password())
-			.orElseThrow(() -> new InvalidPasswordException("비밀번호가 일치하지 않습니다."));
+	/**
+	 * 회원 PK id로 상세 정보 조회
+	 * @throws MemberNotFoundException 존재하지 않는 회원입니다.
+	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
+	 * @param memberId 요청 회원의 PK id
+	 * @return MemberDetailsResponse에 회원의 정보를 담아서 반환
+	 */
+	@Override
+	public MemberDetailsResponse getMemberDetails(Long memberId) {
+
+		Member foundMember = memberRepository.findById(memberId)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+
+		Customer foundCustomer = customerRepository.findById(memberId)
+			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
 
 		return DtoMapper.toDetailsDto(foundCustomer, foundMember);
 	}
@@ -188,7 +183,7 @@ public class MemberServiceImpl implements MemberService {
 	 * 관리자가 다양한 검색 조건을 이용하여 회원 목록 조회
 	 */
 	@Override
-	public Page<MemberSearchResponse> searchMembersWithPaing(MemberSearchRequest request, Pageable pageable) {
+	public Page<MemberSearchResponse> searchMembersWithPaging(MemberSearchRequest request, Pageable pageable) {
 		return memberRepository.searchMembersWithPaging(request, pageable);
 	}
 

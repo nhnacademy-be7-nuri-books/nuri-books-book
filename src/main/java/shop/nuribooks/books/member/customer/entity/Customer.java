@@ -38,10 +38,9 @@ public class Customer {
 	@Column(unique = true)
 	private String email;
 
-	public void changeCustomerInformation(String name, String password, String phoneNumber) {
+	public void changeCustomerInformation(String name, String password) {
 		this.name = name;
 		this.password = password;
-		this.phoneNumber = phoneNumber;
 	}
 
 	public void changeToSoftDeleted() {
