@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.point.dto.request.PointPolicyRequest;
+import shop.nuribooks.books.book.point.dto.response.PointPolicyResponse;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
 import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
@@ -33,13 +35,41 @@ public class PointPolicyServiceTest {
 
 	private PointPolicy pointPolicy;
 	private PointPolicyRequest pointPolicyRequest;
+	private PointPolicyResponse pointPolicyResponse;
 
 	@BeforeEach
 	public void setUp() {
 		this.pointPolicyRequest = new PointPolicyRequest(PolicyType.FIXED, "임시", BigDecimal.valueOf(100));
 		this.pointPolicy = pointPolicyRequest.toEntity();
+		this.pointPolicyResponse = new PointPolicyResponse() {
+			@Override
+			public long getId() {
+				return 1;
+			}
+
+			@Override
+			public PolicyType getPolicyType() {
+				return PolicyType.FIXED;
+			}
+
+			@Override
+			public String getName() {
+				return "이름";
+			}
+
+			@Override
+			public BigDecimal getAmount() {
+				return BigDecimal.valueOf(10);
+			}
+		};
 
 		ReflectionTestUtils.setField(pointPolicy, "id", 1);
+	}
+
+	@Test
+	public void getPointPolicyList() {
+		when(pointPolicyRepository.findAllByDeletedAtIsNull()).thenReturn(List.of(this.pointPolicyResponse));
+		assertEquals(1, pointPolicyService.getPointPolicyResponses().size());
 	}
 
 	@Test

@@ -1,9 +1,12 @@
 package shop.nuribooks.books.book.point.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.point.dto.request.PointPolicyRequest;
+import shop.nuribooks.books.book.point.dto.response.PointPolicyResponse;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
 import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
 import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
@@ -14,6 +17,16 @@ import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 @RequiredArgsConstructor
 public class PointPolicyServiceImpl implements PointPolicyService {
 	private final PointPolicyRepository pointPolicyRepository;
+
+	/**
+	 * 포인트 정책 목록 가져오기
+	 *
+	 * @return
+	 */
+	@Override
+	public List<PointPolicyResponse> getPointPolicyResponses() {
+		return this.pointPolicyRepository.findAllByDeletedAtIsNull();
+	}
 
 	/**
 	 * 포인트 정책 생성
