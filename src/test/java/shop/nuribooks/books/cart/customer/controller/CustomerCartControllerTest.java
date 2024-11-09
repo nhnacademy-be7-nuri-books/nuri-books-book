@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,10 +60,13 @@ class CustomerCartControllerTest {
 
         String sessionId = "sessionId";
         Long bookId1 = 1L;
+        List<String> tagNames = new ArrayList<>();
+        tagNames.add("wow");
+
         BookResponse bookResponse1 = new BookResponse(
                 bookId1, null, "정상", "책 제목", "thumbnail.jpg", null, LocalDate.now(),
                 BigDecimal.valueOf(10000), 10, "책 설명", "책 내용", "1234567890123",
-                true, 0, 10, 100L);
+                true, 0, 10, 100L, tagNames);
 
         CustomerCartResponse response1 = new CustomerCartResponse(bookResponse1, 1);
 
@@ -70,7 +74,7 @@ class CustomerCartControllerTest {
         BookResponse bookResponse2 = new BookResponse(
                 bookId2, null, "정상", "책 제목", "thumbnail.jpg", null, LocalDate.now(),
                 BigDecimal.valueOf(10000), 10, "책 설명", "책 내용", "1234567890123",
-                true, 0, 10, 100L);
+                true, 0, 10, 100L, tagNames);
 
         CustomerCartResponse response2 = new CustomerCartResponse(bookResponse2, 2);
         when(customerCartService.getCustomerCartList(anyString())).thenReturn(List.of(response1, response2));

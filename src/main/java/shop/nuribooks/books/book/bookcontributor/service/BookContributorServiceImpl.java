@@ -12,6 +12,7 @@ import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorRegisterRequest;
 import shop.nuribooks.books.book.bookcontributor.entity.BookContributor;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
+import shop.nuribooks.books.book.booktag.entity.BookTag;
 import shop.nuribooks.books.book.contributor.entity.Contributor;
 import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
@@ -78,7 +79,7 @@ public class BookContributorServiceImpl implements BookContributorService {
      */
     @Override
     public List<BookResponse> getAllBooksByContributorId(Long contributorId) {
-        Contributor contributor = contributorRepository.findById(contributorId)
+        /*Contributor contributor = contributorRepository.findById(contributorId)
                 .orElseThrow(() -> new ContributorNotFoundException("기여자가 존재하지 않습니다."));
 
         List<Long> bookIds = bookContributorRepository.findBookIdsByContributorId(contributorId);
@@ -87,7 +88,22 @@ public class BookContributorServiceImpl implements BookContributorService {
 
         return books.stream()
                 .map(BookResponse::of)
-                .collect(Collectors.toList());    }
+                .collect(Collectors.toList());*/
+        contributorRepository.findById(contributorId)
+            .orElseThrow(() -> new ContributorNotFoundException("기여자가 존재하지 않습니다."));
+
+        List<BookContributor> bookContributors = bookContributorRepository.findByContributorId(contributorId);
+
+        List<Book> books = bookContributors.stream().map(BookContributor::getBook).toList();
+
+        return books.stream().map(book -> {
+                List<String> tagNames = bookContributorRepository.findByBookId(book.getId())
+                    .stream()
+                    .map(bookContributor -> bookContributor.getContributor().getName()).toList();
+                return BookResponse.of(book,tagNames);
+            })
+            .collect(Collectors.toList());
+    }
 
     /**
      * getContributorsAndRolesByBookId : 도서 id로 기여자와 기여자 역할 조회

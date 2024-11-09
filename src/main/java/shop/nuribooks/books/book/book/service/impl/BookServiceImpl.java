@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.book.service.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,10 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.service.BookContributorService;
+import shop.nuribooks.books.book.booktag.entity.BookTag;
+import shop.nuribooks.books.book.booktag.repository.BookTagRepository;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
+import shop.nuribooks.books.book.tag.entity.Tag;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
@@ -38,6 +42,7 @@ public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
 	private final BookContributorService bookContributorService;
+	private final BookTagRepository bookTagRepository;
 
 	//관리자 페이지에서 관리자의 직접 도서 등록을 위한 메서드
 	//TODO: 알라딘서비스의 저장 메서드 같이 사용하면 될 듯 조금만 더 생각해보고 지우겠음
@@ -87,7 +92,13 @@ public class BookServiceImpl implements BookService {
 		book.incrementViewCount();
 		bookRepository.save(book);
 
-		return BookResponse.of(book);
+		List<BookTag> bookTag = bookTagRepository.findByBookId(bookId);
+
+		List<String> tagNames = bookTag.stream()
+			.map(bookTagName -> bookTagName.getTag().getName())
+			.collect(Collectors.toList());
+
+		return BookResponse.of(book, tagNames);
 	}
 
 	//TODO: 도서 목록조회를 하여 도서를 관리하기 위한 메서드 (관리자로 로그인 했을때는 수정버튼을 보이게해서 수정하도록 하는게 좋을까?)

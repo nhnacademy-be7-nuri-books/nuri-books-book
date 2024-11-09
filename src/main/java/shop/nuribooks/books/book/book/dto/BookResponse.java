@@ -2,10 +2,12 @@ package shop.nuribooks.books.book.book.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.booktag.entity.BookTag;
 
 public record BookResponse(
 	Long id,
@@ -24,9 +26,10 @@ public record BookResponse(
 	boolean isPackageable,
 	int likeCount,
 	int stock,
-	Long viewCount
+	Long viewCount,
+	List<String> tagNames
 ) {
-	public static BookResponse of(Book book) {
+	public static BookResponse of(Book book, List<String> tagNames) {
 		return new BookResponse(
 			book.getId(),
 			book.getPublisherId().getName(),
@@ -43,7 +46,8 @@ public record BookResponse(
 			book.isPackageable(),
 			book.getLikeCount(),
 			book.getStock(),
-			book.getViewCount()
+			book.getViewCount(),
+			tagNames
 		);
 	}
 }
