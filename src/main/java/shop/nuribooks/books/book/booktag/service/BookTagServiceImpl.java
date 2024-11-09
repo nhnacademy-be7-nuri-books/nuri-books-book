@@ -102,7 +102,7 @@ public class BookTagServiceImpl implements BookTagService {
      */
     @Override
     public List<BookResponse> getBooksByTagId(Long tagId) {
-        /*Tag tag = tagRepository.findById(tagId)
+        tagRepository.findById(tagId)
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다."));
 
         List<Long> bookIds = bookTagRepository.findBookIdsByTagId(tagId);
@@ -110,23 +110,8 @@ public class BookTagServiceImpl implements BookTagService {
         List<Book> books = bookRepository.findAllById(bookIds);
 
         return books.stream()
-                .map(BookResponse::of)
-                .collect(Collectors.toList());*/
-
-        tagRepository.findById(tagId)
-            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다."));
-
-        List<BookTag> bookTags = bookTagRepository.findByTagId(tagId);
-
-        List<Book> books = bookTags.stream().map(BookTag::getBook).toList();
-
-        return books.stream().map(book -> {
-            List<String> tagNames = bookTagRepository.findByBookId(book.getId())
-                .stream()
-                .map(bookTag -> bookTag.getTag().getName()).toList();
-            return bookMapper.toBookResponse(book);
-        })
-            .collect(Collectors.toList());
+                .map(bookMapper::toBookResponse)
+                .collect(Collectors.toList());
     }
 
     /**

@@ -82,31 +82,15 @@ public class BookContributorServiceImpl implements BookContributorService {
      */
     @Override
     public List<BookResponse> getAllBooksByContributorId(Long contributorId) {
-        /*Contributor contributor = contributorRepository.findById(contributorId)
+        contributorRepository.findById(contributorId)
                 .orElseThrow(() -> new ContributorNotFoundException("기여자가 존재하지 않습니다."));
 
         List<Long> bookIds = bookContributorRepository.findBookIdsByContributorId(contributorId);
-
         List<Book> books = bookRepository.findAllById(bookIds);
 
         return books.stream()
-                .map(BookResponse::of)
-                .collect(Collectors.toList());*/
-        contributorRepository.findById(contributorId)
-            .orElseThrow(() -> new ContributorNotFoundException("기여자가 존재하지 않습니다."));
-
-        List<BookContributor> bookContributors = bookContributorRepository.findByContributorId(contributorId);
-
-        List<Book> books = bookContributors.stream().map(BookContributor::getBook).toList();
-
-        return books.stream().map(book -> {
-                List<String> tagNames = bookContributorRepository.findByBookId(book.getId())
-                    .stream()
-                    .map(bookContributor -> bookContributor.getContributor().getName()).toList();
-                //return BookResponse.of(book,tagNames);
-                return bookMapper.toBookResponse(book);
-            })
-            .collect(Collectors.toList());
+                .map(bookMapper::toBookResponse)
+                .collect(Collectors.toList());
     }
 
     /**
