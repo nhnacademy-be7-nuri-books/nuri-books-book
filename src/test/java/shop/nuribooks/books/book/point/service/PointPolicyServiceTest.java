@@ -88,7 +88,7 @@ public class PointPolicyServiceTest {
 
 	@Test
 	public void updatePointPolicyFail() {
-		when(pointPolicyRepository.findById(anyLong())).thenReturn(Optional.empty());
+		when(pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(anyLong())).thenReturn(Optional.empty());
 		assertThrows(PointPolicyNotFoundException.class,
 			() -> pointPolicyService.updatePointPolicy(2, pointPolicyRequest));
 	}
@@ -96,20 +96,22 @@ public class PointPolicyServiceTest {
 	@Test
 	public void updatePointPolicySuccess() {
 		PointPolicyRequest ppr = new PointPolicyRequest(PolicyType.FIXED, "흠.", BigDecimal.valueOf(19));
-		when(pointPolicyRepository.findById(anyLong())).thenReturn(Optional.of(pointPolicy));
+		when(pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(anyLong())).thenReturn(
+			Optional.of(pointPolicy));
 		assertEquals(pointPolicy, pointPolicyService.updatePointPolicy(1, ppr));
 	}
 
 	@Test
 	public void deletePointPolicyFail() {
-		when(pointPolicyRepository.findById(anyLong())).thenReturn(Optional.empty());
+		when(pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(anyLong())).thenReturn(Optional.empty());
 		assertThrows(PointPolicyNotFoundException.class,
 			() -> pointPolicyService.deletePointPolicy(2));
 	}
 
 	@Test
 	public void deletePointPolicySuccess() {
-		when(pointPolicyRepository.findById(anyLong())).thenReturn(Optional.of(pointPolicy));
+		when(pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(anyLong())).thenReturn(
+			Optional.of(pointPolicy));
 		pointPolicyService.deletePointPolicy(1);
 		assert (pointPolicy.getDeletedAt() != null);
 	}
