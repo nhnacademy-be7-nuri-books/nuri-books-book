@@ -1,6 +1,7 @@
 package shop.nuribooks.books.book.point.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,6 @@ public interface PointPolicyRepository extends JpaRepository<PointPolicy, Long> 
 	PointPolicyResponse findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(String name);
 
 	Boolean existsByNameIgnoreCaseAndDeletedAtIsNull(String name);
+
+	Optional<PointPolicy> findPointPolicyByIdAndDeletedAtIsNull(long id);
 }

@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.point.service.impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.point.dto.request.PointPolicyRequest;
@@ -50,13 +51,13 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 	 * @param pointPolicyRequest
 	 * @return
 	 */
+	@Transactional
 	@Override
 	public PointPolicy updatePointPolicy(long id, PointPolicyRequest pointPolicyRequest) {
-		PointPolicy pointPolicy = pointPolicyRepository.findById(id)
+		PointPolicy pointPolicy = pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(id)
 			.orElseThrow(() -> new PointPolicyNotFoundException());
 
 		pointPolicy.update(pointPolicyRequest);
-
 		return pointPolicy;
 	}
 
@@ -65,9 +66,10 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 	 *
 	 * @param id
 	 */
+	@Transactional
 	@Override
 	public void deletePointPolicy(long id) {
-		PointPolicy pointPolicy = pointPolicyRepository.findById(id)
+		PointPolicy pointPolicy = pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(id)
 			.orElseThrow(() -> new PointPolicyNotFoundException());
 
 		pointPolicy.delete();

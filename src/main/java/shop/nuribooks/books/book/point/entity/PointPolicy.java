@@ -59,7 +59,7 @@ public class PointPolicy {
 	}
 
 	public void update(PointPolicyRequest pointPolicyRequest) {
-		this.name = pointPolicyRequest.name();
+		this.policyType = pointPolicyRequest.policyType();
 		this.amount = pointPolicyRequest.amount();
 	}
 
