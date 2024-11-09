@@ -12,7 +12,10 @@ jobs:
         id: pr-url
         uses: ammaratef45/pr-url-action@v1
 
+      - name: test
+        run: echo ${{ steps.pr-url.outputs.url}}
+        
       - name: Send Message
         run: |
           curl -H "Content-Type:
-            application/json" -X POST -d '{"botName": "GithubBot", "botIconImage": "https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png", "text": ${{ steps.pr-url.outputs.url }} }' ${{ secrets.HOOK_URL }}
+            application/json" -X POST -d '{"botName": "GithubBot", "botIconImage": "https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png", "text": "${{ steps.pr-url.outputs.url }}" }' ${{ secrets.HOOK_URL }}
