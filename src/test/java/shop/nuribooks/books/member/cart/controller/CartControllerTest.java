@@ -1,14 +1,17 @@
 package shop.nuribooks.books.member.cart.controller;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +20,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
-import shop.nuribooks.books.member.cart.dto.request.CartAddRequest;
+import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
+import shop.nuribooks.books.member.cart.dto.response.CartListResponse;
 import shop.nuribooks.books.member.cart.entity.Cart;
 import shop.nuribooks.books.member.cart.service.CartService;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
@@ -39,22 +41,30 @@ class CartControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
-	@Autowired
-	private ObjectMapper objectMapper;
+	@BeforeEach
+	public void setUp() {
+		MemberIdContext.setMemberId(1L);
+	}
+
+	@AfterEach
+	void tearDown() {
+		MemberIdContext.clear();
+	}
 
 	@DisplayName("장바구니 등록 성공")
 	@Test
 	void addToCart() throws Exception {
 		//given
-		CartAddRequest request = getCartAddRequest();
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = 3;
 		CartAddResponse response = getCartAddResponse();
 
-		when(cartService.addToCart(request)).thenReturn(response);
+		when(cartService.addToCart(memberId, bookId, quantity)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(post("/api/member/cart")
-			.contentType(APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(request)));
+		ResultActions result = mockMvc.perform(post(
+			"/api/member/cart/{bookId}/{quantity}", bookId, quantity));
 
 		//then
 		result.andExpect(status().isCreated())
@@ -63,9 +73,35 @@ class CartControllerTest {
 			.andExpect(jsonPath("thumbnailImageUrl").value(response.thumbnailImageUrl()))
 			.andExpect(jsonPath("price").value(response.price()))
 			.andExpect(jsonPath("discountRate").value(response.discountRate()))
-			.andExpect(jsonPath("isPackageable").value(response.isPackageable()));
+			.andExpect(jsonPath("isPackageable").value(response.isPackageable()))
+			.andExpect(jsonPath("quantity").value(response.quantity()));
 	}
 
+	@DisplayName("장바구니 조회 성공")
+	@Test
+	void getCartList() throws Exception {
+		//given
+		Long memberId = MemberIdContext.getMemberId();
+
+		List<CartListResponse> response = getCartListResponses();
+
+		when(cartService.getCartList(memberId)).thenReturn(response);
+
+		//when
+		ResultActions result = mockMvc.perform(get("/api/member/cart/me"))
+			.andDo(print());
+
+		//then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0].state").value(response.getFirst().state().name()))
+			.andExpect(jsonPath("$[0].title").value(response.getFirst().title()))
+			.andExpect(jsonPath("$[0].thumbnailImageUrl").value(response.getFirst().thumbnailImageUrl()))
+			.andExpect(jsonPath("$[0].price").value(response.getFirst().price()))
+			.andExpect(jsonPath("$[0].discountRate").value(response.getFirst().discountRate()))
+			.andExpect(jsonPath("$[0].isPackageable").value(response.getFirst().isPackageable()))
+			.andExpect(jsonPath("$[0].quantity").value(response.getFirst().quantity()))
+			.andExpect(jsonPath("$.length()").value(1));
+	}
 
 	/**
 	 * 테스트를 위한 회원 생성
@@ -119,17 +155,6 @@ class CartControllerTest {
 	}
 
 	/**
-	 * 테스트를 위한 CartAddRequest 생성
-	 */
-	private CartAddRequest getCartAddRequest() {
-		return CartAddRequest.builder()
-			.memberId(1L)
-			.bookId(1L)
-			.quantity(1)
-			.build();
-	}
-
-	/**
 	 * 테스트를 위한 CartAddResponse 생성
 	 */
 	private CartAddResponse getCartAddResponse() {
@@ -140,6 +165,23 @@ class CartControllerTest {
 			.price(getSavedBook().getPrice())
 			.discountRate(getSavedBook().getDiscountRate())
 			.isPackageable(getSavedBook().isPackageable())
+			.quantity(3)
 			.build();
+	}
+
+	/**
+	 * 테스트를 위한 CartListResponse 생성
+	 */
+	private List<CartListResponse> getCartListResponses() {
+		return List.of(
+			CartListResponse.builder()
+			.state(getSavedBook().getState())
+			.title(getSavedBook().getTitle())
+			.thumbnailImageUrl(getSavedBook().getThumbnailImageUrl())
+			.price(getSavedBook().getPrice())
+			.discountRate(getSavedBook().getDiscountRate())
+			.isPackageable(getSavedBook().isPackageable())
+			.quantity(3)
+			.build());
 	}
 }

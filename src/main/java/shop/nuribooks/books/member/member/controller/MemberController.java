@@ -1,7 +1,6 @@
 package shop.nuribooks.books.member.member.controller;
 
 import static org.springframework.http.HttpStatus.*;
-import static shop.nuribooks.books.member.member.entity.AuthorityType.*;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
@@ -164,7 +162,6 @@ public class MemberController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "관리자가 회원 목록 조회 성공")
 	})
-	@HasRole(role = ADMIN)
 	@GetMapping("/admin/api/member/members")
 	public ResponseEntity<Page<MemberSearchResponse>> memberSearchWithPaging(
 		@RequestParam(value = "name", required = false) String name,

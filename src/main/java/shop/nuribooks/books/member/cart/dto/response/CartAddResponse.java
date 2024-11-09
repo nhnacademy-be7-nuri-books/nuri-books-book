@@ -14,5 +14,6 @@ public record CartAddResponse (
 	String thumbnailImageUrl,
 	BigDecimal price,
 	int discountRate,
-	boolean isPackageable
+	boolean isPackageable,
+	int quantity
 ) {}
