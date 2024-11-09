@@ -219,7 +219,7 @@ class MemberControllerTest {
 		doNothing().when(memberService).updateMember(eq(memberId), any(MemberUpdateRequest.class));
 
 		//when
-		ResultActions result = mockMvc.perform(post("/api/member/me")
+		ResultActions result = mockMvc.perform(patch("/api/member/me")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -237,7 +237,7 @@ class MemberControllerTest {
 		MemberUpdateRequest badRequest = getBadMemberUpdateRequest();
 
 		//when
-		ResultActions badResult = mockMvc.perform(post("/api/member/me")
+		ResultActions badResult = mockMvc.perform(patch("/api/member/me")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 

@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
 import shop.nuribooks.books.member.cart.dto.response.CartListResponse;
+import shop.nuribooks.books.member.cart.dto.response.CartUpdateResponse;
 import shop.nuribooks.books.member.cart.service.CartService;
 
 /**
@@ -77,7 +79,8 @@ public class CartController {
 	 */
 	@Operation(summary = "장바구니 삭제", description = "회원 PK id로 장바구니를 삭제합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "장바구니 삭제 성공")
+		@ApiResponse(responseCode = "200", description = "장바구니 삭제 성공"),
+		@ApiResponse(responseCode = "404", description = "장바구니가 존재하지 않음")
 	})
 	@DeleteMapping("/me/{bookId}")
 	public ResponseEntity<ResponseMessage> cartDelete(@PathVariable Long bookId) {
@@ -87,6 +90,28 @@ public class CartController {
 
 		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),
 			"장바구니에서 상품이 삭제되었습니다."));
+	}
+
+	/**
+	 * 장바구니 수정 <br>
+	 * ThreadLocal에서 회원의 PK id를, PathVariable로 도서의 PK id와 수량을 받음 <br>
+	 * 수정 후 해당 도서의 상세 정보들을 CartUpdateResponse에 담아서 반환
+	 */
+	@Operation(summary = "장바구니 수정", description = "회원과 도서의 id로 장바구니를 수정합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "장바구니 수정 성공"),
+		@ApiResponse(responseCode = "400", description = "도서 수량이 유효하지 않음"),
+		@ApiResponse(responseCode = "404", description = "회원 혹은 도서가 존재하지 않음")
+	})
+	@PatchMapping("/me/{bookId}/{quantity}")
+	public ResponseEntity<CartUpdateResponse> cartUpdate(
+		@PathVariable Long bookId, @PathVariable int quantity) {
+
+		Long memberId = MemberIdContext.getMemberId();
+
+		CartUpdateResponse response = cartService.updateCart(memberId, bookId, quantity);
+
+		return ResponseEntity.status(OK).body(response);
 	}
 }
 

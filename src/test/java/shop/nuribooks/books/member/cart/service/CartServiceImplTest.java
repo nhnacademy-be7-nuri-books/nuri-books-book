@@ -23,12 +23,12 @@ import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
-import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.InvalidCartQuantityException;
 import shop.nuribooks.books.exception.member.MemberCartNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
 import shop.nuribooks.books.member.cart.dto.response.CartListResponse;
+import shop.nuribooks.books.member.cart.dto.response.CartUpdateResponse;
 import shop.nuribooks.books.member.cart.entity.Cart;
 import shop.nuribooks.books.member.cart.entity.CartId;
 import shop.nuribooks.books.member.cart.repository.CartRepository;
@@ -84,6 +84,7 @@ class CartServiceImplTest {
 		CartAddResponse result = cartServiceImpl.addToCart(memberId, bookId, quantity);
 
 		//then
+		assertThat(result.bookId()).isEqualTo(savedBook.getId());
 		assertThat(result.state()).isEqualTo(savedBook.getState());
 		assertThat(result.title()).isEqualTo(savedBook.getTitle());
 		assertThat(result.thumbnailImageUrl()).isEqualTo(savedBook.getThumbnailImageUrl());
@@ -103,7 +104,7 @@ class CartServiceImplTest {
 		//when / then
 		assertThatThrownBy(() -> cartServiceImpl.addToCart(memberId, bookId, quantity))
 			.isInstanceOf(InvalidCartQuantityException.class)
-			.hasMessage("도서의 수량은 1개 이상이어야 합니다.");
+			.hasMessage("도서의 수량은 1권 이상이어야 합니다.");
 	}
 
 	@DisplayName("회원과 도서의 PK id로 신규 장바구니 생성 실패 - 존재하지 않는 회원")
@@ -146,7 +147,7 @@ class CartServiceImplTest {
 
 	@DisplayName("회원과 도서의 PK id로 기존 장바구니 도서 수량 증가 성공")
 	@Test
-	void addToCart_updateQuantity() {
+	void addToCart_addQuantity() {
 		//given
 		Long memberId = MemberIdContext.getMemberId();
 		Long bookId = 1L;
@@ -161,8 +162,9 @@ class CartServiceImplTest {
 		CartAddResponse result = cartServiceImpl.addToCart(memberId, bookId, quantity);
 
 		//then
-		verify(savedCart, times(1)).updateQuantity(quantity);
+		verify(savedCart, times(1)).addQuantity(quantity);
 
+		assertThat(result.bookId()).isEqualTo(savedBook.getId());
 		assertThat(result.state()).isEqualTo(savedBook.getState());
 		assertThat(result.title()).isEqualTo(savedBook.getTitle());
 		assertThat(result.thumbnailImageUrl()).isEqualTo(savedBook.getThumbnailImageUrl());
@@ -190,7 +192,7 @@ class CartServiceImplTest {
 		assertThat(result.get(1).quantity()).isEqualTo(savedCart2.getQuantity());
 	}
 
-	@DisplayName("회원의 PK id로 모든 장바구니 조회 - 장바구니가 없을 때")
+	@DisplayName("회원의 PK id로 모든 장바구니 조회 - 존재하지 않는 장바구니")
 	@Test
 	void getCartList_noCart() {
 		//given
@@ -223,7 +225,7 @@ class CartServiceImplTest {
 		verify(cartRepository, times(1)).delete(savedCart);
 	}
 
-	@DisplayName("회원과 도서의 PK id로 장바구니 삭제 실패 - 장바구니가 없을 때")
+	@DisplayName("회원과 도서의 PK id로 장바구니 삭제 실패 - 존재하지 않는 장바구니")
 	@Test
 	void deleteCart_noCart() {
 	    //given
@@ -237,6 +239,64 @@ class CartServiceImplTest {
 			.isInstanceOf(MemberCartNotFoundException.class)
 			.hasMessage("장바구니가 존재하지 않습니다.");
 	}
+
+	@DisplayName("회원과 도서의 PK id로 장바구니 수정 성공")
+	@Test
+	void updateCart() {
+		//given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = 3;
+
+		Book savedBook = getSavedBook();
+		Cart savedCart = spy(getSavedCart());
+
+		when(cartRepository.findById(any(CartId.class))).thenReturn(Optional.of(savedCart));
+
+		//when
+		CartUpdateResponse result = cartServiceImpl.updateCart(memberId, bookId, quantity);
+
+		//then
+		verify(savedCart, times(1)).updateQuantity(quantity);
+		assertThat(result.bookId()).isEqualTo(savedBook.getId());
+		assertThat(result.state()).isEqualTo(savedBook.getState());
+		assertThat(result.title()).isEqualTo(savedBook.getTitle());
+		assertThat(result.thumbnailImageUrl()).isEqualTo(savedBook.getThumbnailImageUrl());
+		assertThat(result.price()).isEqualTo(savedBook.getPrice());
+		assertThat(result.discountRate()).isEqualTo(savedBook.getDiscountRate());
+		assertThat(result.quantity()).isEqualTo(savedCart.getQuantity());
+	}
+
+	@DisplayName("회원과 도서의 PK id로 장바구니 수정 실패 - 유효하지 않은 도서 수량")
+	@Test
+	void updateCart_invalidCartQuantity() {
+		//given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = -3;
+
+		//when / then
+		assertThatThrownBy(() -> cartServiceImpl.updateCart(memberId, bookId, quantity))
+			.isInstanceOf(InvalidCartQuantityException.class)
+			.hasMessage("도서의 수량은 1권 이상이어야 합니다.");
+	}
+
+	@DisplayName("회원과 도서의 PK id로 장바구니 수정 실패 - 존재하지 않는 장바구니")
+	@Test
+	void updateCart_memberCartNotFound() {
+		//given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = 3;
+
+		when(cartRepository.findById(any(CartId.class))).thenReturn(Optional.empty());
+
+		//then
+		assertThatThrownBy(() -> cartServiceImpl.updateCart(memberId, bookId, quantity))
+			.isInstanceOf(MemberCartNotFoundException.class)
+			.hasMessage("장바구니가 존재하지 않습니다.");
+	}
+
 
 
 	/**
