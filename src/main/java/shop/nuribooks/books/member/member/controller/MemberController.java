@@ -164,7 +164,6 @@ public class MemberController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "관리자가 회원 목록 조회 성공")
 	})
-	@HasRole(role = ADMIN)
 	@GetMapping("/admin/api/member/members")
 	public ResponseEntity<Page<MemberSearchResponse>> memberSearchWithPaging(
 		@RequestParam(value = "name", required = false) String name,
