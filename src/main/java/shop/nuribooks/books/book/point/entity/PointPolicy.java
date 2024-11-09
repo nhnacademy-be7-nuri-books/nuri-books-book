@@ -13,6 +13,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import shop.nuribooks.books.book.point.dto.request.PointPolicyRequest;
 import shop.nuribooks.books.book.point.enums.PolicyType;
 
 @Entity
@@ -29,11 +31,13 @@ public class PointPolicy {
 	private PolicyType policyType;
 
 	@NotNull
+	@Setter
 	private String name;
 
 	// 포인트 적용량 값. type이 fixed -> 그냥 적용 값. rated -> 적용 비율
 	@NotNull
 	@Min(0)
+	@Setter
 	private BigDecimal amount;
 
 	@NotNull
@@ -51,5 +55,10 @@ public class PointPolicy {
 		this.name = name;
 		this.amount = amount;
 		this.createdAt = LocalDateTime.now();
+	}
+
+	public void update(PointPolicyRequest pointPolicyRequest) {
+		this.name = pointPolicyRequest.name();
+		this.amount = pointPolicyRequest.amount();
 	}
 }

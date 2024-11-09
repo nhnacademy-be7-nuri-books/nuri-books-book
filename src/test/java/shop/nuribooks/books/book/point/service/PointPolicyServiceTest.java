@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import shop.nuribooks.books.book.point.dto.request.PointPolicyRequest;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
 import shop.nuribooks.books.book.point.enums.PolicyType;
+import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
 import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
 import shop.nuribooks.books.book.point.service.impl.PointPolicyServiceImpl;
 import shop.nuribooks.books.exception.ResourceAlreadyExistException;
@@ -52,5 +54,19 @@ public class PointPolicyServiceTest {
 		when(pointPolicyRepository.existsByNameIgnoreCaseAndDeletedAtIsNull(anyString())).thenReturn(false);
 		when(pointPolicyRepository.save(any())).thenReturn(pointPolicy);
 		assertEquals(pointPolicy, this.pointPolicyService.registerPointPolicy(pointPolicyRequest));
+	}
+
+	@Test
+	public void updatePointPolicyFail() {
+		when(pointPolicyRepository.findById(anyLong())).thenReturn(Optional.empty());
+		assertThrows(PointPolicyNotFoundException.class,
+			() -> pointPolicyService.updatePointPolicy(2, pointPolicyRequest));
+	}
+
+	@Test
+	public void updatePointPolicySuccess() {
+		PointPolicyRequest ppr = new PointPolicyRequest(PolicyType.FIXED, "흠.", BigDecimal.valueOf(19));
+		when(pointPolicyRepository.findById(anyLong())).thenReturn(Optional.of(pointPolicy));
+		assertEquals(pointPolicy, pointPolicyService.updatePointPolicy(1, ppr));
 	}
 }
