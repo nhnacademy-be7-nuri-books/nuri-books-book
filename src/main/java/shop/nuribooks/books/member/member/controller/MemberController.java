@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -137,8 +138,7 @@ public class MemberController {
 	/**
 	 * 회원 정보 수정 <br>
 	 * MemberUpdateReq의 모든 필드 즉, <br>
-	 * name, password에 대해서 검증 후 userId를 통해 수정 진행 <br>
-	 * MemberUpdateResponse에 변경한 이름과 전화번호 담아서 반환
+	 * name, password에 대해서 검증 후 회원의 PK id를 통해 수정 진행 <br>
 	 */
 	@Operation(summary = "회원 정보 수정", description = "유저 아이디로 회원 정보를 수정합니다.")
 	@ApiResponses(value = {
@@ -146,7 +146,7 @@ public class MemberController {
 		@ApiResponse(responseCode = "400", description = "회원 정보 수정 요청 데이터가 유효하지 않음"),
 		@ApiResponse(responseCode = "404", description = "회원이 존재하지 않음")
 	})
-	@PostMapping("/api/member/me")
+	@PatchMapping("/api/member/me")
 	public ResponseEntity<ResponseMessage> memberUpdate(
 		@RequestBody @Valid MemberUpdateRequest request) {
 
@@ -164,7 +164,6 @@ public class MemberController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "관리자가 회원 목록 조회 성공")
 	})
-	@HasRole(role = ADMIN)
 	@GetMapping("/admin/api/member/members")
 	public ResponseEntity<Page<MemberSearchResponse>> memberSearchWithPaging(
 		@RequestParam(value = "name", required = false) String name,

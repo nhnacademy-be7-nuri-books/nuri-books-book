@@ -44,10 +44,18 @@ public class Cart {
 	private LocalDateTime updatedAt;
 
 	/**
-	 * 동일한 도서에 대해서 장바구니 생성 요청이 오면 도서의 수량을 변화시킨다.
+	 * 동일한 도서의 장바구니 수량을 증가시킨다.
 	 */
-	public void updateQuantity(int count) {
-		quantity += count;
+	public void addQuantity(int quantity) {
+		this.quantity += quantity;
+		updatedAt = LocalDateTime.now();
+	}
+
+	/**
+	 * 동일한 도서의 장바구니 수량을 변경한다.
+	 */
+	public void updateQuantity(int quantity) {
+		this.quantity = quantity;
 		updatedAt = LocalDateTime.now();
 	}
 }

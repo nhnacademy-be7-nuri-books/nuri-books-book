@@ -6,7 +6,7 @@ import lombok.Builder;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 
 @Builder
-public record CartListResponse(
+public record CartUpdateResponse(
 
 	Long bookId,
 	BookStateEnum state,

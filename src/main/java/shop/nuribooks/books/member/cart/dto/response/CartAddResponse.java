@@ -9,10 +9,12 @@ import shop.nuribooks.books.book.book.entity.BookStateEnum;
 @Builder
 public record CartAddResponse (
 
+	Long bookId,
 	BookStateEnum state,
 	String title,
 	String thumbnailImageUrl,
 	BigDecimal price,
 	int discountRate,
-	boolean isPackageable
+	boolean isPackageable,
+	int quantity
 ) {}

@@ -67,7 +67,6 @@ public class Member {
 	private Grade grade;
 
 	@OneToMany(mappedBy = "member", fetch = LAZY, cascade = CascadeType.PERSIST)
-
 	@Builder.Default
 	private List<Address> addressList = new ArrayList<>();
 

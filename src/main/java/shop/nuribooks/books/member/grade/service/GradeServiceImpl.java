@@ -1,11 +1,13 @@
 package shop.nuribooks.books.member.grade.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.member.GradeAlreadyExistsException;
 import shop.nuribooks.books.exception.member.GradeInUseException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
@@ -112,6 +114,11 @@ public class GradeServiceImpl implements GradeService {
 	 * 이름으로 등급을 찾는 메서드 추출
 	 */
 	private Grade getGrade(String name) {
+
+		if (Objects.isNull(name)) {
+			throw new BadRequestException("등급명을 입력해주세요.");
+		}
+
 		return gradeRepository.findByName(name.toUpperCase())
 			.orElseThrow(() -> new GradeNotFoundException("해당 이름의 등급이 존재하지 않습니다."));
 	}

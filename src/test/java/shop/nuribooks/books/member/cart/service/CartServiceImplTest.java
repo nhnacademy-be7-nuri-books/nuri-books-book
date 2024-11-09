@@ -6,8 +6,11 @@ import static org.mockito.Mockito.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,10 +21,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.member.InvalidCartQuantityException;
+import shop.nuribooks.books.exception.member.MemberCartNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.member.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
+import shop.nuribooks.books.member.cart.dto.response.CartListResponse;
+import shop.nuribooks.books.member.cart.dto.response.CartUpdateResponse;
 import shop.nuribooks.books.member.cart.entity.Cart;
 import shop.nuribooks.books.member.cart.entity.CartId;
 import shop.nuribooks.books.member.cart.repository.CartRepository;
@@ -46,111 +53,248 @@ class CartServiceImplTest {
 	@Mock
 	private BookRepository bookRepository;
 
+	@BeforeEach
+	public void setUp() {
+		MemberIdContext.setMemberId(1L);
+	}
 
-	@DisplayName("회원과 도서의 id로 신규 장바구니 생성 성공")
+	@AfterEach
+	void tearDown() {
+		MemberIdContext.clear();
+	}
+
+	@DisplayName("회원과 도서의 PK id로 신규 장바구니 생성 성공")
 	@Test
 	void addToCart() {
 		//given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = 3;
+
 		Member savedMember = getSavedMember();
 		Book savedBook = getSavedBook();
 		Cart savedCart = getSavedCart();
-		CartAddRequest request = getCartAddRequest();
-		CartId cartId = new CartId(request.memberId(), request.bookId());
 
-		when(cartRepository.findById(cartId)).thenReturn(Optional.empty());
-		when(memberRepository.findById(request.memberId())).thenReturn(Optional.of(savedMember));
-		when(bookRepository.findById(request.bookId())).thenReturn(Optional.of(savedBook));
+		when(cartRepository.findById(any(CartId.class))).thenReturn(Optional.empty());
+		when(memberRepository.findById(memberId)).thenReturn(Optional.of(savedMember));
+		when(bookRepository.findById(bookId)).thenReturn(Optional.of(savedBook));
 		when(cartRepository.save(any(Cart.class))).thenReturn(savedCart);
 
 		//when
-		CartAddResponse result = cartServiceImpl.addToCart(request);
+		CartAddResponse result = cartServiceImpl.addToCart(memberId, bookId, quantity);
 
 		//then
+		assertThat(result.bookId()).isEqualTo(savedBook.getId());
 		assertThat(result.state()).isEqualTo(savedBook.getState());
 		assertThat(result.title()).isEqualTo(savedBook.getTitle());
 		assertThat(result.thumbnailImageUrl()).isEqualTo(savedBook.getThumbnailImageUrl());
 		assertThat(result.price()).isEqualTo(savedBook.getPrice());
 		assertThat(result.discountRate()).isEqualTo(savedBook.getDiscountRate());
+		assertThat(result.quantity()).isEqualTo(savedCart.getQuantity());
 	}
 
-	@DisplayName("회원과 도서의 id로 신규 장바구니 생성 실패 - 존재하지 않는 회원")
+	@DisplayName("회원과 도서의 PK id로 신규 장바구니 생성 실패 - 유효하지 않은 도서 수량")
+	@Test
+	void addToCart_invalidCartQuantity() {
+		//given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = -3;
+
+		//when / then
+		assertThatThrownBy(() -> cartServiceImpl.addToCart(memberId, bookId, quantity))
+			.isInstanceOf(InvalidCartQuantityException.class)
+			.hasMessage("도서의 수량은 1권 이상이어야 합니다.");
+	}
+
+	@DisplayName("회원과 도서의 PK id로 신규 장바구니 생성 실패 - 존재하지 않는 회원")
 	@Test
 	void addToCart_memberNotFound() {
 		//given
-		CartAddRequest request = getCartAddRequest();
-		CartId cartId = new CartId(request.memberId(), request.bookId());
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = 3;
+		CartId cartId = new CartId(memberId, bookId);
 
 		when(cartRepository.findById(cartId)).thenReturn(Optional.empty());
-		when(memberRepository.findById(request.memberId())).thenReturn(Optional.empty());
+		when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
 		//when / then
-		assertThatThrownBy(() -> cartServiceImpl.addToCart(request))
+		assertThatThrownBy(() -> cartServiceImpl.addToCart(memberId, bookId, quantity))
 			.isInstanceOf(MemberNotFoundException.class)
 			.hasMessage("존재하지 않는 회원입니다.");
 	}
 
-	@DisplayName("회원과 도서의 id로 신규 장바구니 생성 실패 - 존재하지 않는 도서")
+	@DisplayName("회원과 도서의 PK id로 신규 장바구니 생성 실패 - 존재하지 않는 도서")
 	@Test
 	void addToCart_bookNotFound() {
 		//given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = 3;
+		CartId cartId = new CartId(memberId, bookId);
 		Member savedMember = getSavedMember();
-		CartAddRequest request = getCartAddRequest();
-		CartId cartId = new CartId(request.memberId(), request.bookId());
 
 		when(cartRepository.findById(cartId)).thenReturn(Optional.empty());
-		when(memberRepository.findById(request.memberId())).thenReturn(Optional.of(savedMember));
-		when(bookRepository.findById(request.bookId())).thenReturn(Optional.empty());
+		when(memberRepository.findById(memberId)).thenReturn(Optional.of(savedMember));
+		when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
 		// when / then
-		assertThatThrownBy(() -> cartServiceImpl.addToCart(request))
+		assertThatThrownBy(() -> cartServiceImpl.addToCart(memberId, bookId, quantity))
 			.isInstanceOf(BookNotFoundException.class)
-			.hasMessage("해당 도서를 찾을 수 없습니다. Id : " + request.bookId());
+			.hasMessage("해당 도서를 찾을 수 없습니다. Id : " + bookId);
 	}
 
-	@DisplayName("회원과 도서의 id로 기존 장바구니 도서 수량 증가 성공")
+	@DisplayName("회원과 도서의 PK id로 기존 장바구니 도서 수량 증가 성공")
 	@Test
-	void addToCart_updateQuantity() {
+	void addToCart_addQuantity() {
 		//given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = 3;
+		CartId cartId = new CartId(memberId, bookId);
 		Book savedBook = getSavedBook();
 		Cart savedCart = spy(getSavedCart());
-		Cart quantityIncreasedCart = getQuantityIncreasedCart();
-		CartAddRequest request = getCartAddRequest();
-		CartId cartId = new CartId(request.memberId(), request.bookId());
 
 		when(cartRepository.findById(cartId)).thenReturn(Optional.of(savedCart));
-		when(cartRepository.save(any(Cart.class))).thenReturn(quantityIncreasedCart);
 
 		//when
-		CartAddResponse result = cartServiceImpl.addToCart(request);
+		CartAddResponse result = cartServiceImpl.addToCart(memberId, bookId, quantity);
 
 		//then
-		verify(savedCart, times(1)).updateQuantity(request.quantity());
+		verify(savedCart, times(1)).addQuantity(quantity);
 
+		assertThat(result.bookId()).isEqualTo(savedBook.getId());
 		assertThat(result.state()).isEqualTo(savedBook.getState());
 		assertThat(result.title()).isEqualTo(savedBook.getTitle());
 		assertThat(result.thumbnailImageUrl()).isEqualTo(savedBook.getThumbnailImageUrl());
 		assertThat(result.price()).isEqualTo(savedBook.getPrice());
 		assertThat(result.discountRate()).isEqualTo(savedBook.getDiscountRate());
+		assertThat(result.quantity()).isEqualTo(savedCart.getQuantity());
 	}
 
-	@DisplayName("기존 장바구니의 도서 수량이 0이 되어 삭제")
+	@DisplayName("회원의 PK id로 모든 장바구니 조회")
 	@Test
-	void addToCart_deletedByInvalidQuantity() {
+	void getCartList() {
 		//given
-		Cart savedCart = spy(getSavedCart());
-		CartAddRequest request = getCartMinusRequest();
-		CartId cartId = new CartId(request.memberId(), request.bookId());
+		Long memberId = MemberIdContext.getMemberId();
+		Cart savedCart = getSavedCart();
+		Cart savedCart2 = getSavedCart2();
+		List<Cart> carts = List.of(savedCart, savedCart2);
 
-		when(cartRepository.findById(cartId)).thenReturn(Optional.of(savedCart));
-		doNothing().when(cartRepository).delete(savedCart);
+		when(cartRepository.findAllByMemberId(memberId)).thenReturn(carts);
 
 		//when
-		CartAddResponse result = cartServiceImpl.addToCart(request);
+		List<CartListResponse> result = cartServiceImpl.getCartList(memberId);
 
 		//then
-		verify(savedCart, times(1)).updateQuantity(request.quantity());
+		assertThat(result.getFirst().quantity()).isEqualTo(savedCart.getQuantity());
+		assertThat(result.get(1).quantity()).isEqualTo(savedCart2.getQuantity());
+	}
 
-		assertThat(result.state()).isNull();
+	@DisplayName("회원의 PK id로 모든 장바구니 조회 - 존재하지 않는 장바구니")
+	@Test
+	void getCartList_noCart() {
+		//given
+		Long memberId = MemberIdContext.getMemberId();
+		List<Cart> carts = List.of();
+
+		when(cartRepository.findAllByMemberId(memberId)).thenReturn(carts);
+
+		//when
+		List<CartListResponse> result = cartServiceImpl.getCartList(memberId);
+
+		//then
+		assertThat(result).isEmpty();
+	}
+
+	@DisplayName("회원과 도서의 PK id로 장바구니 삭제 성공")
+	@Test
+	void deleteCart() {
+	    //given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		Cart savedCart = getSavedCart();
+
+		when(cartRepository.findById(any(CartId.class))).thenReturn(Optional.of(savedCart));
+
+		//when
+		cartServiceImpl.deleteCart(memberId, bookId);
+
+	    //then
+		verify(cartRepository, times(1)).delete(savedCart);
+	}
+
+	@DisplayName("회원과 도서의 PK id로 장바구니 삭제 실패 - 존재하지 않는 장바구니")
+	@Test
+	void deleteCart_noCart() {
+	    //given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+
+		when(cartRepository.findById(any(CartId.class))).thenReturn(Optional.empty());
+
+		//when / then
+		assertThatThrownBy(() -> cartServiceImpl.deleteCart(memberId, bookId))
+			.isInstanceOf(MemberCartNotFoundException.class)
+			.hasMessage("장바구니에 해당 도서가 존재하지 않습니다.");
+	}
+
+	@DisplayName("회원과 도서의 PK id로 장바구니 수정 성공")
+	@Test
+	void updateCart() {
+		//given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = 3;
+
+		Book savedBook = getSavedBook();
+		Cart savedCart = spy(getSavedCart());
+
+		when(cartRepository.findById(any(CartId.class))).thenReturn(Optional.of(savedCart));
+
+		//when
+		CartUpdateResponse result = cartServiceImpl.updateCart(memberId, bookId, quantity);
+
+		//then
+		verify(savedCart, times(1)).updateQuantity(quantity);
+		assertThat(result.bookId()).isEqualTo(savedBook.getId());
+		assertThat(result.state()).isEqualTo(savedBook.getState());
+		assertThat(result.title()).isEqualTo(savedBook.getTitle());
+		assertThat(result.thumbnailImageUrl()).isEqualTo(savedBook.getThumbnailImageUrl());
+		assertThat(result.price()).isEqualTo(savedBook.getPrice());
+		assertThat(result.discountRate()).isEqualTo(savedBook.getDiscountRate());
+		assertThat(result.quantity()).isEqualTo(savedCart.getQuantity());
+	}
+
+	@DisplayName("회원과 도서의 PK id로 장바구니 수정 실패 - 유효하지 않은 도서 수량")
+	@Test
+	void updateCart_invalidCartQuantity() {
+		//given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = -3;
+
+		//when / then
+		assertThatThrownBy(() -> cartServiceImpl.updateCart(memberId, bookId, quantity))
+			.isInstanceOf(InvalidCartQuantityException.class)
+			.hasMessage("도서의 수량은 1권 이상이어야 합니다.");
+	}
+
+	@DisplayName("회원과 도서의 PK id로 장바구니 수정 실패 - 존재하지 않는 장바구니")
+	@Test
+	void updateCart_memberCartNotFound() {
+		//given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		int quantity = 3;
+
+		when(cartRepository.findById(any(CartId.class))).thenReturn(Optional.empty());
+
+		//then
+		assertThatThrownBy(() -> cartServiceImpl.updateCart(memberId, bookId, quantity))
+			.isInstanceOf(MemberCartNotFoundException.class)
+			.hasMessage("장바구니에 해당 도서가 존재하지 않습니다.");
 	}
 
 
@@ -197,28 +341,6 @@ class CartServiceImplTest {
 	}
 
 	/**
-	 * 테스트를 위한 수량 증가 CartAddRequest 생성
-	 */
-	private CartAddRequest getCartAddRequest() {
-		return CartAddRequest.builder()
-			.memberId(1L)
-			.bookId(1L)
-			.quantity(1)
-			.build();
-	}
-
-	/**
-	 * 테스트를 위한 수량 감소 CartAddRequest 생성
-	 */
-	private CartAddRequest getCartMinusRequest() {
-		return CartAddRequest.builder()
-			.memberId(1L)
-			.bookId(1L)
-			.quantity(-3)
-			.build();
-	}
-
-	/**
 	 * 테스트를 위한 장바구니 생성
 	 */
 	private Cart getSavedCart() {
@@ -230,13 +352,13 @@ class CartServiceImplTest {
 	}
 
 	/**
-	 * 테스트를 위한 수량 증가한 장바구니 생성
+	 * 테스트를 위한 다른 장바구니 생성
 	 */
-	private Cart getQuantityIncreasedCart() {
+	private Cart getSavedCart2() {
 		return Cart.builder()
 			.member(getSavedMember())
 			.book(getSavedBook())
-			.quantity(2)
+			.quantity(3)
 			.build();
 	}
 }
