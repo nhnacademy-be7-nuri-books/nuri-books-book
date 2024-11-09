@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorRegisterRequest;
@@ -38,6 +39,7 @@ public class BookContributorServiceImpl implements BookContributorService {
     private final BookRepository bookRepository;
     private final ContributorRepository contributorRepository;
     private final ContributorRoleRepository contributorRoleRepository;
+    private final BookMapper bookMapper;
 
     /**
      * registerContributorToBook : 도서에 기여자와 기여자 역할 등록
@@ -71,6 +73,7 @@ public class BookContributorServiceImpl implements BookContributorService {
         }
     }
 
+    //TODO: QUERYDSL로 변경해야됨
     /**
      * getAllBooksByContributorId : 기여자 id 로 모든 도서 조회
      *
@@ -100,7 +103,8 @@ public class BookContributorServiceImpl implements BookContributorService {
                 List<String> tagNames = bookContributorRepository.findByBookId(book.getId())
                     .stream()
                     .map(bookContributor -> bookContributor.getContributor().getName()).toList();
-                return BookResponse.of(book,tagNames);
+                //return BookResponse.of(book,tagNames);
+                return bookMapper.toBookResponse(book);
             })
             .collect(Collectors.toList());
     }

@@ -20,6 +20,7 @@ import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
+import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.service.BookContributorService;
 import shop.nuribooks.books.book.booktag.entity.BookTag;
@@ -42,7 +43,7 @@ public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
 	private final BookContributorService bookContributorService;
-	private final BookTagRepository bookTagRepository;
+	private final BookMapper bookMapper;
 
 	//관리자 페이지에서 관리자의 직접 도서 등록을 위한 메서드
 	//TODO: 알라딘서비스의 저장 메서드 같이 사용하면 될 듯 조금만 더 생각해보고 지우겠음
@@ -92,9 +93,7 @@ public class BookServiceImpl implements BookService {
 		book.incrementViewCount();
 		bookRepository.save(book);
 
-		List<String> tagNames = bookTagRepository.findTagNamesByBookId(bookId);
-
-		return BookResponse.of(book, tagNames);
+		return bookMapper.toBookResponse(book);
 	}
 
 	//TODO: 도서 목록조회를 하여 도서를 관리하기 위한 메서드 (관리자로 로그인 했을때는 수정버튼을 보이게해서 수정하도록 하는게 좋을까?)

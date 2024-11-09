@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
@@ -29,6 +30,7 @@ public class BookTagServiceImpl implements BookTagService {
     private final BookTagRepository bookTagRepository;
     private final BookRepository bookRepository;
     private final TagRepository tagRepository;
+    private final BookMapper bookMapper;
 
     /**
      * registerTagToBook : 도서에 태그 등록
@@ -89,6 +91,7 @@ public class BookTagServiceImpl implements BookTagService {
         return BookTagGetResponse.of(bookTagId, bookId, tagNames);
     }
 
+    //TODO:  QUERYDSL로 변경해야됨
     /**
      * getBooksByTagId : 해당하는 태그가 달린 모든 도서 조회
      *
@@ -121,7 +124,7 @@ public class BookTagServiceImpl implements BookTagService {
             List<String> tagNames = bookTagRepository.findByBookId(book.getId())
                 .stream()
                 .map(bookTag -> bookTag.getTag().getName()).toList();
-            return BookResponse.of(book,tagNames);
+            return bookMapper.toBookResponse(book);
         })
             .collect(Collectors.toList());
     }
