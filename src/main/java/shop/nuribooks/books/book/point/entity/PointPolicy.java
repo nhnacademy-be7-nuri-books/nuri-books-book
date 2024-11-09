@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.nuribooks.books.book.point.enums.PolicyType;
@@ -39,4 +40,16 @@ public class PointPolicy {
 	private LocalDateTime createdAt;
 
 	private LocalDateTime deletedAt;
+
+	@Builder
+	public PointPolicy(
+		PolicyType policyType,
+		String name,
+		BigDecimal amount
+	) {
+		this.policyType = policyType;
+		this.name = name;
+		this.amount = amount;
+		this.createdAt = LocalDateTime.now();
+	}
 }
