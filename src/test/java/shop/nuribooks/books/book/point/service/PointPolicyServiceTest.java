@@ -69,4 +69,18 @@ public class PointPolicyServiceTest {
 		when(pointPolicyRepository.findById(anyLong())).thenReturn(Optional.of(pointPolicy));
 		assertEquals(pointPolicy, pointPolicyService.updatePointPolicy(1, ppr));
 	}
+
+	@Test
+	public void deletePointPolicyFail() {
+		when(pointPolicyRepository.findById(anyLong())).thenReturn(Optional.empty());
+		assertThrows(PointPolicyNotFoundException.class,
+			() -> pointPolicyService.deletePointPolicy(2));
+	}
+
+	@Test
+	public void deletePointPolicySuccess() {
+		when(pointPolicyRepository.findById(anyLong())).thenReturn(Optional.of(pointPolicy));
+		pointPolicyService.deletePointPolicy(1);
+		assert (pointPolicy.getDeletedAt() != null);
+	}
 }

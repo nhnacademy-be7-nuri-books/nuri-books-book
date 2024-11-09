@@ -46,4 +46,17 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 
 		return pointPolicy;
 	}
+
+	/**
+	 * 포인트 삭제
+	 *
+	 * @param id
+	 */
+	@Override
+	public void deletePointPolicy(long id) {
+		PointPolicy pointPolicy = pointPolicyRepository.findById(id)
+			.orElseThrow(() -> new PointPolicyNotFoundException());
+
+		pointPolicy.delete();
+	}
 }

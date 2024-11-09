@@ -61,4 +61,8 @@ public class PointPolicy {
 		this.name = pointPolicyRequest.name();
 		this.amount = pointPolicyRequest.amount();
 	}
+
+	public void delete() {
+		this.deletedAt = LocalDateTime.now();
+	}
 }
