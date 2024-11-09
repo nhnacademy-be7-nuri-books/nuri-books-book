@@ -92,11 +92,7 @@ public class BookServiceImpl implements BookService {
 		book.incrementViewCount();
 		bookRepository.save(book);
 
-		List<BookTag> bookTag = bookTagRepository.findByBookId(bookId);
-
-		List<String> tagNames = bookTag.stream()
-			.map(bookTagName -> bookTagName.getTag().getName())
-			.collect(Collectors.toList());
+		List<String> tagNames = bookTagRepository.findTagNamesByBookId(bookId);
 
 		return BookResponse.of(book, tagNames);
 	}
