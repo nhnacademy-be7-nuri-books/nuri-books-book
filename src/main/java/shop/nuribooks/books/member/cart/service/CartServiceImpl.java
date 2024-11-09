@@ -78,7 +78,7 @@ public class CartServiceImpl implements CartService {
 
 	/**
 	 * 회원의 PK id로 모든 장바구니 조회 <br>
-	 * 해당 회원의 장바구니가 없다면 모든 필드가 null인 CartListResponse 반환
+	 * 해당 회원의 장바구니가 없다면 empty list 반환
 	 */
 	@Override
 	public List<CartListResponse> getCartList(Long memberId) {

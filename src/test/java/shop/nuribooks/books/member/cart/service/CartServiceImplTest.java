@@ -23,7 +23,9 @@ import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.InvalidCartQuantityException;
+import shop.nuribooks.books.exception.member.MemberCartNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
 import shop.nuribooks.books.member.cart.dto.response.CartListResponse;
@@ -202,6 +204,38 @@ class CartServiceImplTest {
 
 		//then
 		assertThat(result).isEmpty();
+	}
+
+	@DisplayName("회원과 도서의 PK id로 장바구니 삭제 성공")
+	@Test
+	void deleteCart() {
+	    //given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+		Cart savedCart = getSavedCart();
+
+		when(cartRepository.findById(any(CartId.class))).thenReturn(Optional.of(savedCart));
+
+		//when
+		cartServiceImpl.deleteCart(memberId, bookId);
+
+	    //then
+		verify(cartRepository, times(1)).delete(savedCart);
+	}
+
+	@DisplayName("회원과 도서의 PK id로 장바구니 삭제 실패 - 장바구니가 없을 때")
+	@Test
+	void deleteCart_noCart() {
+	    //given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId = 1L;
+
+		when(cartRepository.findById(any(CartId.class))).thenReturn(Optional.empty());
+
+		//when / then
+		assertThatThrownBy(() -> cartServiceImpl.deleteCart(memberId, bookId))
+			.isInstanceOf(MemberCartNotFoundException.class)
+			.hasMessage("장바구니가 존재하지 않습니다.");
 	}
 
 

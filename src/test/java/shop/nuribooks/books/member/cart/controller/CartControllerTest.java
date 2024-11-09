@@ -2,7 +2,6 @@ package shop.nuribooks.books.member.cart.controller;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.math.BigDecimal;
@@ -88,8 +87,7 @@ class CartControllerTest {
 		when(cartService.getCartList(memberId)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(get("/api/member/cart/me"))
-			.andDo(print());
+		ResultActions result = mockMvc.perform(get("/api/member/cart/me"));
 
 		//then
 		result.andExpect(status().isOk())
@@ -101,6 +99,25 @@ class CartControllerTest {
 			.andExpect(jsonPath("$[0].isPackageable").value(response.getFirst().isPackageable()))
 			.andExpect(jsonPath("$[0].quantity").value(response.getFirst().quantity()))
 			.andExpect(jsonPath("$.length()").value(1));
+	}
+
+	@DisplayName("장바구니 삭제 성공")
+	@Test
+	void cartDelete() throws Exception {
+	    //given
+		Long memberId = MemberIdContext.getMemberId();
+		Long bookId= 1L;
+
+		doNothing().when(cartService).deleteCart(memberId, bookId);
+
+		//when
+		ResultActions result = mockMvc.perform(delete("/api/member/cart/me/{bookId}", bookId));
+
+	    //then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("statusCode").value("200"))
+			.andExpect(jsonPath("message")
+				.value("장바구니에서 상품이 삭제되었습니다."));
 	}
 
 	/**
