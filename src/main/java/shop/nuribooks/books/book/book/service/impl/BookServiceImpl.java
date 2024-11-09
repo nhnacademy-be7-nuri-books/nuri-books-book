@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.book.service.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -21,10 +22,13 @@ import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
+import shop.nuribooks.books.book.book.utility.BookUtils;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
+import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.bookcontributor.service.BookContributorService;
 import shop.nuribooks.books.book.booktag.entity.BookTag;
 import shop.nuribooks.books.book.booktag.repository.BookTagRepository;
+import shop.nuribooks.books.book.contributor.repository.role.ContributorRoleRepository;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.tag.entity.Tag;
 import shop.nuribooks.books.common.message.PagedResponse;
@@ -42,8 +46,8 @@ import shop.nuribooks.books.book.book.service.BookService;
 public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
-	private final BookContributorService bookContributorService;
 	private final BookMapper bookMapper;
+	private final BookContributorRepository bookContributorRepository;
 
 	//관리자 페이지에서 관리자의 직접 도서 등록을 위한 메서드
 	//TODO: 알라딘서비스의 저장 메서드 같이 사용하면 될 듯 조금만 더 생각해보고 지우겠음
@@ -114,16 +118,15 @@ public class BookServiceImpl implements BookService {
 		//소수점 버리기 (1원 단위로 계산 위해)
 		List<BookContributorsResponse> bookListResponses = bookPage.stream()
 			.map(book -> {
-				BigDecimal salePrice = book.getPrice()
-					.multiply(BigDecimal.valueOf(100 - book.getDiscountRate()))
-					.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
+				BigDecimal salePrice = BookUtils.calculateSalePrice(book.getPrice(), book.getDiscountRate());
 
 				AdminBookListResponse bookDetails = AdminBookListResponse.of(book, salePrice);
 				log.info("Fetching contributors for bookId: {}", book.getId());
-				List<BookContributorInfoResponse> contributors = bookContributorService.getContributorsAndRolesByBookId(book.getId());
+				List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(book.getId());
+				Map<String, List<String>> contributorsByRole = BookUtils.groupContributorsByRole(contributors);
 				log.info("Contributors fetched: {}", contributors);
 
-				return new BookContributorsResponse(bookDetails, contributors);
+				return new BookContributorsResponse(bookDetails, contributorsByRole);
 			})
 			.toList();
 

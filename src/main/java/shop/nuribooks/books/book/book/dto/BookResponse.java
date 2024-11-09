@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.book.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -25,6 +26,7 @@ public record BookResponse(
 	int likeCount,
 	int stock,
 	Long viewCount,
-	List<String> tagNames
+	List<String> tagNames,
+	Map<String, List<String>> contributorsByRole
 ) {
 }
