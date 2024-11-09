@@ -25,6 +25,7 @@ jobs:
 
   dev-test:
     runs-on: ubuntu-latest
+    needs: dev-build
     steps:
       - uses: actions/checkout@v4
 
