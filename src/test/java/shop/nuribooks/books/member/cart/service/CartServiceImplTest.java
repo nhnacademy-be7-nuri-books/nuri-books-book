@@ -237,7 +237,7 @@ class CartServiceImplTest {
 		//when / then
 		assertThatThrownBy(() -> cartServiceImpl.deleteCart(memberId, bookId))
 			.isInstanceOf(MemberCartNotFoundException.class)
-			.hasMessage("장바구니가 존재하지 않습니다.");
+			.hasMessage("장바구니에 해당 도서가 존재하지 않습니다.");
 	}
 
 	@DisplayName("회원과 도서의 PK id로 장바구니 수정 성공")
@@ -294,7 +294,7 @@ class CartServiceImplTest {
 		//then
 		assertThatThrownBy(() -> cartServiceImpl.updateCart(memberId, bookId, quantity))
 			.isInstanceOf(MemberCartNotFoundException.class)
-			.hasMessage("장바구니가 존재하지 않습니다.");
+			.hasMessage("장바구니에 해당 도서가 존재하지 않습니다.");
 	}
 
 

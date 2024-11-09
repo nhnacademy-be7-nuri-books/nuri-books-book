@@ -115,7 +115,7 @@ public class CartServiceImpl implements CartService {
 		CartId cartId = new CartId(memberId, bookId);
 
 		Cart foundCart = cartRepository.findById(cartId)
-			.orElseThrow(() -> new MemberCartNotFoundException("장바구니가 존재하지 않습니다."));
+			.orElseThrow(MemberCartNotFoundException::new);
 
 		cartRepository.delete(foundCart);
 	}
@@ -140,7 +140,7 @@ public class CartServiceImpl implements CartService {
 		CartId cartId = new CartId(memberId, bookId);
 
 		Cart foundCart = cartRepository.findById(cartId)
-			.orElseThrow(() -> new MemberCartNotFoundException("장바구니가 존재하지 않습니다."));
+			.orElseThrow(MemberCartNotFoundException::new);
 
 		foundCart.updateQuantity(quantity);
 
