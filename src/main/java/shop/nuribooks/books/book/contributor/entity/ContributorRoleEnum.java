@@ -4,16 +4,12 @@ import shop.nuribooks.books.exception.contributor.InvalidContributorRoleExceptio
 
 public enum ContributorRoleEnum {
 	AUTHOR("지은이"),
+	EDITOR("엮은이"),
 	TRANSLATOR("옮긴이"),
 	ORIGINAL_AUTHOR("원작"),
-	EDITOR("엮은이"),
 	PHOTOS("사진"),
-	COAUTHOR("공저자"),
-	SUPERVISOR("감수자"),
-	COMPILER("편집자"),
-	TRANSCRIBER("필사자"),
-	TEXT("텍스트"),
-	ILLUSTRATION("삽화가");
+	ILLUSTRATOR("그림"),
+	CONSULTANT("감수");
 
 	private final String korName;
 
