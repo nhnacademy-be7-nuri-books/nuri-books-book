@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.review.dto.response;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import lombok.Builder;
@@ -30,6 +31,7 @@ public record ReviewMemberResponse(
 			.content(review.getContent())
 			.score(review.getScore())
 			.member(MemberBriefResponse.of(review.getMember()))
+			.reviewImages(new LinkedList<>())
 			.build();
 		return response;
 	}

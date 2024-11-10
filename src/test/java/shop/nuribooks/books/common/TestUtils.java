@@ -2,6 +2,7 @@ package shop.nuribooks.books.common;
 
 import static shop.nuribooks.books.member.member.entity.AuthorityType.*;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,6 +19,15 @@ import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusType;
 
 public class TestUtils {
+	public static void setIdForEntity(Object entity, Long id) {
+		try {
+			Field idField = entity.getClass().getDeclaredField("id"); // 엔티티의 id 필드를 찾음
+			idField.setAccessible(true);
+			idField.set(entity, id);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			throw new RuntimeException("ID 설정에 실패했습니다.", e);
+		}
+	}
 
 	public static Review createReview(Member member, Book book) {
 		Review review = Review.builder()

@@ -54,12 +54,7 @@ public class CartRepositoryTest {
 	@Autowired
 	private BookRepository bookRepository;
 
-	private Customer savedCustomer;
-	private Grade savedGrade;
 	private Member savedMember;
-	private Publisher savedPublisher;
-	private Book savedBook;
-	private Cart savedCart;
 
 	@BeforeEach
 	void setUp() {
@@ -70,7 +65,7 @@ public class CartRepositoryTest {
 			.email("nhnacademy@nuriBooks.com")
 			.build();
 
-		savedCustomer = customerRepository.save(customer);
+		Customer savedCustomer = customerRepository.save(customer);
 
 		Grade grade = Grade.builder()
 			.name("STANDARD")
@@ -78,7 +73,7 @@ public class CartRepositoryTest {
 			.requirement(BigDecimal.valueOf(100_000))
 			.build();
 
-		savedGrade = gradeRepository.save(grade);
+		Grade savedGrade = gradeRepository.save(grade);
 
 		Member member = Member.builder()
 			.customer(savedCustomer)
@@ -100,7 +95,7 @@ public class CartRepositoryTest {
 			.name("nuri")
 			.build();
 
-		savedPublisher = publisherRepository.save(publisher);
+		Publisher savedPublisher = publisherRepository.save(publisher);
 
 		Book book = Book.builder()
 			.publisherId(savedPublisher)
@@ -120,7 +115,7 @@ public class CartRepositoryTest {
 			.viewCount(0L)
 			.build();
 
-		savedBook = bookRepository.save(book);
+		Book savedBook = bookRepository.save(book);
 
 		CartId cartId = new CartId(savedMember.getId(), savedBook.getId());
 
@@ -132,7 +127,7 @@ public class CartRepositoryTest {
 			.updatedAt(LocalDateTime.now())
 			.build();
 
-		savedCart = cartRepository.save(cart);
+		cartRepository.save(cart);
 	}
 
 	@DisplayName("회원 아이디로 장바구니 목록 조회")

@@ -1,15 +1,17 @@
 package shop.nuribooks.books.book.booktag.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,19 +20,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import shop.nuribooks.books.book.TestUtils;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
-import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
+import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.entity.BookTag;
 import shop.nuribooks.books.book.booktag.repository.BookTagRepository;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.tag.entity.Tag;
 import shop.nuribooks.books.book.tag.repository.TagRepository;
+import shop.nuribooks.books.common.TestUtils;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.tag.BookTagAlreadyExistsException;
 import shop.nuribooks.books.exception.tag.BookTagNotFountException;
@@ -58,46 +60,45 @@ class BookTagServiceImplTest {
 
 	private BookTag bookTag;
 
-
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
 
 		book = Book.builder()
-				.publisherId(new Publisher(1L, "Sample Publisher"))
-				.state(BookStateEnum.NEW)
-				.title("Sample Book")
-				.thumbnailImageUrl("https://example.com/thumbnail.jpg")
-				.detailImageUrl("https://example.com/detail.jpg")
-				.publicationDate(LocalDate.now())
-				.price(BigDecimal.valueOf(29.99))
-				.discountRate(10)
-				.description("Sample description.")
-				.contents("Sample contents.")
-				.isbn("978-3-16-148410-0")
-				.isPackageable(true)
-				.stock(100)
-				.likeCount(0)
-				.viewCount(0L)
-				.build();
+			.publisherId(new Publisher(1L, "Sample Publisher"))
+			.state(BookStateEnum.NEW)
+			.title("Sample Book")
+			.thumbnailImageUrl("https://example.com/thumbnail.jpg")
+			.detailImageUrl("https://example.com/detail.jpg")
+			.publicationDate(LocalDate.now())
+			.price(BigDecimal.valueOf(29.99))
+			.discountRate(10)
+			.description("Sample description.")
+			.contents("Sample contents.")
+			.isbn("978-3-16-148410-0")
+			.isPackageable(true)
+			.stock(100)
+			.likeCount(0)
+			.viewCount(0L)
+			.build();
 
 		book1 = Book.builder()
-				.publisherId(new Publisher(1L, "Sample Publisher"))
-				.state(BookStateEnum.NEW) // state 값 설정
-				.title("Sample Book1")
-				.thumbnailImageUrl("https://example.com/thumbnail.jpg")
-				.detailImageUrl("https://example.com/detail.jpg")
-				.publicationDate(LocalDate.now())
-				.price(BigDecimal.valueOf(29.99))
-				.discountRate(10)
-				.description("Sample description.")
-				.contents("Sample contents.")
-				.isbn("978-3-16-148410-1")
-				.isPackageable(true)
-				.stock(100)
-				.likeCount(0)
-				.viewCount(0L)
-				.build();
+			.publisherId(new Publisher(1L, "Sample Publisher"))
+			.state(BookStateEnum.NEW) // state 값 설정
+			.title("Sample Book1")
+			.thumbnailImageUrl("https://example.com/thumbnail.jpg")
+			.detailImageUrl("https://example.com/detail.jpg")
+			.publicationDate(LocalDate.now())
+			.price(BigDecimal.valueOf(29.99))
+			.discountRate(10)
+			.description("Sample description.")
+			.contents("Sample contents.")
+			.isbn("978-3-16-148410-1")
+			.isPackageable(true)
+			.stock(100)
+			.likeCount(0)
+			.viewCount(0L)
+			.build();
 
 		TestUtils.setIdForEntity(book, 1L);
 		TestUtils.setIdForEntity(book1, 2L);
@@ -106,11 +107,10 @@ class BookTagServiceImplTest {
 		tag2 = Tag.builder().id(3L).name("math").build();
 
 		bookTag = BookTag.builder()
-				.book(book)
-				.tag(tag1)
-				.build();
+			.book(book)
+			.tag(tag1)
+			.build();
 	}
-
 
 	@DisplayName("도서 태그 등록 성공")
 	@Test
@@ -154,6 +154,7 @@ class BookTagServiceImplTest {
 		// When & Then
 		assertThrows(TagNotFoundException.class, () -> bookTagService.registerTagToBook(request));
 	}
+
 	@DisplayName("도서 태그 등록 실패 - 중복")
 	@Test
 	void failed_registerTagToBook_BookTagAlreadyExists() {

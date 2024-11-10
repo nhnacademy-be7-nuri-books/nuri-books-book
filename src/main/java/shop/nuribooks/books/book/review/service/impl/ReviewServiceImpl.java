@@ -1,41 +1,51 @@
 package shop.nuribooks.books.book.review.service.impl;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
+import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.ReviewService;
+import shop.nuribooks.books.common.message.PagedResponse;
+import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
+import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
 	private final MemberRepository memberRepository;
 	private final BookRepository bookRepository;
 	private final ReviewRepository reviewRepository;
+	private final ReviewImageRepository reviewImageRepository;
 
 	/**
 	 * 리뷰 등록. 리뷰 이미지도 함께 등록합니다.
 	 * @param reviewRequest
-	 * @param ownerId
 	 * @return
 	 */
 	@Override
-	public ReviewMemberResponse registerReview(ReviewRequest reviewRequest, long ownerId) {
+	public ReviewMemberResponse registerReview(ReviewRequest reviewRequest) {
+		Long ownerId = Optional.ofNullable(MemberIdContext.getMemberId())
+			.orElseThrow(() -> new RequiredHeaderIsNullException());
 
 		Member member = this.memberRepository.findById(ownerId)
 			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 유저입니다."));
@@ -68,10 +78,34 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public List<ReviewMemberResponse> getReviewsWithMember(long bookId) {
+	public PagedResponse<ReviewMemberResponse> getReviewsByBookId(long bookId, Pageable pageable) {
 		if (!bookRepository.existsById(bookId))
 			throw new BookIdNotFoundException();
-		return this.reviewRepository.findReviewsByBookId(bookId);
+		// review만 가져오기
+		List<ReviewMemberResponse> reviews = this.reviewRepository.findReviewsByBookId(bookId, pageable);
+		// 리뷰가 있다면, 이미지 조합하기
+		if (reviews.size() > 0) {
+			// review id가 key인 map 생성 및 초기화
+			Map<Long, ReviewMemberResponse> reviewMap = new LinkedHashMap<>();
+			for (ReviewMemberResponse rmr : reviews) {
+				reviewMap.put(rmr.id(), rmr);
+			}
+
+			// 리뷰 아이디별 리뷰 이미지 가져오기. query의 in을 사용하기 위해 리뷰 아이디의 리스트를 전달함.
+			List<ReviewImageDto> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(
+				reviewMap.keySet().stream().toList());
+
+			// 리뷰 이미지 목록을 리뷰에 넣어주기.
+			for (ReviewImageDto rir : reviewImages) {
+				reviewMap.get(rir.reviewId()).reviewImages().add(rir.reviewImageResponse());
+			}
+		}
+
+		int totalElement = (int)this.reviewRepository.countByBookId(bookId);
+
+		PagedResponse pagedResponse = PagedResponse.of(reviews, pageable, totalElement);
+
+		return pagedResponse;
 	}
 
 	/**
@@ -81,13 +115,40 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public List<ReviewBookResponse> getReviewsWithBook(long memberId) {
+	public PagedResponse<ReviewBookResponse> getReviewsByMemberId(long memberId, Pageable pageable) {
 		if (!memberRepository.existsById(memberId))
 			throw new MemberNotFoundException("유저를 찾을 수 없습니다.");
-		return this.reviewRepository.findReviewsByMemberId(memberId);
+		// review만 가져오기
+		List<ReviewBookResponse> reviews = this.reviewRepository.findReviewsByMemberId(memberId, pageable);
+
+		// 리뷰가 있다면, 이미지 조합하기
+		if (reviews.size() > 0) {
+			// review id가 key인 map 생성 및 초기화
+			Map<Long, ReviewBookResponse> reviewMap = new LinkedHashMap<>();
+			for (ReviewBookResponse rbr : reviews) {
+				reviewMap.put(rbr.id(), rbr);
+			}
+
+			// 리뷰 아이디별 리뷰 이미지 가져오기. query의 in을 사용하기 위해 리뷰 아이디의 리스트를 전달함.
+			List<ReviewImageDto> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(
+				reviewMap.keySet().stream().toList());
+			// 리뷰 이미지 목록을 리뷰에 넣어주기.
+			for (ReviewImageDto rir : reviewImages) {
+				reviewMap.get(rir.reviewId()).reviewImages().add(rir.reviewImageResponse());
+			}
+		}
+
+		int totalElement = (int)this.reviewRepository.countByMemberId(memberId);
+
+		PagedResponse pagedResponse = PagedResponse.of(reviews, pageable, totalElement);
+
+		return pagedResponse;
 	}
 
-	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId, long ownerId) {
+	@Transactional
+	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId) {
+		Long ownerId = Optional.ofNullable(MemberIdContext.getMemberId())
+			.orElseThrow(() -> new RequiredHeaderIsNullException());
 		// 기존 review update 처리
 		Review prevReview = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException());
 		if (prevReview.getMember().getId() != ownerId) {

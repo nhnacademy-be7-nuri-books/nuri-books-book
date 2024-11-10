@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
 import shop.nuribooks.books.member.customer.dto.DtoMapper;
 import shop.nuribooks.books.member.customer.dto.EntityMapper;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
@@ -36,6 +37,9 @@ public class CustomerServiceImpl implements CustomerService {
 	public CustomerRegisterResponse registerCustomer(CustomerRegisterRequest request) {
 		if (customerRepository.existsByEmail(request.email())) {
 			throw new EmailAlreadyExistsException("이미 존재하는 이메일입니다.");
+		}
+		if (customerRepository.existsByPhoneNumber(request.phoneNumber())) {
+			throw new PhoneNumberAlreadyExistsException("이미 존재하는 전화번호입니다.");
 		}
 
 		Customer customer = EntityMapper.toCustomerEntity(request);

@@ -24,7 +24,6 @@ public class BookCategoryController {
 	/**
 	 * 도서와 카테고리를 연관시킵니다.
 	 *
-	 * @author janghyun
 	 * @param bookId     연관시킬 도서의 ID
 	 * @param categoryId 연관시킬 카테고리의 ID
 	 * @return ResponseEntity<Void>
@@ -46,7 +45,6 @@ public class BookCategoryController {
 	/**
 	 * 도서와 카테고리 간의 연관 관계를 삭제합니다.
 	 *
-	 * @author janghyun
 	 * @param bookId     삭제할 도서의 ID
 	 * @param categoryId 삭제할 카테고리의 ID
 	 * @return 성공 시 204 No Content 응답을 반환합니다.

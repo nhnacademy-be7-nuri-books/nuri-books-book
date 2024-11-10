@@ -94,6 +94,10 @@ public class PublisherServiceImpl implements PublisherService {
 		Publisher publisher = publisherRepository.findById(id)
 			.orElseThrow(() -> new PublisherNotFoundException("출판사가 존재하지 않습니다."));
 
+		if (publisherRepository.existsByName(request.name())) {
+			throw new PublisherAlreadyExistsException("출판사가 이미 등록되어 있습니다.");
+		}
+
 		PublisherEditor publisherEditor = getPublisherEditor(request, publisher);
 		publisher.edit(publisherEditor);
 		return PublisherResponse.of(publisher);
