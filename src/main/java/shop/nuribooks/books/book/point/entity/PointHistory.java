@@ -20,6 +20,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import shop.nuribooks.books.member.member.entity.Member;
 
@@ -47,6 +48,7 @@ public class PointHistory {
 	@Builder.Default
 	private LocalDateTime createdAt = LocalDateTime.now();
 
+	@Setter
 	private LocalDateTime deletedAt;
 
 	@NotNull
