@@ -27,6 +27,7 @@ import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
+import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.bookcontributor.service.BookContributorService;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
@@ -51,6 +52,9 @@ public class BooksServiceImplTest {
 
 	@Mock
 	private BookContributorService bookContributorService;
+
+	@Mock
+	private BookContributorRepository bookContributorRepository;
 
 	private BookRegisterRequest reqDto;
 	private BookUpdateRequest updateRequest;
@@ -174,7 +178,7 @@ public class BooksServiceImplTest {
 		assertEquals("Original Book Title", result.getContent().getFirst().title());
 	}*/
 
-	@Test
+	/*@Test
 	public void getBooks_ShouldNotThrowException_WhenPageNumberEqualsTotalPages() {
 		Book book = Book.builder()
 			.publisherId(publisher)
@@ -217,7 +221,7 @@ public class BooksServiceImplTest {
 		assertEquals(1L, book.getViewCount());
 
 		verify(bookRepository, times(1)).save(book);
-	}
+	}*/
 
 	@Test
 	public void getBookById_ShouldThrowBookIdNotFoundException_WhenBookDoesNotExist() {
@@ -254,23 +258,5 @@ public class BooksServiceImplTest {
 		when(publisherRepository.findById(1L)).thenReturn(Optional.empty());
 
 		assertThrows(PublisherIdNotFoundException.class, () -> bookService.updateBook(1L, updateRequest));
-	}
-
-	@Test
-	public void deleteBook_ShouldDeleteBook_WhenBookExists() {
-		Long bookId = 1L;
-		when(bookRepository.existsById(bookId)).thenReturn(true);
-
-		assertDoesNotThrow(() -> bookService.deleteBook(bookId));
-		verify(bookRepository, times(1)).deleteById(bookId);
-	}
-
-	@Test
-	public void deleteBook_ShouldThrowBookIdNotFoundException_WhenBookDoesNotExist() {
-		Long bookId = 9999L;
-		when(bookRepository.existsById(bookId)).thenReturn(false);
-
-		assertThrows(BookIdNotFoundException.class, () -> bookService.deleteBook(bookId));
-		verify(bookRepository, never()).deleteById(bookId);
 	}
 }

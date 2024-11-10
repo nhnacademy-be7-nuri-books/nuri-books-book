@@ -2,10 +2,10 @@ package shop.nuribooks.books.book.book.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-import shop.nuribooks.books.book.book.entity.Book;
 
 public record BookResponse(
 	Long id,
@@ -18,32 +18,15 @@ public record BookResponse(
 	LocalDate publicationDate,
 	BigDecimal price,
 	int discountRate,
+	BigDecimal salePrice,
 	String description,
 	String contents,
 	String isbn,
 	boolean isPackageable,
 	int likeCount,
 	int stock,
-	Long viewCount
+	Long viewCount,
+	List<String> tagNames,
+	Map<String, List<String>> contributorsByRole
 ) {
-	public static BookResponse of(Book book) {
-		return new BookResponse(
-			book.getId(),
-			book.getPublisherId().getName(),
-			book.getState().getKorName(),
-			book.getTitle(),
-			book.getThumbnailImageUrl(),
-			book.getDetailImageUrl(),
-			book.getPublicationDate(),
-			book.getPrice(),
-			book.getDiscountRate(),
-			book.getDescription(),
-			book.getContents(),
-			book.getIsbn(),
-			book.isPackageable(),
-			book.getLikeCount(),
-			book.getStock(),
-			book.getViewCount()
-		);
-	}
 }

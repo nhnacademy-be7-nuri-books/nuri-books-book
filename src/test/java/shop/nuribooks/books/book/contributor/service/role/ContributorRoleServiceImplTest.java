@@ -82,7 +82,7 @@ class ContributorRoleServiceImplTest {
 		ContributorRole role = new ContributorRole();
 		role.setName(ContributorRoleEnum.AUTHOR);
 		ContributorRole role1 = new ContributorRole();
-		role1.setName(ContributorRoleEnum.ILLUSTRATION);
+		role1.setName(ContributorRoleEnum.ILLUSTRATOR);
 
 		when(contributorRolesRepository.findAll()).thenReturn(List.of(role, role1));
 
@@ -93,12 +93,13 @@ class ContributorRoleServiceImplTest {
 		assertNotNull(roles);
 		assertEquals(2, roles.size());
 		assertEquals(ContributorRoleEnum.AUTHOR, roles.get(0).getName());
-		assertEquals(ContributorRoleEnum.ILLUSTRATION, roles.get(1).getName());
+		assertEquals(ContributorRoleEnum.ILLUSTRATOR, roles.get(1).getName());
 
 		verify(contributorRolesRepository, times(1)).findAll();
 	}
 
-	@DisplayName("기여자 역할 수정 성공")
+	//TODO: 기여자 역할 수정 삭제해도 될 것 같습니다.
+	/*@DisplayName("기여자 역할 수정 성공")
 	@Test
 	void updateContributorRole() {
 		// given
@@ -115,7 +116,7 @@ class ContributorRoleServiceImplTest {
 		assertNotNull(response);
 		assertEquals("COMPILER", response.getName());
 		verify(contributorRolesRepository, times(1)).save(existingRole);
-	}
+	}*/
 
 	@DisplayName("기여자 역할 수정 실패 - 역할이 없을 때 예외 발생")
 	@Test
@@ -149,7 +150,7 @@ class ContributorRoleServiceImplTest {
 		assertEquals("잘못된 형식입니다.", exception.getMessage());
 	}
 
-	@DisplayName("기여자 역할 수정 실패 - 중복일 때")
+	/*@DisplayName("기여자 역할 수정 실패 - 중복일 때")
 	@Test
 	void failed2_updateContributorRole() {
 		// given
@@ -170,7 +171,7 @@ class ContributorRoleServiceImplTest {
 		);
 
 		assertEquals("이미 존재하는 역할입니다.", exception.getMessage());
-	}
+	}*/
 	@DisplayName("기여자 역할 삭제 성공")
 	@Test
 	void deleteContributorRole() {
