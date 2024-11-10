@@ -170,6 +170,13 @@ public class CategoryController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("/")
-
+	@Operation(summary = "카테고리 트리 조회", description = "트리 구조로 모든 카테고리를 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공적으로 카테고리 트리를 조회하였습니다.")
+	})
+	@GetMapping("/tree")
+	public ResponseEntity<List<CategoryResponse>> getAllCategoryTree() {
+		List<CategoryResponse> categoryTrees = categoryService.getAllCategoryTree();
+		return ResponseEntity.status(HttpStatus.OK).body(categoryTrees);
+	}
 }
