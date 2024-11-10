@@ -110,4 +110,60 @@ public class PointHistoryCustomRepositoryImpl implements PointHistoryCustomRepos
 			.limit(pageable.getPageSize())
 			.fetch();
 	}
+
+	/**
+	 * 유저의 포인트 내역 전체 개수
+	 *
+	 * @param memberId
+	 * @param pointHistoryPeriodRequest
+	 * @return
+	 */
+	@Override
+	public long countPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest) {
+		return queryFactory.select(pointHistory.id.count())
+			.from(pointHistory)
+			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart(),
+				pointHistoryPeriodRequest.getEnd()))
+			.where(pointHistory.deletedAt.isNull())
+			.where(pointHistory.member.id.eq(memberId))
+			.fetchOne();
+	}
+
+	/**
+	 * 유저의 사용 포인트 내역 전체 개수
+	 *
+	 * @param memberId
+	 * @param pointHistoryPeriodRequest
+	 * @return
+	 */
+	@Override
+	public long countUsedPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest) {
+		return queryFactory.select(pointHistory.id.count())
+			.from(pointHistory)
+			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart(),
+				pointHistoryPeriodRequest.getEnd()))
+			.where(pointHistory.deletedAt.isNull())
+			.where(pointHistory.member.id.eq(memberId))
+			.where(pointHistory.amount.lt(BigDecimal.ZERO))
+			.fetchOne();
+	}
+
+	/**
+	 * 유저의 적립 포인트 내역 전체 개수
+	 *
+	 * @param memberId
+	 * @param pointHistoryPeriodRequest
+	 * @return
+	 */
+	@Override
+	public long countEarnedPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest) {
+		return queryFactory.select(pointHistory.id.count())
+			.from(pointHistory)
+			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart(),
+				pointHistoryPeriodRequest.getEnd()))
+			.where(pointHistory.deletedAt.isNull())
+			.where(pointHistory.member.id.eq(memberId))
+			.where(pointHistory.amount.goe(BigDecimal.ZERO))
+			.fetchOne();
+	}
 }

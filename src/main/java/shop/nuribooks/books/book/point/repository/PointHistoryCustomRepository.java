@@ -43,4 +43,28 @@ public interface PointHistoryCustomRepository {
 		PointHistoryPeriodRequest pointHistoryPeriodRequest,
 		Pageable pageable,
 		long memberId);
+
+	/**
+	 * 유저의 포인트 내역 전체 개수
+	 * @param memberId
+	 * @param pointHistoryPeriodRequest
+	 * @return
+	 */
+	long countPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest);
+
+	/**
+	 * 유저의 사용 포인트 내역 전체 개수
+	 * @param memberId
+	 * @param pointHistoryPeriodRequest
+	 * @return
+	 */
+	long countUsedPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest);
+
+	/**
+	 * 유저의 적립 포인트 내역 전체 개수
+	 * @param memberId
+	 * @param pointHistoryPeriodRequest
+	 * @return
+	 */
+	long countEarnedPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest);
 }

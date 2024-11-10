@@ -48,15 +48,16 @@ public class PointHistoryRepositoryTest {
 		member = TestUtils.createMember(customer, grade);
 		memberRepository.save(member);
 
-	}
-
-	@Test
-	void findAllHistoriesTest() {
 		PointPolicyRequest ppr = new PointPolicyRequest(PolicyType.FIXED, "이름", BigDecimal.ONE);
 		pointPolicy = pointPolicyRepository.save(ppr.toEntity());
 		PointHistoryRequest rspr = new PointHistoryRequest(member);
 		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
 		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
+
+	}
+
+	@Test
+	void findAllHistoriesTest() {
 		assertEquals(2,
 			PointHistoryRepository.findPointHistories(
 				new PointHistoryPeriodRequest(),
@@ -68,12 +69,6 @@ public class PointHistoryRepositoryTest {
 
 	@Test
 	void findEarnedHistoriesTest() {
-
-		PointPolicyRequest ppr = new PointPolicyRequest(PolicyType.FIXED, "이름", BigDecimal.ONE);
-		pointPolicy = pointPolicyRepository.save(ppr.toEntity());
-		PointHistoryRequest rspr = new PointHistoryRequest(member);
-		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
-		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
 		assertEquals(2,
 			PointHistoryRepository.findEarnedPointHistories(
 				new PointHistoryPeriodRequest(),
@@ -85,17 +80,42 @@ public class PointHistoryRepositoryTest {
 
 	@Test
 	void findUsedHistoriesTest() {
-		PointPolicyRequest ppr = new PointPolicyRequest(PolicyType.FIXED, "이름", BigDecimal.ONE);
-		pointPolicy = pointPolicyRepository.save(ppr.toEntity());
-		PointHistoryRequest rspr = new PointHistoryRequest(member);
-		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
-		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
 		assertEquals(0,
 			PointHistoryRepository.findUsedPointHistories(
 				new PointHistoryPeriodRequest(),
 				PageRequest.of(0, 2),
 				member.getId()
 			).size()
+		);
+	}
+
+	@Test
+	void countHistoriesTest() {
+		assertEquals(2,
+			PointHistoryRepository.countPointHistories(
+				member.getId(),
+				new PointHistoryPeriodRequest()
+			)
+		);
+	}
+
+	@Test
+	void countUsedHistoriesTest() {
+		assertEquals(0,
+			PointHistoryRepository.countUsedPointHistories(
+				member.getId(),
+				new PointHistoryPeriodRequest()
+			)
+		);
+	}
+
+	@Test
+	void countEarnedHistoriesTest() {
+		assertEquals(2,
+			PointHistoryRepository.countEarnedPointHistories(
+				member.getId(),
+				new PointHistoryPeriodRequest()
+			)
 		);
 	}
 }
