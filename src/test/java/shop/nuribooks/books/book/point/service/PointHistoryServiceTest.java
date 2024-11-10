@@ -36,7 +36,6 @@ import shop.nuribooks.books.book.point.service.impl.PointHistoryServiceImpl;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.common.TestUtils;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
-import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -120,49 +119,27 @@ public class PointHistoryServiceTest {
 
 	@Test
 	public void getPointHistories() {
-		when(memberRepository.existsById(anyLong())).thenReturn(true);
 		when(pointHistoryRepository.findPointHistories(any(), any(), anyLong())).thenReturn(this.pointHistoryResponse);
 		assertEquals(1,
-			pointHistoryService.getPointHistories(PageRequest.of(0, 1), new PointHistoryPeriodRequest()).size());
-	}
-
-	@Test
-	public void getPointHistoriesFail() {
-		when(memberRepository.existsById(anyLong())).thenReturn(false);
-		assertThrows(MemberNotFoundException.class,
-			() -> pointHistoryService.getPointHistories(PageRequest.of(0, 1), new PointHistoryPeriodRequest()).size());
+			pointHistoryService.getPointHistories(1l, PageRequest.of(0, 1), new PointHistoryPeriodRequest()).size());
 	}
 
 	@Test
 	public void getEarnedPointHistories() {
-		when(memberRepository.existsById(anyLong())).thenReturn(true);
 		when(pointHistoryRepository.findEarnedPointHistories(any(), any(), anyLong())).thenReturn(
 			this.pointHistoryResponse);
 		assertEquals(1,
-			pointHistoryService.getEarnedPointHistories(PageRequest.of(0, 1), new PointHistoryPeriodRequest()).size());
-	}
-
-	@Test
-	public void getEarnedPointHistoriesFail() {
-		when(memberRepository.existsById(anyLong())).thenReturn(false);
-		assertThrows(MemberNotFoundException.class,
-			() -> pointHistoryService.getEarnedPointHistories(PageRequest.of(0, 1), new PointHistoryPeriodRequest()));
+			pointHistoryService.getEarnedPointHistories(1l, PageRequest.of(0, 1), new PointHistoryPeriodRequest())
+				.size());
 	}
 
 	@Test
 	public void getUsedPointHistories() {
-		when(memberRepository.existsById(anyLong())).thenReturn(true);
 		when(pointHistoryRepository.findUsedPointHistories(any(), any(), anyLong())).thenReturn(
 			this.pointHistoryResponse);
 		assertEquals(1,
-			pointHistoryService.getUsedPointHistories(PageRequest.of(0, 1), new PointHistoryPeriodRequest()).size());
-	}
-
-	@Test
-	public void getUsedPointHistoriesFail() {
-		when(memberRepository.existsById(anyLong())).thenReturn(false);
-		assertThrows(MemberNotFoundException.class,
-			() -> pointHistoryService.getUsedPointHistories(PageRequest.of(0, 1), new PointHistoryPeriodRequest()));
+			pointHistoryService.getUsedPointHistories(1l, PageRequest.of(0, 1), new PointHistoryPeriodRequest())
+				.size());
 	}
 
 	@Test

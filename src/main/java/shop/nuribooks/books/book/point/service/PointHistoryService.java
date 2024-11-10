@@ -24,7 +24,7 @@ public interface PointHistoryService {
 	 * @param period
 	 * @return
 	 */
-	List<PointHistoryResponse> getPointHistories(Pageable pageable,
+	List<PointHistoryResponse> getPointHistories(long memberId, Pageable pageable,
 		PointHistoryPeriodRequest period);
 
 	/**
@@ -33,7 +33,7 @@ public interface PointHistoryService {
 	 * @param period
 	 * @return
 	 */
-	List<PointHistoryResponse> getEarnedPointHistories(Pageable pageable,
+	List<PointHistoryResponse> getEarnedPointHistories(long memberId, Pageable pageable,
 		PointHistoryPeriodRequest period);
 
 	/**
@@ -42,7 +42,7 @@ public interface PointHistoryService {
 	 * @param period
 	 * @return
 	 */
-	List<PointHistoryResponse> getUsedPointHistories(Pageable pageable,
+	List<PointHistoryResponse> getUsedPointHistories(long memberId, Pageable pageable,
 		PointHistoryPeriodRequest period);
 
 	/**

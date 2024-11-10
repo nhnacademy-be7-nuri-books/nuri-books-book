@@ -18,8 +18,6 @@ import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
 import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
 import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
-import shop.nuribooks.books.common.threadlocal.MemberIdContext;
-import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @Service
@@ -51,12 +49,8 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	 * @return
 	 */
 	@Override
-	public List<PointHistoryResponse> getPointHistories(Pageable pageable,
+	public List<PointHistoryResponse> getPointHistories(long memberId, Pageable pageable,
 		PointHistoryPeriodRequest period) {
-		long memberId = MemberIdContext.getMemberId();
-		if (!this.memberRepository.existsById(memberId)) {
-			throw new MemberNotFoundException("회원을 찾을 수 없습니다.");
-		}
 		return this.pointHistoryRepository.findPointHistories(period, pageable, memberId);
 	}
 
@@ -68,11 +62,8 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	 * @return
 	 */
 	@Override
-	public List<PointHistoryResponse> getEarnedPointHistories(Pageable pageable, PointHistoryPeriodRequest period) {
-		long memberId = MemberIdContext.getMemberId();
-		if (!this.memberRepository.existsById(memberId)) {
-			throw new MemberNotFoundException("회원을 찾을 수 없습니다.");
-		}
+	public List<PointHistoryResponse> getEarnedPointHistories(long memberId, Pageable pageable,
+		PointHistoryPeriodRequest period) {
 		return this.pointHistoryRepository.findEarnedPointHistories(period, pageable, memberId);
 	}
 
@@ -84,11 +75,8 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	 * @return
 	 */
 	@Override
-	public List<PointHistoryResponse> getUsedPointHistories(Pageable pageable, PointHistoryPeriodRequest period) {
-		long memberId = MemberIdContext.getMemberId();
-		if (!this.memberRepository.existsById(memberId)) {
-			throw new MemberNotFoundException("회원을 찾을 수 없습니다.");
-		}
+	public List<PointHistoryResponse> getUsedPointHistories(long memberId, Pageable pageable,
+		PointHistoryPeriodRequest period) {
 		return this.pointHistoryRepository.findUsedPointHistories(period, pageable, memberId);
 	}
 
