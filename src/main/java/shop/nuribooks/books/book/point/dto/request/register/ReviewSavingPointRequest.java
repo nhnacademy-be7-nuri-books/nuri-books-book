@@ -8,28 +8,20 @@ import shop.nuribooks.books.member.member.entity.Member;
 
 public class ReviewSavingPointRequest extends PointHistoryRequest {
 	@NotNull
-	Member member;
-
-	@NotNull
-	PointPolicy pointPolicy;
-
-	@NotNull
 	Review review;
 
-	public ReviewSavingPointRequest(Member member, PointPolicy pointPolicy, Review review) {
-		super(member, pointPolicy);
+	public ReviewSavingPointRequest(Member member, Review review) {
+		super(member);
 		this.review = review;
 	}
 
-	public ReviewSavingPoint toEntity() {
-		ReviewSavingPoint reviewSavingPoint = ReviewSavingPoint.builder()
-			.amount(super.pointPolicy.getAmount())
-			.description(super.pointPolicy.getName())
+	public ReviewSavingPoint toEntity(PointPolicy pointPolicy) {
+		return ReviewSavingPoint.builder()
+			.amount(pointPolicy.getAmount())
+			.description(pointPolicy.getName())
 			.member(member)
-			.pointPolicy(super.pointPolicy)
+			.pointPolicy(pointPolicy)
 			.review(review)
 			.build();
-
-		return reviewSavingPoint;
 	}
 }

@@ -26,9 +26,12 @@ import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
 import shop.nuribooks.books.book.point.entity.child.ReviewSavingPoint;
+import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.book.point.exception.PointHistoryNotFoundException;
+import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
 import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
+import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
 import shop.nuribooks.books.book.point.service.impl.PointHistoryServiceImpl;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.common.TestUtils;
@@ -44,6 +47,10 @@ public class PointHistoryServiceTest {
 
 	@Mock
 	private PointHistoryRepository pointHistoryRepository;
+
+	@Mock
+	private PointPolicyRepository pointPolicyRepository;
+
 	@Mock
 	private MemberRepository memberRepository;
 
@@ -52,6 +59,7 @@ public class PointHistoryServiceTest {
 	private PointHistory pointHistory;
 	private List<PointHistoryResponse> pointHistoryResponse = new LinkedList<>();
 	private PointHistoryRequest pointHistoryRequest;
+	private PointPolicy pointPolicy;
 
 	@BeforeEach
 	public void setUp() {
@@ -60,9 +68,9 @@ public class PointHistoryServiceTest {
 		MemberIdContext.setMemberId(1l);
 
 		PointPolicyRequest pointPolicyRequest = new PointPolicyRequest(PolicyType.FIXED, "임시", BigDecimal.valueOf(100));
-		PointPolicy pointPolicy = pointPolicyRequest.toEntity();
-		this.pointHistoryRequest = new PointHistoryRequest(member, pointPolicy);
-		this.pointHistory = this.pointHistoryRequest.toEntity();
+		pointPolicy = pointPolicyRequest.toEntity();
+		this.pointHistoryRequest = new PointHistoryRequest(member);
+		this.pointHistory = this.pointHistoryRequest.toEntity(pointPolicy);
 		TestUtils.setIdForEntity(pointHistory, 1l);
 
 		this.pointHistoryResponse.add(
@@ -73,20 +81,41 @@ public class PointHistoryServiceTest {
 	@Test
 	public void registerPointHistory() {
 		when(pointHistoryRepository.save(any())).thenReturn(pointHistory);
-		PointHistory result = this.pointHistoryService.registerPointHistory(pointHistoryRequest);
+		when(pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(anyString())).thenReturn(
+			Optional.of(pointPolicy));
+		PointHistory result = this.pointHistoryService.registerPointHistory(pointHistoryRequest, PolicyName.WELCOME);
 		assertEquals(pointHistory, result);
+	}
+
+	@Test
+	public void registerPointHistoryFail() {
+		when(pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(anyString())).thenReturn(
+			Optional.empty());
+		assertThrows(PointPolicyNotFoundException.class,
+			() -> this.pointHistoryService.registerPointHistory(pointHistoryRequest, PolicyName.WELCOME));
 	}
 
 	@Test
 	public void registerReviewSavingPoint() {
 		PointPolicyRequest pointPolicyRequest = new PointPolicyRequest(PolicyType.FIXED, "리뷰", BigDecimal.valueOf(500));
-		PointPolicy pointPolicy = pointPolicyRequest.toEntity();
-		ReviewSavingPointRequest reviewSavingPointRequest = new ReviewSavingPointRequest(member, pointPolicy,
+		pointPolicy = pointPolicyRequest.toEntity();
+		ReviewSavingPointRequest reviewSavingPointRequest = new ReviewSavingPointRequest(member,
 			Review.builder().build());
-		ReviewSavingPoint reviewSavingPoint = reviewSavingPointRequest.toEntity();
+		ReviewSavingPoint reviewSavingPoint = reviewSavingPointRequest.toEntity(pointPolicy);
+
 		when(pointHistoryRepository.save(any())).thenReturn(reviewSavingPoint);
-		PointHistory result = this.pointHistoryService.registerPointHistory(pointHistoryRequest);
+		when(pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(anyString())).thenReturn(
+			Optional.of(pointPolicy));
+		PointHistory result = this.pointHistoryService.registerPointHistory(pointHistoryRequest, PolicyName.REVIEW);
 		assertEquals(reviewSavingPoint, result);
+	}
+
+	@Test
+	public void registerReviewSavingPointFail() {
+		when(pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(anyString())).thenReturn(
+			Optional.empty());
+		assertThrows(PointPolicyNotFoundException.class,
+			() -> this.pointHistoryService.registerPointHistory(pointHistoryRequest, PolicyName.REVIEW));
 	}
 
 	@Test

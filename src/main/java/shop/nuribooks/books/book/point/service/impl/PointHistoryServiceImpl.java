@@ -11,8 +11,12 @@ import shop.nuribooks.books.book.point.dto.request.PointHistoryPeriodRequest;
 import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.entity.PointHistory;
+import shop.nuribooks.books.book.point.entity.PointPolicy;
+import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.exception.PointHistoryNotFoundException;
+import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
 import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
+import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
@@ -22,6 +26,7 @@ import shop.nuribooks.books.member.member.repository.MemberRepository;
 @RequiredArgsConstructor
 public class PointHistoryServiceImpl implements PointHistoryService {
 	private final PointHistoryRepository pointHistoryRepository;
+	private final PointPolicyRepository pointPolicyRepository;
 	private final MemberRepository memberRepository;
 
 	/**
@@ -31,8 +36,10 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	 * @return
 	 */
 	@Override
-	public PointHistory registerPointHistory(PointHistoryRequest pointHistoryRequest) {
-		return this.pointHistoryRepository.save(pointHistoryRequest.toEntity());
+	public PointHistory registerPointHistory(PointHistoryRequest pointHistoryRequest, PolicyName policyName) {
+		PointPolicy pointPolicy = pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(
+			policyName.toString()).orElseThrow(() -> new PointPolicyNotFoundException());
+		return this.pointHistoryRepository.save(pointHistoryRequest.toEntity(pointPolicy));
 	}
 
 	/**

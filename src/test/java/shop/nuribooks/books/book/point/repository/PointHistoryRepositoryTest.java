@@ -57,10 +57,9 @@ public class PointHistoryRepositoryTest {
 	void findAllHistoriesTest() {
 		PointPolicyRequest ppr = new PointPolicyRequest(PolicyType.FIXED, "이름", BigDecimal.ONE);
 		pointPolicy = pointPolicyRepository.save(ppr.toEntity());
-		PointHistoryRequest rspr = new PointHistoryRequest(member,
-			pointPolicy);
-		PointHistoryRepository.save(rspr.toEntity());
-		PointHistoryRepository.save(rspr.toEntity());
+		PointHistoryRequest rspr = new PointHistoryRequest(member);
+		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
+		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
 		assertEquals(2,
 			PointHistoryRepository.findPointHistories(
 				new PointHistoryPeriodRequest(),
@@ -75,10 +74,9 @@ public class PointHistoryRepositoryTest {
 
 		PointPolicyRequest ppr = new PointPolicyRequest(PolicyType.FIXED, "이름", BigDecimal.ONE);
 		pointPolicy = pointPolicyRepository.save(ppr.toEntity());
-		PointHistoryRequest rspr = new PointHistoryRequest(member,
-			pointPolicy);
-		PointHistoryRepository.save(rspr.toEntity());
-		PointHistoryRepository.save(rspr.toEntity());
+		PointHistoryRequest rspr = new PointHistoryRequest(member);
+		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
+		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
 		assertEquals(2,
 			PointHistoryRepository.findEarnedPointHistories(
 				new PointHistoryPeriodRequest(),
@@ -92,10 +90,9 @@ public class PointHistoryRepositoryTest {
 	void findUsedHistoriesTest() {
 		PointPolicyRequest ppr = new PointPolicyRequest(PolicyType.FIXED, "이름", BigDecimal.ONE);
 		pointPolicy = pointPolicyRepository.save(ppr.toEntity());
-		PointHistoryRequest rspr = new PointHistoryRequest(member,
-			pointPolicy);
-		PointHistoryRepository.save(rspr.toEntity());
-		PointHistoryRepository.save(rspr.toEntity());
+		PointHistoryRequest rspr = new PointHistoryRequest(member);
+		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
+		PointHistoryRepository.save(rspr.toEntity(pointPolicy));
 		assertEquals(0,
 			PointHistoryRepository.findUsedPointHistories(
 				new PointHistoryPeriodRequest(),

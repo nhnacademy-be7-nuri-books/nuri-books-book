@@ -8,6 +8,7 @@ import shop.nuribooks.books.book.point.dto.request.PointHistoryPeriodRequest;
 import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.entity.PointHistory;
+import shop.nuribooks.books.book.point.enums.PolicyName;
 
 public interface PointHistoryService {
 	/**
@@ -15,7 +16,7 @@ public interface PointHistoryService {
 	 * @param pointHistoryRequest
 	 * @return
 	 */
-	PointHistory registerPointHistory(PointHistoryRequest pointHistoryRequest);
+	PointHistory registerPointHistory(PointHistoryRequest pointHistoryRequest, PolicyName policyName);
 
 	/**
 	 * 포인트 내역 목록 조회

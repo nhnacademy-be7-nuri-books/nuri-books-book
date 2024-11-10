@@ -10,10 +10,8 @@ import shop.nuribooks.books.member.member.entity.Member;
 public class PointHistoryRequest {
 	@NotNull
 	Member member;
-	@NotNull
-	PointPolicy pointPolicy;
 
-	public PointHistory toEntity() {
+	public PointHistory toEntity(PointPolicy pointPolicy) {
 		return PointHistory.builder()
 			.amount(pointPolicy.getAmount())
 			.description(pointPolicy.getName())
