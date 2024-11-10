@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
@@ -29,6 +30,7 @@ public class BookTagServiceImpl implements BookTagService {
     private final BookTagRepository bookTagRepository;
     private final BookRepository bookRepository;
     private final TagRepository tagRepository;
+    private final BookMapper bookMapper;
 
     /**
      * registerTagToBook : 도서에 태그 등록
@@ -89,6 +91,7 @@ public class BookTagServiceImpl implements BookTagService {
         return BookTagGetResponse.of(bookTagId, bookId, tagNames);
     }
 
+    //TODO:  QUERYDSL로 변경해야됨
     /**
      * getBooksByTagId : 해당하는 태그가 달린 모든 도서 조회
      *
@@ -99,7 +102,7 @@ public class BookTagServiceImpl implements BookTagService {
      */
     @Override
     public List<BookResponse> getBooksByTagId(Long tagId) {
-        Tag tag = tagRepository.findById(tagId)
+        tagRepository.findById(tagId)
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다."));
 
         List<Long> bookIds = bookTagRepository.findBookIdsByTagId(tagId);
@@ -107,7 +110,7 @@ public class BookTagServiceImpl implements BookTagService {
         List<Book> books = bookRepository.findAllById(bookIds);
 
         return books.stream()
-                .map(BookResponse::of)
+                .map(bookMapper::toBookResponse)
                 .collect(Collectors.toList());
     }
 
@@ -121,5 +124,27 @@ public class BookTagServiceImpl implements BookTagService {
         BookTag bookTag = bookTagRepository.findById(bookTagId)
                 .orElseThrow(() -> new BookTagNotFountException("도서태그가 존재하지 않습니다."));
         bookTagRepository.delete(bookTag);
+    }
+
+    @Transactional
+    @Override
+    public void registerTagToBook(Long bookId, List<Long> tagIds) {
+        Book book = bookRepository.findById(bookId)
+            .orElseThrow(() -> new BookNotFoundException(bookId));
+
+        for (Long tagId : tagIds) {
+            Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다."));
+
+            if(!bookTagRepository.existsByBookIdAndTagId(bookId, tagId)) {
+                BookTag bookTag = BookTag.builder()
+                    .book(book)
+                    .tag(tag)
+                    .build();
+                bookTagRepository.save(bookTag);
+            } else {
+                throw new BookTagAlreadyExistsException("해당 도서에 이미 등록된 태그입니다.");
+            }
+        }
     }
 }

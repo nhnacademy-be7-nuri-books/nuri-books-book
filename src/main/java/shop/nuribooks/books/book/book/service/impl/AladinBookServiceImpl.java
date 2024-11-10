@@ -19,7 +19,6 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.book.service.AladinBookService;
-import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.service.BookTagService;
 import shop.nuribooks.books.book.category.entity.BookCategory;
 import shop.nuribooks.books.book.category.entity.Category;
@@ -98,26 +97,9 @@ public class AladinBookServiceImpl implements AladinBookService {
 					.build()
 				));
 
-			//TODO: 중복코드 추후 수정 예정
 			BookStateEnum bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.state()));
 
-			Book book = Book.builder()
-				.publisherId(publisher)
-				.state(bookStateEnum)
-				.title(reqDto.title())
-				.thumbnailImageUrl(reqDto.thumbnailImageUrl())
-				.detailImageUrl(reqDto.detailImageUrl())
-				.publicationDate(reqDto.publicationDate())
-				.price(reqDto.price())
-				.discountRate(reqDto.discountRate())
-				.description(reqDto.description())
-				.contents(reqDto.contents())
-				.isbn(reqDto.isbn())
-				.isPackageable(reqDto.isPackageable())
-				.likeCount(0)
-				.stock(reqDto.stock())
-				.viewCount(0L)
-				.build();
+			Book book = reqDto.toEntity(publisher, bookStateEnum);
 
 			log.info("Saving book entity: {}", book);
 			bookRepository.save(book);
@@ -127,8 +109,8 @@ public class AladinBookServiceImpl implements AladinBookService {
 			saveCategories(reqDto.categoryName(), book);
 
 			if (reqDto.tagIds() != null && !reqDto.tagIds().isEmpty()) {
-				BookTagRequest bookTagRequest = new BookTagRequest(book.getId(), reqDto.tagIds());
-				bookTagService.registerTagToBook(bookTagRequest);
+				List<Long> tagIdList = reqDto.tagIds();
+				bookTagService.registerTagToBook(book.getId(), tagIdList);
 			}
 
 			log.info("Book with ISBN {} successfully saved.", reqDto.isbn());

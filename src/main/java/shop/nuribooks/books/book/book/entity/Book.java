@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.book.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -101,6 +102,8 @@ public class Book {
 	//@ColumnDefault("0")
 	private Long viewCount;
 
+	private LocalDateTime deletedAt;
+
 	@Builder
 	@Jacksonized
 	private Book(Publisher publisherId, BookStateEnum state, String title, String thumbnailImageUrl,
@@ -142,6 +145,10 @@ public class Book {
 
 	public void incrementViewCount() {
 		this.viewCount++;
+	}
+
+	public void delete() {
+		this.deletedAt = LocalDateTime.now();
 	}
 
 }

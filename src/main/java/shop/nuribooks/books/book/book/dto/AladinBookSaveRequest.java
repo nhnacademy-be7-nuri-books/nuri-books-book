@@ -10,6 +10,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.entity.BookStateEnum;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 
 public record AladinBookSaveRequest(
 	@NotBlank(message = "제목은 필수입니다.")
@@ -65,4 +68,24 @@ public record AladinBookSaveRequest(
 	@Size(max = 5, message = "최대 5개의 태그를 등록할 수 있습니다.")
 	List<Long> tagIds
 ) {
+	public Book toEntity(Publisher publisher, BookStateEnum bookStateEnum) {
+
+		return Book.builder()
+			.publisherId(publisher)
+			.state(bookStateEnum)
+			.title(this.title)
+			.thumbnailImageUrl(this.thumbnailImageUrl)
+			.detailImageUrl(this.detailImageUrl)
+			.publicationDate(this.publicationDate)
+			.price(this.price)
+			.discountRate(this.discountRate)
+			.description(this.description)
+			.contents(this.contents)
+			.isbn(this.isbn)
+			.isPackageable(this.isPackageable)
+			.likeCount(0)
+			.stock(this.stock)
+			.viewCount(0L)
+			.build();
+	}
 }

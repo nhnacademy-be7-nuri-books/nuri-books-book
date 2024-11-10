@@ -1,8 +1,8 @@
 package shop.nuribooks.books.book.book.service.impl;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +19,10 @@ import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
+import shop.nuribooks.books.book.book.mapper.BookMapper;
+import shop.nuribooks.books.book.book.utility.BookUtils;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
-import shop.nuribooks.books.book.bookcontributor.service.BookContributorService;
-import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
@@ -39,7 +39,8 @@ import shop.nuribooks.books.book.book.service.BookService;
 public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
-	private final BookContributorService bookContributorService;
+	private final BookMapper bookMapper;
+	private final BookContributorRepository bookContributorRepository;
 
 	//관리자 페이지에서 관리자의 직접 도서 등록을 위한 메서드
 	//TODO: 알라딘서비스의 저장 메서드 같이 사용하면 될 듯 조금만 더 생각해보고 지우겠음
@@ -89,7 +90,7 @@ public class BookServiceImpl implements BookService {
 		book.incrementViewCount();
 		bookRepository.save(book);
 
-		return BookResponse.of(book);
+		return bookMapper.toBookResponse(book);
 	}
 
 	//TODO: 도서 목록조회를 하여 도서를 관리하기 위한 메서드 (관리자로 로그인 했을때는 수정버튼을 보이게해서 수정하도록 하는게 좋을까?)
@@ -107,19 +108,17 @@ public class BookServiceImpl implements BookService {
 			throw new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다.");
 		}
 
-		//소수점 버리기 (1원 단위로 계산 위해)
 		List<BookContributorsResponse> bookListResponses = bookPage.stream()
 			.map(book -> {
-				BigDecimal salePrice = book.getPrice()
-					.multiply(BigDecimal.valueOf(100 - book.getDiscountRate()))
-					.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
+				BigDecimal salePrice = BookUtils.calculateSalePrice(book.getPrice(), book.getDiscountRate());
 
 				AdminBookListResponse bookDetails = AdminBookListResponse.of(book, salePrice);
 				log.info("Fetching contributors for bookId: {}", book.getId());
-				List<BookContributorInfoResponse> contributors = bookContributorService.getContributorsAndRolesByBookId(book.getId());
+				List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(book.getId());
+				Map<String, List<String>> contributorsByRole = BookUtils.groupContributorsByRole(contributors);
 				log.info("Contributors fetched: {}", contributors);
 
-				return new BookContributorsResponse(bookDetails, contributors);
+				return new BookContributorsResponse(bookDetails, contributorsByRole);
 			})
 			.toList();
 
@@ -164,9 +163,8 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	@Override
 	public void deleteBook(Long bookId) {
-		if(!bookRepository.existsById(bookId)) {
-			throw new BookIdNotFoundException();
-		}
-		bookRepository.deleteById(bookId);
+		Book book = bookRepository.findBookByIdAndDeletedAtIsNull(bookId)
+			.orElseThrow(BookIdNotFoundException::new);
+		book.delete();
 	}
 }
