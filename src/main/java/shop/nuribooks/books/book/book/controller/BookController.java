@@ -17,12 +17,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
+import shop.nuribooks.books.book.book.dto.AladinBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
-import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
+import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
 import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.message.ResponseMessage;
@@ -33,17 +33,28 @@ import shop.nuribooks.books.common.message.ResponseMessage;
 public class BookController {
 	private final BookService bookService;
 
-	@Operation(summary = "신규 도서 등록", description = "관리자가 새로운 도서를 시스템에 등록할 수 있는 엔드포인트입니다.")
+	@Operation(summary = "Save a book from Aladin", description = "Saves a book based on data retrieved from the Aladin API.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "도서 등록 성공"),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-		@ApiResponse(responseCode = "404", description = "도서 상태 또는 출판사 미발견"),
-		@ApiResponse(responseCode = "409", description = "중복된 ISBN"),
+		@ApiResponse(responseCode = "201", description = "Book successfully created"),
+		@ApiResponse(responseCode = "400", description = "Invalid input data")
 	})
-	@PostMapping
-	public ResponseEntity<BookRegisterResponse> registerBooks(@Valid @RequestBody BookRegisterRequest reqDto) {
-		BookRegisterResponse resDto = bookService.registerBook(reqDto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
+	@PostMapping("/register/aladin")
+	public ResponseEntity<ResponseMessage> registerAladinBook(@Valid @RequestBody AladinBookRegisterRequest aladinBookSaveReq) {
+		bookService.registerBook(aladinBookSaveReq);
+		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서 등록 성공");
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
+	}
+
+	@Operation(summary = "Save a book manually", description = "Saves a book based on manual data entry.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "Book successfully created"),
+		@ApiResponse(responseCode = "400", description = "Invalid input data")
+	})
+	@PostMapping("/register/personal")
+	public ResponseEntity<ResponseMessage> registerPersonallyBook(@Valid @RequestBody PersonallyBookRegisterRequest personallyBookSaveReq) {
+		bookService.registerBook(personallyBookSaveReq);
+		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서 등록 성공");
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
 	}
 
 	@Operation(summary = "도서 목록 조회", description = "페이지네이션을 통해 도서 목록을 조회하는 엔드포인트입니다.")
