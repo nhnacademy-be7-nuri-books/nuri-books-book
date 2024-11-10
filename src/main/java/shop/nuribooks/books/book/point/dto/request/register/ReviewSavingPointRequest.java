@@ -23,10 +23,10 @@ public class ReviewSavingPointRequest extends PointHistoryRequest {
 
 	public ReviewSavingPoint toEntity() {
 		ReviewSavingPoint reviewSavingPoint = ReviewSavingPoint.builder()
-			.amount(pointPolicy.getAmount())
-			.description(pointPolicy.getName())
+			.amount(super.pointPolicy.getAmount())
+			.description(super.pointPolicy.getName())
 			.member(member)
-			.pointPolicy(pointPolicy)
+			.pointPolicy(super.pointPolicy)
 			.review(review)
 			.build();
 
