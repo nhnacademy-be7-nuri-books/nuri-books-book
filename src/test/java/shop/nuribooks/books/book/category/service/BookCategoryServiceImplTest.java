@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.category.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.entity.BookCategory;
 import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
@@ -236,6 +238,53 @@ public class BookCategoryServiceImplTest {
 		verify(categoryRepository, times(1)).findById(categoryId);
 		verify(bookCategoryRepository, times(1)).findByBookAndCategory(book, category);
 		verify(bookCategoryRepository, never()).delete(any());
+	}
+
+	@DisplayName("주어진 도서 ID에 해당하는 카테고리 목록 조회 성공")
+	@Test
+	@Order(9)
+	void findCategoriesByBookId_Success() {
+		// Given
+		Long bookId = 1L;
+		List<List<SimpleCategoryResponse>> categories = List.of(
+			List.of(new SimpleCategoryResponse(1L, "Category1")),
+			List.of(new SimpleCategoryResponse(2L, "Category2"))
+		);
+
+		when(bookRepository.existsById(bookId)).thenReturn(true);
+		when(bookCategoryRepository.findCategoriesByBookId(bookId)).thenReturn(categories);
+
+		// When
+		List<List<SimpleCategoryResponse>> result = bookCategoryService.findCategoriesByBookId(bookId);
+
+		// Then
+		assertThat(result).isNotNull();
+		assertThat(result).hasSize(2);
+		assertThat(result.get(0)).extracting(SimpleCategoryResponse::name)
+			.containsExactly("Category1");
+		assertThat(result.get(1)).extracting(SimpleCategoryResponse::name)
+			.containsExactly("Category2");
+
+		verify(bookRepository, times(1)).existsById(bookId);
+		verify(bookCategoryRepository, times(1)).findCategoriesByBookId(bookId);
+	}
+
+	@DisplayName("주어진 도서 ID가 존재하지 않을 때 BookNotFoundException 발생")
+	@Test
+	@Order(10)
+	void findCategoriesByBookId_BookNotFoundException() {
+		// Given
+		Long bookId = 1L;
+
+		when(bookRepository.existsById(bookId)).thenReturn(false);
+
+		// When & Then
+		assertThatThrownBy(() -> bookCategoryService.findCategoriesByBookId(bookId))
+			.isInstanceOf(BookNotFoundException.class)
+			.hasMessageContaining(String.valueOf(bookId));
+
+		verify(bookRepository, times(1)).existsById(bookId);
+		verify(bookCategoryRepository, never()).findCategoriesByBookId(bookId);
 	}
 
 }

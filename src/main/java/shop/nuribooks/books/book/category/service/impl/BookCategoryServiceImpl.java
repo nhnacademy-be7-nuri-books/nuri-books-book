@@ -1,11 +1,14 @@
 package shop.nuribooks.books.book.category.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.entity.BookCategory;
 import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
@@ -78,6 +81,22 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			.orElseThrow(() -> new BookCategoryNotFoundException(bookId, categoryId));
 
 		bookCategoryRepository.delete(bookCategory);
+	}
+
+	/**
+	 * 주어진 도서 ID에 해당하는 카테고리 목록을 조회하고 각 카테고리에 대한 브레드크럼 목록을 반환합니다.
+	 *
+	 * @param bookId 조회할 도서의 ID
+	 * @return 각 카테고리에 대한 브레드크럼을 포함한 목록의 목록
+	 * @throws BookNotFoundException 도서를 찾을 수 없는 경우 발생
+	 */
+	@Override
+	public List<List<SimpleCategoryResponse>> findCategoriesByBookId(Long bookId) {
+		if (!bookRepository.existsById(bookId)) {
+			throw new BookNotFoundException(bookId);
+		}
+
+		return bookCategoryRepository.findCategoriesByBookId(bookId);
 	}
 
 }

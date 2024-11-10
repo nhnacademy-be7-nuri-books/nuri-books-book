@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
+import shop.nuribooks.books.book.category.entity.BookCategory;
+import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.entity.ReviewImage;
@@ -104,6 +106,25 @@ public class TestUtils {
 			.likeCount(0)
 			.stock(100)
 			.viewCount(0L)
+			.build();
+	}
+
+	public static Category createCategory() {
+		return Category
+			.builder()
+			.parentCategory(
+				Category
+					.builder()
+					.name("testParentCategory1")
+					.build())
+			.name("testSubCategory1")
+			.build();
+	}
+
+	public static BookCategory createBookCategory(Book book, Category category) {
+		return BookCategory.builder()
+			.book(book)
+			.category(category)
 			.build();
 	}
 }
