@@ -1,10 +1,8 @@
 package shop.nuribooks.books.book.book.service.impl;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,12 +23,7 @@ import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.utility.BookUtils;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
-import shop.nuribooks.books.book.bookcontributor.service.BookContributorService;
-import shop.nuribooks.books.book.booktag.entity.BookTag;
-import shop.nuribooks.books.book.booktag.repository.BookTagRepository;
-import shop.nuribooks.books.book.contributor.repository.role.ContributorRoleRepository;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
-import shop.nuribooks.books.book.tag.entity.Tag;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
@@ -170,9 +163,8 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	@Override
 	public void deleteBook(Long bookId) {
-		if(!bookRepository.existsById(bookId)) {
-			throw new BookIdNotFoundException();
-		}
-		bookRepository.deleteById(bookId);
+		Book book = bookRepository.findBookByIdAndDeletedAtIsNull(bookId)
+			.orElseThrow(BookIdNotFoundException::new);
+		book.delete();
 	}
 }

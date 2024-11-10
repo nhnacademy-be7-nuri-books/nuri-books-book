@@ -28,6 +28,7 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom{
 
 		List<Book> books = queryFactory.selectFrom(book)
 			.join(book.publisherId, publisher).fetchJoin()
+			.where(book.deletedAt.isNull())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
@@ -35,9 +36,22 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom{
 		long total = Optional.ofNullable(queryFactory.select(book.count())
 			.from(book)
 			.join(book.publisherId, publisher)
+				.where(book.deletedAt.isNull())
 			.fetchOne())
 			.orElse(0L);
 
 		return new PageImpl<>(books, pageable, total);
+	}
+
+	@Override
+	public Optional<Book> findBookByIdAndDeletedAtIsNull(Long bookId) {
+		QBook book = QBook.book;
+
+		Book result = queryFactory.selectFrom(book)
+			.where(book.id.eq(bookId)
+				.and(book.deletedAt.isNull()))
+			.fetchOne();
+
+		return Optional.ofNullable(result);
 	}
 }
