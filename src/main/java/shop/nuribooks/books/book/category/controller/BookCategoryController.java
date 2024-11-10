@@ -67,6 +67,18 @@ public class BookCategoryController {
 		return ResponseEntity.noContent().build();
 	}
 
+	/**
+	 * 주어진 도서 ID에 해당하는 카테고리 목록을 조회합니다.
+	 *
+	 * @param bookId 조회할 도서의 ID
+	 * @return 도서에 연결된 카테고리 목록을 성공적으로 반환하면 200 OK 응답을 반환합니다.
+	 */
+	@Operation(summary = "도서의 카테고리 조회", description = "도서 ID를 받아 해당 도서와 연관된 카테고리 목록을 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "카테고리 목록 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "도서 또는 연관된 카테고리를 찾을 수 없음"),
+		@ApiResponse(responseCode = "500", description = "서버 오류")
+	})
 	@GetMapping("/book/{bookId}")
 	public ResponseEntity<List<List<SimpleCategoryResponse>>> getCategoriesByBookId(
 		@PathVariable Long bookId
