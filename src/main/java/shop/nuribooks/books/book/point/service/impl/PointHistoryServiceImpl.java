@@ -31,7 +31,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 
 	/**
 	 * 포인트 내역 등록
-	 *
+	 * 포인트 등록하는 법: 정책 이름 찾기. 자신의 타입에 맞는 point history request 찾기. 이 함수에 인자로 넣기. 끝!
 	 * @param pointHistoryRequest
 	 * @return
 	 */

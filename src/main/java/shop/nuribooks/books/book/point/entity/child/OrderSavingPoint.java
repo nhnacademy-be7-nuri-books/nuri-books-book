@@ -8,6 +8,7 @@
 // import lombok.Getter;
 // import lombok.NoArgsConstructor;
 // import lombok.experimental.SuperBuilder;
+// import shop.nuribooks.books.book.point.entity.PointHistory;
 //
 // @Entity
 // @Getter
@@ -15,7 +16,7 @@
 // @SuperBuilder
 // @DiscriminatorValue("order_saving_point")
 // @Table(name = "order_saving_point")
-// public class OrderSavingPoint {
+// public class OrderSavingPoint extends PointHistory {
 // 	// TODO:: 주문 id 추가
 // 	@OneToOne
 // 	@JoinColumn(name = "order_id")
