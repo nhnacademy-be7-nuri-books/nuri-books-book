@@ -13,11 +13,13 @@ public class BookUtils {
 
 	}
 
+	//소수점 버리기 (1원 단위로 계산 위해)
 	public static BigDecimal calculateSalePrice(BigDecimal price, int discountRate) {
 		return price.multiply(BigDecimal.valueOf(100 - discountRate))
 			.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
 	}
 
+	//작가역할에 따른 작가리스트 그룹핑
 	public static Map<String, List<String>> groupContributorsByRole(List<BookContributorInfoResponse> contributors) {
 		return  contributors.stream()
 			.collect(Collectors.groupingBy(

@@ -115,7 +115,6 @@ public class BookServiceImpl implements BookService {
 			throw new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다.");
 		}
 
-		//소수점 버리기 (1원 단위로 계산 위해)
 		List<BookContributorsResponse> bookListResponses = bookPage.stream()
 			.map(book -> {
 				BigDecimal salePrice = BookUtils.calculateSalePrice(book.getPrice(), book.getDiscountRate());
