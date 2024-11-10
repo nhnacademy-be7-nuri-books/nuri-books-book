@@ -40,8 +40,6 @@ public class PointHistoryRepositoryTest {
 	private Member member;
 	private PointPolicy pointPolicy;
 
-	private static long id = 0l;
-
 	@BeforeEach
 	void setUp() {
 		Customer customer = TestUtils.createCustomer();
@@ -49,7 +47,6 @@ public class PointHistoryRepositoryTest {
 		gradeRepository.save(grade);
 		member = TestUtils.createMember(customer, grade);
 		memberRepository.save(member);
-		TestUtils.setIdForEntity(member, ++id);
 
 	}
 
@@ -64,7 +61,7 @@ public class PointHistoryRepositoryTest {
 			PointHistoryRepository.findPointHistories(
 				new PointHistoryPeriodRequest(),
 				PageRequest.of(0, 2),
-				id
+				member.getId()
 			).size()
 		);
 	}
@@ -81,7 +78,7 @@ public class PointHistoryRepositoryTest {
 			PointHistoryRepository.findEarnedPointHistories(
 				new PointHistoryPeriodRequest(),
 				PageRequest.of(0, 2),
-				id
+				member.getId()
 			).size()
 		);
 	}
@@ -97,7 +94,7 @@ public class PointHistoryRepositoryTest {
 			PointHistoryRepository.findUsedPointHistories(
 				new PointHistoryPeriodRequest(),
 				PageRequest.of(0, 2),
-				id
+				member.getId()
 			).size()
 		);
 	}
