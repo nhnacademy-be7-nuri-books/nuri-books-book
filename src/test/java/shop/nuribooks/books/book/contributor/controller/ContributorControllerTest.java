@@ -20,6 +20,8 @@ import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.dto.ContributorResponse;
 import shop.nuribooks.books.book.contributor.service.ContributorServiceImpl;
 
+import java.util.List;
+
 @WebMvcTest(ContributorController.class)
 @AutoConfigureMockMvc
 class ContributorControllerTest {
@@ -51,6 +53,28 @@ class ContributorControllerTest {
 		verify(contributorService).registerContributor(any(ContributorRequest.class));
 	}
 
+	@DisplayName("모든 출판사 조회")
+	@Test
+	void getAllContributor() throws Exception {
+		// given
+		List<ContributorResponse> responses = List.of(
+				new ContributorResponse(1L, "contributor1"),
+				new ContributorResponse(2L, "contributor2")
+		);
+
+		when(contributorService.getAllContributors()).thenReturn(responses);
+
+		// when & then
+		mockMvc.perform(get("/api/contributors")
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("$[0].name").value("contributor1"))
+				.andExpect(jsonPath("$[1].name").value("contributor2"));
+
+		verify(contributorService).getAllContributors();
+	}
+	
 	@DisplayName("기여자 수정")
 	@Test
 	void updateContributor() throws Exception {

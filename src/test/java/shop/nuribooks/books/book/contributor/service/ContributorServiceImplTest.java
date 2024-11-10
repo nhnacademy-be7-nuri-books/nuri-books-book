@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -109,6 +110,26 @@ class ContributorServiceImplTest {
 
 	}
 
+	@DisplayName("모든 기여자 조회 성공")
+	@Test
+	void getAllContributor() {
+		// given
+		List<Contributor> contributors = List.of(new Contributor(1L, "contributor1"), new Contributor(2L, "contributor2"));
+
+		when(contributorRepository.findAll()).thenReturn(contributors);
+
+		// when
+		List<ContributorResponse> responses = contributorService.getAllContributors();
+
+		// then
+		assertThat(responses).isNotEmpty();
+		assertThat(responses).hasSize(2);
+		assertThat(responses.get(0).name()).isEqualTo("contributor1");
+
+		// 메서드 호출 여부 검증
+		verify(contributorRepository).findAll();
+	}
+	
 	@DisplayName("기여자 조회 실패")
 	@Test
 	void failed_getContributor() {
