@@ -18,6 +18,7 @@ import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
 import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
 import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
+import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @Service
@@ -49,9 +50,12 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	 * @return
 	 */
 	@Override
-	public List<PointHistoryResponse> getPointHistories(long memberId, Pageable pageable,
+	public PagedResponse<PointHistoryResponse> getPointHistories(long memberId, Pageable pageable,
 		PointHistoryPeriodRequest period) {
-		return this.pointHistoryRepository.findPointHistories(period, pageable, memberId);
+		List<PointHistoryResponse> result = this.pointHistoryRepository.findPointHistories(period, pageable, memberId);
+		int count = (int)this.pointHistoryRepository.countPointHistories(memberId, period);
+		PagedResponse<PointHistoryResponse> response = PagedResponse.of(result, pageable, count);
+		return response;
 	}
 
 	/**
@@ -62,9 +66,13 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	 * @return
 	 */
 	@Override
-	public List<PointHistoryResponse> getEarnedPointHistories(long memberId, Pageable pageable,
+	public PagedResponse<PointHistoryResponse> getEarnedPointHistories(long memberId, Pageable pageable,
 		PointHistoryPeriodRequest period) {
-		return this.pointHistoryRepository.findEarnedPointHistories(period, pageable, memberId);
+		List<PointHistoryResponse> result = this.pointHistoryRepository.findEarnedPointHistories(period, pageable,
+			memberId);
+		int count = (int)this.pointHistoryRepository.countEarnedPointHistories(memberId, period);
+		PagedResponse<PointHistoryResponse> response = PagedResponse.of(result, pageable, count);
+		return response;
 	}
 
 	/**
@@ -75,9 +83,13 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	 * @return
 	 */
 	@Override
-	public List<PointHistoryResponse> getUsedPointHistories(long memberId, Pageable pageable,
+	public PagedResponse<PointHistoryResponse> getUsedPointHistories(long memberId, Pageable pageable,
 		PointHistoryPeriodRequest period) {
-		return this.pointHistoryRepository.findUsedPointHistories(period, pageable, memberId);
+		List<PointHistoryResponse> result = this.pointHistoryRepository.findUsedPointHistories(period, pageable,
+			memberId);
+		int count = (int)this.pointHistoryRepository.countUsedPointHistories(memberId, period);
+		PagedResponse<PointHistoryResponse> response = PagedResponse.of(result, pageable, count);
+		return response;
 	}
 
 	/**

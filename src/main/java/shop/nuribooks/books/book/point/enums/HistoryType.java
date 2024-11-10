@@ -1,13 +1,12 @@
 package shop.nuribooks.books.book.point.enums;
 
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 
 import reactor.function.Function4;
 import shop.nuribooks.books.book.point.dto.request.PointHistoryPeriodRequest;
 import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
+import shop.nuribooks.books.common.message.PagedResponse;
 
 public enum HistoryType {
 	// 각 조건별로 실행해야 할 함수 실행.
@@ -15,10 +14,10 @@ public enum HistoryType {
 	USED((service, memberId, pageable, req) -> service.getUsedPointHistories(memberId, pageable, req)),
 	SAVED((service, memberId, pageable, req) -> service.getEarnedPointHistories(memberId, pageable, req));
 
-	private Function4<PointHistoryService, Long, Pageable, PointHistoryPeriodRequest, List<PointHistoryResponse>> func;
+	private Function4<PointHistoryService, Long, Pageable, PointHistoryPeriodRequest, PagedResponse<PointHistoryResponse>> func;
 
 	HistoryType(
-		Function4<PointHistoryService, Long, Pageable, PointHistoryPeriodRequest, List<PointHistoryResponse>> func) {
+		Function4<PointHistoryService, Long, Pageable, PointHistoryPeriodRequest, PagedResponse<PointHistoryResponse>> func) {
 		this.func = func;
 	}
 
@@ -33,7 +32,7 @@ public enum HistoryType {
 	}
 
 	// 람다함수 실제 적용
-	public List<PointHistoryResponse> apply(
+	public PagedResponse<PointHistoryResponse> apply(
 		PointHistoryService service,
 		Long memberId,
 		Pageable pageable,

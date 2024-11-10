@@ -1,7 +1,5 @@
 package shop.nuribooks.books.book.point.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.point.dto.request.PointHistoryPeriodRequest;
@@ -9,6 +7,7 @@ import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.enums.PolicyName;
+import shop.nuribooks.books.common.message.PagedResponse;
 
 public interface PointHistoryService {
 	/**
@@ -24,7 +23,7 @@ public interface PointHistoryService {
 	 * @param period
 	 * @return
 	 */
-	List<PointHistoryResponse> getPointHistories(long memberId, Pageable pageable,
+	PagedResponse<PointHistoryResponse> getPointHistories(long memberId, Pageable pageable,
 		PointHistoryPeriodRequest period);
 
 	/**
@@ -33,7 +32,7 @@ public interface PointHistoryService {
 	 * @param period
 	 * @return
 	 */
-	List<PointHistoryResponse> getEarnedPointHistories(long memberId, Pageable pageable,
+	PagedResponse<PointHistoryResponse> getEarnedPointHistories(long memberId, Pageable pageable,
 		PointHistoryPeriodRequest period);
 
 	/**
@@ -42,7 +41,7 @@ public interface PointHistoryService {
 	 * @param period
 	 * @return
 	 */
-	List<PointHistoryResponse> getUsedPointHistories(long memberId, Pageable pageable,
+	PagedResponse<PointHistoryResponse> getUsedPointHistories(long memberId, Pageable pageable,
 		PointHistoryPeriodRequest period);
 
 	/**
