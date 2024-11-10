@@ -39,6 +39,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	public PointHistory registerPointHistory(PointHistoryRequest pointHistoryRequest, PolicyName policyName) {
 		PointPolicy pointPolicy = pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(
 			policyName.toString()).orElseThrow(() -> new PointPolicyNotFoundException());
+		// 멤버에 포인터 변화량 적용.
 		return this.pointHistoryRepository.save(pointHistoryRequest.toEntity(pointPolicy));
 	}
 
