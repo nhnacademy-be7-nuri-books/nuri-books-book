@@ -22,7 +22,7 @@ public class BookCategoryCustomImpl implements BookCategoryCustom {
 	public List<List<SimpleCategoryResponse>> findCategoriesByBookId(Long bookId) {
 		List<Category> categories = queryFactory.select(category)
 			.from(bookCategory)
-			.join(bookCategory.category, category).fetchJoin()
+			.join(bookCategory.category, category)
 			.where(bookCategory.book.id.eq(bookId))
 			.fetch();
 

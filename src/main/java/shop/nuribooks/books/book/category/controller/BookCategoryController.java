@@ -1,8 +1,11 @@
 package shop.nuribooks.books.book.category.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
 
 @RequiredArgsConstructor
@@ -61,6 +65,13 @@ public class BookCategoryController {
 		@PathVariable Long categoryId) {
 		bookCategoryService.deleteBookCategory(bookId, categoryId);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/book/{bookId}")
+	public ResponseEntity<List<List<SimpleCategoryResponse>>> getCategoriesByBookId(
+		@PathVariable Long bookId
+	) {
+		return ResponseEntity.ok(bookCategoryService.findCategoriesByBookId(bookId));
 	}
 
 }
