@@ -1,11 +1,14 @@
 package shop.nuribooks.books.book.category.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.entity.BookCategory;
 import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
@@ -78,6 +81,15 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			.orElseThrow(() -> new BookCategoryNotFoundException(bookId, categoryId));
 
 		bookCategoryRepository.delete(bookCategory);
+	}
+
+	@Override
+	public List<List<SimpleCategoryResponse>> findCategoriesByBookId(Long bookId) {
+		if (!bookRepository.existsById(bookId)) {
+			throw new BookNotFoundException(bookId);
+		}
+
+		return bookCategoryRepository.findCategoriesByBookId(bookId);
 	}
 
 }

@@ -7,8 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.category.entity.BookCategory;
 import shop.nuribooks.books.book.category.entity.Category;
+import shop.nuribooks.books.book.category.repository.querydsl.BookCategoryCustom;
 
-public interface BookCategoryRepository extends JpaRepository<BookCategory, Long> {
+public interface BookCategoryRepository extends JpaRepository<BookCategory, Long>, BookCategoryCustom {
 	boolean existsByBookAndCategory(Book book, Category category);
 
 	Optional<BookCategory> findByBookAndCategory(Book book, Category category);
