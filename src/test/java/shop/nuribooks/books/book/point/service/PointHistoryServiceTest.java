@@ -62,7 +62,7 @@ public class PointHistoryServiceTest {
 
 	@BeforeEach
 	public void setUp() {
-		member = Member.builder().build();
+		member = Member.builder().point(BigDecimal.valueOf(500)).build();
 		TestUtils.setIdForEntity(member, 1l);
 		MemberIdContext.setMemberId(1l);
 

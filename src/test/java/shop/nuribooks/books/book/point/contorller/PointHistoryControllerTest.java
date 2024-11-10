@@ -45,7 +45,7 @@ public class PointHistoryControllerTest {
 			any())).thenReturn(
 			PagedResponse.of(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 		MemberIdContext.setMemberId(1l);
-		mockMvc.perform(get("/api/point-history")
+		mockMvc.perform(get("/api/members/point-history")
 				.queryParam("type", "ALL")
 				.queryParam("page", "0")
 				.queryParam("size", "3")
@@ -60,7 +60,7 @@ public class PointHistoryControllerTest {
 			any())).thenReturn(
 			PagedResponse.of(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 		MemberIdContext.setMemberId(1l);
-		mockMvc.perform(get("/api/point-history")
+		mockMvc.perform(get("/api/members/point-history")
 				.queryParam("type", "all")
 				.queryParam("page", "0")
 				.queryParam("size", "3")
@@ -75,7 +75,7 @@ public class PointHistoryControllerTest {
 			any())).thenReturn(
 			PagedResponse.of(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 		MemberIdContext.setMemberId(1l);
-		mockMvc.perform(get("/api/point-history")
+		mockMvc.perform(get("/api/members/point-history")
 				.queryParam("type", "alla")
 				.queryParam("page", "0")
 				.queryParam("size", "3")
@@ -90,7 +90,7 @@ public class PointHistoryControllerTest {
 			any())).thenReturn(
 			PagedResponse.of(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 		MemberIdContext.setMemberId(1l);
-		mockMvc.perform(get("/api/point-history")
+		mockMvc.perform(get("/api/members/point-history")
 				.queryParam("type", "ALL")
 				.queryParam("page", "0")
 				.queryParam("size", "3")
@@ -105,7 +105,7 @@ public class PointHistoryControllerTest {
 			any())).thenReturn(
 			PagedResponse.of(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 		MemberIdContext.setMemberId(1l);
-		mockMvc.perform(get("/api/point-history")
+		mockMvc.perform(get("/api/members/point-history")
 				.queryParam("type", "ALL")
 				.queryParam("page", "0")
 				.queryParam("size", "3")

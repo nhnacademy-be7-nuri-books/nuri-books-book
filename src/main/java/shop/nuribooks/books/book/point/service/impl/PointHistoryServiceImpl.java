@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.point.dto.request.PointHistoryPeriodRequest;
@@ -19,6 +20,7 @@ import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
 import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.common.message.PagedResponse;
+import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @Service
@@ -31,15 +33,20 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	/**
 	 * 포인트 내역 등록
 	 * 포인트 등록하는 법: 정책 이름 찾기. 자신의 타입에 맞는 point history request 찾기. 이 함수에 인자로 넣기. 끝!
+	 * 트랜잭션... 유저랑 엮여야하는데..?
 	 * @param pointHistoryRequest
 	 * @return
 	 */
 	@Override
 	public PointHistory registerPointHistory(PointHistoryRequest pointHistoryRequest, PolicyName policyName) {
+
 		PointPolicy pointPolicy = pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(
 			policyName.toString()).orElseThrow(() -> new PointPolicyNotFoundException());
 		// 멤버에 포인터 변화량 적용.
-		return this.pointHistoryRepository.save(pointHistoryRequest.toEntity(pointPolicy));
+		PointHistory pointHistory = pointHistoryRequest.toEntity(pointPolicy);
+		Member member = pointHistoryRequest.getMember();
+		member.setPoint(member.getPoint().add(pointHistory.getAmount()));
+		return this.pointHistoryRepository.save(pointHistory);
 	}
 
 	/**
@@ -97,6 +104,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	 *
 	 * @param pointHistoryId
 	 */
+	@Transactional
 	@Override
 	public void deletePointHistory(long pointHistoryId) {
 		PointHistory pointHistory = this.pointHistoryRepository.findById(pointHistoryId)
