@@ -102,6 +102,14 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		return bookCategoryRepository.findCategoriesByBookId(bookId);
 	}
 
+	/**
+	 * 주어진 카테고리 ID로 책을 페이지네이션하여 조회합니다.
+	 *
+	 * @param categoryId 조회할 카테고리의 ID
+	 * @param pageable   페이지네이션 정보
+	 * @return 책 목록이 포함된 페이지 응답
+	 * @throws CategoryNotFoundException 지정된 카테고리 ID가 존재하지 않을 경우 발생
+	 */
 	@Override
 	public PagedResponse<BookBriefResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
 		if (!categoryRepository.existsById(categoryId)) {
