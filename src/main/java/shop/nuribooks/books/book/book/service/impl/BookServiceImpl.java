@@ -144,7 +144,7 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	@Override
 	public BookResponse getBookById(Long bookId) {
-		Book book = bookRepository.findById(bookId)
+		Book book = bookRepository.findByIdAndDeletedAtIsNull(bookId)
 			.orElseThrow(BookIdNotFoundException::new);
 
 		book.incrementViewCount();
