@@ -169,7 +169,7 @@ public class BookServiceImpl implements BookService {
 
 		List<BookContributorsResponse> bookListResponses = bookPage.stream()
 			.map(book -> {
-				BigDecimal salePrice = BookUtils.calculateSalePrice(book.getPrice(), book.getDiscountRate());
+				//BigDecimal salePrice = BookUtils.calculateSalePrice(book.getPrice(), book.getDiscountRate());
 
 				AdminBookListResponse bookDetails = AdminBookListResponse.of(book);
 				log.info("Fetching contributors for bookId: {}", book.getId());

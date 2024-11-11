@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.stereotype.Repository;
@@ -66,6 +68,38 @@ public class BookCategoryCustomImpl implements BookCategoryCustom {
 			.collect(Collectors.toList());
 
 	}
+
+	@Override
+	public Page<AdminBookListResponse> findBooksByCategoryIdWithPaging(List<Long> categoryIds, Pageable pageable) {
+		List<Book> books = queryFactory
+			.select(book)
+			.from(bookCategory)
+			.join(bookCategory.book, book)
+			.where(bookCategory.category.id.in(categoryIds))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		// 총 개수를 계산할 때 NullPointerException을 방지하도록 수정합니다.
+		Long totalElements = queryFactory
+			.select(book.count())
+			.from(bookCategory)
+			.join(bookCategory.book, book)
+			.where(bookCategory.category.id.in(categoryIds))
+			.fetchOne();
+
+		// totalElements가 null일 경우 기본값 0으로 설정합니다.
+		totalElements = (totalElements != null) ? totalElements : 0L;
+
+		// books 리스트를 Page로 변환합니다.
+		List<AdminBookListResponse> adminBookListResponseList = books.stream()
+			.map(AdminBookListResponse::of)
+			.collect(Collectors.toList());
+
+		return new PageImpl<>(adminBookListResponseList, pageable, totalElements);
+	}
+
+
 
 	@Override
 	public long countBookByCategoryIds(List<Long> categoryIds) {
