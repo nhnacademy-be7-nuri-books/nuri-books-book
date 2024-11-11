@@ -15,12 +15,12 @@ package shop.nuribooks.books.order.orderDetail.entity;
  * @author nuri
  */
 public enum OrderState {
-	PENDING(1,"주문 대기"),
-	PAID(2,"결제 완료"), // 결제가 실패했을 때를 대비한 상태
-	DELIVERING(3,"배송중"),
-	COMPLETED(4,"주문 완료"),
-	RETURNED(5,"반품"),
-	CANCELED(6,"결제 취소");
+	PENDING(0,"주문 대기"),
+	PAID(1,"결제 완료"), // 결제가 실패했을 때를 대비한 상태
+	DELIVERING(2,"배송중"),
+	COMPLETED(3,"주문 완료"),
+	RETURNED(4,"반품"),
+	CANCELED(5,"결제 취소");
 
 	private final int code;
 	private final String korName;
