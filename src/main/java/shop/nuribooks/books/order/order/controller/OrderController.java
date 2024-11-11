@@ -54,7 +54,7 @@ public class OrderController {
 		HttpServletRequest request,
 		@Valid @RequestBody OrderTempRegisterRequest orderTempRegisterRequest) {
 
-		Optional<Long> userId = Optional.of(MemberIdContext.getMemberId());
+		Optional<Long> userId = Optional.ofNullable(MemberIdContext.getMemberId());
 
 		OrderTempRegisterResponse result = userId
 			// 회원 주문
