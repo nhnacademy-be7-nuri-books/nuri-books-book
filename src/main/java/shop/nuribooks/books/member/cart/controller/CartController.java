@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,9 +46,9 @@ public class CartController {
 		@ApiResponse(responseCode = "400", description = "도서 수량이 유효하지 않음"),
 		@ApiResponse(responseCode = "404", description = "회원 혹은 도서가 존재하지 않음")
 	})
-	@PostMapping("/{bookId}/{quantity}")
+	@PostMapping("/{bookId}")
 	public ResponseEntity<CartAddResponse> addToCart(
-		@PathVariable Long bookId, @PathVariable int quantity) {
+		@PathVariable Long bookId, @RequestParam("quantity") int quantity) {
 
 		Long memberId = MemberIdContext.getMemberId();
 
@@ -103,9 +104,9 @@ public class CartController {
 		@ApiResponse(responseCode = "400", description = "도서 수량이 유효하지 않음"),
 		@ApiResponse(responseCode = "404", description = "회원 혹은 도서가 존재하지 않음")
 	})
-	@PatchMapping("/me/{bookId}/{quantity}")
+	@PatchMapping("/me/{bookId}")
 	public ResponseEntity<CartUpdateResponse> cartUpdate(
-		@PathVariable Long bookId, @PathVariable int quantity) {
+		@PathVariable Long bookId, @RequestParam("quantity") int quantity) {
 
 		Long memberId = MemberIdContext.getMemberId();
 

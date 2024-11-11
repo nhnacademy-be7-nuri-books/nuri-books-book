@@ -58,7 +58,8 @@ class CartControllerTest {
 
 		//when
 		ResultActions result = mockMvc.perform(post(
-			"/api/member/cart/{bookId}/{quantity}", bookId, quantity));
+			"/api/member/cart/{bookId}", bookId)
+			.param("quantity", String.valueOf(quantity)));
 
 		//then
 		result.andExpect(status().isCreated())
@@ -130,7 +131,8 @@ class CartControllerTest {
 
 		//when
 		ResultActions result = mockMvc.perform(patch(
-			"/api/member/cart/me/{bookId}/{quantity}", bookId, quantity));
+			"/api/member/cart/me/{bookId}", bookId)
+			.param("quantity", String.valueOf(quantity)));
 
 		//then
 		result.andExpect(status().isOk())
