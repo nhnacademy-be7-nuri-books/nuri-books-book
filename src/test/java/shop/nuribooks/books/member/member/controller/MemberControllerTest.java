@@ -260,7 +260,7 @@ class MemberControllerTest {
 			.thenReturn(pageResponse);
 
 	    //when
-		ResultActions result = mockMvc.perform(get("/admin/api/member/members")
+		ResultActions result = mockMvc.perform(get("/api/member/members")
 				.param("name", "김")
 				.param("email", "nuri")
 				.param("phoneNumber","010")
