@@ -31,18 +31,15 @@ import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.cart.customer.dto.request.CustomerCartAddRequest;
 import shop.nuribooks.books.cart.customer.dto.response.CustomerCartResponse;
 import shop.nuribooks.books.cart.customer.service.CustomerCartService;
+import shop.nuribooks.books.common.ControllerTestSupport;
 
-@WebMvcTest(controllers = CustomerCartController.class)
-class CustomerCartControllerTest {
+class CustomerCartControllerTest extends ControllerTestSupport {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     ObjectMapper objectMapper;
-
-    @MockBean
-    private CustomerCartService customerCartService;
 
     @DisplayName("비회원 장바구니에 도서를 담는다.")
     @Test

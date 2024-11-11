@@ -18,20 +18,17 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
+import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.category.BookCategoryAlreadyExistsException;
 import shop.nuribooks.books.exception.category.BookCategoryNotFoundException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
-@WebMvcTest(BookCategoryController.class)
 @TestMethodOrder(OrderAnnotation.class)
-public class BookCategoryControllerTest {
+public class BookCategoryControllerTest extends ControllerTestSupport {
 
 	@Autowired
 	private MockMvc mockMvc;
-
-	@MockBean
-	private BookCategoryService bookCategoryService;
 
 	@DisplayName("도서와 카테고리가 존재할 때 연관 관계 생성 성공")
 	@Test

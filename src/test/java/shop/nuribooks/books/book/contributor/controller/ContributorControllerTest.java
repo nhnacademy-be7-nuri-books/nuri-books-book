@@ -21,10 +21,11 @@ import shop.nuribooks.books.book.contributor.dto.ContributorResponse;
 import shop.nuribooks.books.book.contributor.service.ContributorServiceImpl;
 
 import java.util.List;
+import shop.nuribooks.books.common.ControllerTestSupport;
 
 @WebMvcTest(ContributorController.class)
 @AutoConfigureMockMvc
-class ContributorControllerTest {
+class ContributorControllerTest extends ControllerTestSupport {
 
 	@MockBean
 	private ContributorServiceImpl contributorService;

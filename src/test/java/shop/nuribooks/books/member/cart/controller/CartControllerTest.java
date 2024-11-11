@@ -20,17 +20,14 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
+import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.cart.dto.response.CartAddResponse;
 import shop.nuribooks.books.member.cart.dto.response.CartListResponse;
 import shop.nuribooks.books.member.cart.dto.response.CartUpdateResponse;
 import shop.nuribooks.books.member.cart.service.CartService;
 
-@WebMvcTest(CartController.class)
-class CartControllerTest {
-
-	@MockBean
-	private CartService cartService;
+class CartControllerTest extends ControllerTestSupport {
 
 	@Autowired
 	private MockMvc mockMvc;

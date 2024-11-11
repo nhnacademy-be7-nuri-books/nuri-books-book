@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.member.grade.dto.DtoMapper;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
@@ -32,11 +33,7 @@ import shop.nuribooks.books.member.grade.dto.response.GradeUpdateResponse;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.service.GradeService;
 
-@WebMvcTest(GradeController.class)
-public class GradeControllerTest {
-
-	@MockBean
-	private GradeService gradeService;
+public class GradeControllerTest extends ControllerTestSupport {
 
 	@Autowired
 	private MockMvc mockMvc;

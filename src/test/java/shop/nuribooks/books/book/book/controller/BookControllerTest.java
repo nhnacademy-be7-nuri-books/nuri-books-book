@@ -24,18 +24,15 @@ import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.service.BookService;
+import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
 
-@WebMvcTest(BookController.class)
-public class BookControllerTest {
+public class BookControllerTest extends ControllerTestSupport {
 
 	@Autowired
 	private MockMvc mockMvc;
-
-	@MockBean
-	private BookService bookService;
 
 	@Autowired
 	private ObjectMapper objectMapper;

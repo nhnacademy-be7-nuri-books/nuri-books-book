@@ -26,6 +26,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.member.address.dto.requset.AddressEditRequest;
 import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
@@ -38,8 +39,7 @@ import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 
-@WebMvcTest(controllers = AddressController.class)
-class AddressControllerTest {
+class AddressControllerTest extends ControllerTestSupport {
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,18 +47,11 @@ class AddressControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @MockBean
-    private AddressServiceImpl addressService;
-
-    @MockBean
-    private MemberRepository memberRepository;
-
     @DisplayName("회원의 주소를 등록한다.")
     @Test
     void registerAddress() throws Exception {
         // given
-        Member member = createMember(createCustomer(), creategrade());
-        when(memberRepository.findById(any())).thenReturn(Optional.of(member));
+
 
         AddressRegisterRequest request = AddressRegisterRequest.builder()
                 .name("test")

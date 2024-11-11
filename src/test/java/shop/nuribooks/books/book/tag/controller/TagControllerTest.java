@@ -20,11 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.nuribooks.books.book.tag.dto.TagRequest;
 import shop.nuribooks.books.book.tag.dto.TagResponse;
 import shop.nuribooks.books.book.tag.service.TagServiceImpl;
+import shop.nuribooks.books.common.ControllerTestSupport;
 
-@WebMvcTest(TagController.class)
-class TagControllerTest {
-	@MockBean
-	private TagServiceImpl tagService;
+class TagControllerTest extends ControllerTestSupport {
 
 	@Autowired
 	private MockMvc mockMvc;

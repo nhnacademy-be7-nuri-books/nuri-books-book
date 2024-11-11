@@ -29,6 +29,7 @@ public class CustomerCartController {
     private ResponseEntity addToCart(@RequestBody @Valid CustomerCartAddRequest customerCartAddRequest, HttpServletRequest request) {
         HttpSession session = request.getSession(true);
         String sessionId = session.getId();
+
         customerCartService.addToCart(sessionId, customerCartAddRequest);
         return ResponseEntity.ok().build();
     }

@@ -32,17 +32,14 @@ import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.service.BookTagService;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
+import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.common.TestUtils;
 
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(BookTagController.class)
-class BookTagControllerTest {
+class BookTagControllerTest extends ControllerTestSupport {
 
 	@Autowired
 	private MockMvc mockMvc;
-
-	@MockBean
-	private BookTagService bookTagService;
 
 	@Autowired
 	private ObjectMapper objectMapper;
