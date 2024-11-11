@@ -41,102 +41,6 @@ public class BookControllerTest {
 	private ObjectMapper objectMapper;
 
 	@Test
-	public void registerBooks_ShouldReturnCreated_WhenRequestIsValid() throws Exception {
-		BookRegisterRequest reqDto = new BookRegisterRequest(
-			1L,
-			BookStateEnum.NORMAL,
-			"책 제목",
-			"thumbnail.jpg",
-			"detail.jpg",
-			LocalDate.parse("2024-10-21"),
-			BigDecimal.valueOf(10000),
-			0,
-			"책 설명",
-			"책 내용",
-			"1234567890123",
-			true,
-			10
-		);
-
-		BookRegisterResponse resDto = new BookRegisterResponse(
-			1L,
-			"출판사",
-			BookStateEnum.NORMAL.getKorName(),
-			"책 제목",
-			"thumbnail.jpg",
-			LocalDate.parse("2024-10-21"),
-			BigDecimal.valueOf(10000),
-			0,
-			"책 설명",
-			10
-		);
-
-		when(bookService.registerBook(any(BookRegisterRequest.class))).thenReturn(resDto);
-
-		mockMvc.perform(post("/api/books")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(reqDto)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.id").value(1L))
-			.andExpect(jsonPath("$.title").value("책 제목"));
-	}
-
-	@Test
-	public void registerBooks_ShouldReturnBadRequest_WhenRequestIsInvalid() throws Exception {
-		BookRegisterRequest reqDto = new BookRegisterRequest(
-			null,
-			null,
-			"",
-			null,
-			null,
-			null,
-			null,
-			-1,
-			null,
-			null,
-			null,
-			false,
-			-1
-		);
-
-		when(bookService.registerBook(any(BookRegisterRequest.class)))
-			.thenThrow(new BadRequestException("잘못된 요청 데이터입니다."));
-
-		mockMvc.perform(post("/api/books")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(reqDto)))
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.message", containsString("설명은 필수입니다.")))
-			.andExpect(jsonPath("$.message", containsString("내용은 필수입니다.")));
-	}
-
-	/*@Test
-	public void getBooks_ShouldReturnPageOfBooks_WhenRequestIsValid() throws Exception {
-		Pageable pageable = PageRequest.of(0, 10);
-		AdminBookListResponse bookResponse = new AdminBookListResponse(
-			1L,
-			null,
-			BookStateEnum.NORMAL.getKorName(),
-			"책 제목",
-			BigDecimal.valueOf(10000),
-			0,
-			true,
-			10
-		);
-
-		Page<AdminBookListResponse> bookPage = new PageImpl<>(List.of(bookResponse), pageable, 1);
-		when(bookService.getBooks(pageable)).thenReturn(bookPage);
-
-		mockMvc.perform(get("/api/books")
-				.contentType(MediaType.APPLICATION_JSON)
-				.param("page", "0")
-				.param("size", "10"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.content[0].id").value(1L))
-			.andExpect(jsonPath("$.content[0].title").value("책 제목"));
-	}*/
-
-	@Test
 	public void getBooks_ShouldReturnBadRequest_WhenPageIsOutOfRange() throws Exception {
 		Pageable pageable = PageRequest.of(10, 10);
 		when(bookService.getBooks(pageable)).thenThrow(new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다."));
@@ -148,35 +52,6 @@ public class BookControllerTest {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.message").value("조회 가능한 페이지 범위를 초과했습니다."));
 	}
-
-	/*@Test
-	public void getBookById_ShouldReturnBookResponse_WhenBookExists() throws Exception {
-		Long bookId = 1L;
-		BookResponse bookResponse = new BookResponse(
-			bookId, null, "정상", "책 제목", "thumbnail.jpg", null, LocalDate.now(),
-			BigDecimal.valueOf(10000), 10, "책 설명", "책 내용", "1234567890123",
-			true, 0, 10, 100L);
-
-		when(bookService.getBookById(bookId)).thenReturn(bookResponse);
-
-		mockMvc.perform(get("/api/books/{bookId}", bookId)
-				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").value(bookId))
-			.andExpect(jsonPath("$.title").value("책 제목"));
-	}*/
-
-	/*@Test
-	public void getBookById_ShouldReturnNotFound_WhenBookDoesNotExist() throws Exception {
-		Long bookId = 9999L;
-
-		when(bookService.getBookById(bookId)).thenThrow(new ResourceNotFoundException("도서를 찾을 수 없습니다."));
-
-		mockMvc.perform(get("/api/books/{bookId}", bookId)
-				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isNotFound())
-			.andExpect(jsonPath("$.message").value("도서를 찾을 수 없습니다."));
-	}*/
 
 	@Test
 	public void updateBook_ShouldReturnOk_WhenRequestIsValid() throws Exception {

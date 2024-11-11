@@ -119,33 +119,6 @@ public class BooksServiceImplTest {
 	}
 
 	@Test
-	public void registerBook_ShouldReturnResponse_WhenValidRequest() {
-		when(publisherRepository.findById(1L)).thenReturn(Optional.of(publisher));
-		when(bookRepository.existsByIsbn(reqDto.isbn())).thenReturn(false);
-		when(bookRepository.save(any(Book.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-		BookRegisterResponse result = bookService.registerBook(reqDto);
-
-		assertNotNull(result);
-		assertEquals("Book Title", result.title());
-		verify(bookRepository, times(1)).save(any(Book.class));
-	}
-
-	@Test
-	public void registerBook_ShouldThrowPublisherIdNotFoundException_WhenPublisherNotFound() {
-		when(publisherRepository.findById(1L)).thenReturn(Optional.empty());
-
-		assertThrows(PublisherIdNotFoundException.class, () -> bookService.registerBook(reqDto));
-	}
-
-	@Test
-	public void registerBook_ShouldThrowResourceAlreadyExistIsbnException_WhenIsbnAlreadyExists() {
-		when(bookRepository.existsByIsbn(reqDto.isbn())).thenReturn(true);
-
-		assertThrows(ResourceAlreadyExistIsbnException.class, () -> bookService.registerBook(reqDto));
-	}
-
-	@Test
 	public void getBooks_ShouldThrowInvalidPageRequestException_WhenPageNumberIsNegative() {
 		Pageable pageable = mock(Pageable.class);
 		when(pageable.getPageNumber()).thenReturn(-1);

@@ -175,5 +175,32 @@ public class CategoryServiceImpl implements CategoryService {
 		categoryRepository.delete(category);
 	}
 
+	/**
+	 * 최상위 카테고리들을 가져와 buildCategoryTree를 호출하여 전체 트리구조 생성
+	 * @return 트리구조의 CategoryResponse 리스트 반환
+	 */
+	@Override
+	public List<CategoryResponse> getAllCategoryTree() {
+		List<Category> rootCategories = categoryRepository.findAllByParentCategoryIsNull();
+		List<CategoryResponse> categoryTree = new ArrayList<>();
+		for(Category rootCategory : rootCategories) {
+			categoryTree.add(buildCategoryTree(rootCategory));
+		}
+		return categoryTree;
+	}
+
+	/**
+	 *
+	 * @param category 최상위 카테고리
+	 * @return 각 카테고리의 하위카테고리들을 추가한 CategoryResponse
+	 */
+	@Override
+	public CategoryResponse buildCategoryTree(Category category) {
+		List<CategoryResponse> subCategories = new ArrayList<>();
+		for(Category subCategory : category.getSubCategory()) {
+			subCategories.add(buildCategoryTree(subCategory));
+		}
+		return new CategoryResponse(category.getId(), category.getName(), subCategories);
+	}
 }
 

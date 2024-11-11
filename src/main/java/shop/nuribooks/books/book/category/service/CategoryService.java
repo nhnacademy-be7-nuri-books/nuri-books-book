@@ -59,4 +59,8 @@ public interface CategoryService {
 	 * @param categoryId 삭제할 카테고리의 ID
 	 */
 	void deleteCategory(Long categoryId);
+
+	List<CategoryResponse> getAllCategoryTree();
+
+	CategoryResponse buildCategoryTree(Category category);
 }
