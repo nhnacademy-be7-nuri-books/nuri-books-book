@@ -11,7 +11,7 @@ import shop.nuribooks.books.book.point.entity.PointPolicy;
 public interface PointPolicyRepository extends JpaRepository<PointPolicy, Long> {
 	List<PointPolicyResponse> findAllByDeletedAtIsNull();
 
-	PointPolicyResponse findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(String name);
+	Optional<PointPolicy> findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(String name);
 
 	Boolean existsByNameIgnoreCaseAndDeletedAtIsNull(String name);
 
