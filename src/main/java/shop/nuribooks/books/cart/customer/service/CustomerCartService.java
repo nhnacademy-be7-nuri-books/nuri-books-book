@@ -6,7 +6,7 @@ import shop.nuribooks.books.cart.customer.dto.response.CustomerCartResponse;
 
 public interface CustomerCartService {
 
-    void addToCart(CustomerCartAddRequest request);
+    void addToCart(String sessionId, CustomerCartAddRequest request);
 
     //비회원 장바구니 조회
     List<CustomerCartResponse> getCustomerCartList(String sessionId);

@@ -4,7 +4,7 @@ import java.util.Map;
 import shop.nuribooks.books.cart.customer.entity.CustomerCart;
 
 public interface CustomerCartRepository {
-    void addCart(CustomerCart customerCart);
+    void addCart(String sessionId, CustomerCart customerCart);
 
     Map<String, Integer> getCart(String sessionId);
 

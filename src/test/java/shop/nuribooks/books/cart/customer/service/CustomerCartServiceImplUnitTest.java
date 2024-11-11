@@ -40,13 +40,13 @@ class CustomerCartServiceImplUnitTest {
     void addToCart() {
         // given
         String sessionId = "sessionId";
-        CustomerCartAddRequest customerCartAddRequest = new CustomerCartAddRequest(sessionId,1L, 1);
+        CustomerCartAddRequest customerCartAddRequest = new CustomerCartAddRequest(1L, 1);
 
         // when
-        customerCartService.addToCart(customerCartAddRequest);
+        customerCartService.addToCart(sessionId, customerCartAddRequest);
 
         // then
-        verify(customerCartRepository, times(1)).addCart(any(CustomerCart.class));
+        verify(customerCartRepository, times(1)).addCart(anyString(), any(CustomerCart.class));
     }
 
     @DisplayName("sessionId에 대한 장바구니를 가져온다.")

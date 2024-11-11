@@ -22,8 +22,8 @@ public class CustomerCartRepositoryImpl implements CustomerCartRepository{
     }
 
     @Override
-    public void addCart(CustomerCart customerCart) {
-        hashOperations.put(customerCart.getId(), customerCart.getBookId(), customerCart.getQuantity());
+    public void addCart(String sessionId, CustomerCart customerCart) {
+        hashOperations.put(sessionId, customerCart.getBookId(), customerCart.getQuantity());
         redisTemplate.expire(customerCart.getId(), 3, TimeUnit.MINUTES);
     }
 

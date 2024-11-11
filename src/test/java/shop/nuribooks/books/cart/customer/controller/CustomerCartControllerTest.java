@@ -24,10 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 
 import shop.nuribooks.books.book.book.dto.BookResponse;
-import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
 import shop.nuribooks.books.cart.customer.dto.request.CustomerCartAddRequest;
 import shop.nuribooks.books.cart.customer.dto.response.CustomerCartResponse;
 import shop.nuribooks.books.cart.customer.service.CustomerCartService;
@@ -46,9 +46,9 @@ class CustomerCartControllerTest {
 
     @DisplayName("비회원 장바구니에 도서를 담는다.")
     @Test
-    void registerAddress() throws Exception {
+    void addCustomerCart() throws Exception {
         // given
-        CustomerCartAddRequest request = new CustomerCartAddRequest("sessionId", 1L, 1);
+        CustomerCartAddRequest request = new CustomerCartAddRequest( 1L, 1);
 
         // when then
         mockMvc.perform(post("/api/customer/cart")
@@ -62,8 +62,7 @@ class CustomerCartControllerTest {
     @Test
     void getCustomerCartList() throws Exception {
         // given
-
-        String sessionId = "sessionId";
+        MockHttpSession session = new MockHttpSession();
         Long bookId1 = 1L;
         List<String> tagNames = new ArrayList<>();
         tagNames.add("wow");
@@ -95,7 +94,8 @@ class CustomerCartControllerTest {
         when(customerCartService.getCustomerCartList(anyString())).thenReturn(List.of(response1, response2));
 
         // when then
-        mockMvc.perform(get("/api/customer/cart"))
+        mockMvc.perform(get("/api/customer/cart")
+                        .session(session))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(2)));
 
@@ -104,16 +104,22 @@ class CustomerCartControllerTest {
     @DisplayName("비회원 장바구니를 삭제한다")
     @Test
     void removeCustomerCart() throws Exception {
-        // given when then
-        mockMvc.perform(delete("/api/customer/cart"))
+        // given
+        MockHttpSession session = new MockHttpSession();
+        // when then
+        mockMvc.perform(delete("/api/customer/cart")
+                        .session(session))
                 .andExpect(status().isNoContent());
     }
 
     @DisplayName("비회원 장바구니에서 특정 아이템을 삭제한다")
     @Test
     void removeCustomerCartItem() throws Exception {
-        // given when then
-        mockMvc.perform(delete("/api/customer/cart/{bookId}", 1L))
+        // given
+        MockHttpSession session = new MockHttpSession();
+        //when then
+        mockMvc.perform(delete("/api/customer/cart/{bookId}", 1L)
+                        .session(session))
                 .andExpect(status().isNoContent());
     }
 

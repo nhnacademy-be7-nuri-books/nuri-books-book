@@ -20,10 +20,10 @@ public class CustomerCartServiceImpl implements CustomerCartService {
 
     // 비회원 장바구니 담기
     @Override
-    public void addToCart(CustomerCartAddRequest request) {
+    public void addToCart(String sessionId, CustomerCartAddRequest request) {
         CustomerCart customerCart = request.toEntity();
 
-        customerCartRepository.addCart(customerCart);
+        customerCartRepository.addCart(sessionId, customerCart);
     }
 
     //비회원 장바구니 조회

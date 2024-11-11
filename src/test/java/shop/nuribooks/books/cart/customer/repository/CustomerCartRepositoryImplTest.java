@@ -54,7 +54,7 @@ class CustomerCartRepositoryImplTest extends TestRedisContainer {
                 .build();
 
         // when
-        customerCartRepository.addCart(customerCart);
+        customerCartRepository.addCart(sessionId, customerCart);
 
         // then
         Integer savedQuantity = hashOperations.get(sessionId, bookId);
