@@ -16,12 +16,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @AllArgsConstructor
@@ -43,7 +41,7 @@ public class Category {
 	@BatchSize(size = 100)
 	@OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Category> subCategory = new ArrayList<>();
-	
+
 	@Builder
 	public Category(String name, Category parentCategory) {
 		this.name = name;

@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.category.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,6 +85,7 @@ class CategoryRepositoryTest {
 	 * 존재하지 않는 카테고리 이름에 대해 false를 반환하는지 테스트합니다.
 	 */
 	@Test
+	@Order(4)
 	void checkIfCategoryDoesNotExist() {
 		boolean exists = categoryRepository.existsByNameAndParentCategoryIsNull("비존재 카테고리");
 		assertThat(exists).isFalse();
@@ -93,6 +95,7 @@ class CategoryRepositoryTest {
 	 * 부모 카테고리가 없는 모든 카테고리를 조회할 때 올바른 결과를 반환하는지 테스트합니다.
 	 */
 	@Test
+	@Order(5)
 	void findAllByParentCategoryIsNull_whenCalled_thenReturnsTopCategories() {
 		// when
 		List<Category> categories = categoryRepository.findAllByParentCategoryIsNull();
@@ -107,6 +110,7 @@ class CategoryRepositoryTest {
 	 * 데이터베이스에 해당하는 카테고리가 없는 경우 올바르게 false를 반환하는지 테스트합니다.
 	 */
 	@Test
+	@Order(6)
 	void existsByNameAndParentCategoryIsNull_whenCategoryNotExists_thenReturnsFalse() {
 		boolean exists = categoryRepository.existsByNameAndParentCategoryIsNull("비존재하는 카테고리");
 		assertThat(exists).isFalse();
@@ -116,6 +120,7 @@ class CategoryRepositoryTest {
 	 * 특정 ID로 카테고리를 조회할 때 올바른 카테고리를 반환하는지 테스트합니다.
 	 */
 	@Test
+	@Order(7)
 	void findById_whenCategoryExists_thenReturnsCategory() {
 		// given
 		Long categoryId = 1L; // category-sample.sql에 존재하는 ID를 사용
@@ -126,6 +131,40 @@ class CategoryRepositoryTest {
 		// then
 		assertThat(categoryOptional).isPresent();
 		assertThat(categoryOptional.get().getName()).isEqualTo("여행"); // 예제 데이터의 이름과 일치하는지 확인
+	}
+
+	@Test
+	@Order(8)
+	void findAllChildCategoryIds_whenCalled_thenReturnsAllChildIds() {
+		// given
+		Category parentCategory = new Category("Parent Category", null);
+		categoryRepository.save(parentCategory);
+
+		Category childCategory1 = new Category("Child Category 1", parentCategory);
+		Category childCategory2 = new Category("Child Category 2", parentCategory);
+		categoryRepository.saveAll(Arrays.asList(childCategory1, childCategory2));
+
+		// when
+		List<Long> childCategoryIds = categoryRepository.findAllChildCategoryIds(parentCategory.getId());
+
+		// then
+		assertThat(childCategoryIds).isNotEmpty();
+		assertThat(childCategoryIds).contains(parentCategory.getId(), childCategory1.getId(), childCategory2.getId());
+		assertThat(childCategoryIds.size()).isEqualTo(3);
+	}
+
+	@Test
+	@Order(8)
+	void findAllChildCategoryId() {
+		// given
+		Category parentCategory = new Category("Parent Category", null);
+		categoryRepository.save(parentCategory);
+		// when
+		List<Long> childCategoryIds = categoryRepository.findAllChildCategoryIds(parentCategory.getId());
+
+		// then
+		assertThat(childCategoryIds).isNotEmpty();
+		assertThat(childCategoryIds.size()).isEqualTo(1);
 	}
 }
 

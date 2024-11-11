@@ -17,16 +17,17 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 	Optional<Category> findByNameAndParentCategory(String name, Category parentCategory);
 
 	@Query(value = """
-		WITH RECURSIVE CategoryTree AS (
-		SELECT id, parent_category_id
-		FROM category
-		WHERE id = :categoryId
+		WITH RECURSIVE CategoryTree(category_id, parent_category_id) AS (
+		SELECT category_id, parent_category_id
+		FROM categories
+		WHERE category_id = :categoryId
 		UNION ALL
-			SELECT c.id, c.parent_category_id
-			FROM category c
-				JOIN CategoryTree ct ON c.parent_category_id = ct.id
-			)
-		SELECT id FROM CategoryTree
+		    SELECT c.category_id, c.parent_category_id
+		    FROM categories c
+		        JOIN CategoryTree ct ON c.parent_category_id = ct.category_id
+		    )
+		SELECT category_id FROM CategoryTree
 		""", nativeQuery = true)
 	List<Long> findAllChildCategoryIds(@Param("categoryId") Long categoryId);
+
 }

@@ -108,7 +108,14 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			throw new CategoryNotFoundException();
 		}
 
-		return null;
+		List<Long> categoryIds = categoryRepository.findAllChildCategoryIds(categoryId);
+
+		List<BookBriefResponse> bookBriefResponseList = bookCategoryRepository.findBooksByCategoryId(categoryIds,
+			pageable);
+
+		int total = (int)bookCategoryRepository.countBookByCategoryIds(categoryIds);
+
+		return (PagedResponse<BookBriefResponse>)PagedResponse.of(bookBriefResponseList, pageable, total);
 	}
 
 }
