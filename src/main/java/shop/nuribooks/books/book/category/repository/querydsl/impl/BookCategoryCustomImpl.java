@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 
+import org.springframework.stereotype.Repository;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.querydsl.BookCategoryCustom;
 
+@Repository
 @RequiredArgsConstructor
 public class BookCategoryCustomImpl implements BookCategoryCustom {
 

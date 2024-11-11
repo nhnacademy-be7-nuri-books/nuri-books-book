@@ -58,7 +58,8 @@ class CartControllerTest {
 
 		//when
 		ResultActions result = mockMvc.perform(post(
-			"/api/member/cart/{bookId}/{quantity}", bookId, quantity));
+			"/api/members/carts/{book-id}", bookId)
+			.param("quantity", String.valueOf(quantity)));
 
 		//then
 		result.andExpect(status().isCreated())
@@ -83,7 +84,7 @@ class CartControllerTest {
 		when(cartService.getCartList(memberId)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(get("/api/member/cart/me"));
+		ResultActions result = mockMvc.perform(get("/api/members/carts/me"));
 
 		//then
 		result.andExpect(status().isOk())
@@ -108,7 +109,7 @@ class CartControllerTest {
 		doNothing().when(cartService).deleteCart(memberId, bookId);
 
 		//when
-		ResultActions result = mockMvc.perform(delete("/api/member/cart/me/{bookId}", bookId));
+		ResultActions result = mockMvc.perform(delete("/api/members/carts/me/{book-id}", bookId));
 
 	    //then
 		result.andExpect(status().isOk())
@@ -130,7 +131,8 @@ class CartControllerTest {
 
 		//when
 		ResultActions result = mockMvc.perform(patch(
-			"/api/member/cart/me/{bookId}/{quantity}", bookId, quantity));
+			"/api/members/carts/me/{book-id}", bookId)
+			.param("quantity", String.valueOf(quantity)));
 
 		//then
 		result.andExpect(status().isOk())
