@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.category.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,8 +16,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
+import shop.nuribooks.books.common.message.PagedResponse;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/book-category")
@@ -84,6 +87,27 @@ public class BookCategoryController {
 		@PathVariable Long bookId
 	) {
 		return ResponseEntity.ok(bookCategoryService.findCategoriesByBookId(bookId));
+	}
+
+	/**
+	 * 주어진 카테고리 ID로 책을 페이지네이션하여 조회합니다.
+	 *
+	 * @param categoryId 책을 조회할 카테고리의 ID
+	 * @param pageable   페이지네이션 정보
+	 * @return 책 정보가 포함된 페이지 응답
+	 */
+	@Operation(summary = "카테고리 ID로 책 조회", description = "주어진 카테고리 ID에 해당하는 책 목록을 페이지네이션하여 반환합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공적으로 책 목록을 반환함"),
+		@ApiResponse(responseCode = "404", description = "카테고리를 찾을 수 없음")
+	})
+	@GetMapping("/category/{categoryId}")
+	public ResponseEntity<PagedResponse<AdminBookListResponse>> getBooksByCategoryId(
+		@PathVariable Long categoryId,
+		Pageable pageable) {
+		PagedResponse<AdminBookListResponse> pagedResponse = bookCategoryService.findBooksByCategoryId(categoryId,
+			pageable);
+		return ResponseEntity.ok(pagedResponse);
 	}
 
 }

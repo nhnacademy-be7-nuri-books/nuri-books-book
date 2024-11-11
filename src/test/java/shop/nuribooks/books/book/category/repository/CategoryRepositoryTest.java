@@ -5,15 +5,12 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
 
 import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
@@ -22,21 +19,41 @@ import shop.nuribooks.books.common.config.QuerydslConfiguration;
  * CategoryRepository의 기능을 테스트하는 클래스.
  */
 @DataJpaTest
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Import(QuerydslConfiguration.class)
 class CategoryRepositoryTest {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
 
+	private Category parentCategory;
+	private Category subCategory;
+
+	@BeforeEach
+	void setUp() {
+		// 데이터 초기화
+		parentCategory = Category.builder()
+			.name("여행")
+			.build();
+		parentCategory = categoryRepository.save(parentCategory);
+
+		subCategory = Category.builder()
+			.name("국내 여행")
+			.parentCategory(parentCategory)
+			.build();
+		subCategory = categoryRepository.save(subCategory);
+	}
+
+	@AfterEach
+	void tearDown() {
+		// 데이터 정리
+		categoryRepository.deleteAll();
+	}
+
 	@Test
-	@Order(1)
-	@Transactional
-	@Rollback(false)
 	void saveCategory() {
 		// given
 		Category category = Category.builder()
-			.name("여행")
+			.name("음악")
 			.build();
 
 		// when
@@ -44,54 +61,46 @@ class CategoryRepositoryTest {
 
 		// then
 		assertThat(savedCategory).isNotNull();
-		assertThat(savedCategory.getId()).isEqualTo(1L);
 		assertThat(savedCategory.getId()).isNotNull(); // 저장 후 ID가 생성되었는지 확인
-		assertThat(savedCategory.getName()).isEqualTo("여행");
+		assertThat(savedCategory.getName()).isEqualTo("음악");
 	}
 
 	@Test
-	@Order(2)
 	void saveSubCategory() {
-		Category parentCategory = categoryRepository.findById(1L)
-			.orElseThrow(() -> new IllegalStateException("부모 카테고리를 찾을 수 없습니다."));
-
-		Category subCategory = Category.builder()
-			.name("국내 여행")
+		// given
+		Category newSubCategory = Category.builder()
+			.name("클래식")
 			.parentCategory(parentCategory)
 			.build();
 
 		// when
-		Category savedSubCategory = categoryRepository.save(subCategory);
+		Category savedSubCategory = categoryRepository.save(newSubCategory);
 
 		// then
 		assertThat(savedSubCategory).isNotNull();
 		assertThat(savedSubCategory.getId()).isNotNull(); // 저장 후 ID가 생성되었는지 확인
-		assertThat(savedSubCategory.getName()).isEqualTo("국내 여행");
+		assertThat(savedSubCategory.getName()).isEqualTo("클래식");
 		assertThat(savedSubCategory.getParentCategory()).isEqualTo(parentCategory);
 	}
 
-	/**
-	 * 카테고리 이름이 존재하며 부모 카테고리가 없는 경우, true를 반환하는지 테스트합니다.
-	 */
 	@Test
-	@Order(3)
-	void existsByNameAndParentCategoriesIsNull() {
+	void existsByNameAndParentCategoryIsNull_whenCategoryExists_thenReturnsTrue() {
+		// when
 		boolean exists = categoryRepository.existsByNameAndParentCategoryIsNull("여행");
+
+		// then
 		assertThat(exists).isTrue();
 	}
 
-	/**
-	 * 존재하지 않는 카테고리 이름에 대해 false를 반환하는지 테스트합니다.
-	 */
 	@Test
-	void checkIfCategoryDoesNotExist() {
+	void existsByNameAndParentCategoryIsNull_whenCategoryDoesNotExist_thenReturnsFalse() {
+		// when
 		boolean exists = categoryRepository.existsByNameAndParentCategoryIsNull("비존재 카테고리");
+
+		// then
 		assertThat(exists).isFalse();
 	}
 
-	/**
-	 * 부모 카테고리가 없는 모든 카테고리를 조회할 때 올바른 결과를 반환하는지 테스트합니다.
-	 */
 	@Test
 	void findAllByParentCategoryIsNull_whenCalled_thenReturnsTopCategories() {
 		// when
@@ -99,33 +108,44 @@ class CategoryRepositoryTest {
 
 		// then
 		assertThat(categories).isNotEmpty();
-		assertThat(categories.size()).isGreaterThanOrEqualTo(1);
-		assertThat(categories.get(0).getParentCategory()).isNull();
+		assertThat(categories).extracting(Category::getName).contains("여행");
+		categories.forEach(category -> assertThat(category.getParentCategory()).isNull());
 	}
 
-	/**
-	 * 데이터베이스에 해당하는 카테고리가 없는 경우 올바르게 false를 반환하는지 테스트합니다.
-	 */
-	@Test
-	void existsByNameAndParentCategoryIsNull_whenCategoryNotExists_thenReturnsFalse() {
-		boolean exists = categoryRepository.existsByNameAndParentCategoryIsNull("비존재하는 카테고리");
-		assertThat(exists).isFalse();
-	}
-
-	/**
-	 * 특정 ID로 카테고리를 조회할 때 올바른 카테고리를 반환하는지 테스트합니다.
-	 */
 	@Test
 	void findById_whenCategoryExists_thenReturnsCategory() {
-		// given
-		Long categoryId = 1L; // category-sample.sql에 존재하는 ID를 사용
-
 		// when
-		Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
+		Optional<Category> categoryOptional = categoryRepository.findById(parentCategory.getId());
 
 		// then
 		assertThat(categoryOptional).isPresent();
-		assertThat(categoryOptional.get().getName()).isEqualTo("여행"); // 예제 데이터의 이름과 일치하는지 확인
+		assertThat(categoryOptional.get().getName()).isEqualTo("여행");
+	}
+
+	@Test
+	void findAllChildCategoryIds_whenCalled_thenReturnsAllChildIds() {
+		// when
+		List<Long> childCategoryIds = categoryRepository.findAllChildCategoryIds(parentCategory.getId());
+
+		// then
+		assertThat(childCategoryIds).isNotEmpty();
+		assertThat(childCategoryIds).containsExactlyInAnyOrder(
+			parentCategory.getId(), subCategory.getId()
+		);
+	}
+
+	@Test
+	void findAllChildCategoryIds_whenNoChildren_thenReturnsParentIdOnly() {
+		// given
+		Category singleParentCategory = Category.builder()
+			.name("독립 카테고리")
+			.build();
+		singleParentCategory = categoryRepository.save(singleParentCategory);
+
+		// when
+		List<Long> childCategoryIds = categoryRepository.findAllChildCategoryIds(singleParentCategory.getId());
+
+		// then
+		assertThat(childCategoryIds).containsExactly(singleParentCategory.getId());
 	}
 }
-
