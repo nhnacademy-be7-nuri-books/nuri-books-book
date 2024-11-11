@@ -2,10 +2,12 @@ package shop.nuribooks.books.book.category.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.book.dto.BookBriefResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
@@ -14,6 +16,7 @@ import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
+import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.category.BookCategoryAlreadyExistsException;
 import shop.nuribooks.books.exception.category.BookCategoryNotFoundException;
@@ -97,6 +100,15 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		}
 
 		return bookCategoryRepository.findCategoriesByBookId(bookId);
+	}
+
+	@Override
+	public PagedResponse<BookBriefResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
+		if (!categoryRepository.existsById(categoryId)) {
+			throw new CategoryNotFoundException();
+		}
+
+		return null;
 	}
 
 }

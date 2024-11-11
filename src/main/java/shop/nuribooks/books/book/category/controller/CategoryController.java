@@ -161,7 +161,7 @@ public class CategoryController {
 		@ApiResponse(responseCode = "404", description = "해당 ID의 카테고리를 찾을 수 없습니다."),
 	})
 	@DeleteMapping("/{categoryId}")
-	public ResponseEntity<ResponseMessage> deleteCategory(
+	public ResponseEntity<Void> deleteCategory(
 		@Parameter(description = "업데이트할 카테고리의 ID", required = true)
 		@PathVariable Long categoryId
 	) {
