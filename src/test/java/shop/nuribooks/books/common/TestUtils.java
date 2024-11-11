@@ -109,15 +109,28 @@ public class TestUtils {
 			.build();
 	}
 
-	public static Category createCategory() {
-		return Category
-			.builder()
-			.parentCategory(
-				Category
-					.builder()
-					.name("testParentCategory1")
-					.build())
+	// 새로운 메서드: 부모 카테고리 생성
+	public static Category createParentCategory() {
+		return Category.builder()
+			.name("testParentCategory1")
+			.parentCategory(null) // 부모가 없는 최상위 카테고리
+			.build();
+	}
+
+	// 새로운 메서드: 주어진 부모를 가진 자식 카테고리 생성
+	public static Category createCategory(Category parent) {
+		return Category.builder()
 			.name("testSubCategory1")
+			.parentCategory(parent)
+			.build();
+	}
+
+	// 기존 메서드 수정: 필요에 따라 유지 또는 삭제
+	public static Category createCategory() {
+		// 필요 없다면 삭제하거나, 기본 카테고리를 생성하는 용도로 남겨둘 수 있습니다.
+		return Category.builder()
+			.name("defaultCategory")
+			.parentCategory(null)
 			.build();
 	}
 
