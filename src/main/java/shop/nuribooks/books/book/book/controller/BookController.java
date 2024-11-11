@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.AladinBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
@@ -73,8 +72,8 @@ public class BookController {
 		@ApiResponse(responseCode = "200", description = "도서 조회 성공"),
 		@ApiResponse(responseCode = "404", description = "존재하지 않는 도서입니다.")
 	})
-	@GetMapping("/{bookId}")
-	public ResponseEntity<BookResponse> getBookById(@PathVariable Long bookId) {
+	@GetMapping("/{book-id}")
+	public ResponseEntity<BookResponse> getBookById(@PathVariable(name = "book-id") Long bookId) {
 		BookResponse bookResponse = bookService.getBookById(bookId);
 		return ResponseEntity.status(HttpStatus.OK).body(bookResponse);
 	}
@@ -85,8 +84,8 @@ public class BookController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 		@ApiResponse(responseCode = "404", description = "도서 미발견")
 	})
-	@PutMapping("/{bookId}")
-	public ResponseEntity<ResponseMessage> updateBook(@PathVariable Long bookId,
+	@PutMapping("/{book-id}")
+	public ResponseEntity<ResponseMessage> updateBook(@PathVariable(name = "book-id") Long bookId,
 		@Valid @RequestBody BookUpdateRequest bookUpdateReq) {
 
 		bookService.updateBook(bookId, bookUpdateReq);
@@ -99,8 +98,8 @@ public class BookController {
 		@ApiResponse(responseCode = "200", description = "도서 삭제 성공"),
 		@ApiResponse(responseCode = "404", description = "도서 미발견")
 	})
-	@DeleteMapping("{bookId}")
-	public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
+	@DeleteMapping("{book-id}")
+	public ResponseEntity<Void> deleteBook(@PathVariable(name = "book-id") Long bookId) {
 		bookService.deleteBook(bookId);
 		return ResponseEntity.noContent().build();
 	}
