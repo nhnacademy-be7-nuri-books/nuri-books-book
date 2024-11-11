@@ -20,18 +20,18 @@ import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
+import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.book.book.utility.BookUtils;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
+import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
-import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
-import shop.nuribooks.books.book.book.service.BookService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -98,13 +98,13 @@ public class BookServiceImpl implements BookService {
 	@Transactional(readOnly = true)
 	@Override
 	public PagedResponse<BookContributorsResponse> getBooks(Pageable pageable) {
-		if(pageable.getPageNumber() < 0) {
+		if (pageable.getPageNumber() < 0) {
 			throw new InvalidPageRequestException("페이지 번호는 0 이상이어야 합니다.");
 		}
 
 		Page<Book> bookPage = bookRepository.findAllWithPublisher(pageable);
 
-		if(pageable.getPageNumber() > bookPage.getTotalPages() - 1) {
+		if (pageable.getPageNumber() > bookPage.getTotalPages() - 1) {
 			throw new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다.");
 		}
 
@@ -112,9 +112,10 @@ public class BookServiceImpl implements BookService {
 			.map(book -> {
 				BigDecimal salePrice = BookUtils.calculateSalePrice(book.getPrice(), book.getDiscountRate());
 
-				AdminBookListResponse bookDetails = AdminBookListResponse.of(book, salePrice);
+				AdminBookListResponse bookDetails = AdminBookListResponse.of(book);
 				log.info("Fetching contributors for bookId: {}", book.getId());
-				List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(book.getId());
+				List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(
+					book.getId());
 				Map<String, List<String>> contributorsByRole = BookUtils.groupContributorsByRole(contributors);
 				log.info("Contributors fetched: {}", contributors);
 
@@ -132,6 +133,7 @@ public class BookServiceImpl implements BookService {
 	}
 
 	//TODO: 좋아요나 조회수에 대한 업데이트는 따로 메서드를 구현할 계획입니다.
+
 	/**
 	 * 주어진 책 ID에 해당하는 책 정보를 업데이트합니다.
 	 * <p>

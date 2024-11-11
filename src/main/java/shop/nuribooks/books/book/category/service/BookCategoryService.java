@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import shop.nuribooks.books.book.book.dto.BookBriefResponse;
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.common.message.PagedResponse;
 
@@ -15,5 +15,5 @@ public interface BookCategoryService {
 
 	List<List<SimpleCategoryResponse>> findCategoriesByBookId(Long bookId);
 
-	PagedResponse<BookBriefResponse> findBooksByCategoryId(Long categoryId, Pageable pageable);
+	PagedResponse<AdminBookListResponse> findBooksByCategoryId(Long categoryId, Pageable pageable);
 }

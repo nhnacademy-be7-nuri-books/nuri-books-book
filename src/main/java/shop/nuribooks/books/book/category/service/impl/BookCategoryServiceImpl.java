@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.dto.BookBriefResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -111,19 +112,20 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	 * @throws CategoryNotFoundException 지정된 카테고리 ID가 존재하지 않을 경우 발생
 	 */
 	@Override
-	public PagedResponse<BookBriefResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
+	public PagedResponse<AdminBookListResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
 		if (!categoryRepository.existsById(categoryId)) {
 			throw new CategoryNotFoundException();
 		}
 
 		List<Long> categoryIds = categoryRepository.findAllChildCategoryIds(categoryId);
 
-		List<BookBriefResponse> bookBriefResponseList = bookCategoryRepository.findBooksByCategoryId(categoryIds,
+		List<AdminBookListResponse> adminBookListResponseList = bookCategoryRepository.findBooksByCategoryId(
+			categoryIds,
 			pageable);
 
 		int total = (int)bookCategoryRepository.countBookByCategoryIds(categoryIds);
 
-		return (PagedResponse<BookBriefResponse>)PagedResponse.of(bookBriefResponseList, pageable, total);
+		return (PagedResponse<BookBriefResponse>)PagedResponse.of(adminBookListResponseList, pageable, total);
 	}
 
 }
