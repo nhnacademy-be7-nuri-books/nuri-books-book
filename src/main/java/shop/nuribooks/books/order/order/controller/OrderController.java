@@ -1,10 +1,12 @@
 package shop.nuribooks.books.order.order.controller;
 
+import java.awt.print.Pageable;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
@@ -46,12 +49,12 @@ public class OrderController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청"),
 		@ApiResponse(responseCode = "404", description = "사용자 또는 상품을 찾을 수 없음")
 	})
-	@PostMapping("")
+	@PostMapping
 	public ResponseEntity<OrderTempRegisterResponse> registerTempOrder(
 		HttpServletRequest request,
 		@Valid @RequestBody OrderTempRegisterRequest orderTempRegisterRequest) {
 
-		Optional<Long> userId = Optional.ofNullable(MemberIdContext.getMemberId());
+		Optional<Long> userId = Optional.of(MemberIdContext.getMemberId());
 
 		OrderTempRegisterResponse result = userId
 			// 회원 주문
