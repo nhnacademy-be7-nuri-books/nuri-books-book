@@ -33,10 +33,10 @@ public class PointHistoryAdminController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@HasRole(role = AuthorityType.ADMIN)
-	@GetMapping("/admin/api/members/{memberId}/point-history")
+	@GetMapping("/admin/api/members/{member-id}/point-history")
 	public ResponseEntity<PagedResponse<PointHistoryResponse>> getPointHistories(
 		@RequestParam(value = "type") HistoryType type,
-		@PathVariable("memberId") long memberId,
+		@PathVariable("member-id") long memberId,
 		Pageable pageable,
 		PointHistoryPeriodRequest pointHistoryPeriodRequest) {
 
@@ -53,9 +53,9 @@ public class PointHistoryAdminController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@HasRole(role = AuthorityType.ADMIN)
-	@DeleteMapping("/admin/api/point-history/{pointHistoryId}")
+	@DeleteMapping("/admin/api/point-history/{point-history-id}")
 	public ResponseEntity<ResponseMessage> getPointHistories(
-		@PathVariable("pointHistoryId") long pointHistoryId) {
+		@PathVariable("point-history-id") long pointHistoryId) {
 
 		pointHistoryService.deletePointHistory(pointHistoryId);
 
