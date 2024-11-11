@@ -34,7 +34,7 @@ import shop.nuribooks.books.member.grade.service.GradeService;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/member/grade")
+@RequestMapping("/api/members/grades")
 public class GradeController {
 
 	private final GradeService gradeService;
@@ -111,7 +111,7 @@ public class GradeController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "등급 목록 조회 성공")
 	})
-	@GetMapping("/grades")
+	@GetMapping
 	public ResponseEntity<List<GradeListResponse>> getGradeList() {
 		List<GradeListResponse> response = gradeService.getGradeList();
 

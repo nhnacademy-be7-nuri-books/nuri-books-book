@@ -79,7 +79,7 @@ class MemberControllerTest {
 		when(memberService.registerMember(any(MemberRegisterRequest.class))).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(post("/api/member")
+		ResultActions result = mockMvc.perform(post("/api/members")
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)));
 
@@ -100,7 +100,7 @@ class MemberControllerTest {
 		MemberRegisterRequest badRequest = getBadMemberRegisterRequest();
 
 		//when
-		ResultActions badResult = mockMvc.perform(post("/api/member")
+		ResultActions badResult = mockMvc.perform(post("/api/members")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 
@@ -132,7 +132,7 @@ class MemberControllerTest {
 		when(memberService.getMemberAuthInfoByUsername(username)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(get("/api/member/username/{username}", username));
+		ResultActions result = mockMvc.perform(get("/api/members/username/{username}", username));
 
 		//then
 		result.andExpect(status().isOk())
@@ -152,7 +152,7 @@ class MemberControllerTest {
 		when(memberService.getMemberAuthInfoByEmail(email)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(get("/api/member/email/{email}", email));
+		ResultActions result = mockMvc.perform(get("/api/members/email/{email}", email));
 
 		//then
 		result.andExpect(status().isOk())
@@ -172,7 +172,7 @@ class MemberControllerTest {
 		when(memberService.getMemberDetails(memberId)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(get("/api/member/me"));
+		ResultActions result = mockMvc.perform(get("/api/members/me"));
 
 		//then
 		result.andExpect(status().isOk())
@@ -200,7 +200,7 @@ class MemberControllerTest {
 		doNothing().when(memberService).withdrawMember(anyLong());
 
 		//when
-		ResultActions result = mockMvc.perform(delete("/api/member/me"));
+		ResultActions result = mockMvc.perform(delete("/api/members/me"));
 
 		//then
 		result.andExpect(status().isOk())
@@ -219,7 +219,7 @@ class MemberControllerTest {
 		doNothing().when(memberService).updateMember(eq(memberId), any(MemberUpdateRequest.class));
 
 		//when
-		ResultActions result = mockMvc.perform(patch("/api/member/me")
+		ResultActions result = mockMvc.perform(patch("/api/members/me")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -237,7 +237,7 @@ class MemberControllerTest {
 		MemberUpdateRequest badRequest = getBadMemberUpdateRequest();
 
 		//when
-		ResultActions badResult = mockMvc.perform(patch("/api/member/me")
+		ResultActions badResult = mockMvc.perform(patch("/api/members/me")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 
@@ -260,7 +260,7 @@ class MemberControllerTest {
 			.thenReturn(pageResponse);
 
 	    //when
-		ResultActions result = mockMvc.perform(get("/api/member/members")
+		ResultActions result = mockMvc.perform(get("/api/members")
 				.param("name", "김")
 				.param("email", "nuri")
 				.param("phoneNumber","010")
