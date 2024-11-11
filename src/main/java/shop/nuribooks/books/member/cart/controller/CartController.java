@@ -29,7 +29,7 @@ import shop.nuribooks.books.member.cart.service.CartService;
  * @author Jprotection
  */
 @RestController
-@RequestMapping("/api/member/cart")
+@RequestMapping("/api/members/carts")
 @RequiredArgsConstructor
 public class CartController {
 
@@ -46,9 +46,9 @@ public class CartController {
 		@ApiResponse(responseCode = "400", description = "도서 수량이 유효하지 않음"),
 		@ApiResponse(responseCode = "404", description = "회원 혹은 도서가 존재하지 않음")
 	})
-	@PostMapping("/{bookId}")
+	@PostMapping("/{book-id}")
 	public ResponseEntity<CartAddResponse> addToCart(
-		@PathVariable Long bookId, @RequestParam("quantity") int quantity) {
+		@PathVariable(name = "book-id") Long bookId, @RequestParam("quantity") int quantity) {
 
 		Long memberId = MemberIdContext.getMemberId();
 
@@ -83,8 +83,8 @@ public class CartController {
 		@ApiResponse(responseCode = "200", description = "장바구니 삭제 성공"),
 		@ApiResponse(responseCode = "404", description = "장바구니가 존재하지 않음")
 	})
-	@DeleteMapping("/me/{bookId}")
-	public ResponseEntity<ResponseMessage> cartDelete(@PathVariable Long bookId) {
+	@DeleteMapping("/me/{book-id}")
+	public ResponseEntity<ResponseMessage> cartDelete(@PathVariable(name = "book-id") Long bookId) {
 
 		Long memberId = MemberIdContext.getMemberId();
 		cartService.deleteCart(memberId, bookId);
@@ -104,9 +104,9 @@ public class CartController {
 		@ApiResponse(responseCode = "400", description = "도서 수량이 유효하지 않음"),
 		@ApiResponse(responseCode = "404", description = "회원 혹은 도서가 존재하지 않음")
 	})
-	@PatchMapping("/me/{bookId}")
+	@PatchMapping("/me/{book-id}")
 	public ResponseEntity<CartUpdateResponse> cartUpdate(
-		@PathVariable Long bookId, @RequestParam("quantity") int quantity) {
+		@PathVariable(name = "book-id") Long bookId, @RequestParam("quantity") int quantity) {
 
 		Long memberId = MemberIdContext.getMemberId();
 
