@@ -38,7 +38,7 @@ public class ShippingPolicy {
 	@Comment("적용 날짜")
 	private LocalDateTime appliedDatetime;
 
-	@Column(nullable = false)
+	@Column(precision = 9, nullable = false)
 	@Comment("최소 주문 금액")
 	private BigDecimal minimumOrderPrice;
 
