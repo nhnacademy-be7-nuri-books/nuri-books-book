@@ -53,6 +53,7 @@ import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
@@ -67,39 +68,70 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public void registerBook(BaseBookRegisterRequest reqDto) {
 		log.info("Attempting to save book with ISBN: {}", reqDto.getIsbn());
+
 		if (bookRepository.existsByIsbn(reqDto.getIsbn())) {
 			log.warn("Book with ISBN {} already exists.", reqDto.getIsbn());
 			throw new ResourceAlreadyExistIsbnException(reqDto.getIsbn());
 		}
 
 		try {
-			Publisher publisher = publisherRepository.findByName(reqDto.getPublisherName())
-				.orElseGet(() -> publisherRepository.save(Publisher.builder()
-					.name(reqDto.getPublisherName())
-					.build()
-				));
-
-			BookStateEnum bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.getState()));
-
-			Book book = reqDto.toEntity(publisher, bookStateEnum);
-
-			log.info("Saving book entity: {}", book);
-			bookRepository.save(book);
-
-			List<ParsedContributor> parsedContributors = parseContributors(reqDto.getAuthor());
-			saveContributors(parsedContributors, book);
-
-			if(reqDto instanceof AladinBookRegisterRequest aladinReq) {
-				registerAladinCategories(aladinReq.getCategoryName(), book);
-			} else if (reqDto instanceof PersonallyBookRegisterRequest personallyReq) {
-				registerPersonallyCategories(personallyReq.getCategoryIds(), book);
+			Publisher publisher;
+			try {
+				publisher = publisherRepository.findByName(reqDto.getPublisherName())
+					.orElseGet(() -> publisherRepository.save(Publisher.builder()
+						.name(reqDto.getPublisherName())
+						.build()
+					));
+			} catch (Exception ex) {
+				log.error("Error saving book entity: {}", ex.getMessage(), ex);
+				throw ex;
 			}
 
-			if (reqDto.getTagIds() != null && !reqDto.getTagIds().isEmpty()) {
-				List<Long> tagIdList = reqDto.getTagIds();
-				bookTagService.registerTagToBook(book.getId(), tagIdList);
+			BookStateEnum bookStateEnum;
+			try {
+				bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.getState()));
+			} catch(IllegalArgumentException ex) {
+				log.error("Error parsing book state from request: {}", ex.getMessage(), ex);
+				throw ex;
 			}
 
+			Book book;
+			try {
+				book = reqDto.toEntity(publisher, bookStateEnum);
+				log.info("Saving book entity: {}", book);
+				bookRepository.save(book);
+			} catch (Exception ex) {
+				log.error("Error saving book entity: {}", ex.getMessage(), ex);
+				throw ex;
+			}
+
+			try {
+				List<ParsedContributor> parsedContributors = parseContributors(reqDto.getAuthor());
+				saveContributors(parsedContributors, book);
+			} catch (Exception ex) {
+				log.error("Error parsing or saving contributors: {}", ex.getMessage(), ex);
+			}
+
+			try {
+				if(reqDto instanceof AladinBookRegisterRequest aladinReq) {
+					registerAladinCategories(aladinReq.getCategoryName(), book);
+				} else if (reqDto instanceof PersonallyBookRegisterRequest personallyReq) {
+					registerPersonallyCategories(personallyReq.getCategoryIds(), book);
+				}
+			} catch (Exception ex) {
+				log.error("Error registering categories: {}", ex.getMessage(), ex);
+				throw ex;
+			}
+
+			try{
+				if (reqDto.getTagIds() != null && !reqDto.getTagIds().isEmpty()) {
+					List<Long> tagIdList = reqDto.getTagIds();
+					bookTagService.registerTagToBook(book.getId(), tagIdList);
+				}
+			} catch (Exception ex) {
+				log.error("Error registering tags: {}", ex.getMessage(), ex);
+				throw ex;
+			}
 			log.info("Book with ISBN {} successfully saved.", reqDto.getIsbn());
 		} catch (Exception ex) {
 			log.error("Error saving book with ISBN {}: {}", reqDto.getIsbn(), ex.getMessage(), ex);
@@ -123,7 +155,6 @@ public class BookServiceImpl implements BookService {
 
 	//TODO: 도서 목록조회를 하여 도서를 관리하기 위한 메서드 (관리자로 로그인 했을때는 수정버튼을 보이게해서 수정하도록 하는게 좋을까?)
 	//TODO: 추후 엘라스틱 서치 적용 시 사용자를 위한 도서 검색 기능을 따로 구현 예정
-	@Transactional(readOnly = true)
 	@Override
 	public PagedResponse<BookContributorsResponse> getBooks(Pageable pageable) {
 		if(pageable.getPageNumber() < 0) {
@@ -171,7 +202,6 @@ public class BookServiceImpl implements BookService {
 	 * @throws shop.nuribooks.books.exception.book.InvalidBookStateException BookStateEnum에 존재하지 않는 도서상태가 입력된 경우 발생
 	 * @throws PublisherIdNotFoundException 주어진 출판사 ID가 존재하지 않는 경우 발생
 	 */
-	@Transactional
 	@Override
 	public void updateBook(Long bookId, BookUpdateRequest bookUpdateReq) {
 		Book book = bookRepository.findById(bookId)
@@ -188,7 +218,6 @@ public class BookServiceImpl implements BookService {
 	}
 
 	//관리자페이지에서 관리자의 도서 삭제 기능
-	@Transactional
 	@Override
 	public void deleteBook(Long bookId) {
 		Book book = bookRepository.findBookByIdAndDeletedAtIsNull(bookId)
