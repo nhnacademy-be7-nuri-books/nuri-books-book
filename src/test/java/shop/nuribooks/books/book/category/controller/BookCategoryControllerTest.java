@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.dto.BookBriefResponse;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
@@ -225,7 +226,7 @@ public class BookCategoryControllerTest {
 		Pageable pageable = PageRequest.of(0, 10);
 		List<BookBriefResponse> bookList = List.of(new BookBriefResponse(1L, "Book1", "afew"),
 			new BookBriefResponse(2L, "Book2", "fewafaw"));
-		PagedResponse<BookBriefResponse> pagedResponse = PagedResponse.of(bookList, pageable, bookList.size());
+		PagedResponse<AdminBookListResponse> pagedResponse = PagedResponse.of(bookList, pageable, bookList.size());
 
 		when(bookCategoryService.findBooksByCategoryId(categoryId, pageable)).thenReturn(pagedResponse);
 

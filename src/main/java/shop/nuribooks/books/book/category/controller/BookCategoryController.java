@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.dto.BookBriefResponse;
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
 import shop.nuribooks.books.common.message.PagedResponse;
@@ -102,10 +102,10 @@ public class BookCategoryController {
 		@ApiResponse(responseCode = "404", description = "카테고리를 찾을 수 없음")
 	})
 	@GetMapping("/category/{categoryId}")
-	public ResponseEntity<PagedResponse<BookBriefResponse>> getBooksByCategoryId(
+	public ResponseEntity<PagedResponse<AdminBookListResponse>> getBooksByCategoryId(
 		@PathVariable Long categoryId,
 		Pageable pageable) {
-		PagedResponse<BookBriefResponse> pagedResponse = bookCategoryService.findBooksByCategoryId(categoryId,
+		PagedResponse<AdminBookListResponse> pagedResponse = bookCategoryService.findBooksByCategoryId(categoryId,
 			pageable);
 		return ResponseEntity.ok(pagedResponse);
 	}

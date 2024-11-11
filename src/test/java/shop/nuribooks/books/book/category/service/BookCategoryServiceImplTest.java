@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.category.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +21,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import shop.nuribooks.books.book.book.dto.BookBriefResponse;
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
@@ -306,21 +307,43 @@ public class BookCategoryServiceImplTest {
 		when(categoryRepository.existsById(categoryId)).thenReturn(true);
 		when(categoryRepository.findAllChildCategoryIds(categoryId)).thenReturn(Arrays.asList(1L, 2L));
 
-		List<BookBriefResponse> books = Arrays.asList(
-			new BookBriefResponse(1L, "Book Title 1", "thumbnail1.jpg"),
-			new BookBriefResponse(2L, "Book Title 2", "thumbnail2.jpg")
+		List<AdminBookListResponse> books = Arrays.asList(
+			new AdminBookListResponse(
+				1L,                      // id
+				"Publisher 1",           // publisherName
+				"Available",             // state
+				"Book Title 1",          // title
+				new BigDecimal("29.99"), // price
+				new BigDecimal("19.99"), // salePrice
+				33,                      // discountRate
+				true,                    // isPackageable
+				100,                     // stock
+				"thumbnail1.jpg"         // thumbnailImageUrl
+			),
+			new AdminBookListResponse(
+				2L,                      // id
+				"Publisher 2",           // publisherName
+				"OutOfStock",            // state
+				"Book Title 2",          // title
+				new BigDecimal("39.99"), // price
+				new BigDecimal("29.99"), // salePrice
+				25,                      // discountRate
+				false,                   // isPackageable
+				0,                       // stock
+				"thumbnail2.jpg"         // thumbnailImageUrl
+			)
 		);
 		when(bookCategoryRepository.findBooksByCategoryId(Arrays.asList(1L, 2L), pageable)).thenReturn(books);
 		when(bookCategoryRepository.countBookByCategoryIds(Arrays.asList(1L, 2L))).thenReturn(2L);
 
 		// When
-		PagedResponse<BookBriefResponse> response = bookCategoryService.findBooksByCategoryId(categoryId, pageable);
+		PagedResponse<AdminBookListResponse> response = bookCategoryService.findBooksByCategoryId(categoryId, pageable);
 
 		// Then
 		assertThat(response).isNotNull();
 		assertThat(response.totalElements()).isEqualTo(2);
 		assertThat(response.content()).hasSize(2);
-		assertThat(response.content()).extracting(BookBriefResponse::id)
+		assertThat(response.content()).extracting(AdminBookListResponse::id)
 			.containsExactly(1L, 2L);
 
 		verify(categoryRepository, times(1)).existsById(categoryId);
@@ -364,7 +387,7 @@ public class BookCategoryServiceImplTest {
 		when(bookCategoryRepository.countBookByCategoryIds(Arrays.asList(1L, 2L))).thenReturn(0L);
 
 		// When
-		PagedResponse<BookBriefResponse> response = bookCategoryService.findBooksByCategoryId(categoryId, pageable);
+		PagedResponse<AdminBookListResponse> response = bookCategoryService.findBooksByCategoryId(categoryId, pageable);
 
 		// Then
 		assertThat(response).isNotNull();

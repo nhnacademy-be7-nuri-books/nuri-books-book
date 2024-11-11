@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import shop.nuribooks.books.book.book.dto.BookBriefResponse;
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
@@ -143,7 +143,7 @@ class BookCategoryRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// When
-		List<BookBriefResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
+		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
 
 		// Then
 		assertThat(books).isNotNull();
@@ -175,7 +175,7 @@ class BookCategoryRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// When
-		List<BookBriefResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
+		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
 
 		// Then
 		assertThat(books).isNotNull();
@@ -205,7 +205,7 @@ class BookCategoryRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// When
-		List<BookBriefResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
+		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
 
 		// Then
 		assertThat(books).isEmpty();
@@ -234,7 +234,7 @@ class BookCategoryRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// When
-		List<BookBriefResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
+		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
 
 		// Then
 		assertThat(books).isEmpty();

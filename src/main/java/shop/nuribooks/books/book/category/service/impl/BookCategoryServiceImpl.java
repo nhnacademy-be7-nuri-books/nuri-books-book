@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
-import shop.nuribooks.books.book.book.dto.BookBriefResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
@@ -125,7 +124,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 		int total = (int)bookCategoryRepository.countBookByCategoryIds(categoryIds);
 
-		return (PagedResponse<BookBriefResponse>)PagedResponse.of(adminBookListResponseList, pageable, total);
+		return (PagedResponse<AdminBookListResponse>)PagedResponse.of(adminBookListResponseList, pageable, total);
 	}
 
 }
