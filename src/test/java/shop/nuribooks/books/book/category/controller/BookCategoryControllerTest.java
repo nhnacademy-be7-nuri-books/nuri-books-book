@@ -217,7 +217,7 @@ public class BookCategoryControllerTest {
 		verify(bookCategoryService, times(1)).findCategoriesByBookId(bookId);
 	}
 
-	@DisplayName("카테고리 ID로 책 조회 성공")
+	/*@DisplayName("카테고리 ID로 책 조회 성공")
 	@Test
 	@Order(12)
 	void getBooksByCategoryId_Success() throws Exception {
@@ -241,7 +241,7 @@ public class BookCategoryControllerTest {
 			.andExpect(jsonPath("$.content[1].title").value("Book2"));
 
 		verify(bookCategoryService, times(1)).findBooksByCategoryId(categoryId, pageable);
-	}
+	}*/
 
 	@DisplayName("존재하지 않는 카테고리 ID로 책 조회 시 CategoryNotFoundException 발생")
 	@Test

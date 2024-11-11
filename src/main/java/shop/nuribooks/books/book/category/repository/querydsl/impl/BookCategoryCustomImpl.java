@@ -6,6 +6,7 @@ import static shop.nuribooks.books.book.category.entity.QCategory.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -18,7 +19,11 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
+import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.utility.BookUtils;
+import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
+import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.querydsl.BookCategoryCustom;
@@ -28,6 +33,7 @@ import shop.nuribooks.books.book.category.repository.querydsl.BookCategoryCustom
 public class BookCategoryCustomImpl implements BookCategoryCustom {
 
 	private final JPAQueryFactory queryFactory;
+	private final BookContributorRepository bookContributorRepository;
 
 	/**
 	 * 주어진 도서 ID에 해당하는 카테고리 목록을 조회하고 각 카테고리에 대한 브레드크럼 목록을 반환합니다.
@@ -70,7 +76,7 @@ public class BookCategoryCustomImpl implements BookCategoryCustom {
 	}
 
 	@Override
-	public Page<AdminBookListResponse> findBooksByCategoryIdWithPaging(List<Long> categoryIds, Pageable pageable) {
+	public Page<BookContributorsResponse> findBooksByCategoryIdWithPaging(List<Long> categoryIds, Pageable pageable) {
 		List<Book> books = queryFactory
 			.select(book)
 			.from(bookCategory)
@@ -91,12 +97,21 @@ public class BookCategoryCustomImpl implements BookCategoryCustom {
 		// totalElements가 null일 경우 기본값 0으로 설정합니다.
 		totalElements = (totalElements != null) ? totalElements : 0L;
 
-		// books 리스트를 Page로 변환합니다.
-		List<AdminBookListResponse> adminBookListResponseList = books.stream()
-			.map(AdminBookListResponse::of)
+		// BookContributorsResponse 목록을 생성합니다.
+		List<BookContributorsResponse> bookContributorsResponseList = books.stream()
+			.map(book -> {
+				AdminBookListResponse bookDetails = AdminBookListResponse.of(book);
+
+				// 기여자 정보를 조회하여 역할별로 그룹화합니다.
+				List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(book.getId());
+				Map<String, List<String>> contributorsByRole = BookUtils.groupContributorsByRole(contributors);
+
+				// BookContributorsResponse 객체를 생성합니다.
+				return new BookContributorsResponse(bookDetails, contributorsByRole);
+			})
 			.collect(Collectors.toList());
 
-		return new PageImpl<>(adminBookListResponseList, pageable, totalElements);
+		return new PageImpl<>(bookContributorsResponseList, pageable, totalElements);
 	}
 
 

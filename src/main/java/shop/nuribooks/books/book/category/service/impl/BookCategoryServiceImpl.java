@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
+import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
@@ -113,7 +114,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	 * @throws CategoryNotFoundException 지정된 카테고리 ID가 존재하지 않을 경우 발생
 	 */
 	@Override
-	public PagedResponse<AdminBookListResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
+	public PagedResponse<BookContributorsResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
 		if (!categoryRepository.existsById(categoryId)) {
 			throw new CategoryNotFoundException();
 		}
@@ -124,21 +125,21 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
 		List<Long> categoryIds = categoryRepository.findAllChildCategoryIds(categoryId);
 
-		Page<AdminBookListResponse> adminBookListResponsePage = bookCategoryRepository.findBooksByCategoryIdWithPaging(
+		Page<BookContributorsResponse> bookContributorsResponsePage = bookCategoryRepository.findBooksByCategoryIdWithPaging(
 			categoryIds,
 			pageable
 		);
 
-		if (pageable.getPageNumber() > adminBookListResponsePage.getTotalPages() - 1) {
+		if (pageable.getPageNumber() > bookContributorsResponsePage.getTotalPages() - 1) {
 			throw new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다.");
 		}
 
 		return new PagedResponse<>(
-			adminBookListResponsePage.getContent(),
-			adminBookListResponsePage.getNumber(),
-			adminBookListResponsePage.getSize(),
-			adminBookListResponsePage.getTotalPages(),
-			adminBookListResponsePage.getTotalElements()
+			bookContributorsResponsePage.getContent(),
+			bookContributorsResponsePage.getNumber(),
+			bookContributorsResponsePage.getSize(),
+			bookContributorsResponsePage.getTotalPages(),
+			bookContributorsResponsePage.getTotalElements()
 		);
 
 		/*List<AdminBookListResponse> adminBookListResponseList = bookCategoryRepository.findBooksByCategoryId(

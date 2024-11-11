@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
+import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 
 public interface BookCategoryCustom {
@@ -14,7 +15,7 @@ public interface BookCategoryCustom {
 
 	List<AdminBookListResponse> findBooksByCategoryId(List<Long> categoryIds, Pageable pageable);
 
-	Page<AdminBookListResponse> findBooksByCategoryIdWithPaging(List<Long> categoryIds, Pageable pageable);
+	Page<BookContributorsResponse> findBooksByCategoryIdWithPaging(List<Long> categoryIds, Pageable pageable);
 
 	long countBookByCategoryIds(List<Long> categoryIds);
 }
