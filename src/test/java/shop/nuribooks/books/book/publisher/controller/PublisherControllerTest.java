@@ -13,6 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -38,10 +42,10 @@ class PublisherControllerTest {
 	private MockMvc mockMvc;
 	private final ObjectMapper objectMapper = new ObjectMapper();  // JSON 직렬화에 사용
 
-	@BeforeEach
-	void setUp() {
-		mockMvc = MockMvcBuilders.standaloneSetup(publisherController).build();
-	}
+	// @BeforeEach
+	// void setUp() {
+	// 	mockMvc = MockMvcBuilders.standaloneSetup(publisherController).build();
+	// }
 
 	@DisplayName("출판사 등록")
 	@Test
@@ -70,17 +74,22 @@ class PublisherControllerTest {
 			new PublisherResponse(2L, "publisher2")
 		);
 
-		when(publisherService.getAllPublisher()).thenReturn(responses);
+		Page<PublisherResponse> pageResponses = new PageImpl<>(responses);
+		Pageable pageable = PageRequest.of(0, 10);
+
+		when(publisherService.getAllPublisher(pageable)).thenReturn(pageResponses);
 
 		// when & then
 		mockMvc.perform(get("/api/publishers")
-				.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("page", "0")
+				.param("size", "10"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$").isArray())
-			.andExpect(jsonPath("$[0].name").value("publisher1"))
-			.andExpect(jsonPath("$[1].name").value("publisher2"));
+			.andExpect(jsonPath("$.content").isArray())  // "content" 배열 여부 확인
+			.andExpect(jsonPath("$.content[0].name").value("publisher1"))
+			.andExpect(jsonPath("$.content[1].name").value("publisher2"));
 
-		verify(publisherService).getAllPublisher();
+		verify(publisherService).getAllPublisher(pageable);
 	}
 
 	@DisplayName("출판사 조회 성공")
@@ -88,7 +97,7 @@ class PublisherControllerTest {
 	void getPublisher() throws Exception {
 		// given
 		Long publisherId = 1L;
-		PublisherResponse response = new PublisherResponse(publisherId, "publisher1" );
+		PublisherResponse response = new PublisherResponse(publisherId, "publisher1");
 
 		when(publisherService.getPublisher(publisherId)).thenReturn(response);
 
@@ -144,7 +153,6 @@ class PublisherControllerTest {
 	private PublisherRequest editRequest() {
 		return PublisherRequest.builder().name("update").build();
 	}
-
 
 	private PublisherResponse registerResponse() {
 		return PublisherResponse.builder().name("publisher1").build();
