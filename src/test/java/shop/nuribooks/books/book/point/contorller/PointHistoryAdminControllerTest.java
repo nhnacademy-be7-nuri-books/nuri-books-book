@@ -45,7 +45,7 @@ public class PointHistoryAdminControllerTest {
 			any())).thenReturn(
 			new PageImpl(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 
-		mockMvc.perform(get("/admin/api/members/1/point-history")
+		mockMvc.perform(get("/api/members/1/point-history")
 				.queryParam("type", "ALL")
 				.queryParam("page", "0")
 				.queryParam("size", "3")
@@ -56,7 +56,7 @@ public class PointHistoryAdminControllerTest {
 
 	@Test
 	void deleteTest() throws Exception {
-		mockMvc.perform(delete("/admin/api/point-history/1"))
+		mockMvc.perform(delete("/api/point-history/1"))
 			.andExpect(status().isOk());
 	}
 }

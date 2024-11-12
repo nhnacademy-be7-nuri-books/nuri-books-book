@@ -1,7 +1,7 @@
 package shop.nuribooks.books.book.point.service.impl;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,8 +25,8 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 	 * @return
 	 */
 	@Override
-	public List<PointPolicyResponse> getPointPolicyResponses() {
-		return this.pointPolicyRepository.findAllByDeletedAtIsNull();
+	public Page<PointPolicyResponse> getPointPolicyResponses(Pageable pageable) {
+		return this.pointPolicyRepository.findAllByDeletedAtIsNull(pageable);
 	}
 
 	/**

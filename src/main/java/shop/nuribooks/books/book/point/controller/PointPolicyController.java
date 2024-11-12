@@ -1,7 +1,7 @@
 package shop.nuribooks.books.book.point.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,8 +38,8 @@ public class PointPolicyController {
 	})
 	@HasRole(role = AuthorityType.ADMIN)
 	@GetMapping
-	public ResponseEntity<List<PointPolicyResponse>> getPointPolicies() {
-		List<PointPolicyResponse> pointPolicyResponses = this.pointPolicyService.getPointPolicyResponses();
+	public ResponseEntity<Page<PointPolicyResponse>> getPointPolicies(Pageable pageable) {
+		Page<PointPolicyResponse> pointPolicyResponses = this.pointPolicyService.getPointPolicyResponses(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(pointPolicyResponses);
 	}
 
