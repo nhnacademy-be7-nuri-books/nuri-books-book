@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.point.dto.request.PointHistoryPeriodRequest;
 import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
+import shop.nuribooks.books.book.point.enums.HistoryType;
 
 public interface PointHistoryCustomRepository {
 	/**
@@ -18,32 +19,9 @@ public interface PointHistoryCustomRepository {
 	List<PointHistoryResponse> findPointHistories(
 		PointHistoryPeriodRequest pointHistoryPeriodRequest,
 		Pageable pageable,
-		long memberId);
-
-	/**
-	 * 적립 포인트 내역
-	 * @param pointHistoryPeriodRequest
-	 * @param pageable
-	 * @param memberId
-	 * @return
-	 */
-	List<PointHistoryResponse> findEarnedPointHistories(
-		PointHistoryPeriodRequest pointHistoryPeriodRequest,
-		Pageable pageable,
-		long memberId);
-
-	/**
-	 * 사용 포인트 내역
-	 * @param pointHistoryPeriodRequest
-	 * @param pageable
-	 * @param memberId
-	 * @return
-	 */
-	List<PointHistoryResponse> findUsedPointHistories(
-		PointHistoryPeriodRequest pointHistoryPeriodRequest,
-		Pageable pageable,
-		long memberId);
-
+		long memberId,
+		HistoryType type);
+	
 	/**
 	 * 유저의 포인트 내역 전체 개수
 	 * @param memberId

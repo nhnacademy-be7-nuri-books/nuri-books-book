@@ -1,24 +1,24 @@
 package shop.nuribooks.books.book.point.enums;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import static shop.nuribooks.books.book.point.entity.QPointHistory.*;
 
-import reactor.function.Function4;
-import shop.nuribooks.books.book.point.dto.request.PointHistoryPeriodRequest;
-import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
-import shop.nuribooks.books.book.point.service.PointHistoryService;
+import java.math.BigDecimal;
+
+import com.querydsl.core.types.dsl.BooleanExpression;
+
+import lombok.Getter;
 
 public enum HistoryType {
 	// 각 조건별로 실행해야 할 함수 실행.
-	ALL((service, memberId, pageable, req) -> service.getPointHistories(memberId, pageable, req)),
-	USED((service, memberId, pageable, req) -> service.getUsedPointHistories(memberId, pageable, req)),
-	SAVED((service, memberId, pageable, req) -> service.getEarnedPointHistories(memberId, pageable, req));
+	ALL(null),
+	USED(pointHistory.amount.lt(BigDecimal.ZERO)),
+	SAVED(pointHistory.amount.goe(BigDecimal.ZERO));
 
-	private Function4<PointHistoryService, Long, Pageable, PointHistoryPeriodRequest, Page<PointHistoryResponse>> func;
+	@Getter
+	private BooleanExpression be;
 
-	HistoryType(
-		Function4<PointHistoryService, Long, Pageable, PointHistoryPeriodRequest, Page<PointHistoryResponse>> func) {
-		this.func = func;
+	HistoryType(BooleanExpression be) {
+		this.be = be;
 	}
 
 	public static HistoryType convert(String str) {
@@ -30,14 +30,4 @@ public enum HistoryType {
 		}
 		return type;
 	}
-
-	// 람다함수 실제 적용
-	public Page<PointHistoryResponse> apply(
-		PointHistoryService service,
-		Long memberId,
-		Pageable pageable,
-		PointHistoryPeriodRequest req) {
-		return func.apply(service, memberId, pageable, req);
-	}
-
 }

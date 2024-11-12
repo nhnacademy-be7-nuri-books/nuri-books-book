@@ -41,8 +41,7 @@ public class PointHistoryController {
 
 		long memberId = MemberIdContext.getMemberId();
 
-		// enum에서 lambda 함수를 이용해서 구현하였습니다.
-		Page<PointHistoryResponse> response = type.apply(pointHistoryService, memberId, pageable,
+		Page<PointHistoryResponse> response = pointHistoryService.getPointHistories(memberId, type, pageable,
 			pointHistoryPeriodRequest);
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);

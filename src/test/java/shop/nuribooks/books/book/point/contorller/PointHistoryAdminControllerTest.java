@@ -41,7 +41,7 @@ public class PointHistoryAdminControllerTest {
 
 	@Test
 	void getAllTest() throws Exception {
-		when(pointHistoryService.getPointHistories(anyLong(), any(),
+		when(pointHistoryService.getPointHistories(anyLong(), any(), any(),
 			any())).thenReturn(
 			new PageImpl(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 

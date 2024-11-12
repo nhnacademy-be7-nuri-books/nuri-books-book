@@ -16,6 +16,7 @@ import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
+import shop.nuribooks.books.book.point.enums.HistoryType;
 import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.exception.PointHistoryNotFoundException;
 import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
@@ -61,44 +62,11 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	 * @return
 	 */
 	@Override
-	public Page<PointHistoryResponse> getPointHistories(long memberId, Pageable pageable,
+	public Page<PointHistoryResponse> getPointHistories(long memberId, HistoryType type, Pageable pageable,
 		PointHistoryPeriodRequest period) {
-		List<PointHistoryResponse> result = this.pointHistoryRepository.findPointHistories(period, pageable, memberId);
+		List<PointHistoryResponse> result = this.pointHistoryRepository.findPointHistories(period, pageable, memberId,
+			type);
 		int count = (int)this.pointHistoryRepository.countPointHistories(memberId, period);
-		Page<PointHistoryResponse> response = new PageImpl(result, pageable, count);
-		return response;
-	}
-
-	/**
-	 * 적립 포인트 내역 목록 조회
-	 *
-	 * @param pageable
-	 * @param period
-	 * @return
-	 */
-	@Override
-	public Page<PointHistoryResponse> getEarnedPointHistories(long memberId, Pageable pageable,
-		PointHistoryPeriodRequest period) {
-		List<PointHistoryResponse> result = this.pointHistoryRepository.findEarnedPointHistories(period, pageable,
-			memberId);
-		int count = (int)this.pointHistoryRepository.countEarnedPointHistories(memberId, period);
-		Page<PointHistoryResponse> response = new PageImpl(result, pageable, count);
-		return response;
-	}
-
-	/**
-	 * 사용 포인트 내역 목록 조회
-	 *
-	 * @param pageable
-	 * @param period
-	 * @return
-	 */
-	@Override
-	public Page<PointHistoryResponse> getUsedPointHistories(long memberId, Pageable pageable,
-		PointHistoryPeriodRequest period) {
-		List<PointHistoryResponse> result = this.pointHistoryRepository.findUsedPointHistories(period, pageable,
-			memberId);
-		int count = (int)this.pointHistoryRepository.countUsedPointHistories(memberId, period);
 		Page<PointHistoryResponse> response = new PageImpl(result, pageable, count);
 		return response;
 	}

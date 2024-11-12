@@ -7,6 +7,7 @@ import shop.nuribooks.books.book.point.dto.request.PointHistoryPeriodRequest;
 import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.entity.PointHistory;
+import shop.nuribooks.books.book.point.enums.HistoryType;
 import shop.nuribooks.books.book.point.enums.PolicyName;
 
 public interface PointHistoryService {
@@ -23,25 +24,7 @@ public interface PointHistoryService {
 	 * @param period
 	 * @return
 	 */
-	Page<PointHistoryResponse> getPointHistories(long memberId, Pageable pageable,
-		PointHistoryPeriodRequest period);
-
-	/**
-	 * 적립 포인트 내역 목록 조회
-	 * @param pageable
-	 * @param period
-	 * @return
-	 */
-	Page<PointHistoryResponse> getEarnedPointHistories(long memberId, Pageable pageable,
-		PointHistoryPeriodRequest period);
-
-	/**
-	 * 사용 포인트 내역 목록 조회
-	 * @param pageable
-	 * @param period
-	 * @return
-	 */
-	Page<PointHistoryResponse> getUsedPointHistories(long memberId, Pageable pageable,
+	Page<PointHistoryResponse> getPointHistories(long memberId, HistoryType type, Pageable pageable,
 		PointHistoryPeriodRequest period);
 
 	/**
