@@ -179,4 +179,10 @@ public class CategoryController {
 		List<CategoryResponse> categoryTrees = categoryService.getAllCategoryTree();
 		return ResponseEntity.status(HttpStatus.OK).body(categoryTrees);
 	}
+
+	@GetMapping("/{category-id}/name")
+	public ResponseEntity<CategoryRequest> getCategoryName(@PathVariable(name = "category-id") Long categoryId) {
+		CategoryRequest categoryName = categoryService.getCategoryNameById(categoryId);
+		return ResponseEntity.status(HttpStatus.OK).body(categoryName);
+	}
 }

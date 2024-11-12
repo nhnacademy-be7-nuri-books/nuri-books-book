@@ -27,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import shop.nuribooks.books.book.book.dto.BookResponse;
+import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
 import shop.nuribooks.books.cart.customer.dto.request.CustomerCartAddRequest;
 import shop.nuribooks.books.cart.customer.dto.response.CustomerCartResponse;
@@ -78,10 +79,21 @@ class CustomerCartControllerTest {
         contributorsByRole.put("지은이", List.of("유재령", "이영애", "차효정"));
         contributorsByRole.put("감수", List.of("김광웅"));
 
+        List<List<SimpleCategoryResponse>> simpleCategories = List.of(
+            List.of(
+                new SimpleCategoryResponse(1L, "Parent Category 1"),
+                new SimpleCategoryResponse(2L, "Subcategory 1")
+            ),
+            List.of(
+                new SimpleCategoryResponse(1L, "Parent Category 2"),
+                new SimpleCategoryResponse(3L, "Subcategory 2")
+            )
+        );
+
         BookResponse bookResponse1 = new BookResponse(
             bookId1, null, "정상", "책 제목", "thumbnail.jpg", null, LocalDate.now(),
             price, discountRate, salePrice, "책 설명", "책 내용", "1234567890123",
-            true, 0, 10, 100L, tagNames, contributorsByRole);
+            true, 0, 10, 100L, tagNames, contributorsByRole, simpleCategories);
 
         CustomerCartResponse response1 = new CustomerCartResponse(bookResponse1, 1);
 
@@ -89,7 +101,7 @@ class CustomerCartControllerTest {
         BookResponse bookResponse2 = new BookResponse(
             bookId2, null, "정상", "책 제목", "thumbnail.jpg", null, LocalDate.now(),
             price, discountRate, salePrice, "책 설명", "책 내용", "1234567890123",
-            true, 0, 10, 100L, tagNames, contributorsByRole);
+            true, 0, 10, 100L, tagNames, contributorsByRole, simpleCategories);
 
         CustomerCartResponse response2 = new CustomerCartResponse(bookResponse2, 2);
         when(customerCartService.getCustomerCartList(anyString())).thenReturn(List.of(response1, response2));

@@ -15,12 +15,15 @@ import shop.nuribooks.books.book.book.utility.BookUtils;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.booktag.repository.BookTagRepository;
+import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
+import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 
 @Component
 @RequiredArgsConstructor
 public class BookMapper {
 	private final BookTagRepository bookTagRepository;
 	private final BookContributorRepository bookContributorRepository;
+	private final BookCategoryRepository bookCategoryRepository;
 
 	public BookResponse toBookResponse(Book book) {
 		BigDecimal salePrice = BookUtils.calculateSalePrice(book.getPrice(), book.getDiscountRate());
@@ -29,6 +32,8 @@ public class BookMapper {
 		Map<String, List<String>> contributorsByRole = BookUtils.groupContributorsByRole(contributorsResponses);
 
 		List<String> tagNames = bookTagRepository.findTagNamesByBookId(book.getId());
+
+		List<List<SimpleCategoryResponse>> simpleCategories = bookCategoryRepository.findCategoriesByBookId(book.getId());
 
 		return new BookResponse(
 			book.getId(),
@@ -49,7 +54,8 @@ public class BookMapper {
 			book.getStock(),
 			book.getViewCount(),
 			tagNames,
-			contributorsByRole
+			contributorsByRole,
+			simpleCategories
 		);
 	}
 }
