@@ -23,8 +23,10 @@ import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
 import shop.nuribooks.books.book.book.service.BookService;
+import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.message.ResponseMessage;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
 
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
@@ -98,7 +100,8 @@ public class BookController {
 		@ApiResponse(responseCode = "200", description = "도서 삭제 성공"),
 		@ApiResponse(responseCode = "404", description = "도서 미발견")
 	})
-	@DeleteMapping("{book-id}")
+	//@HasRole(role = AuthorityType.ADMIN)
+	@DeleteMapping("/{book-id}")
 	public ResponseEntity<Void> deleteBook(@PathVariable(name = "book-id") Long bookId) {
 		bookService.deleteBook(bookId);
 		return ResponseEntity.noContent().build();

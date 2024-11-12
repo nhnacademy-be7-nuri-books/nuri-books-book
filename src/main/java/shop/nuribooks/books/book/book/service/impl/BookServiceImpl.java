@@ -220,11 +220,21 @@ public class BookServiceImpl implements BookService {
 	}
 
 	//관리자페이지에서 관리자의 도서 삭제 기능
+	@Transactional
 	@Override
 	public void deleteBook(Long bookId) {
+		log.info("deleteBook attempt - bookId: {}", bookId);
+
+		if(bookId == null) {
+			log.error("Book Delete fail - bookId is Null");
+			throw new BookIdNotFoundException();
+		}
 		Book book = bookRepository.findBookByIdAndDeletedAtIsNull(bookId)
 			.orElseThrow(BookIdNotFoundException::new);
+
 		book.delete();
+
+		log.info("Delete Complete - bookId: {}", book.getId());
 	}
 
 	//Contributor 저장 메서드
