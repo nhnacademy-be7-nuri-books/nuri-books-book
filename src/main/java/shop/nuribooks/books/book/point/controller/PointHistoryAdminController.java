@@ -33,7 +33,7 @@ public class PointHistoryAdminController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@HasRole(role = AuthorityType.ADMIN)
-	@GetMapping("/admin/api/members/{member-id}/point-history")
+	@GetMapping("/api/members/{member-id}/point-history")
 	public ResponseEntity<Page<PointHistoryResponse>> getPointHistories(
 		@RequestParam(value = "type") HistoryType type,
 		@PathVariable("member-id") long memberId,
@@ -52,7 +52,7 @@ public class PointHistoryAdminController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@HasRole(role = AuthorityType.ADMIN)
-	@DeleteMapping("/admin/api/point-history/{point-history-id}")
+	@DeleteMapping("/api/point-history/{point-history-id}")
 	public ResponseEntity<ResponseMessage> getPointHistories(
 		@PathVariable("point-history-id") long pointHistoryId) {
 

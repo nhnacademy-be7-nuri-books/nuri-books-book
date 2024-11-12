@@ -27,7 +27,7 @@ import shop.nuribooks.books.member.member.entity.AuthorityType;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/api/point-policies")
+@RequestMapping("/api/point-policies")
 public class PointPolicyController {
 	private final PointPolicyService pointPolicyService;
 
