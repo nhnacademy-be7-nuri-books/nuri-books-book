@@ -176,6 +176,7 @@ class MemberControllerTest {
 
 		//then
 		result.andExpect(status().isOk())
+			.andExpect(jsonPath("username").value(response.username()))
 			.andExpect(jsonPath("name").value(response.name()))
 			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
 			.andExpect(jsonPath("email").value(response.email()))
@@ -331,6 +332,7 @@ class MemberControllerTest {
 	 */
 	private MemberDetailsResponse getMemberDetailsResponse() {
 		return MemberDetailsResponse.builder()
+			.username("abc123")
 			.name("boho")
 			.phoneNumber("042-8282-8282")
 			.email("boho@nhnacademy.com")

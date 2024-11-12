@@ -336,6 +336,7 @@ class MemberServiceImplTest {
 
 		//then
 		assertThat(response.name()).isEqualTo(savedCustomer.getName());
+		assertThat(response.username()).isEqualTo(savedMember.getUsername());
 			assertThat(response.phoneNumber()).isEqualTo(savedCustomer.getPhoneNumber());
 			assertThat(response.email()).isEqualTo(savedCustomer.getEmail());
 			assertThat(response.point()).isEqualTo(savedMember.getPoint());

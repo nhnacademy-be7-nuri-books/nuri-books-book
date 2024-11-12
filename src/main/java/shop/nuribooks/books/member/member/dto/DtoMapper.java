@@ -49,6 +49,7 @@ public class DtoMapper {
 	 */
 	public static MemberDetailsResponse toDetailsDto(Customer customer, Member member) {
 		return MemberDetailsResponse.builder()
+			.username(member.getUsername())
 			.name(customer.getName())
 			.phoneNumber(customer.getPhoneNumber())
 			.email(customer.getEmail())

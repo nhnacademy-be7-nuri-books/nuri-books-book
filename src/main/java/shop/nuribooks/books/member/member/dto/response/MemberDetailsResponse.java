@@ -15,6 +15,7 @@ import lombok.Builder;
 @Builder
 public record MemberDetailsResponse(
 
+	String username,
 	String name,
 	String phoneNumber,
 	String email,
