@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import shop.nuribooks.books.book.point.controller.PointHistoryAdminController;
 import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
-import shop.nuribooks.books.common.message.PagedResponse;
 
 @WebMvcTest(PointHistoryAdminController.class)
 public class PointHistoryAdminControllerTest {
@@ -43,8 +43,8 @@ public class PointHistoryAdminControllerTest {
 	void getAllTest() throws Exception {
 		when(pointHistoryService.getPointHistories(anyLong(), any(),
 			any())).thenReturn(
-			PagedResponse.of(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
-		
+			new PageImpl(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
+
 		mockMvc.perform(get("/admin/api/members/1/point-history")
 				.queryParam("type", "ALL")
 				.queryParam("page", "0")

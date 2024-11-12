@@ -121,7 +121,9 @@ public class PointHistoryServiceTest {
 	public void getPointHistories() {
 		when(pointHistoryRepository.findPointHistories(any(), any(), anyLong())).thenReturn(this.pointHistoryResponse);
 		assertEquals(1,
-			pointHistoryService.getPointHistories(1l, PageRequest.of(0, 1), new PointHistoryPeriodRequest()).size());
+			pointHistoryService.getPointHistories(1l, PageRequest.of(0, 1), new PointHistoryPeriodRequest())
+				.getContent()
+				.size());
 	}
 
 	@Test
@@ -130,7 +132,7 @@ public class PointHistoryServiceTest {
 			this.pointHistoryResponse);
 		assertEquals(1,
 			pointHistoryService.getEarnedPointHistories(1l, PageRequest.of(0, 1), new PointHistoryPeriodRequest())
-				.size());
+				.getContent().size());
 	}
 
 	@Test
@@ -139,7 +141,7 @@ public class PointHistoryServiceTest {
 			this.pointHistoryResponse);
 		assertEquals(1,
 			pointHistoryService.getUsedPointHistories(1l, PageRequest.of(0, 1), new PointHistoryPeriodRequest())
-				.size());
+				.getContent().size());
 	}
 
 	@Test

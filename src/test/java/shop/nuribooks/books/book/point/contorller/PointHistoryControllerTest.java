@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import shop.nuribooks.books.book.point.controller.PointHistoryController;
 import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 
 @WebMvcTest(PointHistoryController.class)
@@ -43,7 +43,7 @@ public class PointHistoryControllerTest {
 	void getAllTest() throws Exception {
 		when(pointHistoryService.getPointHistories(anyLong(), any(),
 			any())).thenReturn(
-			PagedResponse.of(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
+			new PageImpl<>(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 		MemberIdContext.setMemberId(1l);
 		mockMvc.perform(get("/api/members/point-history")
 				.queryParam("type", "ALL")
@@ -58,7 +58,7 @@ public class PointHistoryControllerTest {
 	void getAllLowerCaseTest() throws Exception {
 		when(pointHistoryService.getPointHistories(anyLong(), any(),
 			any())).thenReturn(
-			PagedResponse.of(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
+			new PageImpl<>(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 		MemberIdContext.setMemberId(1l);
 		mockMvc.perform(get("/api/members/point-history")
 				.queryParam("type", "all")
@@ -73,7 +73,7 @@ public class PointHistoryControllerTest {
 	void getWrongTypeTest() throws Exception {
 		when(pointHistoryService.getPointHistories(anyLong(), any(),
 			any())).thenReturn(
-			PagedResponse.of(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
+			new PageImpl<>(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 		MemberIdContext.setMemberId(1l);
 		mockMvc.perform(get("/api/members/point-history")
 				.queryParam("type", "alla")
@@ -88,7 +88,7 @@ public class PointHistoryControllerTest {
 	void getUsedTest() throws Exception {
 		when(pointHistoryService.getUsedPointHistories(anyLong(), any(),
 			any())).thenReturn(
-			PagedResponse.of(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
+			new PageImpl<>(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 		MemberIdContext.setMemberId(1l);
 		mockMvc.perform(get("/api/members/point-history")
 				.queryParam("type", "ALL")
@@ -103,7 +103,7 @@ public class PointHistoryControllerTest {
 	void getSavedTest() throws Exception {
 		when(pointHistoryService.getEarnedPointHistories(anyLong(), any(),
 			any())).thenReturn(
-			PagedResponse.of(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
+			new PageImpl<>(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
 		MemberIdContext.setMemberId(1l);
 		mockMvc.perform(get("/api/members/point-history")
 				.queryParam("type", "ALL")
