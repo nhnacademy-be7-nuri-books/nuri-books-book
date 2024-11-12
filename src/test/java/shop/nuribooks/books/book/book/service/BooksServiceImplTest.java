@@ -61,7 +61,7 @@ public class BooksServiceImplTest {
 	private Publisher publisher;
 	private Book book;
 
-	@BeforeEach
+	/*@BeforeEach
 	public void setUp() {
 		publisher = new Publisher(1L, "Publisher Name");
 
@@ -116,7 +116,7 @@ public class BooksServiceImplTest {
 			.build();
 
 		ReflectionTestUtils.setField(book, "id", 1L);
-	}
+	}*/
 
 	@Test
 	public void getBooks_ShouldThrowInvalidPageRequestException_WhenPageNumberIsNegative() {

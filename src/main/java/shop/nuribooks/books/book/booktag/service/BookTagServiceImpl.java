@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Service
 public class BookTagServiceImpl implements BookTagService {
     private final BookTagRepository bookTagRepository;
@@ -42,6 +42,7 @@ public class BookTagServiceImpl implements BookTagService {
      *
      * @return 해당하는 도서와 등록된 태그들이 포함된 BookTagResponse
      */
+    @Transactional
     @Override
     public BookTagRegisterResponse registerTagToBook(BookTagRequest request) {
         Book book = bookRepository.findById(request.bookId())
@@ -119,11 +120,18 @@ public class BookTagServiceImpl implements BookTagService {
      * @param bookTagId 삭제할 도서태그 id
      * @throws BookTagNotFountException 도서태그 id가 없을 때 예외
      */
+    @Transactional
     @Override
     public void deleteBookTag(Long bookTagId) {
         BookTag bookTag = bookTagRepository.findById(bookTagId)
                 .orElseThrow(() -> new BookTagNotFountException("도서태그가 존재하지 않습니다."));
         bookTagRepository.delete(bookTag);
+    }
+
+    @Transactional
+    public void deleteBookTagIds(Long bookId) {
+        List<BookTag> bookTags = bookTagRepository.findByBookId(bookId);
+        bookTagRepository.deleteAll(bookTags);
     }
 
     @Transactional

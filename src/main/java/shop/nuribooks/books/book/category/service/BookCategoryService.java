@@ -13,6 +13,8 @@ public interface BookCategoryService {
 
 	void deleteBookCategory(Long bookId, Long categoryId);
 
+	void deleteBookCategories(Long bookId);
+
 	List<List<SimpleCategoryResponse>> findCategoriesByBookId(Long bookId);
 
 	PagedResponse<BookContributorsResponse> findBooksByCategoryId(Long categoryId, Pageable pageable);

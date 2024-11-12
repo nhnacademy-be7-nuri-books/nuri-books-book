@@ -36,6 +36,7 @@ import shop.nuribooks.books.book.category.entity.BookCategory;
 import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
+import shop.nuribooks.books.book.category.service.BookCategoryService;
 import shop.nuribooks.books.book.contributor.entity.Contributor;
 import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
@@ -64,8 +65,10 @@ public class BookServiceImpl implements BookService {
 	private final ContributorRoleRepository contributorRoleRepository;
 	private final BookCategoryRepository bookCategoryRepository;
 	private final BookTagService bookTagService;
+	private final BookCategoryService bookCategoryService;
 
 	@Transactional
+	@Override
 	public void registerBook(BaseBookRegisterRequest reqDto) {
 		log.info("Attempting to save book with ISBN: {}", reqDto.getIsbn());
 
@@ -169,8 +172,6 @@ public class BookServiceImpl implements BookService {
 
 		List<BookContributorsResponse> bookListResponses = bookPage.stream()
 			.map(book -> {
-				//BigDecimal salePrice = BookUtils.calculateSalePrice(book.getPrice(), book.getDiscountRate());
-
 				AdminBookListResponse bookDetails = AdminBookListResponse.of(book);
 				log.info("Fetching contributors for bookId: {}", book.getId());
 				List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(
@@ -193,30 +194,19 @@ public class BookServiceImpl implements BookService {
 
 	//TODO: 좋아요나 조회수에 대한 업데이트는 따로 메서드를 구현할 계획입니다.
 
-	/**
-	 * 주어진 책 ID에 해당하는 책 정보를 업데이트합니다.
-	 * <p>
-	 *     관리자페이지에서 도서에 대한 정보를 수정하기 위한 메서드 입니다.
-	 * </p>
-	 * @param bookId 업데이트할 책의 ID
-	 * @param bookUpdateReq 책 업데이트 요청 정보를 포함한 객체
-	 * @throws BookIdNotFoundException 책 ID가 존재하지 않는 경우 발생
-	 * @throws shop.nuribooks.books.exception.book.InvalidBookStateException BookStateEnum에 존재하지 않는 도서상태가 입력된 경우 발생
-	 * @throws PublisherIdNotFoundException 주어진 출판사 ID가 존재하지 않는 경우 발생
-	 */
+	@Transactional
 	@Override
 	public void updateBook(Long bookId, BookUpdateRequest bookUpdateReq) {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(BookIdNotFoundException::new);
 
-		Publisher publisher = publisherRepository.findById(bookUpdateReq.publisherId())
-			.orElseThrow(() -> new PublisherIdNotFoundException(bookUpdateReq.publisherId()));
+		book.updateBookDetails(bookUpdateReq);
 
-		BookStateEnum bookStateEnum = BookStateEnum.fromString(String.valueOf(bookUpdateReq.state()));
+		bookTagService.deleteBookTagIds(bookId);
+		bookTagService.registerTagToBook(book.getId(), bookUpdateReq.tagIds());
 
-		book.updateBookDetails(bookUpdateReq, bookStateEnum, publisher);
-
-		bookRepository.save(book);
+		bookCategoryService.deleteBookCategories(bookId);
+		registerPersonallyCategories(bookUpdateReq.categoryIds(), book);
 	}
 
 	//관리자페이지에서 관리자의 도서 삭제 기능

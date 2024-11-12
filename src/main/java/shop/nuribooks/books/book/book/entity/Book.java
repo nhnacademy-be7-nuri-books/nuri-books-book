@@ -127,20 +127,16 @@ public class Book {
 		this.viewCount = viewCount;
 	}
 
-	public void updateBookDetails(BookUpdateRequest request, BookStateEnum bookStateEnum, Publisher publisher) {
-		this.publisherId = publisher;
-		this.state = bookStateEnum;
-		this.title = request.title();
-		this.thumbnailImageUrl = request.thumbnailImageUrl();
-		this.detailImageUrl = request.detailImageUrl();
-		this.publicationDate = request.publicationDate();
+	public void updateBookDetails(BookUpdateRequest request) {
 		this.price = request.price();
 		this.discountRate = request.discountRate();
+		this.stock = request.stock();
+		this.state = BookStateEnum.fromStringKor(request.state());
+		this.thumbnailImageUrl = request.thumbnailImageUrl();
+		this.detailImageUrl = request.detailImageUrl();
 		this.description = request.description();
 		this.contents = request.contents();
-		this.isbn = request.isbn();
 		this.isPackageable = request.isPackageable();
-		this.stock = request.stock();
 	}
 
 	public void incrementViewCount() {
