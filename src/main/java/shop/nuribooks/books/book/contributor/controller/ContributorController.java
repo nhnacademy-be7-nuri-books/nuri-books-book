@@ -119,7 +119,7 @@ public class ContributorController {
 		@ApiResponse(responseCode = "404", description = "기여자를 찾을 수 없음"),
 		@ApiResponse(responseCode = "500", description = "서버 내부 오류")
 	})
-	@DeleteMapping("{contributorId}")
+	@DeleteMapping("/{contributorId}")
 	public ResponseEntity<HttpStatus> deleteContributor(@PathVariable Long contributorId) {
 		contributorService.deleteContributor(contributorId);
 		return ResponseEntity.status(HttpStatus.OK).build();
