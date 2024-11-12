@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -81,7 +82,7 @@ public class ReviewControllerTest {
 		);
 
 		when(reviewService.getReviewsByBookId(anyLong(), any())).thenReturn(
-			new PagedResponse<>(List.of(review), 1, 1, 1, 1));
+			new PageImpl<>(List.of(review)));
 
 		mockMvc.perform(get("/api/books/" + bookId + "/reviews"))
 			.andExpect(status().isOk())
