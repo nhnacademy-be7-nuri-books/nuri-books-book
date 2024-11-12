@@ -50,12 +50,12 @@ public class RedisKeyExpirationListener implements MessageListener {
 			Cart cart = dbCartRepository.findByMember_Id(memberId).orElseGet(
 				() -> createCartForMember(memberId));
 
-			Map<String, Integer> cartDetails = getDataFromRedis(expiredKey);
+			Map<Long, Integer> cartDetails = getDataFromRedis(expiredKey);
 
 			List<CartDetail> cartDetailList = cartDetails.entrySet().stream()
 				.map(cartDetail -> {
-						CartDetailId cartDetailId = new CartDetailId(cart.getId(), Long.parseLong(cartDetail.getKey()));
-						Book book = bookRepository.findById(Long.parseLong(cartDetail.getKey())).orElseThrow();
+						CartDetailId cartDetailId = new CartDetailId(cart.getId(), cartDetail.getKey());
+						Book book = bookRepository.findById(cartDetail.getKey()).orElseThrow();
 						return new CartDetail(cartDetailId, cart, book, cartDetail.getValue());
 					}
 				)
@@ -64,7 +64,7 @@ public class RedisKeyExpirationListener implements MessageListener {
 		}
 	}
 
-	private Map<String, Integer> getDataFromRedis(String key) {
+	private Map<Long, Integer> getDataFromRedis(String key) {
 		return redisCartRepository.getCart(key);
 	}
 

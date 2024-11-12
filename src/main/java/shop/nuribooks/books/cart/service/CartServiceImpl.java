@@ -36,7 +36,7 @@ public class CartServiceImpl implements CartService {
     //비회원 장바구니 조회
     @Override
     public List<CartResponse> getCart(String cartId) {
-        Map<String, Integer> cart = redisCartRepository.getCart(cartId);
+        Map<Long, Integer> cart = redisCartRepository.getCart(cartId);
 
         return convertRedisCartList(cart);
     }
@@ -55,10 +55,10 @@ public class CartServiceImpl implements CartService {
        redisCartRepository.removeCartItem(sessionId, bookId.toString());
     }
 
-    private List<CartResponse> convertRedisCartList(Map<String, Integer> cart) {
+    private List<CartResponse> convertRedisCartList(Map<Long, Integer> cart) {
         return cart.entrySet().stream()
             .map(cartItem -> {
-                    Book book = bookRepository.findById(Long.parseLong(cartItem.getKey())).orElseThrow();
+                    Book book = bookRepository.findById(cartItem.getKey()).orElseThrow();
                     return new CartResponse(CartBookResponse.of(book), cartItem.getValue());
                 }
             )

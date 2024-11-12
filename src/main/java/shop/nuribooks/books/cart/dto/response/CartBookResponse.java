@@ -9,13 +9,15 @@ import shop.nuribooks.books.book.book.entity.Book;
 public record CartBookResponse(
 	String title,
 	BigDecimal price,
-	int discountRate) {
+	int discountRate,
+	String thumbnailImageUrl) {
 
 	public static CartBookResponse of(Book book) {
 		return CartBookResponse.builder()
 			.title(book.getTitle())
 			.price(book.getPrice())
 			.discountRate(book.getDiscountRate())
+			.thumbnailImageUrl(book.getThumbnailImageUrl())
 			.build();
 	}
 

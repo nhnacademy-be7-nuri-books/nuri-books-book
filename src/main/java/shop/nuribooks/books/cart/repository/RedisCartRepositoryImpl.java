@@ -14,7 +14,7 @@ import shop.nuribooks.books.cart.cartdetail.entity.RedisCartDetail;
 @Repository
 public class RedisCartRepositoryImpl implements RedisCartRepository {
 
-    private final HashOperations<String, String, Integer> hashOperations;
+    private final HashOperations<String, Object, Object> hashOperations;
     private final RedisTemplate<String, Object> redisTemplate;
 
     public RedisCartRepositoryImpl(RedisTemplate<String, Object> redisTemplate) {
@@ -25,18 +25,20 @@ public class RedisCartRepositoryImpl implements RedisCartRepository {
     @Override
     public void addCart(String cartId, RedisCartDetail redisCartDetail) {
         hashOperations.put(cartId, redisCartDetail.getBookId(), redisCartDetail.getQuantity());
-        redisTemplate.expire(cartId, 1, TimeUnit.MINUTES);
+        redisTemplate.expire(cartId, 5, TimeUnit.MINUTES);
     }
 
     @Override
-    public Map<String, Integer> getCart(String cartId) {
-        Map<String, Integer> cartItems = new HashMap<>();
+    public Map<Long, Integer> getCart(String cartId) {
+        Map<Long, Integer> cartItems = new HashMap<>();
         ScanOptions scanOptions = ScanOptions.scanOptions().count(20).build();
 
-        try (Cursor<Map.Entry<String, Integer>> result = hashOperations.scan(cartId, scanOptions)) {
+        try (Cursor<Map.Entry<Object, Object>> result = hashOperations.scan(cartId, scanOptions)) {
             while (result.hasNext()) {
-                Map.Entry<String, Integer> cartItem = result.next();
-                cartItems.put(cartItem.getKey(), cartItem.getValue());
+                Map.Entry<Object, Object> cartItem = result.next();
+                Long bookId = Long.parseLong(cartItem.getKey().toString());
+                Integer quantity = Integer.valueOf(cartItem.getValue().toString());
+                cartItems.put(bookId, quantity);
             }
         } catch (Exception e) {
             e.printStackTrace();

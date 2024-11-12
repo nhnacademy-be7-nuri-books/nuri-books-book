@@ -7,7 +7,7 @@ import shop.nuribooks.books.cart.cartdetail.entity.RedisCartDetail;
 public interface RedisCartRepository {
     void addCart(String cartId, RedisCartDetail redisCartDetail);
 
-    Map<String, Integer> getCart(String sessionId);
+    Map<Long, Integer> getCart(String sessionId);
 
     void removeCart(String sessionId);
 
