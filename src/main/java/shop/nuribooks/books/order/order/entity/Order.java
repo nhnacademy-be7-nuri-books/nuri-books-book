@@ -9,6 +9,7 @@ import org.hibernate.annotations.Comment;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -40,7 +41,7 @@ public class Order {
 	@Comment("주문 아이디")
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_id", nullable = false,
 		foreignKey = @ForeignKey(name = "FK_orders_to_customers_1"))
 	@Comment("주문자 정보")

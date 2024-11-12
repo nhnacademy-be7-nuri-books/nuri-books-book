@@ -1,8 +1,9 @@
 package shop.nuribooks.books.book.category.repository;
 
-import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,10 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
@@ -44,7 +48,10 @@ class BookCategoryRepositoryTest {
 	private PublisherRepository publisherRepository;
 
 	private Book book;
+	private Book book2;
 	private Category category;
+	private Category parentCategory; // 여기 추가
+
 	private List<BookCategory> bookCategories = new ArrayList<>();
 
 	@BeforeEach
@@ -52,20 +59,25 @@ class BookCategoryRepositoryTest {
 		Publisher publisher = TestUtils.createPublisher();
 		publisherRepository.save(publisher);
 
-		category = TestUtils.createCategory();
-		Category parentCategory = category.getParentCategory();
+		// 부모 카테고리 생성 및 저장
+		parentCategory = TestUtils.createParentCategory();
 		categoryRepository.save(parentCategory);
+
+		// 자식 카테고리 생성 및 저장
+		category = TestUtils.createCategory(parentCategory);
 		categoryRepository.save(category);
 
+		// 책 생성 및 저장
 		book = TestUtils.createBook(publisher);
 		bookRepository.save(book);
-		Book book2 = TestUtils.createBook(publisher);
+
+		book2 = TestUtils.createBook(publisher);
 		bookRepository.save(book2);
 
+		// BookCategory 생성 및 저장
 		bookCategories.add(TestUtils.createBookCategory(book, category));
 		bookCategories.add(TestUtils.createBookCategory(book2, parentCategory));
-		bookCategoryRepository.save(bookCategories.get(0));
-		bookCategoryRepository.save(bookCategories.get(1));
+		bookCategoryRepository.saveAll(bookCategories);
 
 	}
 
@@ -79,7 +91,7 @@ class BookCategoryRepositoryTest {
 		// Then
 		assertThat(exists).isTrue();
 	}
-	
+
 	@DisplayName("책과 카테고리가 존재할 때 BookCategory 조회 성공")
 	@Test
 	@Order(3)
@@ -118,5 +130,127 @@ class BookCategoryRepositoryTest {
 
 		// Then
 		assertThat(categories).isNotNull();
+	}
+
+	// 추가된 테스트 메서드들
+
+	@DisplayName("카테고리 ID 목록으로 책 조회 성공")
+	@Test
+	@Order(7)
+	void findBooksByCategoryId_Success() {
+		// Given
+		List<Long> categoryIds = Arrays.asList(category.getId());
+		Pageable pageable = PageRequest.of(0, 10);
+
+		// When
+		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
+
+		// Then
+		assertThat(books).isNotNull();
+		assertThat(books.size()).isEqualTo(1);
+		assertThat(books.get(0).id()).isEqualTo(book.getId());
+		assertThat(books.get(0).title()).isEqualTo(book.getTitle());
+	}
+
+	@DisplayName("카테고리 ID 목록으로 책 개수 조회 성공")
+	@Test
+	@Order(8)
+	void countBookByCategoryIds_Success() {
+		// Given
+		List<Long> categoryIds = Arrays.asList(category.getId());
+
+		// When
+		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
+
+		// Then
+		assertThat(count).isEqualTo(1);
+	}
+
+	@DisplayName("복수의 카테고리 ID로 책 조회 성공")
+	@Test
+	@Order(9)
+	void findBooksByMultipleCategoryIds_Success() {
+		// Given
+		List<Long> categoryIds = Arrays.asList(category.getId(), parentCategory.getId());
+		Pageable pageable = PageRequest.of(0, 10);
+
+		// When
+		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
+
+		// Then
+		assertThat(books).isNotNull();
+		assertThat(books.size()).isEqualTo(2);
+	}
+
+	@DisplayName("복수의 카테고리 ID로 책 개수 조회 성공")
+	@Test
+	@Order(10)
+	void countBookByMultipleCategoryIds_Success() {
+		// Given
+		List<Long> categoryIds = Arrays.asList(category.getId(), parentCategory.getId());
+
+		// When
+		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
+
+		// Then
+		assertThat(count).isEqualTo(2);
+	}
+
+	@DisplayName("존재하지 않는 카테고리 ID로 책 조회 시 빈 결과 반환")
+	@Test
+	@Order(11)
+	void findBooksByInvalidCategoryId_ReturnsEmpty() {
+		// Given
+		List<Long> categoryIds = Arrays.asList(999L);
+		Pageable pageable = PageRequest.of(0, 10);
+
+		// When
+		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
+
+		// Then
+		assertThat(books).isEmpty();
+	}
+
+	@DisplayName("존재하지 않는 카테고리 ID로 책 개수 조회 시 0 반환")
+	@Test
+	@Order(12)
+	void countBookByInvalidCategoryIds_ReturnsZero() {
+		// Given
+		List<Long> categoryIds = Arrays.asList(999L);
+
+		// When
+		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
+
+		// Then
+		assertThat(count).isEqualTo(0);
+	}
+
+	@DisplayName("카테고리 ID 목록이 비어있을 때 책 조회 시 빈 결과 반환")
+	@Test
+	@Order(13)
+	void findBooksByEmptyCategoryIds_ReturnsEmpty() {
+		// Given
+		List<Long> categoryIds = new ArrayList<>();
+		Pageable pageable = PageRequest.of(0, 10);
+
+		// When
+		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
+
+		// Then
+		assertThat(books).isEmpty();
+	}
+
+	@DisplayName("카테고리 ID 목록이 비어있을 때 책 개수 조회 시 0 반환")
+	@Test
+	@Order(14)
+	void countBookByEmptyCategoryIds_ReturnsZero() {
+		// Given
+		List<Long> categoryIds = new ArrayList<>();
+
+		// When
+		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
+
+		// Then
+		assertThat(count).isEqualTo(0);
 	}
 }

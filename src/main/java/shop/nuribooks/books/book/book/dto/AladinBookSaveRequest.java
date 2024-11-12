@@ -32,6 +32,9 @@ public record AladinBookSaveRequest(
 	@NotBlank(message = "카테고리명은 필수입니다.")
 	String categoryName,
 
+	@Size(min = 1, max = 10, message = "카테고리는 최대 10개까지 선택 가능합니다.")
+	List<Long> categoryIds,
+
 	@NotNull(message = "가격은 필수입니다.")
 	@DecimalMin(value = "0.0", inclusive = false, message = "가격은 0보다 커야 합니다.")
 	BigDecimal price,

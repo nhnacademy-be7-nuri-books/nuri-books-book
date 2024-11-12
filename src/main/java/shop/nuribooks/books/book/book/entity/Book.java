@@ -151,5 +151,9 @@ public class Book {
 		this.deletedAt = LocalDateTime.now();
 	}
 
+	public void updateStock(int count){
+		this.stock -= count;
+	}
+
 }
 

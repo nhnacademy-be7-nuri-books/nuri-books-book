@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,7 +80,7 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public PagedResponse<ReviewMemberResponse> getReviewsByBookId(long bookId, Pageable pageable) {
+	public Page<ReviewMemberResponse> getReviewsByBookId(long bookId, Pageable pageable) {
 		if (!bookRepository.existsById(bookId))
 			throw new BookIdNotFoundException();
 		// review만 가져오기
@@ -101,11 +103,11 @@ public class ReviewServiceImpl implements ReviewService {
 			}
 		}
 
-		int totalElement = (int)this.reviewRepository.countByBookId(bookId);
+		long totalElement = this.reviewRepository.countByBookId(bookId);
 
-		PagedResponse pagedResponse = PagedResponse.of(reviews, pageable, totalElement);
+		Page<ReviewMemberResponse> page = new PageImpl(reviews, pageable, totalElement);
 
-		return pagedResponse;
+		return page;
 	}
 
 	/**
