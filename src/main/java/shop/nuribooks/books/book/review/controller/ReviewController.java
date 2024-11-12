@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.review.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,11 +50,11 @@ public class ReviewController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@GetMapping("/api/books/{bookId}/reviews")
-	public ResponseEntity<PagedResponse<ReviewMemberResponse>> getReviewMember(
+	public ResponseEntity<Page<ReviewMemberResponse>> getReviewMember(
 		@PathVariable("bookId") long bookId,
 		Pageable pageable
 	) {
-		PagedResponse<ReviewMemberResponse> response = this.reviewService.getReviewsByBookId(bookId, pageable);
+		Page<ReviewMemberResponse> response = this.reviewService.getReviewsByBookId(bookId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 

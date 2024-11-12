@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -195,10 +196,10 @@ public class ReviewServiceTest {
 		List<ReviewMemberResponse> res = new LinkedList<>();
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByBookId(anyLong(), any())).thenReturn(res);
-		PagedResponse<ReviewMemberResponse> pageRes = reviewService.getReviewsByBookId(1, PageRequest.of(0, 1));
-		assertEquals(0, pageRes.content().size());
-		assertEquals(0, pageRes.page());
-		assertEquals(1, pageRes.size());
+		Page<ReviewMemberResponse> pageRes = reviewService.getReviewsByBookId(1, PageRequest.of(0, 1));
+		assertEquals(0, pageRes.getContent().size());
+		assertEquals(0, pageRes.getPageable().getPageNumber());
+		assertEquals(1, pageRes.getPageable().getPageSize());
 	}
 
 	@Test
@@ -208,10 +209,10 @@ public class ReviewServiceTest {
 		when(reviewRepository.findReviewsByBookId(anyLong(), any())).thenReturn(res);
 		List<ReviewImageDto> reviewImages = List.of(new ReviewImageDto(1L, reviewImageResponse));
 		when(reviewImageRepository.findReviewImagesByReviewIds(anyList())).thenReturn(reviewImages);
-		PagedResponse<ReviewMemberResponse> pageRes = reviewService.getReviewsByBookId(1, PageRequest.of(0, 1));
-		assertEquals(1, pageRes.content().size());
-		assertEquals(0, pageRes.page());
-		assertEquals(1, pageRes.size());
+		Page<ReviewMemberResponse> pageRes = reviewService.getReviewsByBookId(1, PageRequest.of(0, 1));
+		assertEquals(1, pageRes.getContent().size());
+		assertEquals(0, pageRes.getPageable().getPageNumber());
+		assertEquals(1, pageRes.getPageable().getPageSize());
 	}
 
 	@Test

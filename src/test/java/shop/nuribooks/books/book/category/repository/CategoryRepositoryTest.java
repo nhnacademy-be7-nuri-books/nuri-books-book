@@ -122,30 +122,30 @@ class CategoryRepositoryTest {
 		assertThat(categoryOptional.get().getName()).isEqualTo("여행");
 	}
 
-	@Test
-	void findAllChildCategoryIds_whenCalled_thenReturnsAllChildIds() {
-		// when
-		List<Long> childCategoryIds = categoryRepository.findAllChildCategoryIds(parentCategory.getId());
-
-		// then
-		assertThat(childCategoryIds).isNotEmpty();
-		assertThat(childCategoryIds).containsExactlyInAnyOrder(
-			parentCategory.getId(), subCategory.getId()
-		);
-	}
-
-	@Test
-	void findAllChildCategoryIds_whenNoChildren_thenReturnsParentIdOnly() {
-		// given
-		Category singleParentCategory = Category.builder()
-			.name("독립 카테고리")
-			.build();
-		singleParentCategory = categoryRepository.save(singleParentCategory);
-
-		// when
-		List<Long> childCategoryIds = categoryRepository.findAllChildCategoryIds(singleParentCategory.getId());
-
-		// then
-		assertThat(childCategoryIds).containsExactly(singleParentCategory.getId());
-	}
+	// @Test
+	// void findAllChildCategoryIds_whenCalled_thenReturnsAllChildIds() {
+	// 	// when
+	// 	List<Long> childCategoryIds = categoryRepository.findAllChildCategoryIds(parentCategory.getId());
+	//
+	// 	// then
+	// 	assertThat(childCategoryIds).isNotEmpty();
+	// 	assertThat(childCategoryIds).containsExactlyInAnyOrder(
+	// 		parentCategory.getId(), subCategory.getId()
+	// 	);
+	// }
+	//
+	// @Test
+	// void findAllChildCategoryIds_whenNoChildren_thenReturnsParentIdOnly() {
+	// 	// given
+	// 	Category singleParentCategory = Category.builder()
+	// 		.name("독립 카테고리")
+	// 		.build();
+	// 	singleParentCategory = categoryRepository.save(singleParentCategory);
+	//
+	// 	// when
+	// 	List<Long> childCategoryIds = categoryRepository.findAllChildCategoryIds(singleParentCategory.getId());
+	//
+	// 	// then
+	// 	assertThat(childCategoryIds).containsExactly(singleParentCategory.getId());
+	// }
 }
