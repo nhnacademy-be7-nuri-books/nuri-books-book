@@ -3,7 +3,9 @@ package shop.nuribooks.books.book.contributor.service;
 import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.dto.ContributorResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface ContributorService {
 	ContributorResponse registerContributor(ContributorRequest req);
 
@@ -11,7 +13,7 @@ public interface ContributorService {
 
 	ContributorResponse getContributor(Long contributorId);
 
-	List<ContributorResponse> getAllContributors();
+	Page<ContributorResponse> getAllContributors(Pageable pageable);
 
 	void deleteContributor(Long contributorId);
 

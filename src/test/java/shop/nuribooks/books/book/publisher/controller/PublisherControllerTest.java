@@ -85,7 +85,7 @@ class PublisherControllerTest {
 				.param("page", "0")
 				.param("size", "10"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.content").isArray())  // "content" 배열 여부 확인
+			.andExpect(jsonPath("$.content").isArray())
 			.andExpect(jsonPath("$.content[0].name").value("publisher1"))
 			.andExpect(jsonPath("$.content[1].name").value("publisher2"));
 
