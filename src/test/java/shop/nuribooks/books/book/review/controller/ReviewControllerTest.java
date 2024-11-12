@@ -86,7 +86,7 @@ public class ReviewControllerTest {
 
 		mockMvc.perform(get("/api/books/" + bookId + "/reviews"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.*", Matchers.hasSize(5)));
+			.andExpect(jsonPath("$.*", Matchers.hasSize(11)));
 	}
 
 	@Test
