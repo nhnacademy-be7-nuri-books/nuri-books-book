@@ -213,7 +213,7 @@ class CategoryControllerTest {
 		when(categoryService.updateCategory(any(CategoryRequest.class), eq(categoryId))).thenReturn(response);
 
 		// when & then
-		mockMvc.perform(patch("/api/categories/{categoryId}", categoryId)
+		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
 			.andExpect(status().isOk())
@@ -233,7 +233,7 @@ class CategoryControllerTest {
 			.updateCategory(any(CategoryRequest.class), any(Long.class));
 
 		// when & then
-		mockMvc.perform(patch("/api/categories/{categoryId}", categoryId)
+		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
 			.andExpect(status().isNotFound())
@@ -250,7 +250,7 @@ class CategoryControllerTest {
 		CategoryRequest dto = new CategoryRequest(""); // 빈 이름으로 잘못된 요청
 
 		// when & then
-		mockMvc.perform(patch("/api/categories/{categoryId}", categoryId)
+		mockMvc.perform(put("/api/categories/{categoryId}", categoryId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(dto)))
 			.andExpect(status().isBadRequest())
