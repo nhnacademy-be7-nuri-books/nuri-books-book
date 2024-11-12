@@ -51,7 +51,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 		when(gradeService.registerGrade(any(GradeRegisterRequest.class))).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(post("/api/member/grade")
+		ResultActions result = mockMvc.perform(post("/api/members/grades")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -69,7 +69,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 		GradeRegisterRequest badRequest = getBadGradeRegisterRequest();
 
 		//when
-		ResultActions badResult = mockMvc.perform(post("/api/member/grade")
+		ResultActions badResult = mockMvc.perform(post("/api/members/grades")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 
@@ -93,7 +93,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 		when(gradeService.getGradeDetails(requiredName)).thenReturn(response);
 
 	    //when
-		ResultActions result = mockMvc.perform(get("/api/member/grade/{name}", requiredName));
+		ResultActions result = mockMvc.perform(get("/api/members/grades/{name}", requiredName));
 
 		//then
 		result.andExpect(status().isOk())
@@ -114,7 +114,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 			.thenReturn(response);
 
 	    //when
-		ResultActions result = mockMvc.perform(patch("/api/member/grade/{name}", requestName)
+		ResultActions result = mockMvc.perform(patch("/api/members/grades/{name}", requestName)
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -133,7 +133,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 		String requiredName = "STANDARD";
 
 		//when
-		ResultActions badResult = mockMvc.perform(patch("/api/member/grade/{name}", requiredName)
+		ResultActions badResult = mockMvc.perform(patch("/api/members/grades/{name}", requiredName)
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 
@@ -156,7 +156,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 		doNothing().when(gradeService).deleteGrade(requiredName);
 
 	    //when
-		ResultActions result = mockMvc.perform(delete("/api/member/grade/{name}", requiredName));
+		ResultActions result = mockMvc.perform(delete("/api/members/grades/{name}", requiredName));
 
 		//then
 		result.andExpect(status().isOk())
@@ -173,7 +173,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 		when(gradeService.getGradeList()).thenReturn(response);
 
 	    //when
-		ResultActions result = mockMvc.perform(get("/api/member/grade/grades"));
+		ResultActions result = mockMvc.perform(get("/api/members/grades"));
 
 		//then
 		result.andExpect(status().isOk())

@@ -40,7 +40,7 @@ public class CustomerControllerTest extends ControllerTestSupport {
 		when(customerService.registerCustomer(any(CustomerRegisterRequest.class))).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(post("/api/member/customer")
+		ResultActions result = mockMvc.perform(post("/api/members/customers")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -58,7 +58,7 @@ public class CustomerControllerTest extends ControllerTestSupport {
 		CustomerRegisterRequest badRequest = getBadCustomerRegisterRequest();
 
 		//when
-		ResultActions badResult = mockMvc.perform(post("/api/member/customer")
+		ResultActions badResult = mockMvc.perform(post("/api/members/customers")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 

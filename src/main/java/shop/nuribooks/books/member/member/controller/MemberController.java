@@ -56,7 +56,7 @@ public class MemberController {
 		@ApiResponse(responseCode = "400", description = "신규 회원 등록 요청 데이터가 유효하지 않음"),
 		@ApiResponse(responseCode = "409", description = "등록된 정보가 이미 존재함")
 	})
-	@PostMapping("/api/member")
+	@PostMapping("/api/members")
 	public ResponseEntity<MemberRegisterResponse> memberRegister(
 		@RequestBody @Valid MemberRegisterRequest request) {
 
@@ -74,7 +74,7 @@ public class MemberController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "회원 인증 조회 성공")
 	})
-	@GetMapping("/api/member/username/{username}")
+	@GetMapping("/api/members/username/{username}")
 	public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfoByUsername(@PathVariable String username) {
 
 		MemberAuthInfoResponse response = memberService.getMemberAuthInfoByUsername(username);
@@ -91,7 +91,7 @@ public class MemberController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "회원 인증 조회 성공")
 	})
-	@GetMapping("/api/member/email/{email}")
+	@GetMapping("/api/members/email/{email}")
 	public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfoByEmail(@PathVariable String email) {
 
 		MemberAuthInfoResponse response = memberService.getMemberAuthInfoByEmail(email);
@@ -107,7 +107,7 @@ public class MemberController {
 		@ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
 		@ApiResponse(responseCode = "404", description = "회원이 존재하지 않음")
 	})
-	@DeleteMapping("/api/member/me")
+	@DeleteMapping("/api/members/me")
 	public ResponseEntity<ResponseMessage> memberWithdraw() {
 
 		Long memberId = MemberIdContext.getMemberId();
@@ -126,7 +126,7 @@ public class MemberController {
 		@ApiResponse(responseCode = "200", description = "회원 상세 조회 성공"),
 		@ApiResponse(responseCode = "404", description = "회원이 존재하지 않음")
 	})
-	@GetMapping("/api/member/me")
+	@GetMapping("/api/members/me")
 	public ResponseEntity<MemberDetailsResponse> getMemberDetails() {
 
 		Long memberId = MemberIdContext.getMemberId();
@@ -146,7 +146,7 @@ public class MemberController {
 		@ApiResponse(responseCode = "400", description = "회원 정보 수정 요청 데이터가 유효하지 않음"),
 		@ApiResponse(responseCode = "404", description = "회원이 존재하지 않음")
 	})
-	@PatchMapping("/api/member/me")
+	@PatchMapping("/api/members/me")
 	public ResponseEntity<ResponseMessage> memberUpdate(
 		@RequestBody @Valid MemberUpdateRequest request) {
 
@@ -164,7 +164,7 @@ public class MemberController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "관리자가 회원 목록 조회 성공")
 	})
-	@GetMapping("/admin/api/member/members")
+	@GetMapping("/api/members")
 	public ResponseEntity<Page<MemberSearchResponse>> memberSearchWithPaging(
 		@RequestParam(value = "name", required = false) String name,
 		@RequestParam(value = "email", required = false) String email,
