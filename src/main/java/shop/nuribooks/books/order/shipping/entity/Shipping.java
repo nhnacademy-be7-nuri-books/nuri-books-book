@@ -6,6 +6,7 @@ import org.hibernate.annotations.Comment;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -45,7 +46,7 @@ public class Shipping {
 	@Comment("연관된 주문 정보")
 	private Order order;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "shipping_policy_id", nullable = false,
 		foreignKey = @ForeignKey(name = "FK_shippings_to_shipping_policies_1"))
 	@Comment("배송 정책 정보")
