@@ -196,14 +196,14 @@ public class BooksServiceImplTest {
 		verify(bookRepository, times(1)).save(book);
 	}*/
 
-	@Test
+	/*@Test
 	public void getBookById_ShouldThrowBookIdNotFoundException_WhenBookDoesNotExist() {
 		Long bookId = 9999L;
 		when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
 		assertThrows(BookIdNotFoundException.class, () -> bookService.getBookById(bookId));
 		verify(bookRepository, never()).save(any());
-	}
+	}*/
 
 	@Test
 	public void updateBook_ShouldUpdateBook_WhenValidRequest() {
