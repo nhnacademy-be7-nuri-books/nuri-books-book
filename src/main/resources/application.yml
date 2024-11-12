@@ -2,7 +2,7 @@ spring:
   application:
     name: books
   profiles:
-    active: local
+    active: prod
 
   cache:
     type: none

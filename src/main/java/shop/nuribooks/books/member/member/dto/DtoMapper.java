@@ -50,17 +50,13 @@ public class DtoMapper {
 	public static MemberDetailsResponse toDetailsDto(Customer customer, Member member) {
 		return MemberDetailsResponse.builder()
 			.name(customer.getName())
-			.gender(member.getGender())
 			.phoneNumber(customer.getPhoneNumber())
 			.email(customer.getEmail())
-			.birthday(member.getBirthday())
-			.username(member.getUsername())
 			.point(member.getPoint())
 			.totalPaymentAmount(member.getTotalPaymentAmount())
-			.authority(member.getAuthority())
-			.grade(member.getGrade())
+			.gradeName(member.getGrade().getName())
+			.pointRate(member.getGrade().getPointRate())
 			.createdAt(member.getCreatedAt())
-			.latestLoginAt(member.getLatestLoginAt())
 			.build();
 	}
 }
