@@ -85,6 +85,7 @@ public class OrderServiceImpl implements OrderService{
 	 * @return OrderTempRegisterResponse
 	 */
 	@Override
+	@Transactional
 	public OrderTempRegisterResponse registerTempOrderForCustomer(OrderTempRegisterRequest orderTempRegisterRequest) {
 		// todo :  사용자 생성
 		Customer customer = null;
