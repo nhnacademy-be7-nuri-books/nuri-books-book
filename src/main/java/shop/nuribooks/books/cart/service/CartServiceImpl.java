@@ -2,6 +2,7 @@ package shop.nuribooks.books.cart.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import shop.nuribooks.books.cart.cartdetail.entity.CartDetail;
 import shop.nuribooks.books.cart.cartdetail.entity.RedisCartDetail;
 import shop.nuribooks.books.cart.cartdetail.repository.CartDetailRepository;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
+import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
 import shop.nuribooks.books.cart.dto.response.CartBookResponse;
 import shop.nuribooks.books.cart.dto.response.CartResponse;
 import shop.nuribooks.books.cart.entity.Cart;
@@ -26,9 +28,12 @@ import shop.nuribooks.books.cart.repository.RedisCartRepository;
 @Service
 public class CartServiceImpl implements CartService {
     private static final String SHADOW_KEY = "shadow:";
+    private static final String MEMBER_CART_KEY = "member:";
 
     private final BookRepository bookRepository;
     private final RedisCartRepository redisCartRepository;
+    private final DBCartRepository dbCartRepository;
+    private final CartDetailRepository cartDetailRepository;
 
     @Override
     public void addCustomerCart(String cartId, CartAddRequest request) {
@@ -64,6 +69,20 @@ public class CartServiceImpl implements CartService {
     public void removeCartItem(String sessionId, Long bookId) {
         //TODO: 아이템 없는 경우 예외 처리
        redisCartRepository.removeCartItem(sessionId, bookId.toString());
+    }
+
+    @Override
+    public void loadCart(CartLoadRequest request) {
+        Cart cart = dbCartRepository.findByMember_Id(request.userId()).orElse(null);
+        if (Objects.isNull(cart)) {
+            return;
+        }
+        String cartId = MEMBER_CART_KEY + request.userId();
+        List<CartDetail> cartDetailList = cartDetailRepository.findByCart_Id(cart.getId());
+        List<RedisCartDetail> redisCartDetailList = cartDetailList.stream()
+            .map(cartDetail -> new RedisCartDetail(cartDetail.getBook().getId().toString(), cartDetail.getQuantity())).toList();
+        redisCartRepository.saveAll(cartId, redisCartDetailList);
+        redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
     }
 
     private List<CartResponse> convertRedisCartList(Map<Long, Integer> cart) {

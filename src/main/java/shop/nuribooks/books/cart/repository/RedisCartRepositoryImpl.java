@@ -1,6 +1,7 @@
 package shop.nuribooks.books.cart.repository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.springframework.data.redis.core.Cursor;
@@ -9,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Repository;
 
+import shop.nuribooks.books.cart.cartdetail.entity.CartDetail;
 import shop.nuribooks.books.cart.cartdetail.entity.RedisCartDetail;
 
 @Repository
@@ -65,6 +67,11 @@ public class RedisCartRepositoryImpl implements RedisCartRepository {
     public void setShadowExpireKey(String key, int value, TimeUnit timeUnit) {
         redisTemplate.opsForValue().set(key, "");
         redisTemplate.expire(key, value, timeUnit);
+    }
+
+    @Override
+    public void saveAll(String cartId, List<RedisCartDetail> redisCartDetailList) {
+        redisCartDetailList.forEach(redisCartDetail -> hashOperations.put(cartId, redisCartDetail.getBookId(), redisCartDetail.getQuantity()));
     }
 
 }
