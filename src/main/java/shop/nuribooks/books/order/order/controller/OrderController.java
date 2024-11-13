@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +22,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
+import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
 import shop.nuribooks.books.order.order.service.OrderService;
@@ -35,6 +38,21 @@ import shop.nuribooks.books.order.order.service.OrderService;
 public class OrderController {
 
 	private final OrderService orderService;
+
+	@GetMapping("/{book-id}")
+	public ResponseEntity<OrderInformationResponse> getOrderInformation(
+		@PathVariable("book-id") Long bookId, @RequestParam Integer quantity){
+
+		Optional<Long> userId = Optional.ofNullable(MemberIdContext.getMemberId());
+
+		OrderInformationResponse result = userId
+			// 회원 주문에 필요한 정보 가져오기
+			.map(id -> orderService.getMemberOrderInformation(id, bookId, quantity))
+			// 비회원 주문에 필요한 정보 가져오기
+			.orElseGet(() -> orderService.getCustomerOrderInformation(bookId, quantity));
+
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
 
 	/**
 	 * 결제 전 임시 주문 저장
