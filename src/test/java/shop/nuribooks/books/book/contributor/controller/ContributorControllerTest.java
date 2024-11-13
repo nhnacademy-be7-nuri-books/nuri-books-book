@@ -25,10 +25,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.dto.ContributorResponse;
 import shop.nuribooks.books.book.contributor.service.ContributorServiceImpl;
+import shop.nuribooks.books.common.ControllerTestSupport;
 
 @WebMvcTest(ContributorController.class)
 @AutoConfigureMockMvc
-class ContributorControllerTest {
+class ContributorControllerTest extends ControllerTestSupport {
 
 	@MockBean
 	private ContributorServiceImpl contributorService;

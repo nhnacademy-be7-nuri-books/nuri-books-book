@@ -7,6 +7,5 @@ import shop.nuribooks.books.member.address.entity.Address;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Long> {
-
     List<Address> findAllByMemberId(Long memberId);
 }

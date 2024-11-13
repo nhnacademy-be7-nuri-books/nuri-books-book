@@ -22,16 +22,13 @@ import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
+import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 
-@WebMvcTest(ReviewController.class)
-public class ReviewControllerTest {
+public class ReviewControllerTest extends ControllerTestSupport {
 	@Autowired
 	private MockMvc mockMvc;
-
-	@MockBean
-	private ReviewService reviewService;
 
 	@Autowired
 	private ObjectMapper objectMapper;

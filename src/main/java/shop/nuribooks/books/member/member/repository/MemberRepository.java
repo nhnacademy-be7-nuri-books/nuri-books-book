@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import org.springframework.data.jpa.repository.Query;
+import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.member.entity.Member;
 
 /**
@@ -22,4 +24,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 	List<Member> findAllByLatestLoginAtBefore(LocalDateTime thresholdDate);
 
 	List<Member> findAllByWithdrawnAtBefore(LocalDateTime thresholdDate);
+
+
+	@Query("select m from Member m join fetch m.addressList")
+	List<Member> findAddressFetchJoin();
 }

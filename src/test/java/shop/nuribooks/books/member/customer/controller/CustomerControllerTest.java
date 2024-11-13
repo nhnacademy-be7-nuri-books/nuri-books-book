@@ -17,15 +17,12 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.service.CustomerService;
 
-@WebMvcTest(CustomerController.class)
-public class CustomerControllerTest {
-
-	@MockBean
-	private CustomerService customerService;
+public class CustomerControllerTest extends ControllerTestSupport {
 
 	@Autowired
 	private MockMvc mockMvc;
