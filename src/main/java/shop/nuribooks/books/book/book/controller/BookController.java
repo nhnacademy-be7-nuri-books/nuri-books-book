@@ -100,7 +100,7 @@ public class BookController {
 		@ApiResponse(responseCode = "200", description = "도서 삭제 성공"),
 		@ApiResponse(responseCode = "404", description = "도서 미발견")
 	})
-	//@HasRole(role = AuthorityType.ADMIN)
+	@HasRole(role = AuthorityType.ADMIN)
 	@DeleteMapping("/{book-id}")
 	public ResponseEntity<Void> deleteBook(@PathVariable(name = "book-id") Long bookId) {
 		bookService.deleteBook(bookId);

@@ -17,4 +17,6 @@ public interface BookTagService {
 	void deleteBookTag(Long bookTagId);
 
 	void registerTagToBook(Long bookId, List<Long> tagIds);
+
+	void deleteBookTagIds(Long bookId);
 }
