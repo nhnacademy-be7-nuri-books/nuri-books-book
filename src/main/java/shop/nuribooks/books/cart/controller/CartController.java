@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
-import shop.nuribooks.books.cart.dto.response.CartResponse;
+import shop.nuribooks.books.cart.dto.response.CartBookResponse;
 import shop.nuribooks.books.cart.service.CartService;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.cart.customer.CustomerCartNotFoundException;
@@ -44,7 +44,7 @@ public class CartController {
     }
 
     @GetMapping("/api/cart/{cart-id}")
-    private ResponseEntity<List<CartResponse>> getCartList(@PathVariable("cart-id") String requestCartId) {
+    private ResponseEntity<List<CartBookResponse>> getCartList(@PathVariable("cart-id") String requestCartId) {
         Long memberId = MemberIdContext.getMemberId();
         String cartId;
         if (Objects.isNull(memberId)) {
@@ -52,7 +52,7 @@ public class CartController {
         } else {
             cartId = MEMBER_CART_KEY + requestCartId;
         }
-        List<CartResponse> cartResponseList = cartService.getCart(cartId);
+        List<CartBookResponse> cartResponseList = cartService.getCart(cartId);
         return ResponseEntity.ok().body(cartResponseList);
     }
 

@@ -8,6 +8,7 @@ import shop.nuribooks.books.book.book.utility.BookUtils;
 
 @Builder
 public record CartBookResponse(
+	Long bookId,
 	String title,
 	BigDecimal price,
 	int discountRate,
@@ -21,6 +22,7 @@ public record CartBookResponse(
 		BigDecimal totalPrice = BookUtils.calculateTotalPrice(salePrice, quantity);
 
 		return CartBookResponse.builder()
+			.bookId(book.getId())
 			.title(book.getTitle())
 			.price(book.getPrice())
 			.discountRate(book.getDiscountRate())

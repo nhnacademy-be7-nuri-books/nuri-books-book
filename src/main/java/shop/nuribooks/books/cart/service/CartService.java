@@ -4,7 +4,6 @@ import java.util.List;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
 import shop.nuribooks.books.cart.dto.response.CartBookResponse;
-import shop.nuribooks.books.cart.dto.response.CartResponse;
 
 public interface CartService {
 

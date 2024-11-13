@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
-import shop.nuribooks.books.cart.dto.response.CartResponse;
 import shop.nuribooks.books.cart.entity.Cart;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 
