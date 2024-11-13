@@ -1,6 +1,7 @@
 package shop.nuribooks.books.order.order.service;
 
 import jakarta.validation.Valid;
+import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
 
@@ -27,4 +28,8 @@ public interface OrderService {
 	 * @return 주문 임시 등록 response
 	 */
 	OrderTempRegisterResponse registerTempOrderForCustomer(@Valid OrderTempRegisterRequest orderTempRegisterRequest);
+
+	OrderInformationResponse getMemberOrderInformation(Long id, Long bookId, int quantity);
+
+	OrderInformationResponse getCustomerOrderInformation(Long bookId, int quantity);
 }
