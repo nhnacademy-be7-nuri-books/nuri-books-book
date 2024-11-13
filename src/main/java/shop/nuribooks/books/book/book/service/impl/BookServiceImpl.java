@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.book.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -167,7 +168,13 @@ public class BookServiceImpl implements BookService {
 		Page<Book> bookPage = bookRepository.findAllWithPublisher(pageable);
 
 		if (pageable.getPageNumber() > bookPage.getTotalPages() - 1) {
-			throw new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다.");
+			return new PagedResponse<>(
+				Collections.emptyList(),
+				pageable.getPageNumber(),
+				pageable.getPageSize(),
+				bookPage.getTotalPages(),
+				bookPage.getTotalElements()
+			);
 		}
 
 		List<BookContributorsResponse> bookListResponses = bookPage.stream()
