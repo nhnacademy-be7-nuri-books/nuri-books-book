@@ -23,7 +23,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @EnableCaching
 public class RedisConfig {
-    private final String EXPIRED_EVENT_PATTERN = "__keyevent@133__:expired";
+
 
     @Value("${spring.data.redis.host}")
     private String host;
@@ -63,7 +63,8 @@ public class RedisConfig {
         RedisKeyExpirationListener listener) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listener, new ChannelTopic(EXPIRED_EVENT_PATTERN));
+        String expired_event_pattern = "__keyevent@" + database + "__:expired";
+        container.addMessageListener(listener, new ChannelTopic(expired_event_pattern));
         return container;
     }
 
