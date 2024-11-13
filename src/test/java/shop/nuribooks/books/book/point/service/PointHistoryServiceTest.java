@@ -26,6 +26,7 @@ import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
 import shop.nuribooks.books.book.point.entity.child.ReviewSavingPoint;
+import shop.nuribooks.books.book.point.enums.HistoryType;
 import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.book.point.exception.PointHistoryNotFoundException;
@@ -119,27 +120,33 @@ public class PointHistoryServiceTest {
 
 	@Test
 	public void getPointHistories() {
-		when(pointHistoryRepository.findPointHistories(any(), any(), anyLong())).thenReturn(this.pointHistoryResponse);
+		when(pointHistoryRepository.findPointHistories(any(), any(), anyLong(), any())).thenReturn(
+			this.pointHistoryResponse);
 		assertEquals(1,
-			pointHistoryService.getPointHistories(1l, PageRequest.of(0, 1), new PointHistoryPeriodRequest()).size());
+			pointHistoryService.getPointHistories(1l, HistoryType.ALL, PageRequest.of(0, 1),
+					new PointHistoryPeriodRequest())
+				.getContent()
+				.size());
 	}
 
 	@Test
 	public void getEarnedPointHistories() {
-		when(pointHistoryRepository.findEarnedPointHistories(any(), any(), anyLong())).thenReturn(
+		when(pointHistoryRepository.findPointHistories(any(), any(), anyLong(), any())).thenReturn(
 			this.pointHistoryResponse);
 		assertEquals(1,
-			pointHistoryService.getEarnedPointHistories(1l, PageRequest.of(0, 1), new PointHistoryPeriodRequest())
-				.size());
+			pointHistoryService.getPointHistories(1l, HistoryType.SAVED, PageRequest.of(0, 1),
+					new PointHistoryPeriodRequest())
+				.getContent().size());
 	}
 
 	@Test
 	public void getUsedPointHistories() {
-		when(pointHistoryRepository.findUsedPointHistories(any(), any(), anyLong())).thenReturn(
+		when(pointHistoryRepository.findPointHistories(any(), any(), anyLong(), any())).thenReturn(
 			this.pointHistoryResponse);
 		assertEquals(1,
-			pointHistoryService.getUsedPointHistories(1l, PageRequest.of(0, 1), new PointHistoryPeriodRequest())
-				.size());
+			pointHistoryService.getPointHistories(1l, HistoryType.USED, PageRequest.of(0, 1),
+					new PointHistoryPeriodRequest())
+				.getContent().size());
 	}
 
 	@Test

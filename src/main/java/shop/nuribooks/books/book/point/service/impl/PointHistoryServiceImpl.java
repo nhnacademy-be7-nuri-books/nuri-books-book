@@ -3,6 +3,8 @@ package shop.nuribooks.books.book.point.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -14,13 +16,13 @@ import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
+import shop.nuribooks.books.book.point.enums.HistoryType;
 import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.exception.PointHistoryNotFoundException;
 import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
 import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
 import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -60,45 +62,12 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	 * @return
 	 */
 	@Override
-	public PagedResponse<PointHistoryResponse> getPointHistories(long memberId, Pageable pageable,
+	public Page<PointHistoryResponse> getPointHistories(long memberId, HistoryType type, Pageable pageable,
 		PointHistoryPeriodRequest period) {
-		List<PointHistoryResponse> result = this.pointHistoryRepository.findPointHistories(period, pageable, memberId);
+		List<PointHistoryResponse> result = this.pointHistoryRepository.findPointHistories(period, pageable, memberId,
+			type);
 		int count = (int)this.pointHistoryRepository.countPointHistories(memberId, period);
-		PagedResponse<PointHistoryResponse> response = PagedResponse.of(result, pageable, count);
-		return response;
-	}
-
-	/**
-	 * 적립 포인트 내역 목록 조회
-	 *
-	 * @param pageable
-	 * @param period
-	 * @return
-	 */
-	@Override
-	public PagedResponse<PointHistoryResponse> getEarnedPointHistories(long memberId, Pageable pageable,
-		PointHistoryPeriodRequest period) {
-		List<PointHistoryResponse> result = this.pointHistoryRepository.findEarnedPointHistories(period, pageable,
-			memberId);
-		int count = (int)this.pointHistoryRepository.countEarnedPointHistories(memberId, period);
-		PagedResponse<PointHistoryResponse> response = PagedResponse.of(result, pageable, count);
-		return response;
-	}
-
-	/**
-	 * 사용 포인트 내역 목록 조회
-	 *
-	 * @param pageable
-	 * @param period
-	 * @return
-	 */
-	@Override
-	public PagedResponse<PointHistoryResponse> getUsedPointHistories(long memberId, Pageable pageable,
-		PointHistoryPeriodRequest period) {
-		List<PointHistoryResponse> result = this.pointHistoryRepository.findUsedPointHistories(period, pageable,
-			memberId);
-		int count = (int)this.pointHistoryRepository.countUsedPointHistories(memberId, period);
-		PagedResponse<PointHistoryResponse> response = PagedResponse.of(result, pageable, count);
+		Page<PointHistoryResponse> response = new PageImpl(result, pageable, count);
 		return response;
 	}
 

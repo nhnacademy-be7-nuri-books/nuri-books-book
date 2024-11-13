@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.point.dto.request.PointPolicyRequest;
@@ -68,8 +70,10 @@ public class PointPolicyServiceTest {
 
 	@Test
 	public void getPointPolicyList() {
-		when(pointPolicyRepository.findAllByDeletedAtIsNull()).thenReturn(List.of(this.pointPolicyResponse));
-		assertEquals(1, pointPolicyService.getPointPolicyResponses().size());
+		when(pointPolicyRepository.findAllByDeletedAtIsNull(any())).thenReturn(
+			new PageImpl(List.of(this.pointPolicyResponse),
+				PageRequest.of(0, 10), 1));
+		assertEquals(1, pointPolicyService.getPointPolicyResponses(PageRequest.of(0, 10)).getContent().size());
 	}
 
 	@Test

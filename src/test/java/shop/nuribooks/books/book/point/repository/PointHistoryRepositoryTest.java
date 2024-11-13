@@ -15,6 +15,7 @@ import shop.nuribooks.books.book.point.dto.request.PointHistoryPeriodRequest;
 import shop.nuribooks.books.book.point.dto.request.PointPolicyRequest;
 import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
+import shop.nuribooks.books.book.point.enums.HistoryType;
 import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.common.TestUtils;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
@@ -62,7 +63,8 @@ public class PointHistoryRepositoryTest {
 			PointHistoryRepository.findPointHistories(
 				new PointHistoryPeriodRequest(),
 				PageRequest.of(0, 2),
-				member.getId()
+				member.getId(),
+				HistoryType.ALL
 			).size()
 		);
 	}
@@ -70,10 +72,11 @@ public class PointHistoryRepositoryTest {
 	@Test
 	void findEarnedHistoriesTest() {
 		assertEquals(2,
-			PointHistoryRepository.findEarnedPointHistories(
+			PointHistoryRepository.findPointHistories(
 				new PointHistoryPeriodRequest(),
 				PageRequest.of(0, 2),
-				member.getId()
+				member.getId(),
+				HistoryType.SAVED
 			).size()
 		);
 	}
@@ -81,10 +84,11 @@ public class PointHistoryRepositoryTest {
 	@Test
 	void findUsedHistoriesTest() {
 		assertEquals(0,
-			PointHistoryRepository.findUsedPointHistories(
+			PointHistoryRepository.findPointHistories(
 				new PointHistoryPeriodRequest(),
 				PageRequest.of(0, 2),
-				member.getId()
+				member.getId(),
+				HistoryType.USED
 			).size()
 		);
 	}
