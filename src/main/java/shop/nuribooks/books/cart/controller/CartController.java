@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
+import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
 import shop.nuribooks.books.cart.dto.response.CartResponse;
 import shop.nuribooks.books.cart.service.CartService;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
@@ -53,6 +54,12 @@ public class CartController {
         }
         List<CartResponse> cartResponseList = cartService.getCart(cartId);
         return ResponseEntity.ok().body(cartResponseList);
+    }
+
+    @PostMapping("/api/cart/load-to-redis")
+    private ResponseEntity<Void> loadCartToRedis(@RequestBody CartLoadRequest request) {
+        cartService.loadCart(request);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/api/customer/cart")

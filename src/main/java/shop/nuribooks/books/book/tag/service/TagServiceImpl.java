@@ -53,6 +53,16 @@ public class TagServiceImpl implements TagService {
 	}
 
 	/**
+	 *
+	 * @return
+	 */
+	@Override
+	public List<TagResponse> getAllTags() {
+		List<Tag> tags = tagRepository.findAll();
+		return tags.stream().map(TagResponse::of).toList();
+	}
+
+	/**
 	 * getTag : 태그 조회
 	 *
 	 * @param id id로 태그 정보 조회
