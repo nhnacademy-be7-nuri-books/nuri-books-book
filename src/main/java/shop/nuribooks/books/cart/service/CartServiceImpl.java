@@ -78,6 +78,10 @@ public class CartServiceImpl implements CartService {
             return;
         }
         String cartId = MEMBER_CART_KEY + request.userId();
+        if (redisCartRepository.isExist(cartId)) {
+            redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
+            return;
+        }
         List<CartDetail> cartDetailList = cartDetailRepository.findByCart_Id(cart.getId());
         List<RedisCartDetail> redisCartDetailList = cartDetailList.stream()
             .map(cartDetail -> new RedisCartDetail(cartDetail.getBook().getId().toString(), cartDetail.getQuantity())).toList();

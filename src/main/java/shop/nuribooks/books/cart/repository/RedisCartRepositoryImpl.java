@@ -74,4 +74,9 @@ public class RedisCartRepositoryImpl implements RedisCartRepository {
         redisCartDetailList.forEach(redisCartDetail -> hashOperations.put(cartId, redisCartDetail.getBookId(), redisCartDetail.getQuantity()));
     }
 
+    @Override
+    public boolean isExist(String cartId) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(cartId));
+    }
+
 }
