@@ -8,18 +8,14 @@ import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
-import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.cart.cartdetail.entity.CartDetail;
 import shop.nuribooks.books.cart.cartdetail.entity.RedisCartDetail;
 import shop.nuribooks.books.cart.cartdetail.repository.CartDetailRepository;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
 import shop.nuribooks.books.cart.dto.response.CartBookResponse;
-import shop.nuribooks.books.cart.dto.response.CartResponse;
 import shop.nuribooks.books.cart.entity.Cart;
 import shop.nuribooks.books.cart.repository.DBCartRepository;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
@@ -51,7 +47,7 @@ public class CartServiceImpl implements CartService {
 
     //비회원 장바구니 조회
     @Override
-    public List<CartResponse> getCart(String cartId) {
+    public List<CartBookResponse> getCart(String cartId) {
         Map<Long, Integer> cart = redisCartRepository.getCart(cartId);
 
         return convertRedisCartList(cart);
@@ -89,11 +85,11 @@ public class CartServiceImpl implements CartService {
         redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
     }
 
-    private List<CartResponse> convertRedisCartList(Map<Long, Integer> cart) {
+    private List<CartBookResponse> convertRedisCartList(Map<Long, Integer> cart) {
         return cart.entrySet().stream()
             .map(cartItem -> {
                     Book book = bookRepository.findById(cartItem.getKey()).orElseThrow();
-                    return new CartResponse(CartBookResponse.of(book), cartItem.getValue());
+                    return CartBookResponse.of(book, cartItem.getValue());
                 }
             )
             .toList();

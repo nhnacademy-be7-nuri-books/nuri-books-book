@@ -3,6 +3,7 @@ package shop.nuribooks.books.cart.service;
 import java.util.List;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
+import shop.nuribooks.books.cart.dto.response.CartBookResponse;
 import shop.nuribooks.books.cart.dto.response.CartResponse;
 
 public interface CartService {
@@ -12,7 +13,7 @@ public interface CartService {
     void addMemberCart(String cartId, CartAddRequest request);
 
     //비회원 장바구니 조회
-    List<CartResponse> getCart(String cartId);
+    List<CartBookResponse> getCart(String cartId);
 
     //비회원 장바구니 삭제
     void removeCart(String sessionId);
