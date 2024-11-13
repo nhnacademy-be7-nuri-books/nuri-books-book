@@ -45,7 +45,6 @@ public class CartServiceImpl implements CartService {
         redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
     }
 
-    //비회원 장바구니 조회
     @Override
     public List<CartBookResponse> getCart(String cartId) {
         Map<Long, Integer> cart = redisCartRepository.getCart(cartId);
@@ -53,18 +52,15 @@ public class CartServiceImpl implements CartService {
         return convertRedisCartList(cart);
     }
 
-    //비회원 장바구니 전체 삭제
     @Override
-    public void removeCart(String sessionId) {
-        //TODO: 장바구니가 없는 경우 예외 처리
-       redisCartRepository.removeCart(sessionId);
+    public void removeCart(String cartId) {
+       redisCartRepository.removeCart(cartId);
     }
 
     //비회원 장바구니 특정 도서 삭제
     @Override
-    public void removeCartItem(String sessionId, Long bookId) {
-        //TODO: 아이템 없는 경우 예외 처리
-       redisCartRepository.removeCartItem(sessionId, bookId.toString());
+    public void removeCartItem(String cartId, Long bookId) {
+       redisCartRepository.removeCartItem(cartId, bookId.toString());
     }
 
     @Override

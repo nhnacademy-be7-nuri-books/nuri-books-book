@@ -18,7 +18,7 @@ public interface CartService {
     void removeCart(String sessionId);
 
     //비회원 장바구니 특정 도서 삭제
-    void removeCartItem(String sessionId, Long bookId);
+    void removeCartItem(String cartId, Long bookId);
 
 	void loadCart(CartLoadRequest request);
 }
