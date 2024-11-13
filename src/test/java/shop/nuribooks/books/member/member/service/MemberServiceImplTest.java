@@ -21,8 +21,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
 
+import shop.nuribooks.books.book.point.entity.PointHistory;
+import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
+import shop.nuribooks.books.exception.member.CustomerNotFoundException;
+import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
+import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.member.UsernameAlreadyExistsException;
+import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.dto.EntityMapper;
@@ -31,15 +39,9 @@ import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
-import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.exception.member.CustomerNotFoundException;
-import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
-import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.exception.member.UsernameAlreadyExistsException;
-import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -58,6 +60,9 @@ class MemberServiceImplTest {
 
 	@Mock
 	private MemberRepository memberRepository;
+
+	@Mock
+	private PointHistoryService pointHistoryService;
 
 	@BeforeEach
 	void setUp() {
@@ -85,7 +90,7 @@ class MemberServiceImplTest {
 		when(gradeRepository.findByName("STANDARD")).thenReturn(Optional.of(standard));
 		when(memberRepository.save(any(Member.class)))
 			.thenReturn(savedMember);
-
+		when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
 		// when
 		MemberRegisterResponse response = memberServiceImpl.registerMember(request);
 
@@ -103,11 +108,11 @@ class MemberServiceImplTest {
 	@DisplayName("회원 등록 실패 - 중복된 이메일")
 	@Test
 	public void registerMember_EmailAlreadyExists() {
-	    //given
+		//given
 		MemberRegisterRequest request = getMemberCreateRequest();
 		when(customerRepository.existsByEmail(request.email())).thenReturn(true);
 
-	    //when / then
+		//when / then
 		EmailAlreadyExistsException exception = assertThrows(EmailAlreadyExistsException.class,
 			() -> memberServiceImpl.registerMember(request));
 		assertThat(exception.getMessage()).isEqualTo("이미 존재하는 이메일입니다.");
@@ -117,7 +122,7 @@ class MemberServiceImplTest {
 	@DisplayName("회원 등록 실패 - 중복된 아이디")
 	@Test
 	void registerMember_UsernameAlreadyExists() {
-	    //given
+		//given
 		MemberRegisterRequest request = getMemberCreateRequest();
 
 		when(customerRepository.existsByEmail(request.email())).thenReturn(false);
@@ -132,7 +137,7 @@ class MemberServiceImplTest {
 	@DisplayName("회원 탈퇴 성공")
 	@Test
 	void withdrawMember() {
-	    //given
+		//given
 		Long memberId = MemberIdContext.getMemberId();
 
 		Customer existingCustomer = getSavedCustomer();
@@ -143,7 +148,7 @@ class MemberServiceImplTest {
 		//when
 		memberServiceImpl.withdrawMember(memberId);
 
-	    //then
+		//then
 		verify(existingMember, times(1)).changeToWithdrawn(); // 메서드 호출 확인
 		assertThat(existingMember.getStatus()).isEqualTo(StatusType.WITHDRAWN); // 상태가 WITHDRAWN로 변경되었는지 확인
 		assertThat(existingMember.getWithdrawnAt()).isNotNull(); // withdrawnAt이 현재 시간으로 설정되었는지 확인
@@ -152,12 +157,12 @@ class MemberServiceImplTest {
 	@DisplayName("회원 탈퇴 실패 - 존재하지 않는 회원")
 	@Test
 	void withdrawMember_UsernameNotFound() {
-	    //given
+		//given
 		Long memberId = MemberIdContext.getMemberId();
 
 		when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
-	    //when / then
+		//when / then
 		MemberNotFoundException exception = assertThrows(MemberNotFoundException.class,
 			() -> memberServiceImpl.withdrawMember(memberId));
 		assertThat(exception.getMessage()).isEqualTo("존재하지 않는 회원입니다.");
@@ -166,17 +171,17 @@ class MemberServiceImplTest {
 	@DisplayName("회원 정보 수정 성공")
 	@Test
 	void updateMember() {
-	    //given
+		//given
 		Long memberId = MemberIdContext.getMemberId();
 		MemberUpdateRequest request = getMemberUpdateRequest();
 		Customer existingCustomer = spy(getSavedCustomer());
 
 		when(customerRepository.findById(memberId)).thenReturn(Optional.of(existingCustomer));
 
-	    //when
+		//when
 		memberServiceImpl.updateMember(memberId, request);
 
-	    //then
+		//then
 		verify(existingCustomer, times(1))
 			.changeCustomerInformation(request.name(), request.password());
 		assertThat(existingCustomer.getName()).isEqualTo(request.name());
@@ -201,14 +206,14 @@ class MemberServiceImplTest {
 	@DisplayName("username으로 회원 PK id, username, 비밀번호, 권한 조회 성공")
 	@Test
 	void getMemberAuthInfoByUsername() {
-	    //given
+		//given
 		Customer savedCustomer = getSavedCustomer();
 		Member savedMember = getSavedMember(savedCustomer);
 
 		when(memberRepository.findByUsername(savedMember.getUsername())).thenReturn(Optional.of(savedMember));
 		when(customerRepository.findById(savedMember.getId())).thenReturn(Optional.of(savedCustomer));
 
-	    //when
+		//when
 		MemberAuthInfoResponse response = memberServiceImpl.getMemberAuthInfoByUsername(savedMember.getUsername());
 
 		//then
@@ -418,7 +423,6 @@ class MemberServiceImplTest {
 		assertThat(savedMember.getAuthority()).isNull();
 	}
 
-
 	/**
 	 * 테스트를 위한 MemberRegisterRequest 생성
 	 */
@@ -502,7 +506,7 @@ class MemberServiceImplTest {
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
-			.latestLoginAt(LocalDateTime.of(2024,2,22,22,22,22))
+			.latestLoginAt(LocalDateTime.of(2024, 2, 22, 22, 22, 22))
 			.build();
 	}
 

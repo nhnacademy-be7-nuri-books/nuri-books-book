@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.point.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,6 @@ import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.enums.HistoryType;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.common.annotation.HasRole;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 
@@ -33,15 +33,14 @@ public class PointHistoryAdminController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@HasRole(role = AuthorityType.ADMIN)
-	@GetMapping("/admin/api/members/{member-id}/point-history")
-	public ResponseEntity<PagedResponse<PointHistoryResponse>> getPointHistories(
+	@GetMapping("/api/members/{member-id}/point-history")
+	public ResponseEntity<Page<PointHistoryResponse>> getPointHistories(
 		@RequestParam(value = "type") HistoryType type,
 		@PathVariable("member-id") long memberId,
 		Pageable pageable,
 		PointHistoryPeriodRequest pointHistoryPeriodRequest) {
 
-		// enum에서 lambda 함수를 이용해서 구현하였습니다.
-		PagedResponse<PointHistoryResponse> response = type.apply(pointHistoryService, memberId, pageable,
+		Page<PointHistoryResponse> response = pointHistoryService.getPointHistories(memberId, type, pageable,
 			pointHistoryPeriodRequest);
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -53,7 +52,7 @@ public class PointHistoryAdminController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@HasRole(role = AuthorityType.ADMIN)
-	@DeleteMapping("/admin/api/point-history/{point-history-id}")
+	@DeleteMapping("/api/point-history/{point-history-id}")
 	public ResponseEntity<ResponseMessage> getPointHistories(
 		@PathVariable("point-history-id") long pointHistoryId) {
 

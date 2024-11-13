@@ -11,8 +11,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
+import shop.nuribooks.books.book.point.enums.PolicyName;
+import shop.nuribooks.books.book.point.service.PointHistoryService;
+import shop.nuribooks.books.exception.member.CustomerNotFoundException;
+import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
+import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
+import shop.nuribooks.books.exception.member.UsernameAlreadyExistsException;
+import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.dto.DtoMapper;
@@ -24,14 +33,8 @@ import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
-import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.exception.member.CustomerNotFoundException;
-import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
-import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.exception.member.UsernameAlreadyExistsException;
-import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -47,6 +50,7 @@ public class MemberServiceImpl implements MemberService {
 	private final CustomerRepository customerRepository;
 	private final MemberRepository memberRepository;
 	private final GradeRepository gradeRepository;
+	private final PointHistoryService pointHistoryService;
 
 	/**
 	 * 회원등록 <br>
@@ -91,6 +95,7 @@ public class MemberServiceImpl implements MemberService {
 
 		Member savedMember = memberRepository.save(newMember);
 
+		pointHistoryService.registerPointHistory(new PointHistoryRequest(savedMember), PolicyName.WELCOME);
 		return DtoMapper.toRegisterDto(savedCustomer, savedMember);
 	}
 

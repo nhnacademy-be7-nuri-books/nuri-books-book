@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -64,16 +66,18 @@ public class PointPolicyControllerTest extends ControllerTestSupport {
 
 	@Test
 	void getTest() throws Exception {
-		when(pointPolicyService.getPointPolicyResponses()).thenReturn(List.of(pointPolicyResponse));
-		mockMvc.perform(get("/admin/api/point-policies"))
+		when(pointPolicyService.getPointPolicyResponses(any())).thenReturn(
+			new PageImpl(List.of(this.pointPolicyResponse),
+				PageRequest.of(0, 10), 1));
+		mockMvc.perform(get("/api/point-policies"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.*", Matchers.hasSize(1)));
+			.andExpect(jsonPath("$.*", Matchers.hasSize(11)));
 	}
 
 	@Test
 	void registeredByAppJsonTest() throws Exception {
 		when(pointPolicyService.registerPointPolicy(any())).thenReturn(pointPolicyRequest.toEntity());
-		mockMvc.perform(post("/admin/api/point-policies")
+		mockMvc.perform(post("/api/point-policies")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(pointPolicyRequest)))
 			.andExpect(status().isCreated())
@@ -83,7 +87,7 @@ public class PointPolicyControllerTest extends ControllerTestSupport {
 	@Test
 	void updateByAppJsonTest() throws Exception {
 		when(pointPolicyService.updatePointPolicy(anyLong(), any())).thenReturn(pointPolicyRequest.toEntity());
-		mockMvc.perform(put("/admin/api/point-policies/1")
+		mockMvc.perform(put("/api/point-policies/1")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(pointPolicyRequest)))
 			.andExpect(status().isOk())
@@ -92,7 +96,7 @@ public class PointPolicyControllerTest extends ControllerTestSupport {
 
 	@Test
 	void deleteTest() throws Exception {
-		mockMvc.perform(delete("/admin/api/point-policies/1"))
+		mockMvc.perform(delete("/api/point-policies/1"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.*", Matchers.hasSize(2)));
 	}

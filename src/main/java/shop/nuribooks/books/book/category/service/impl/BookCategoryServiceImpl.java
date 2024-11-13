@@ -30,6 +30,7 @@ import shop.nuribooks.books.exception.category.CategoryNotFoundException;
  *
  * @author janghyun
  */
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class BookCategoryServiceImpl implements BookCategoryService {
@@ -87,6 +88,13 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			.orElseThrow(() -> new BookCategoryNotFoundException(bookId, categoryId));
 
 		bookCategoryRepository.delete(bookCategory);
+	}
+
+	@Transactional
+	@Override
+	public void deleteBookCategories(Long bookId) {
+		List<BookCategory> bookCategories = bookCategoryRepository.findByBookId(bookId);
+		bookCategoryRepository.deleteAll(bookCategories);
 	}
 
 	/**
