@@ -12,6 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.publisher.dto.PublisherRequest;
 import shop.nuribooks.books.book.publisher.dto.PublisherResponse;
@@ -74,18 +78,20 @@ class PublisherServiceImplTest {
 		// given
 		List<Publisher> publishers = List.of(new Publisher(1L, "publisher1"), new Publisher(2L, "publisher2"));
 
-		when(publisherRepository.findAll()).thenReturn(publishers);
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Publisher> publisherPage = new PageImpl<>(publishers, pageable, publishers.size());
 
+		when(publisherRepository.findAll(pageable)).thenReturn(publisherPage);
 		// when
-		List<PublisherResponse> responses = publisherService.getAllPublisher();
+		Page<PublisherResponse> responses = publisherService.getAllPublisher(pageable);
 
 		// then
 		assertThat(responses).isNotEmpty();
 		assertThat(responses).hasSize(2);
-		assertThat(responses.get(0).name()).isEqualTo("publisher1");
+		assertThat(responses.getContent().get(0).name()).isEqualTo("publisher1");
 
 		// 메서드 호출 여부 검증
-		verify(publisherRepository).findAll();
+		verify(publisherRepository).findAll(pageable);
 	}
 
 	@DisplayName("검색한 출판사 조회 성공")

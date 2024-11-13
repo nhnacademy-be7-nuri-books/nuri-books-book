@@ -2,6 +2,8 @@ package shop.nuribooks.books.book.tag.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,11 +47,9 @@ public class TagServiceImpl implements TagService {
 	 * @return 등록된 태그 정보를 포함한 TagResponse List
 	 */
 	@Override
-	public List<TagResponse> getAllTags() {
-		List<Tag> tags = tagRepository.findAll().stream().toList();
-		return tags.stream()
-			.map(TagResponse::of)
-			.toList();
+	public Page<TagResponse> getAllTags(Pageable pageable) {
+		Page<Tag> tags = tagRepository.findAll(pageable);
+		return tags.map(TagResponse::of);
 	}
 
 	/**

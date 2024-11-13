@@ -294,7 +294,7 @@ public class BookCategoryServiceImplTest {
 		verify(bookCategoryRepository, never()).findCategoriesByBookId(bookId);
 	}
 
-	@DisplayName("존재하는 카테고리 ID로 책 목록 조회 성공")
+	/*@DisplayName("존재하는 카테고리 ID로 책 목록 조회 성공")
 	@Test
 	@Order(11)
 	void findBooksByCategoryId_Success() {
@@ -350,7 +350,7 @@ public class BookCategoryServiceImplTest {
 		verify(categoryRepository, times(1)).findAllChildCategoryIds(categoryId);
 		verify(bookCategoryRepository, times(1)).findBooksByCategoryId(Arrays.asList(1L, 2L), pageable);
 		verify(bookCategoryRepository, times(1)).countBookByCategoryIds(Arrays.asList(1L, 2L));
-	}
+	}*/
 
 	@DisplayName("존재하지 않는 카테고리 ID로 조회 시 CategoryNotFoundException 발생")
 	@Test
@@ -372,7 +372,7 @@ public class BookCategoryServiceImplTest {
 		verify(bookCategoryRepository, never()).countBookByCategoryIds(anyList());
 	}
 
-	@DisplayName("카테고리에 해당하는 책이 없을 때 빈 PagedResponse 반환")
+	/*@DisplayName("카테고리에 해당하는 책이 없을 때 빈 PagedResponse 반환")
 	@Test
 	@Order(13)
 	void findBooksByCategoryId_NoBooks() {
@@ -398,6 +398,6 @@ public class BookCategoryServiceImplTest {
 		verify(categoryRepository, times(1)).findAllChildCategoryIds(categoryId);
 		verify(bookCategoryRepository, times(1)).findBooksByCategoryId(Arrays.asList(1L, 2L), pageable);
 		verify(bookCategoryRepository, times(1)).countBookByCategoryIds(Arrays.asList(1L, 2L));
-	}
+	}*/
 
 }

@@ -176,21 +176,15 @@ class MemberControllerTest {
 
 		//then
 		result.andExpect(status().isOk())
+			.andExpect(jsonPath("username").value(response.username()))
 			.andExpect(jsonPath("name").value(response.name()))
-			.andExpect(jsonPath("gender").value(response.gender().name()))
 			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
 			.andExpect(jsonPath("email").value(response.email()))
-			.andExpect(jsonPath("birthday").value(response.birthday().toString()))
-			.andExpect(jsonPath("username").value(response.username()))
 			.andExpect(jsonPath("point").value(response.point()))
 			.andExpect(jsonPath("totalPaymentAmount").value(response.totalPaymentAmount()))
-			.andExpect(jsonPath("authority").value(response.authority().name()))
-			.andExpect(jsonPath("grade.id").value(response.grade().getId()))
-			.andExpect(jsonPath("grade.name").value(response.grade().getName()))
-			.andExpect(jsonPath("grade.pointRate").value(response.grade().getPointRate()))
-			.andExpect(jsonPath("grade.requirement").value(response.grade().getRequirement()))
-			.andExpect(jsonPath("createdAt").value(response.createdAt().toString()))
-			.andExpect(jsonPath("latestLoginAt").value(response.latestLoginAt().toString()));
+			.andExpect(jsonPath("gradeName").value(response.gradeName()))
+			.andExpect(jsonPath("pointRate").value(response.pointRate()))
+			.andExpect(jsonPath("createdAt").value(response.createdAt().toString()));
 	}
 
 	@DisplayName("회원 PK id로 회원 탈퇴 성공")
@@ -338,18 +332,15 @@ class MemberControllerTest {
 	 */
 	private MemberDetailsResponse getMemberDetailsResponse() {
 		return MemberDetailsResponse.builder()
+			.username("abc123")
 			.name("boho")
-			.gender(GenderType.MALE)
 			.phoneNumber("042-8282-8282")
 			.email("boho@nhnacademy.com")
-			.birthday(LocalDate.of(2000, 2, 22))
-			.username("nuribooks")
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
-			.authority(AuthorityType.MEMBER)
-			.grade(getStandardGrade())
+			.gradeName(getStandardGrade().getName())
+			.pointRate((getStandardGrade().getPointRate()))
 			.createdAt(LocalDateTime.of(2020, 2, 22, 22, 22 ,22))
-			.latestLoginAt(LocalDateTime.of(2022,2,22,22,22,22))
 			.build();
 	}
 

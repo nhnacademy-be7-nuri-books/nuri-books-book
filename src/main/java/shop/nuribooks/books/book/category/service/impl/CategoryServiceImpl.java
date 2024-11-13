@@ -202,5 +202,14 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 		return new CategoryResponse(category.getId(), category.getName(), subCategories);
 	}
+
+	@Override
+	public CategoryRequest getCategoryNameById(Long categoryId) {
+		String categoryName = categoryRepository.findById(categoryId)
+			.map(Category::getName)
+			.orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
+		return new CategoryRequest(categoryName);
+	}
 }
 

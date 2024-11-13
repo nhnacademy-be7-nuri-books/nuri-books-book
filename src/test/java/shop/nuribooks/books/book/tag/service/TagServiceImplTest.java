@@ -12,7 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.tag.dto.TagRequest;
 import shop.nuribooks.books.book.tag.dto.TagResponse;
 import shop.nuribooks.books.book.tag.entity.Tag;
@@ -77,18 +82,22 @@ class TagServiceImplTest {
 		Tag tag2 = Tag.builder().name("tag2").build();
 		List<Tag> tags = List.of(tag1, tag2);
 
-		//when
-		when(tagRepository.findAll()).thenReturn(tags);
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Tag> publisherPage = new PageImpl<>(tags, pageable, tags.size());
 
-		List<TagResponse> response = tagService.getAllTags();
+
+		//when
+		when(tagRepository.findAll(pageable)).thenReturn(publisherPage);
+
+		Page<TagResponse> response = tagService.getAllTags(pageable);
 
 		//then
 		assertThat(response).isNotNull();
-		assertThat(response.size()).isEqualTo(2);
-		assertThat(response.get(0).name()).isEqualTo("tag1");
-		assertThat(response.get(1).name()).isEqualTo("tag2");
+		assertThat(response).hasSize(2);
+		assertThat(response.getContent().get(0).name()).isEqualTo("tag1");
+		assertThat(response.getContent().get(1).name()).isEqualTo("tag2");
 
-		verify(tagRepository).findAll();
+		verify(tagRepository).findAll(pageable);
 
 	}
 

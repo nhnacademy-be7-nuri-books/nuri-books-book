@@ -6,6 +6,7 @@ import org.hibernate.annotations.Comment;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -38,7 +39,7 @@ public class OrderDetail {
 	@Comment("주문 상세 아이디")
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id", nullable = false,
 		foreignKey = @ForeignKey(name = "FK_order_details_to_orders_1"))
 	@Comment("연결된 주문 정보")
@@ -48,7 +49,7 @@ public class OrderDetail {
 	@Comment("주문 상태")
 	private OrderState orderState = OrderState.PENDING;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false,
 		foreignKey = @ForeignKey(name = "FK_order_details_to_books_1"))
 	@Comment("연결된 책 정보")

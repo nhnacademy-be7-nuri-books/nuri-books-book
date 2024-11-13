@@ -3,6 +3,7 @@ package shop.nuribooks.books.order.wrapping.entity;
 import org.hibernate.annotations.Comment;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,13 +31,13 @@ public class Wrapping {
 	@Comment("포장 아이디")
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id", nullable = false,
 	foreignKey = @ForeignKey(name = "FK_orders_TO_wrappings_1"))
 	@Comment("연결된 주문 정보")
 	private Order order;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "wrapping_paper_id", nullable = false,
 		foreignKey = @ForeignKey(name = "FK_wrapping_papers_TO_wrappings_1"))
 	@Comment("연결된 포장지 정보")

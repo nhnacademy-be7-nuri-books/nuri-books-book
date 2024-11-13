@@ -63,4 +63,6 @@ public interface CategoryService {
 	List<CategoryResponse> getAllCategoryTree();
 
 	CategoryResponse buildCategoryTree(Category category);
+
+	CategoryRequest getCategoryNameById(Long categoryId);
 }

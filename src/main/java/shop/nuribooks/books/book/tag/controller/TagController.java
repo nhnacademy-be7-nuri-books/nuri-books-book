@@ -2,6 +2,8 @@ package shop.nuribooks.books.book.tag.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,9 +57,9 @@ public class TagController {
 		@ApiResponse(responseCode = "200", description = "태그 조회 성공"),
 	})
 	@GetMapping
-	public ResponseEntity<List<TagResponse>> getAllTags() {
-		List<TagResponse> tags = tagService.getAllTags();
-		return ResponseEntity.status(HttpStatus.OK).body(tags);
+	public ResponseEntity<Page<TagResponse>> getAllTags(Pageable pageable) {
+		Page<TagResponse> tagResponses = tagService.getAllTags(pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(tagResponses);
 	}
 
 	/**
