@@ -1,6 +1,7 @@
 package shop.nuribooks.books.book.publisher.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.publisher.dto.PublisherRequest;
 import shop.nuribooks.books.book.publisher.dto.PublisherResponse;
@@ -9,7 +10,7 @@ public interface PublisherService {
 
 	PublisherResponse registerPublisher(PublisherRequest request);
 
-	List<PublisherResponse> getAllPublisher();
+	Page<PublisherResponse> getAllPublisher(Pageable pageable);
 
 	PublisherResponse getPublisher(Long id);
 

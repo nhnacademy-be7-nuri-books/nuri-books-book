@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.contributor.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,11 +79,9 @@ public class ContributorServiceImpl implements ContributorService {
 	 * @return 등록된 기여자 정보를 포함한 ContributorResponse List
 	 */
 	@Override
-	public List<ContributorResponse> getAllContributors() {
-		List<Contributor> contributors = contributorRepository.findAll().stream().toList();
-		return contributors.stream()
-				.map(ContributorResponse::of)
-				.toList();
+	public Page<ContributorResponse> getAllContributors(Pageable pageable) {
+		Page<Contributor> contributors = contributorRepository.findAll(pageable);
+		return contributors.map(ContributorResponse::of);
 	}
 
 	/**

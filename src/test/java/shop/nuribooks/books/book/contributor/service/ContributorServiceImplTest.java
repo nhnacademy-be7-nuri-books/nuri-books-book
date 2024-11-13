@@ -12,11 +12,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.dto.ContributorResponse;
 import shop.nuribooks.books.book.contributor.entity.Contributor;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.exception.contributor.ContributorNotFoundException;
 
 @SpringBootTest
@@ -116,18 +121,21 @@ class ContributorServiceImplTest {
 		// given
 		List<Contributor> contributors = List.of(new Contributor(1L, "contributor1"), new Contributor(2L, "contributor2"));
 
-		when(contributorRepository.findAll()).thenReturn(contributors);
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Contributor> contributorPage = new PageImpl<>(contributors, pageable, contributors.size());
+
+		when(contributorRepository.findAll(pageable)).thenReturn(contributorPage);
 
 		// when
-		List<ContributorResponse> responses = contributorService.getAllContributors();
+		Page<ContributorResponse> responses = contributorService.getAllContributors(pageable);
 
 		// then
 		assertThat(responses).isNotEmpty();
 		assertThat(responses).hasSize(2);
-		assertThat(responses.get(0).name()).isEqualTo("contributor1");
+		assertThat(responses.getContent().get(0).name()).isEqualTo("contributor1");
 
 		// 메서드 호출 여부 검증
-		verify(contributorRepository).findAll();
+		verify(contributorRepository).findAll(pageable);
 	}
 	
 	@DisplayName("기여자 조회 실패")
