@@ -6,4 +6,6 @@ import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
 public interface CouponPolicyService {
 
 	CouponPolicy registerCouponPolicy(CouponPolicyRequest request);
+
+	void deleteCouponPolicy(Long id);
 }

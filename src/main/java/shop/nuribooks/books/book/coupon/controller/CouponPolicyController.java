@@ -2,6 +2,8 @@ package shop.nuribooks.books.book.coupon.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +38,18 @@ public class CouponPolicyController {
 		couponPolicyService.registerCouponPolicy(couponPolicyRequest);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(new ResponseMessage(HttpStatus.CREATED.value(), "쿠폰 정책 생성 성공"));
+	}
+
+	@Operation(summary = "쿠폰 정책 삭제", description = "쿠폰 정책을 삭제합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "204", description = "삭제 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+	})
+	@HasRole(role = AuthorityType.ADMIN)
+	@DeleteMapping("/{coupon-policy-id}")
+	public ResponseEntity<ResponseMessage> deleteCouponPolicy(@PathVariable("coupon-policy-id") Long id) {
+		couponPolicyService.deleteCouponPolicy(id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT)
+			.body(new ResponseMessage(HttpStatus.NO_CONTENT.value(), "포인트 정책 삭제 성공"));
 	}
 }
