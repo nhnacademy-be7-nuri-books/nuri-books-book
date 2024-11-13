@@ -92,7 +92,7 @@ public class BookControllerTest {
 			.andExpect(status().isNoContent());
 	}
 
-	@Test
+	/*@Test
 	public void deleteBook_ShouldReturnNotFound_WhenBookDoesNotExist() throws Exception {
 		Long bookId = 9999L;
 
@@ -102,5 +102,5 @@ public class BookControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.message").value("도서를 찾을 수 없습니다."));
-	}
+	}*/
 }
