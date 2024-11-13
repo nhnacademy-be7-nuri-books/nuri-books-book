@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,7 +41,22 @@ public class CouponPolicyController {
 			.body(new ResponseMessage(HttpStatus.CREATED.value(), "쿠폰 정책 생성 성공"));
 	}
 
-	@Operation(summary = "쿠폰 정책 삭제", description = "쿠폰 정책을 삭제합니다.")
+	@Operation(summary = "쿠폰 정책 업데이트", description = "포인터 정책을 업데이트합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "업데이트 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+	})
+	@HasRole(role = AuthorityType.ADMIN)
+	@PutMapping("/{coupon-policy-id}")
+	public ResponseEntity<ResponseMessage> updateCouponPolicy(@PathVariable("coupon-policy-id") Long id,
+		@Valid @RequestBody CouponPolicyRequest couponPolicyRequest) {
+		this.couponPolicyService.updateCouponPolicy(id, couponPolicyRequest);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(new ResponseMessage(HttpStatus.CREATED.value(), "쿠폰 정책 업데이트 성공"));
+	}
+
+
+	@Operation(summary = "쿠폰 정책 삭제", description = "쿠폰 정책을 삭제합니다폰.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "204", description = "삭제 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
@@ -50,6 +66,6 @@ public class CouponPolicyController {
 	public ResponseEntity<ResponseMessage> deleteCouponPolicy(@PathVariable("coupon-policy-id") Long id) {
 		couponPolicyService.deleteCouponPolicy(id);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT)
-			.body(new ResponseMessage(HttpStatus.NO_CONTENT.value(), "포인트 정책 삭제 성공"));
+			.body(new ResponseMessage(HttpStatus.NO_CONTENT.value(), "쿠폰 정책 삭제 성공"));
 	}
 }

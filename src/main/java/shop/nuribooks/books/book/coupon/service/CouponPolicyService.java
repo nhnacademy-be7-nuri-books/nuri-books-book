@@ -7,5 +7,7 @@ public interface CouponPolicyService {
 
 	CouponPolicy registerCouponPolicy(CouponPolicyRequest request);
 
+	CouponPolicy updateCouponPolicy(Long id, CouponPolicyRequest request);
+
 	void deleteCouponPolicy(Long id);
 }

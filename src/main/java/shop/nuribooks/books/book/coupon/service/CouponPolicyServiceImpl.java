@@ -5,10 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponPolicyRequest;
-import shop.nuribooks.books.book.coupon.dto.CouponPolicyResponse;
 import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
 import shop.nuribooks.books.book.coupon.repository.CouponPolicyRepository;
-import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
 import shop.nuribooks.books.exception.coupon.CouponPolicyAlreadyExistsException;
 import shop.nuribooks.books.exception.coupon.CouponPolicyNotFoundException;
 
@@ -32,6 +30,22 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 		}
 		CouponPolicy couponPolicy = couponPolicyRequest.toEntity();
 		return couponPolicyRepository.save(couponPolicy);
+	}
+
+	/**
+	 * 쿠폰 정책 수정하는 메서드
+	 *
+	 * @param id
+	 * @param request
+	 * @return CouponPolicy
+	 */
+	@Override
+	public CouponPolicy updateCouponPolicy(Long id, CouponPolicyRequest request) {
+		CouponPolicy couponPolicy = couponPolicyRepository.findById(id)
+			.orElseThrow(() -> new CouponPolicyNotFoundException("쿠폰 정책이 존재하지 않습니다."));
+
+		couponPolicy.update(request);
+		return couponPolicy;
 	}
 
 	/**

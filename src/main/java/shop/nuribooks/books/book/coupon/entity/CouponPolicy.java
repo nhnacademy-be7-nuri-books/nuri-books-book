@@ -15,6 +15,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.nuribooks.books.book.coupon.dto.CouponPolicyRequest;
 import shop.nuribooks.books.book.point.enums.PolicyType;
 
 @Entity
@@ -61,5 +62,15 @@ public class CouponPolicy {
 		this.maximumDiscountPrice = maximumDiscountPrice;
 		this.startedAt = startedAt;
 		this.endedAt = endedAt;
+	}
+
+	public void update(CouponPolicyRequest request) {
+		this.policyType = request.policyType();
+		this.name = request.name();
+		this.discount = request.discount();
+		this.minimumOrderPrice = request.minimumOrderPrice();
+		this.maximumDiscountPrice = request.maximumDiscountPrice();
+		this.startedAt = request.startedAt();
+		this.endedAt = request.endedAt();
 	}
 }
