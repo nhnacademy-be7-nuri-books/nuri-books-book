@@ -25,7 +25,6 @@ public class RedisCartRepositoryImpl implements RedisCartRepository {
     @Override
     public void addCart(String cartId, RedisCartDetail redisCartDetail) {
         hashOperations.put(cartId, redisCartDetail.getBookId(), redisCartDetail.getQuantity());
-        redisTemplate.expire(cartId, 5, TimeUnit.MINUTES);
     }
 
     @Override
@@ -57,5 +56,15 @@ public class RedisCartRepositoryImpl implements RedisCartRepository {
         hashOperations.delete(sessionId, bookId);
     }
 
+    @Override
+    public void setExpire(String cartId, int value, TimeUnit timeUnit) {
+        redisTemplate.expire(cartId, value, timeUnit);
+    }
+
+    @Override
+    public void setShadowExpireKey(String key, int value, TimeUnit timeUnit) {
+        redisTemplate.opsForValue().set(key, "");
+        redisTemplate.expire(key, value, timeUnit);
+    }
 
 }

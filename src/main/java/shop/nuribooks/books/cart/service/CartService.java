@@ -1,13 +1,14 @@
 package shop.nuribooks.books.cart.service;
 
-import jakarta.validation.Valid;
 import java.util.List;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.cart.dto.response.CartResponse;
 
 public interface CartService {
 
-    void addToCart(String sessionId, CartAddRequest request);
+    void addCustomerCart(String cartId, CartAddRequest request);
+
+    void addMemberCart(String cartId, CartAddRequest request);
 
     //비회원 장바구니 조회
     List<CartResponse> getCart(String cartId);

@@ -23,7 +23,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @EnableCaching
 public class RedisConfig {
-    private final String EXPIRED_EVENT_PATTERN = "__keyevent@140__:expired";
+    private final String EXPIRED_EVENT_PATTERN = "__keyevent@133__:expired";
 
     @Value("${spring.data.redis.host}")
     private String host;

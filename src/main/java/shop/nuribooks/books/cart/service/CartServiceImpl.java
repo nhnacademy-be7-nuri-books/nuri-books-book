@@ -2,6 +2,8 @@ package shop.nuribooks.books.cart.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +25,23 @@ import shop.nuribooks.books.cart.repository.RedisCartRepository;
 @RequiredArgsConstructor
 @Service
 public class CartServiceImpl implements CartService {
+    private static final String SHADOW_KEY = "shadow:";
 
     private final BookRepository bookRepository;
     private final RedisCartRepository redisCartRepository;
 
     @Override
-    public void addToCart(String cartId, CartAddRequest request) {
+    public void addCustomerCart(String cartId, CartAddRequest request) {
         RedisCartDetail redisCartDetail = new RedisCartDetail(request.bookId().toString(), request.quantity());
         redisCartRepository.addCart(cartId, redisCartDetail);
+        redisCartRepository.setExpire(cartId, 1, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public void addMemberCart(String cartId, CartAddRequest request) {
+        RedisCartDetail redisCartDetail = new RedisCartDetail(request.bookId().toString(), request.quantity());
+        redisCartRepository.addCart(cartId, redisCartDetail);
+        redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
     }
 
     //비회원 장바구니 조회
