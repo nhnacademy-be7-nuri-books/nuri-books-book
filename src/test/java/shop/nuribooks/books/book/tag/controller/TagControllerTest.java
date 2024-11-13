@@ -12,6 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -53,17 +57,23 @@ class TagControllerTest extends ControllerTestSupport {
 		TagResponse tag2 = TagResponse.builder().id(2L).name("tag2").build();
 		List<TagResponse> response = List.of(tag1, tag2);
 
-		when(tagService.getAllTags()).thenReturn(response);
+		Page<TagResponse> pageResponses = new PageImpl<>(response);
+		Pageable pageable = PageRequest.of(0, 10);
+
+		when(tagService.getAllTags(pageable)).thenReturn(pageResponses);
 
 		mockMvc.perform(get("/api/books/tags")
-				.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("page", "0")
+				.param("size", "10"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$[0].id").value(1L))
-			.andExpect(jsonPath("$[0].name").value("tag1"))
-			.andExpect(jsonPath("$[1].id").value(2L))
-			.andExpect(jsonPath("$[1].name").value("tag2"));
+			.andExpect(jsonPath("$.content").isArray())
+			.andExpect(jsonPath("$.content[0].id").value(1L))
+			.andExpect(jsonPath("$.content[0].name").value("tag1"))
+			.andExpect(jsonPath("$.content[1].id").value(2L))
+			.andExpect(jsonPath("$.content[1].name").value("tag2"));
 
-		verify(tagService, times(1)).getAllTags();
+		verify(tagService, times(1)).getAllTags(pageable);
 
 	}
 
