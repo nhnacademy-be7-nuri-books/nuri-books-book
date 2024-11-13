@@ -42,18 +42,11 @@ public class RedisKeyExpirationListener implements MessageListener {
 		if (expiredKey.startsWith(SHADOW_KEY + MEMBER_CART_KEY)) {
 			String parsedKey = expiredKey.substring((SHADOW_KEY + MEMBER_CART_KEY).length());
 			Long memberId = Long.parseLong(parsedKey);
-			Member member = memberRepository.findById(memberId)
-				.orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-
-
 			//TODO: 기존에 카트를 가지고 있었으면 날리고 새로 만들어 주어야 한다
 
 			Cart cart = dbCartRepository.findByMember_Id(memberId)
-				.map(existingCart -> {
-					cartDetailRepository.deleteByCart(existingCart);
-					return existingCart;
-				})
 				.orElseGet(() -> createCartForMember(memberId));
+			cartDetailRepository.deleteByCart(cart);
 
 			String memberCartId = MEMBER_CART_KEY + parsedKey;
 			Map<Long, Integer> cartDetails = redisCartRepository.getCart(memberCartId);
