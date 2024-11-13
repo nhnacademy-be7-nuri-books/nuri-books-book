@@ -62,6 +62,12 @@ public class TagController {
 		return ResponseEntity.status(HttpStatus.OK).body(tagResponses);
 	}
 
+	@GetMapping("/all")
+	public ResponseEntity<List<TagResponse>> getAllTags() {
+		List<TagResponse> tagResponses = tagService.getAllTags();
+		return ResponseEntity.status(HttpStatus.OK).body(tagResponses);
+	}
+
 	/**
 	 * 특정 태그 조회하는 controller
 	 *

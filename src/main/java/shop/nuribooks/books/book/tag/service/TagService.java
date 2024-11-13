@@ -13,6 +13,8 @@ public interface TagService {
 
 	Page<TagResponse> getAllTags(Pageable pageable);
 
+	List<TagResponse> getAllTags();
+
 	TagResponse getTag(Long id);
 
 	TagResponse updateTag(Long id, TagRequest request);
