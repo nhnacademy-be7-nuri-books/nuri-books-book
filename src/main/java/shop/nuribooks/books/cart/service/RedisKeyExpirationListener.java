@@ -1,12 +1,8 @@
 package shop.nuribooks.books.cart.service;
 
-import static java.util.stream.Collectors.*;
-
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -17,16 +13,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.cart.cartdetail.entity.CartDetail;
-import shop.nuribooks.books.cart.cartdetail.entity.CartDetailId;
 import shop.nuribooks.books.cart.cartdetail.repository.CartDetailRepository;
 import shop.nuribooks.books.cart.entity.Cart;
 import shop.nuribooks.books.cart.repository.DBCartRepository;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
-import shop.nuribooks.books.member.member.service.MemberService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -52,34 +45,30 @@ public class RedisKeyExpirationListener implements MessageListener {
 			Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
-			Cart newCart = new Cart(member);
-			dbCartRepository.save(newCart);
-			return;
 
 			//TODO: 기존에 카트를 가지고 있었으면 날리고 새로 만들어 주어야 한다
 
-			// Cart cart = dbCartRepository.findByMember_Id(memberId)
-			// 	.map(existingCart -> {
-			// 		cartDetailRepository.deleteByCart(existingCart);
-			// 		return existingCart;
-			// 	})
-			// 	.orElseGet(() -> createCartForMember(memberId));
-			//
-			// String memberCartId = MEMBER_CART_KEY + parsedKey;
-			// Map<Long, Integer> cartDetails = redisCartRepository.getCart(memberCartId);
-			//
-			// List<CartDetail> cartDetailList = getCartDetailList(cartDetails, cart);
-			// cartDetailRepository.saveAll(cartDetailList);
-			// redisCartRepository.removeCart(memberCartId);
+			Cart cart = dbCartRepository.findByMember_Id(memberId)
+				.map(existingCart -> {
+					cartDetailRepository.deleteByCart(existingCart);
+					return existingCart;
+				})
+				.orElseGet(() -> createCartForMember(memberId));
+
+			String memberCartId = MEMBER_CART_KEY + parsedKey;
+			Map<Long, Integer> cartDetails = redisCartRepository.getCart(memberCartId);
+
+			List<CartDetail> cartDetailList = getCartDetailList(cartDetails, cart);
+			cartDetailRepository.saveAll(cartDetailList);
+			redisCartRepository.removeCart(memberCartId);
 		}
 	}
 
 	private List<CartDetail> getCartDetailList(Map<Long, Integer> cartDetails, Cart cart) {
 		return cartDetails.entrySet().stream()
 			.map(cartDetail -> {
-					CartDetailId cartDetailId = new CartDetailId(cart.getId(), cartDetail.getKey());
 					Book book = bookRepository.findById(cartDetail.getKey()).orElseThrow();
-					return new CartDetail(cartDetailId, cart, book, cartDetail.getValue());
+					return new CartDetail(cart, book, cartDetail.getValue());
 				}
 			)
 			.toList();
