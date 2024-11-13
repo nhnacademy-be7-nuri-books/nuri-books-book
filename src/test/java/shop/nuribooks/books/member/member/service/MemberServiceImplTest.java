@@ -336,17 +336,14 @@ class MemberServiceImplTest {
 
 		//then
 		assertThat(response.name()).isEqualTo(savedCustomer.getName());
-			assertThat(response.gender()).isEqualTo(savedMember.getGender());
+		assertThat(response.username()).isEqualTo(savedMember.getUsername());
 			assertThat(response.phoneNumber()).isEqualTo(savedCustomer.getPhoneNumber());
 			assertThat(response.email()).isEqualTo(savedCustomer.getEmail());
-			assertThat(response.birthday()).isEqualTo(savedMember.getBirthday());
-			assertThat(response.username()).isEqualTo(savedMember.getUsername());
 			assertThat(response.point()).isEqualTo(savedMember.getPoint());
 			assertThat(response.totalPaymentAmount()).isEqualTo(savedMember.getTotalPaymentAmount());
-			assertThat(response.authority()).isEqualTo(savedMember.getAuthority());
-			assertThat(response.grade()).isEqualTo(savedMember.getGrade());
+			assertThat(response.gradeName()).isEqualTo(savedMember.getGrade().getName());
+			assertThat(response.pointRate()).isEqualTo(savedMember.getGrade().getPointRate());
 			assertThat(response.createdAt()).isEqualTo(savedMember.getCreatedAt());
-			assertThat(response.latestLoginAt()).isEqualTo(savedMember.getLatestLoginAt());
 	}
 
 	@DisplayName("회원 상세 조회 실패 - 회원이 존재하지 않을 때")
