@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -11,11 +12,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.dto.ContributorResponse;
 import shop.nuribooks.books.book.contributor.entity.Contributor;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.exception.contributor.ContributorNotFoundException;
 
 @SpringBootTest
@@ -109,6 +115,29 @@ class ContributorServiceImplTest {
 
 	}
 
+	@DisplayName("모든 기여자 조회 성공")
+	@Test
+	void getAllContributor() {
+		// given
+		List<Contributor> contributors = List.of(new Contributor(1L, "contributor1"), new Contributor(2L, "contributor2"));
+
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Contributor> contributorPage = new PageImpl<>(contributors, pageable, contributors.size());
+
+		when(contributorRepository.findAll(pageable)).thenReturn(contributorPage);
+
+		// when
+		Page<ContributorResponse> responses = contributorService.getAllContributors(pageable);
+
+		// then
+		assertThat(responses).isNotEmpty();
+		assertThat(responses).hasSize(2);
+		assertThat(responses.getContent().get(0).name()).isEqualTo("contributor1");
+
+		// 메서드 호출 여부 검증
+		verify(contributorRepository).findAll(pageable);
+	}
+	
 	@DisplayName("기여자 조회 실패")
 	@Test
 	void failed_getContributor() {

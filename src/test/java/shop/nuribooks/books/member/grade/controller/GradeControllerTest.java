@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.member.grade.dto.DtoMapper;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
@@ -32,11 +33,7 @@ import shop.nuribooks.books.member.grade.dto.response.GradeUpdateResponse;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.service.GradeService;
 
-@WebMvcTest(GradeController.class)
-public class GradeControllerTest {
-
-	@MockBean
-	private GradeService gradeService;
+public class GradeControllerTest extends ControllerTestSupport {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -54,7 +51,7 @@ public class GradeControllerTest {
 		when(gradeService.registerGrade(any(GradeRegisterRequest.class))).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(post("/api/member/grade")
+		ResultActions result = mockMvc.perform(post("/api/members/grades")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -72,7 +69,7 @@ public class GradeControllerTest {
 		GradeRegisterRequest badRequest = getBadGradeRegisterRequest();
 
 		//when
-		ResultActions badResult = mockMvc.perform(post("/api/member/grade")
+		ResultActions badResult = mockMvc.perform(post("/api/members/grades")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 
@@ -96,7 +93,7 @@ public class GradeControllerTest {
 		when(gradeService.getGradeDetails(requiredName)).thenReturn(response);
 
 	    //when
-		ResultActions result = mockMvc.perform(get("/api/member/grade/{name}", requiredName));
+		ResultActions result = mockMvc.perform(get("/api/members/grades/{name}", requiredName));
 
 		//then
 		result.andExpect(status().isOk())
@@ -117,7 +114,7 @@ public class GradeControllerTest {
 			.thenReturn(response);
 
 	    //when
-		ResultActions result = mockMvc.perform(patch("/api/member/grade/{name}", requestName)
+		ResultActions result = mockMvc.perform(patch("/api/members/grades/{name}", requestName)
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -136,7 +133,7 @@ public class GradeControllerTest {
 		String requiredName = "STANDARD";
 
 		//when
-		ResultActions badResult = mockMvc.perform(patch("/api/member/grade/{name}", requiredName)
+		ResultActions badResult = mockMvc.perform(patch("/api/members/grades/{name}", requiredName)
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 
@@ -159,7 +156,7 @@ public class GradeControllerTest {
 		doNothing().when(gradeService).deleteGrade(requiredName);
 
 	    //when
-		ResultActions result = mockMvc.perform(delete("/api/member/grade/{name}", requiredName));
+		ResultActions result = mockMvc.perform(delete("/api/members/grades/{name}", requiredName));
 
 		//then
 		result.andExpect(status().isOk())
@@ -176,7 +173,7 @@ public class GradeControllerTest {
 		when(gradeService.getGradeList()).thenReturn(response);
 
 	    //when
-		ResultActions result = mockMvc.perform(get("/api/member/grade/grades"));
+		ResultActions result = mockMvc.perform(get("/api/members/grades"));
 
 		//then
 		result.andExpect(status().isOk())

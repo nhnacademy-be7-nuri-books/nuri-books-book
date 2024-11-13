@@ -7,11 +7,13 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorRegisterRequest;
 import shop.nuribooks.books.book.bookcontributor.entity.BookContributor;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
+import shop.nuribooks.books.book.booktag.entity.BookTag;
 import shop.nuribooks.books.book.contributor.entity.Contributor;
 import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
@@ -37,6 +39,7 @@ public class BookContributorServiceImpl implements BookContributorService {
     private final BookRepository bookRepository;
     private final ContributorRepository contributorRepository;
     private final ContributorRoleRepository contributorRoleRepository;
+    private final BookMapper bookMapper;
 
     /**
      * registerContributorToBook : 도서에 기여자와 기여자 역할 등록
@@ -70,6 +73,7 @@ public class BookContributorServiceImpl implements BookContributorService {
         }
     }
 
+    //TODO: QUERYDSL로 변경해야됨
     /**
      * getAllBooksByContributorId : 기여자 id 로 모든 도서 조회
      *
@@ -78,16 +82,16 @@ public class BookContributorServiceImpl implements BookContributorService {
      */
     @Override
     public List<BookResponse> getAllBooksByContributorId(Long contributorId) {
-        Contributor contributor = contributorRepository.findById(contributorId)
+        contributorRepository.findById(contributorId)
                 .orElseThrow(() -> new ContributorNotFoundException("기여자가 존재하지 않습니다."));
 
         List<Long> bookIds = bookContributorRepository.findBookIdsByContributorId(contributorId);
-
         List<Book> books = bookRepository.findAllById(bookIds);
 
         return books.stream()
-                .map(BookResponse::of)
-                .collect(Collectors.toList());    }
+                .map(bookMapper::toBookResponse)
+                .collect(Collectors.toList());
+    }
 
     /**
      * getContributorsAndRolesByBookId : 도서 id로 기여자와 기여자 역할 조회

@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -134,7 +134,7 @@ public class CategoryController {
 		@ApiResponse(responseCode = "404", description = "해당 ID의 카테고리를 찾을 수 없습니다."),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
 	})
-	@PatchMapping("/{categoryId}")
+	@PutMapping("/{categoryId}")
 	public ResponseEntity<ResponseMessage> updateCategory(
 		@Valid
 		@Parameter(description = "업데이트할 카테고리의 정보", required = true)
@@ -161,7 +161,7 @@ public class CategoryController {
 		@ApiResponse(responseCode = "404", description = "해당 ID의 카테고리를 찾을 수 없습니다."),
 	})
 	@DeleteMapping("/{categoryId}")
-	public ResponseEntity<ResponseMessage> deleteCategory(
+	public ResponseEntity<Void> deleteCategory(
 		@Parameter(description = "업데이트할 카테고리의 ID", required = true)
 		@PathVariable Long categoryId
 	) {
@@ -170,4 +170,19 @@ public class CategoryController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@Operation(summary = "카테고리 트리 조회", description = "트리 구조로 모든 카테고리를 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공적으로 카테고리 트리를 조회하였습니다.")
+	})
+	@GetMapping("/tree")
+	public ResponseEntity<List<CategoryResponse>> getAllCategoryTree() {
+		List<CategoryResponse> categoryTrees = categoryService.getAllCategoryTree();
+		return ResponseEntity.status(HttpStatus.OK).body(categoryTrees);
+	}
+
+	@GetMapping("/{category-id}/name")
+	public ResponseEntity<CategoryRequest> getCategoryName(@PathVariable(name = "category-id") Long categoryId) {
+		CategoryRequest categoryName = categoryService.getCategoryNameById(categoryId);
+		return ResponseEntity.status(HttpStatus.OK).body(categoryName);
+	}
 }

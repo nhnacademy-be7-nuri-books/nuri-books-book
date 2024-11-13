@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.annotation.PostConstruct;
+import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
@@ -42,11 +42,7 @@ import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.service.MemberService;
 
-@WebMvcTest(MemberController.class)
-class MemberControllerTest {
-
-	@MockBean
-	private MemberService memberService;
+class MemberControllerTest extends ControllerTestSupport {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -79,7 +75,7 @@ class MemberControllerTest {
 		when(memberService.registerMember(any(MemberRegisterRequest.class))).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(post("/api/member")
+		ResultActions result = mockMvc.perform(post("/api/members")
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)));
 
@@ -100,7 +96,7 @@ class MemberControllerTest {
 		MemberRegisterRequest badRequest = getBadMemberRegisterRequest();
 
 		//when
-		ResultActions badResult = mockMvc.perform(post("/api/member")
+		ResultActions badResult = mockMvc.perform(post("/api/members")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 
@@ -132,7 +128,7 @@ class MemberControllerTest {
 		when(memberService.getMemberAuthInfoByUsername(username)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(get("/api/member/username/{username}", username));
+		ResultActions result = mockMvc.perform(get("/api/members/username/{username}", username));
 
 		//then
 		result.andExpect(status().isOk())
@@ -152,7 +148,7 @@ class MemberControllerTest {
 		when(memberService.getMemberAuthInfoByEmail(email)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(get("/api/member/email/{email}", email));
+		ResultActions result = mockMvc.perform(get("/api/members/email/{email}", email));
 
 		//then
 		result.andExpect(status().isOk())
@@ -172,25 +168,19 @@ class MemberControllerTest {
 		when(memberService.getMemberDetails(memberId)).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(get("/api/member/me"));
+		ResultActions result = mockMvc.perform(get("/api/members/me"));
 
 		//then
 		result.andExpect(status().isOk())
+			.andExpect(jsonPath("username").value(response.username()))
 			.andExpect(jsonPath("name").value(response.name()))
-			.andExpect(jsonPath("gender").value(response.gender().name()))
 			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
 			.andExpect(jsonPath("email").value(response.email()))
-			.andExpect(jsonPath("birthday").value(response.birthday().toString()))
-			.andExpect(jsonPath("username").value(response.username()))
 			.andExpect(jsonPath("point").value(response.point()))
 			.andExpect(jsonPath("totalPaymentAmount").value(response.totalPaymentAmount()))
-			.andExpect(jsonPath("authority").value(response.authority().name()))
-			.andExpect(jsonPath("grade.id").value(response.grade().getId()))
-			.andExpect(jsonPath("grade.name").value(response.grade().getName()))
-			.andExpect(jsonPath("grade.pointRate").value(response.grade().getPointRate()))
-			.andExpect(jsonPath("grade.requirement").value(response.grade().getRequirement()))
-			.andExpect(jsonPath("createdAt").value(response.createdAt().toString()))
-			.andExpect(jsonPath("latestLoginAt").value(response.latestLoginAt().toString()));
+			.andExpect(jsonPath("gradeName").value(response.gradeName()))
+			.andExpect(jsonPath("pointRate").value(response.pointRate()))
+			.andExpect(jsonPath("createdAt").value(response.createdAt().toString()));
 	}
 
 	@DisplayName("회원 PK id로 회원 탈퇴 성공")
@@ -200,7 +190,7 @@ class MemberControllerTest {
 		doNothing().when(memberService).withdrawMember(anyLong());
 
 		//when
-		ResultActions result = mockMvc.perform(delete("/api/member/me"));
+		ResultActions result = mockMvc.perform(delete("/api/members/me"));
 
 		//then
 		result.andExpect(status().isOk())
@@ -219,7 +209,7 @@ class MemberControllerTest {
 		doNothing().when(memberService).updateMember(eq(memberId), any(MemberUpdateRequest.class));
 
 		//when
-		ResultActions result = mockMvc.perform(post("/api/member/me")
+		ResultActions result = mockMvc.perform(patch("/api/members/me")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -237,7 +227,7 @@ class MemberControllerTest {
 		MemberUpdateRequest badRequest = getBadMemberUpdateRequest();
 
 		//when
-		ResultActions badResult = mockMvc.perform(post("/api/member/me")
+		ResultActions badResult = mockMvc.perform(patch("/api/members/me")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 
@@ -260,7 +250,7 @@ class MemberControllerTest {
 			.thenReturn(pageResponse);
 
 	    //when
-		ResultActions result = mockMvc.perform(get("/admin/api/member/members")
+		ResultActions result = mockMvc.perform(get("/api/members")
 				.param("name", "김")
 				.param("email", "nuri")
 				.param("phoneNumber","010")
@@ -338,18 +328,15 @@ class MemberControllerTest {
 	 */
 	private MemberDetailsResponse getMemberDetailsResponse() {
 		return MemberDetailsResponse.builder()
+			.username("abc123")
 			.name("boho")
-			.gender(GenderType.MALE)
 			.phoneNumber("042-8282-8282")
 			.email("boho@nhnacademy.com")
-			.birthday(LocalDate.of(2000, 2, 22))
-			.username("nuribooks")
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
-			.authority(AuthorityType.MEMBER)
-			.grade(getStandardGrade())
+			.gradeName(getStandardGrade().getName())
+			.pointRate((getStandardGrade().getPointRate()))
 			.createdAt(LocalDateTime.of(2020, 2, 22, 22, 22 ,22))
-			.latestLoginAt(LocalDateTime.of(2022,2,22,22,22,22))
 			.build();
 	}
 

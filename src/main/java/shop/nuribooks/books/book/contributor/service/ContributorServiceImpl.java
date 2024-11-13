@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.contributor.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +13,11 @@ import shop.nuribooks.books.book.contributor.entity.ContributorEditor;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.exception.contributor.ContributorNotFoundException;
 
+import java.util.List;
+
+/**
+ * @author kyongmin
+ */
 @Transactional
 @RequiredArgsConstructor
 @Service
@@ -64,6 +71,17 @@ public class ContributorServiceImpl implements ContributorService {
 		Contributor contributor = contributorRepository.findById(contributorId)
 			.orElseThrow(() -> new ContributorNotFoundException("해당 기여자가 존재하지 않습니다."));
 		return ContributorResponse.of(contributor);
+	}
+
+	/**
+	 * getAllContributors : 등록 되어있는 모든 기여자 정보 조회
+	 *
+	 * @return 등록된 기여자 정보를 포함한 ContributorResponse List
+	 */
+	@Override
+	public Page<ContributorResponse> getAllContributors(Pageable pageable) {
+		Page<Contributor> contributors = contributorRepository.findAll(pageable);
+		return contributors.map(ContributorResponse::of);
 	}
 
 	/**

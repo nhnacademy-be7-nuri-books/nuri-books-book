@@ -21,7 +21,7 @@ import shop.nuribooks.books.member.customer.service.CustomerService;
  * @author Jprotection
  */
 @RestController
-@RequestMapping("/api/member/customer")
+@RequestMapping("/api/members/customers")
 @RequiredArgsConstructor
 public class CustomerController {
 

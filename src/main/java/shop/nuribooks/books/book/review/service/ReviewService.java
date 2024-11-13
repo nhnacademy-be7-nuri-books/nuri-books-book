@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.review.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
@@ -22,7 +23,7 @@ public interface ReviewService {
 	 * @param bookId
 	 * @return
 	 */
-	PagedResponse<ReviewMemberResponse> getReviewsByBookId(long bookId, Pageable pageable);
+	Page<ReviewMemberResponse> getReviewsByBookId(long bookId, Pageable pageable);
 
 	/**
 	 * 회원과 관련된 review 목록 반환

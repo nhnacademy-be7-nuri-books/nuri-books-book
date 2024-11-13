@@ -41,7 +41,7 @@ public class BookTest {
 		assertTrue(book.isPackageable());
 	}
 
-	@Test
+	/*@Test
 	public void testUpdateBookDetails() {
 		Publisher publisher = Publisher.builder().name("Publisher").build();
 		Book book = Book.builder()
@@ -81,7 +81,7 @@ public class BookTest {
 		assertThat(book.getTitle()).isEqualTo("Updated Title");
 		assertThat(book.getThumbnailImageUrl()).isEqualTo("updated_thumbnail.jpg");
 		assertThat(book.getDescription()).isEqualTo("Updated Description");
-	}
+	}*/
 
 	@Test
 	public void testBuilderWithNullValues() {

@@ -1,0 +1,9 @@
+### 도서태그 등록 1
+POST localhost:8083/api/cart
+Content-Type:application/json
+
+{
+  "cartId": "uuid",
+  "bookId": 1,
+  "quantity": 3
+}

@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.contributor.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +21,11 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.dto.ContributorResponse;
 import shop.nuribooks.books.book.contributor.service.ContributorService;
+import java.util.List;
 
+/**
+ * @author kyongmin
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/contributors")
@@ -74,13 +80,33 @@ public class ContributorController {
 	 */
 	@Operation(summary = "기여자 정보 조회", description = "ID를 사용해 특정 기여자의 정보를 조회합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "기여자 조회 성공")
+		@ApiResponse(responseCode = "200", description = "기여자 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+		@ApiResponse(responseCode = "404", description = "기여자를 찾을 수 없음")
+
 	})
 	@GetMapping("/{contributorId}")
 	public ResponseEntity<ContributorResponse> getContributor(
 		@PathVariable Long contributorId) {
 		ContributorResponse response = contributorService.getContributor(contributorId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	/**
+	 * 모든 기여자 정보 조회하는 controller
+	 *
+	 * @return 모든 기여자 목록이 담긴 ResponseEntity
+	 */
+	@Operation(summary = "모든 기여자 정보 조회", description = "모든 기여자의 정보를 조회합니다.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "기여자 목록 조회 성공"),
+			@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+			@ApiResponse(responseCode = "500", description = "서버 오류")
+	})
+	@GetMapping
+	public ResponseEntity<Page<ContributorResponse>> getAllContributor(Pageable pageable) {
+		Page<ContributorResponse> contributorResponses = contributorService.getAllContributors(pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(contributorResponses);
 	}
 
 	/**
@@ -95,7 +121,7 @@ public class ContributorController {
 		@ApiResponse(responseCode = "404", description = "기여자를 찾을 수 없음"),
 		@ApiResponse(responseCode = "500", description = "서버 내부 오류")
 	})
-	@DeleteMapping("{contributorId}")
+	@DeleteMapping("/{contributorId}")
 	public ResponseEntity<HttpStatus> deleteContributor(@PathVariable Long contributorId) {
 		contributorService.deleteContributor(contributorId);
 		return ResponseEntity.status(HttpStatus.OK).build();

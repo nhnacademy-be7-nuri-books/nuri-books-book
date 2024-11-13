@@ -70,7 +70,7 @@ class ContributorRoleControllerTest {
 		role1.setName(ContributorRoleEnum.AUTHOR);
 
 		ContributorRole role2 = new ContributorRole();
-		role2.setName(ContributorRoleEnum.ILLUSTRATION);
+		role2.setName(ContributorRoleEnum.ILLUSTRATOR);
 
 		when(contributorRoleService.getContributorRoles()).thenReturn(List.of(role1, role2));
 
@@ -80,7 +80,7 @@ class ContributorRoleControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.length()").value(2))
 			.andExpect(jsonPath("$[0].name").value("AUTHOR"))
-			.andExpect(jsonPath("$[1].name").value("ILLUSTRATION"));
+			.andExpect(jsonPath("$[1].name").value("ILLUSTRATOR"));
 
 		verify(contributorRoleService, times(1)).getContributorRoles();
 	}

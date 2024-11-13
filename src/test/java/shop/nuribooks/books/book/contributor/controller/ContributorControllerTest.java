@@ -5,12 +5,18 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -19,10 +25,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.dto.ContributorResponse;
 import shop.nuribooks.books.book.contributor.service.ContributorServiceImpl;
+import shop.nuribooks.books.common.ControllerTestSupport;
 
 @WebMvcTest(ContributorController.class)
 @AutoConfigureMockMvc
-class ContributorControllerTest {
+class ContributorControllerTest extends ControllerTestSupport {
 
 	@MockBean
 	private ContributorServiceImpl contributorService;
@@ -51,6 +58,33 @@ class ContributorControllerTest {
 		verify(contributorService).registerContributor(any(ContributorRequest.class));
 	}
 
+	@DisplayName("모든 출판사 조회")
+	@Test
+	void getAllContributor() throws Exception {
+		// given
+		List<ContributorResponse> responses = List.of(
+			new ContributorResponse(1L, "contributor1"),
+			new ContributorResponse(2L, "contributor2")
+		);
+
+		Page<ContributorResponse> pageResponses = new PageImpl<>(responses);
+		Pageable pageable = PageRequest.of(0, 10);
+
+		when(contributorService.getAllContributors(pageable)).thenReturn(pageResponses);
+
+		// when & then
+		mockMvc.perform(get("/api/contributors")
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("page", "0")
+				.param("size", "10"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.content").isArray())
+			.andExpect(jsonPath("$.content[0].name").value("contributor1"))
+			.andExpect(jsonPath("$.content[1].name").value("contributor2"));
+
+		verify(contributorService).getAllContributors(pageable);
+	}
+
 	@DisplayName("기여자 수정")
 	@Test
 	void updateContributor() throws Exception {
@@ -59,7 +93,8 @@ class ContributorControllerTest {
 		ContributorRequest request = ContributorRequest.builder().name("Lee").build();
 		ContributorResponse response = ContributorResponse.builder().id(1L).name("Lee").build();
 
-		when(contributorService.updateContributor(eq(contributorId), any(ContributorRequest.class))).thenReturn(response);
+		when(contributorService.updateContributor(eq(contributorId), any(ContributorRequest.class))).thenReturn(
+			response);
 
 		// when & then
 		mockMvc.perform(put("/api/contributors/{contributorId}", contributorId)

@@ -1,7 +1,7 @@
 package shop.nuribooks.books.book.publisher.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.publisher.dto.PublisherRequest;
 import shop.nuribooks.books.book.publisher.dto.PublisherResponse;
+import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.service.PublisherService;
 
 /**
@@ -59,8 +60,8 @@ public class PublisherController {
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	@GetMapping("/api/publishers")
-	public ResponseEntity<List<PublisherResponse>> getAllPublisher() {
-		List<PublisherResponse> publisherResponses = publisherService.getAllPublisher();
+	public ResponseEntity<Page<PublisherResponse>> getAllPublisher(Pageable pageable) {
+		Page<PublisherResponse> publisherResponses = publisherService.getAllPublisher(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(publisherResponses);
 	}
 

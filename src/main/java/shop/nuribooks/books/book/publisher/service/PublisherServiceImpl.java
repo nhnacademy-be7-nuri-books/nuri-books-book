@@ -2,6 +2,8 @@ package shop.nuribooks.books.book.publisher.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,11 +48,9 @@ public class PublisherServiceImpl implements PublisherService {
 	 * @return 등록된 출판사 정보를 포함한 PublisherResponse List
 	 */
 	@Override
-	public List<PublisherResponse> getAllPublisher() {
-		List<Publisher> publishers = publisherRepository.findAll().stream().toList();
-		return publishers.stream()
-			.map(PublisherResponse::of)
-			.toList();
+	public Page<PublisherResponse> getAllPublisher(Pageable pageable) {
+		Page<Publisher> publishers = publisherRepository.findAll(pageable);
+		return publishers.map(PublisherResponse::of);
 	}
 
 	/**

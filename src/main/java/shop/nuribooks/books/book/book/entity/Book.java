@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.book.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -101,6 +102,8 @@ public class Book {
 	//@ColumnDefault("0")
 	private Long viewCount;
 
+	private LocalDateTime deletedAt;
+
 	@Builder
 	@Jacksonized
 	private Book(Publisher publisherId, BookStateEnum state, String title, String thumbnailImageUrl,
@@ -124,24 +127,28 @@ public class Book {
 		this.viewCount = viewCount;
 	}
 
-	public void updateBookDetails(BookUpdateRequest request, BookStateEnum bookStateEnum, Publisher publisher) {
-		this.publisherId = publisher;
-		this.state = bookStateEnum;
-		this.title = request.title();
-		this.thumbnailImageUrl = request.thumbnailImageUrl();
-		this.detailImageUrl = request.detailImageUrl();
-		this.publicationDate = request.publicationDate();
+	public void updateBookDetails(BookUpdateRequest request) {
 		this.price = request.price();
 		this.discountRate = request.discountRate();
+		this.stock = request.stock();
+		this.state = BookStateEnum.fromStringKor(request.state());
+		this.thumbnailImageUrl = request.thumbnailImageUrl();
+		this.detailImageUrl = request.detailImageUrl();
 		this.description = request.description();
 		this.contents = request.contents();
-		this.isbn = request.isbn();
 		this.isPackageable = request.isPackageable();
-		this.stock = request.stock();
 	}
 
 	public void incrementViewCount() {
 		this.viewCount++;
+	}
+
+	public void delete() {
+		this.deletedAt = LocalDateTime.now();
+	}
+
+	public void updateStock(int count){
+		this.stock -= count;
 	}
 
 }

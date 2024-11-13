@@ -17,15 +17,12 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.service.CustomerService;
 
-@WebMvcTest(CustomerController.class)
-public class CustomerControllerTest {
-
-	@MockBean
-	private CustomerService customerService;
+public class CustomerControllerTest extends ControllerTestSupport {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -43,7 +40,7 @@ public class CustomerControllerTest {
 		when(customerService.registerCustomer(any(CustomerRegisterRequest.class))).thenReturn(response);
 
 		//when
-		ResultActions result = mockMvc.perform(post("/api/member/customer")
+		ResultActions result = mockMvc.perform(post("/api/members/customers")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -61,7 +58,7 @@ public class CustomerControllerTest {
 		CustomerRegisterRequest badRequest = getBadCustomerRegisterRequest();
 
 		//when
-		ResultActions badResult = mockMvc.perform(post("/api/member/customer")
+		ResultActions badResult = mockMvc.perform(post("/api/members/customers")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 

@@ -3,6 +3,10 @@ package shop.nuribooks.books.book.category.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -14,14 +18,19 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.entity.BookCategory;
 import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.impl.BookCategoryServiceImpl;
+import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.category.BookCategoryAlreadyExistsException;
 import shop.nuribooks.books.exception.category.BookCategoryNotFoundException;
@@ -237,5 +246,158 @@ public class BookCategoryServiceImplTest {
 		verify(bookCategoryRepository, times(1)).findByBookAndCategory(book, category);
 		verify(bookCategoryRepository, never()).delete(any());
 	}
+
+	@DisplayName("주어진 도서 ID에 해당하는 카테고리 목록 조회 성공")
+	@Test
+	@Order(9)
+	void findCategoriesByBookId_Success() {
+		// Given
+		Long bookId = 1L;
+		List<List<SimpleCategoryResponse>> categories = List.of(
+			List.of(new SimpleCategoryResponse(1L, "Category1")),
+			List.of(new SimpleCategoryResponse(2L, "Category2"))
+		);
+
+		when(bookRepository.existsById(bookId)).thenReturn(true);
+		when(bookCategoryRepository.findCategoriesByBookId(bookId)).thenReturn(categories);
+
+		// When
+		List<List<SimpleCategoryResponse>> result = bookCategoryService.findCategoriesByBookId(bookId);
+
+		// Then
+		assertThat(result).isNotNull();
+		assertThat(result).hasSize(2);
+		assertThat(result.get(0)).extracting(SimpleCategoryResponse::name)
+			.containsExactly("Category1");
+		assertThat(result.get(1)).extracting(SimpleCategoryResponse::name)
+			.containsExactly("Category2");
+
+		verify(bookRepository, times(1)).existsById(bookId);
+		verify(bookCategoryRepository, times(1)).findCategoriesByBookId(bookId);
+	}
+
+	@DisplayName("주어진 도서 ID가 존재하지 않을 때 BookNotFoundException 발생")
+	@Test
+	@Order(10)
+	void findCategoriesByBookId_BookNotFoundException() {
+		// Given
+		Long bookId = 1L;
+
+		when(bookRepository.existsById(bookId)).thenReturn(false);
+
+		// When & Then
+		assertThatThrownBy(() -> bookCategoryService.findCategoriesByBookId(bookId))
+			.isInstanceOf(BookNotFoundException.class)
+			.hasMessageContaining(String.valueOf(bookId));
+
+		verify(bookRepository, times(1)).existsById(bookId);
+		verify(bookCategoryRepository, never()).findCategoriesByBookId(bookId);
+	}
+
+	/*@DisplayName("존재하는 카테고리 ID로 책 목록 조회 성공")
+	@Test
+	@Order(11)
+	void findBooksByCategoryId_Success() {
+		// Given
+		Long categoryId = 1L;
+		Pageable pageable = PageRequest.of(0, 10);
+
+		Category category = mock(Category.class);
+
+		when(categoryRepository.existsById(categoryId)).thenReturn(true);
+		when(categoryRepository.findAllChildCategoryIds(categoryId)).thenReturn(Arrays.asList(1L, 2L));
+
+		List<AdminBookListResponse> books = Arrays.asList(
+			new AdminBookListResponse(
+				1L,                      // id
+				"Publisher 1",           // publisherName
+				"Available",             // state
+				"Book Title 1",          // title
+				new BigDecimal("29.99"), // price
+				new BigDecimal("19.99"), // salePrice
+				33,                      // discountRate
+				true,                    // isPackageable
+				100,                     // stock
+				"thumbnail1.jpg"         // thumbnailImageUrl
+			),
+			new AdminBookListResponse(
+				2L,                      // id
+				"Publisher 2",           // publisherName
+				"OutOfStock",            // state
+				"Book Title 2",          // title
+				new BigDecimal("39.99"), // price
+				new BigDecimal("29.99"), // salePrice
+				25,                      // discountRate
+				false,                   // isPackageable
+				0,                       // stock
+				"thumbnail2.jpg"         // thumbnailImageUrl
+			)
+		);
+		when(bookCategoryRepository.findBooksByCategoryId(Arrays.asList(1L, 2L), pageable)).thenReturn(books);
+		when(bookCategoryRepository.countBookByCategoryIds(Arrays.asList(1L, 2L))).thenReturn(2L);
+
+		// When
+		PagedResponse<AdminBookListResponse> response = bookCategoryService.findBooksByCategoryId(categoryId, pageable);
+
+		// Then
+		assertThat(response).isNotNull();
+		assertThat(response.totalElements()).isEqualTo(2);
+		assertThat(response.content()).hasSize(2);
+		assertThat(response.content()).extracting(AdminBookListResponse::id)
+			.containsExactly(1L, 2L);
+
+		verify(categoryRepository, times(1)).existsById(categoryId);
+		verify(categoryRepository, times(1)).findAllChildCategoryIds(categoryId);
+		verify(bookCategoryRepository, times(1)).findBooksByCategoryId(Arrays.asList(1L, 2L), pageable);
+		verify(bookCategoryRepository, times(1)).countBookByCategoryIds(Arrays.asList(1L, 2L));
+	}*/
+
+	@DisplayName("존재하지 않는 카테고리 ID로 조회 시 CategoryNotFoundException 발생")
+	@Test
+	@Order(12)
+	void findBooksByCategoryId_CategoryNotFoundException() {
+		// Given
+		Long categoryId = 1L;
+		Pageable pageable = PageRequest.of(0, 10);
+
+		when(categoryRepository.existsById(categoryId)).thenReturn(false);
+
+		// When & Then
+		assertThatThrownBy(() -> bookCategoryService.findBooksByCategoryId(categoryId, pageable))
+			.isInstanceOf(CategoryNotFoundException.class);
+
+		verify(categoryRepository, times(1)).existsById(categoryId);
+		verify(categoryRepository, never()).findAllChildCategoryIds(anyLong());
+		verify(bookCategoryRepository, never()).findBooksByCategoryId(anyList(), any());
+		verify(bookCategoryRepository, never()).countBookByCategoryIds(anyList());
+	}
+
+	/*@DisplayName("카테고리에 해당하는 책이 없을 때 빈 PagedResponse 반환")
+	@Test
+	@Order(13)
+	void findBooksByCategoryId_NoBooks() {
+		// Given
+		Long categoryId = 1L;
+		Pageable pageable = PageRequest.of(0, 10);
+
+		when(categoryRepository.existsById(categoryId)).thenReturn(true);
+		when(categoryRepository.findAllChildCategoryIds(categoryId)).thenReturn(Arrays.asList(1L, 2L));
+		when(bookCategoryRepository.findBooksByCategoryId(Arrays.asList(1L, 2L), pageable)).thenReturn(
+			new ArrayList<>());
+		when(bookCategoryRepository.countBookByCategoryIds(Arrays.asList(1L, 2L))).thenReturn(0L);
+
+		// When
+		PagedResponse<AdminBookListResponse> response = bookCategoryService.findBooksByCategoryId(categoryId, pageable);
+
+		// Then
+		assertThat(response).isNotNull();
+		assertThat(response.totalElements()).isEqualTo(0);
+		assertThat(response.content()).isEmpty();
+
+		verify(categoryRepository, times(1)).existsById(categoryId);
+		verify(categoryRepository, times(1)).findAllChildCategoryIds(categoryId);
+		verify(bookCategoryRepository, times(1)).findBooksByCategoryId(Arrays.asList(1L, 2L), pageable);
+		verify(bookCategoryRepository, times(1)).countBookByCategoryIds(Arrays.asList(1L, 2L));
+	}*/
 
 }
