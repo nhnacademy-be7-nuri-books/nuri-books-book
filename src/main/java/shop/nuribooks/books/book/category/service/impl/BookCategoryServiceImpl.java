@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -137,10 +136,6 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			categoryIds,
 			pageable
 		);
-
-		if (pageable.getPageNumber() > bookContributorsResponsePage.getTotalPages() - 1) {
-			throw new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다.");
-		}
 
 		return new PagedResponse<>(
 			bookContributorsResponsePage.getContent(),
