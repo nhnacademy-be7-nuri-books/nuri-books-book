@@ -1,10 +1,13 @@
 package shop.nuribooks.books.book.coupon.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponPolicyRequest;
+import shop.nuribooks.books.book.coupon.dto.CouponPolicyResponse;
 import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
 import shop.nuribooks.books.book.coupon.repository.CouponPolicyRepository;
 import shop.nuribooks.books.exception.coupon.CouponPolicyAlreadyExistsException;
@@ -15,6 +18,18 @@ import shop.nuribooks.books.exception.coupon.CouponPolicyNotFoundException;
 public class CouponPolicyServiceImpl implements CouponPolicyService {
 
 	private final CouponPolicyRepository couponPolicyRepository;
+
+	/**
+	 * 모든 쿠폰 정책 조회하는 메서드
+	 *
+	 * @param pageable
+	 * @return
+	 */
+	@Override
+	public Page<CouponPolicyResponse> getCouponPolicies(Pageable pageable) {
+		Page<CouponPolicy> couponPolicies = couponPolicyRepository.findAll(pageable);
+		return couponPolicies.map(CouponPolicyResponse::of);
+	}
 
 	/**
 	 * 쿠폰 정책 등록하는 메서드
