@@ -66,7 +66,7 @@ class AddressRepositoryTest {
         Address address = Address.builder()
                 .name("test")
                 .address("장말로")
-                .addressDetail("103호")
+                .detailAddress("103호")
                 .isDefault(true)
                 .build();
         address.setMember(member);
