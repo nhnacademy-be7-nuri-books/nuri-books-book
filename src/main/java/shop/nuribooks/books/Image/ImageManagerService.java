@@ -1,6 +1,8 @@
 package shop.nuribooks.books.Image;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +18,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.common.config.keymanager.KeyManagerConfig;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageManagerService {
@@ -35,9 +39,15 @@ public class ImageManagerService {
 	private String imageSecretId;
 
 	public String uploadImage(MultipartFile file) throws IOException {
-		String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-		String path = "/nuribooks/" + fileName;
-		String uploadUrl = imageManagerUrl + "/" + imageAppKey + "/images?path=" + path + "&overwirte=true";
+		String originalFileName = file.getOriginalFilename();
+		if(originalFileName == null || originalFileName.isEmpty()) {
+			originalFileName = "default_image.png";
+		}
+
+		String encodedFileName = URLEncoder.encode(originalFileName, StandardCharsets.UTF_8);
+
+		String path = "/nuribooks/" + encodedFileName;
+		String uploadUrl = imageManagerUrl + "/" + imageAppKey + "/images?path=" + path + "&overwrite=true";
 
 		String secretKey = keyManagerConfig.getSecretValue(imageSecretId);
 
@@ -53,9 +63,13 @@ public class ImageManagerService {
 
 		if(response.getStatusCode().is2xxSuccessful()) {
 			//JSON 응답 파싱하여 URL 추출
+			log.info("{}", response.getBody());
 			JsonNode root = objectMapper.readTree(response.getBody());
+			String imageUrl = root.path("file").path("url").asText();
+			log.info("Image uploaded successfully. URL: {}", imageUrl);
 			return root.path("file").path("url").asText();
 		} else {
+			log.error("Failed to upload image to NHN Image Manager. Status: {}, Response: {}", response.getStatusCode(), response.getBody());
 			throw new IOException("Image Manager 업로드 실패");
 		}
 	}

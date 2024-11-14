@@ -31,7 +31,7 @@ public class KeyManagerConfig {
 	public String getSecretValue(String keyId) {
 		RestTemplate restTemplate = new RestTemplate();
 
-		String url = String.format("%s/keymanager/v1.2/appkey/%s/secrets/%s", keyManagerUrl, appKey, accessKeyId);
+		String url = String.format("%s/keymanager/v1.2/appkey/%s/secrets/%s", keyManagerUrl, appKey, keyId);
 
 		//키매니저 필수 헤더
 		HttpHeaders headers = new HttpHeaders();
