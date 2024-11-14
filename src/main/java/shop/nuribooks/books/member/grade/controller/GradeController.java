@@ -25,7 +25,6 @@ import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeListResponse;
-import shop.nuribooks.books.member.grade.dto.response.GradeRegisterResponse;
 import shop.nuribooks.books.member.grade.service.GradeService;
 
 /**
@@ -48,10 +47,12 @@ public class GradeController {
 		@ApiResponse(responseCode = "409", description = "등록된 등급이 이미 존재함")
 	})
 	@PostMapping
-	public ResponseEntity<GradeRegisterResponse> gradeRegister(@RequestBody @Valid GradeRegisterRequest request) {
-		GradeRegisterResponse response = gradeService.registerGrade(request);
+	public ResponseEntity<ResponseMessage> gradeRegister(@RequestBody @Valid GradeRegisterRequest request) {
 
-		return ResponseEntity.status(CREATED).body(response);
+		gradeService.registerGrade(request);
+
+		return ResponseEntity.status(CREATED).body(
+			new ResponseMessage(CREATED.value(), "등급이 성공적으로 생성되었습니다."));
 	}
 
 	/**

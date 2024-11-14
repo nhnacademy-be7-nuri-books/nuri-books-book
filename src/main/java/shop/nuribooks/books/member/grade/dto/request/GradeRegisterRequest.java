@@ -2,7 +2,6 @@ package shop.nuribooks.books.member.grade.dto.request;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
@@ -23,7 +22,6 @@ public record GradeRegisterRequest(
 	Integer pointRate,
 
 	@NotNull(message = "등급의 승급 조건 금액은 반드시 입력해야 합니다.")
-	@Column(precision = 11, scale = 2)
 	@DecimalMin(value = "0", inclusive = false, message = "등급의 승급 조건 금액은 0원을 초과해야 합니다.")
 	@DecimalMax(value = "100000000", message = "등급의 승급 조건 금액은 1억원을 초과할 수 없습니다.")
 	BigDecimal requirement
