@@ -1,16 +1,15 @@
 package shop.nuribooks.books.member.member.controller;
 
 import static org.springframework.http.HttpStatus.*;
-import static shop.nuribooks.books.member.member.entity.AuthorityType.*;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,12 +19,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
+import shop.nuribooks.books.member.member.dto.request.MemberPasswordUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberSearchRequest;
-import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
@@ -146,9 +144,9 @@ public class MemberController {
 		@ApiResponse(responseCode = "400", description = "회원 정보 수정 요청 데이터가 유효하지 않음"),
 		@ApiResponse(responseCode = "404", description = "회원이 존재하지 않음")
 	})
-	@PatchMapping("/api/members/me")
+	@PutMapping("/api/members/me")
 	public ResponseEntity<ResponseMessage> memberUpdate(
-		@RequestBody @Valid MemberUpdateRequest request) {
+		@RequestBody @Valid MemberPasswordUpdateRequest request) {
 
 		Long memberId = MemberIdContext.getMemberId();
 		memberService.updateMember(memberId, request);

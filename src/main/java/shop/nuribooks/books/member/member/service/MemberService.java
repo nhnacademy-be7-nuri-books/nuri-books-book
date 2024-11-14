@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberSearchRequest;
-import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
+import shop.nuribooks.books.member.member.dto.request.MemberPasswordUpdateRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
@@ -20,7 +20,7 @@ public interface MemberService {
 
 	void withdrawMember(Long memberId);
 
-	void updateMember(Long memberId, MemberUpdateRequest request);
+	void updateMember(Long memberId, MemberPasswordUpdateRequest request);
 
 	MemberAuthInfoResponse getMemberAuthInfoByUsername(String username);
 

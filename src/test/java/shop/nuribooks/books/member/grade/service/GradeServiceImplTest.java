@@ -23,7 +23,6 @@ import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeListResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeRegisterResponse;
-import shop.nuribooks.books.member.grade.dto.response.GradeUpdateResponse;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -88,6 +87,7 @@ public class GradeServiceImplTest {
 		GradeDetailsResponse response = gradeServiceImpl.getGradeDetails(requiredName);
 
 		//then
+		assertThat(response.id()).isEqualTo(savedGrade.getId());
 		assertThat(response.name()).isEqualTo(savedGrade.getName());
 		assertThat(response.pointRate()).isEqualTo(savedGrade.getPointRate());
 		assertThat(response.requirement()).isEqualTo(savedGrade.getRequirement());
@@ -119,14 +119,9 @@ public class GradeServiceImplTest {
 		when(gradeRepository.findByName(requiredName)).thenReturn(Optional.of(savedGrade));
 
 	    //when
-		GradeUpdateResponse response = gradeServiceImpl.updateGrade(requiredName, request);
+		gradeServiceImpl.updateGrade(requiredName, request);
 
 		//then
-		assertThat(response.name()).isEqualTo(request.name());
-		assertThat(response.pointRate()).isEqualTo(request.pointRate());
-		assertThat(response.requirement()).isEqualTo(request.requirement());
-
-		//verify
 		verify(savedGrade, times(1))
 			.changeGradeInformation(request.name(), request.pointRate(), request.requirement());
 	}
