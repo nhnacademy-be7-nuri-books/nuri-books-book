@@ -49,7 +49,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public List<CartBookResponse> getCart(String cartId) {
         Map<Long, Integer> cart = redisCartRepository.getCart(cartId);
-
+        refreshExpireKey(cartId);
         return convertRedisCartList(cart);
     }
 
@@ -95,6 +95,16 @@ public class CartServiceImpl implements CartService {
                 }
             )
             .toList();
+    }
+
+    private void refreshExpireKey(String cartId) {
+        if (cartId.startsWith(MEMBER_CART_KEY)) {
+            redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
+        }
+        else {
+            redisCartRepository.setExpire(cartId, 1, TimeUnit.MINUTES);
+
+        }
     }
 
 }
