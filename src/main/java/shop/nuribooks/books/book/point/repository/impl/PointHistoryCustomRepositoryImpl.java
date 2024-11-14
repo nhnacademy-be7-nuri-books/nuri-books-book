@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.point.repository.impl;
 import static shop.nuribooks.books.book.point.entity.QPointHistory.*;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -40,8 +41,8 @@ public class PointHistoryCustomRepositoryImpl implements PointHistoryCustomRepos
 					pointHistory.createdAt
 				)
 			).from(pointHistory)
-			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart(),
-				pointHistoryPeriodRequest.getEnd()))
+			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart().atStartOfDay(),
+				pointHistoryPeriodRequest.getEnd().atTime(LocalTime.now())))
 			.where(pointHistory.deletedAt.isNull())
 			.where(pointHistory.member.id.eq(memberId))
 			.where(type.getBe())
@@ -62,8 +63,8 @@ public class PointHistoryCustomRepositoryImpl implements PointHistoryCustomRepos
 	public long countPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest) {
 		return queryFactory.select(pointHistory.id.count())
 			.from(pointHistory)
-			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart(),
-				pointHistoryPeriodRequest.getEnd()))
+			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart().atStartOfDay(),
+				pointHistoryPeriodRequest.getEnd().atTime(LocalTime.now())))
 			.where(pointHistory.deletedAt.isNull())
 			.where(pointHistory.member.id.eq(memberId))
 			.fetchOne();
@@ -80,8 +81,8 @@ public class PointHistoryCustomRepositoryImpl implements PointHistoryCustomRepos
 	public long countUsedPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest) {
 		return queryFactory.select(pointHistory.id.count())
 			.from(pointHistory)
-			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart(),
-				pointHistoryPeriodRequest.getEnd()))
+			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart().atStartOfDay(),
+				pointHistoryPeriodRequest.getEnd().atTime(LocalTime.now())))
 			.where(pointHistory.deletedAt.isNull())
 			.where(pointHistory.member.id.eq(memberId))
 			.where(pointHistory.amount.lt(BigDecimal.ZERO))
@@ -99,8 +100,8 @@ public class PointHistoryCustomRepositoryImpl implements PointHistoryCustomRepos
 	public long countEarnedPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest) {
 		return queryFactory.select(pointHistory.id.count())
 			.from(pointHistory)
-			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart(),
-				pointHistoryPeriodRequest.getEnd()))
+			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart().atStartOfDay(),
+				pointHistoryPeriodRequest.getEnd().atTime(LocalTime.now())))
 			.where(pointHistory.deletedAt.isNull())
 			.where(pointHistory.member.id.eq(memberId))
 			.where(pointHistory.amount.goe(BigDecimal.ZERO))
