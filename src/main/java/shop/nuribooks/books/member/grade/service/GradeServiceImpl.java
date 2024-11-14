@@ -18,7 +18,6 @@ import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeListResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeRegisterResponse;
-import shop.nuribooks.books.member.grade.dto.response.GradeUpdateResponse;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -73,12 +72,10 @@ public class GradeServiceImpl implements GradeService {
 	 */
 	@Override
 	@Transactional
-	public GradeUpdateResponse updateGrade(String name, GradeUpdateRequest request) {
+	public void updateGrade(String name, GradeUpdateRequest request) {
 		Grade foundGrade = getGrade(name);
 
 		foundGrade.changeGradeInformation(request.name().toUpperCase(), request.pointRate(), request.requirement());
-
-		return DtoMapper.toUpdateDto(foundGrade);
 	}
 
 	/**
