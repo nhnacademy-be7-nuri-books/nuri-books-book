@@ -8,10 +8,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.Builder;
+import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
 import shop.nuribooks.books.order.orderDetail.dto.OrderDetailRequest;
 import shop.nuribooks.books.order.shipping.dto.ShippingRegisterRequest;
 import shop.nuribooks.books.order.stub.coupon.AllAppliedCouponRequestStub;
@@ -30,6 +29,7 @@ public record OrderTempRegisterRequest(
 	ShippingRegisterRequest shippingRegister, // 배송 정보
 
 	// nullable
+	CustomerRegisterRequest customerRegister,
 	@PositiveOrZero(message = "사용 포인트는 0 이상이어야 합니다.")
 	BigDecimal usingPoint, // 사용 포인트
 	AllAppliedCouponRequestStub allAppliedCoupon, // 주문 전용 쿠폰 (stub 객체 사용 이후 변경 예정)

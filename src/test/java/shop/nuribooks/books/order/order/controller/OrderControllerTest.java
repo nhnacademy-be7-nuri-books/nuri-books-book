@@ -78,6 +78,7 @@ class OrderControllerTest {
 			LocalDateTime.now(),
 			orderDetailRequestList,
 			shippingRegisterRequest,
+			null,
 			BigDecimal.ZERO,
 			null,
 			null
