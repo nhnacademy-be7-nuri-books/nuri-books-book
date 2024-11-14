@@ -8,5 +8,6 @@ public record MemberAuthInfoResponse(
 	Long customerId,
 	String username,
 	String password,
-	String role // "ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SELLER"
+	String role, // "ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SELLER"
+	String status // "STATUS_ACTIVE", "STATUS_INACTIVE", "STATUS_WITHDRAWN"
 ) {}

@@ -92,12 +92,12 @@ public class Member {
 
 	private LocalDateTime createdAt;
 
-	@Column(precision = 10, scale = 2)
+	@Column(precision = 10)
 	@NotNull
 	@Setter
 	private BigDecimal point;
 
-	@Column(precision = 10, scale = 2)
+	@Column(precision = 10)
 	@NotNull
 	private BigDecimal totalPaymentAmount;
 
@@ -124,6 +124,7 @@ public class Member {
 	public void changeToWithdrawn() {
 		this.status = WITHDRAWN;
 		this.withdrawnAt = LocalDateTime.now();
+		this.point = ZERO;
 	}
 
 	/**
