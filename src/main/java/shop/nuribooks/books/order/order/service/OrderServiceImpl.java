@@ -16,12 +16,15 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
+import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.address.repository.AddressRepository;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
+import shop.nuribooks.books.member.member.dto.MemberPointDTO;
+import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
@@ -40,6 +43,7 @@ import shop.nuribooks.books.order.shipping.service.ShippingService;
 public class OrderServiceImpl implements OrderService{
 
 	private final CustomerRepository customerRepository;
+	private final MemberRepository memberRepository;
 	private final OrderRepository orderRepository;
 	private final BookRepository bookRepository;
 	private final AddressRepository addressRepository;
@@ -48,6 +52,72 @@ public class OrderServiceImpl implements OrderService{
 
 	private final OrderDetailService orderDetailService;
 	private final ShippingService shippingService;
+
+	/**
+	 * 주문 폼 정보 가져오기 - 바로 주문(회원)
+	 *
+	 * @param id 사용자 아이디
+	 * @param bookId 상품 아이디
+	 * @param quantity 상품 갯수
+	 * @return OrderInformationResponse
+	 */
+	@Override
+	public OrderInformationResponse getMemberOrderInformation(Long id, Long bookId, int quantity) {
+
+		// 사용자 확인
+		Customer customer = getCustomerById(id);
+
+		// 주소 정보 가져오기
+		List<Address> addressesByMemberId = addressRepository.findAllByMemberId(customer.getId());
+		List<AddressResponse> addressResponseList = addressesByMemberId.stream()
+			.map(AddressResponse::of)
+			.toList();
+
+		// 도서 정보 가져오기
+		List<BookOrderResponse> bookOrderResponses = getBookOrderResponses(bookId,
+			quantity);
+
+		// 도서 리스트의 총 가격 반환
+		BigDecimal orderTotalPrice = calculateTotalPrice(bookOrderResponses);
+
+		// 배송비 정보 가져오기
+		ShippingPolicy shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
+
+		// 포인트 가져오기
+		Optional<MemberPointDTO> point = memberRepository.findPointById(id);
+
+		// todo : 쿠폰
+
+		return OrderInformationResponse.of(
+			customer,
+			addressResponseList,
+			bookOrderResponses,
+			shippingPolicy,
+			point.get().point());
+	}
+
+	/**
+	 * 주문 폼 정보 가져오기 - 바로 주문(회원)
+	 *
+	 * @param bookId 상품 아이디
+	 * @param quantity 상품 갯수
+	 * @return
+	 */
+	@Override
+	public OrderInformationResponse getCustomerOrderInformation(Long bookId, int quantity) {
+		
+		// 도서 정보 가져오기
+		List<BookOrderResponse> bookOrderResponses = getBookOrderResponses(bookId,
+			quantity);
+
+		// 도서 리스트의 총 가격 반환
+		BigDecimal orderTotalPrice = calculateTotalPrice(bookOrderResponses);
+
+		// 배송비 정보 가져오기
+		ShippingPolicy shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
+
+		return OrderInformationResponse.of(bookOrderResponses, shippingPolicy);
+	}
 
 	/**
 	 * 회원 주문 임시 저장
@@ -62,8 +132,7 @@ public class OrderServiceImpl implements OrderService{
 		OrderTempRegisterRequest orderTempRegisterRequest) {
 
 		// 사용자 확인
-		Customer customer = customerRepository.findById(id)
-			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 사용자입니다."));
+		Customer customer = getCustomerById(id);
 
 		// todo : 회원 쿠폰 처리
 		// todo : 회원 포인트 차감
@@ -132,68 +201,6 @@ public class OrderServiceImpl implements OrderService{
 		return OrderTempRegisterResponse.of(order, makeOrderName(bookTitles));
 	}
 
-	// 바로 주문 - 회원
-	@Override
-	public OrderInformationResponse getMemberOrderInformation(Long id, Long bookId, int quantity) {
-
-		// 사용자 확인
-		Customer customer = customerRepository.findById(id)
-			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 사용자입니다."));
-
-		// 주소 정보 가져오기
-		List<Address> addressesByMemberId = addressRepository.findAllByMemberId(customer.getId());
-		List<AddressResponse> addressResponseList = addressesByMemberId.stream()
-			.map(AddressResponse::of)
-			.toList();
-
-		// 도서 정보 가져오기
-		Optional<Book> book = bookRepository.findById(bookId);
-
-		// 도서 기여자 정보 가져오기
-		List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(bookId);
-
-		List<BookOrderResponse> bookOrderResponses = new ArrayList<>();
-		BookOrderResponse bookOrderResponse = BookOrderResponse.of(book.get(), contributors, quantity);
-		bookOrderResponses.add(bookOrderResponse);
-
-		BigDecimal orderTotalPrice = BigDecimal.ZERO;
-		for(BookOrderResponse bookOrder : bookOrderResponses){
-			orderTotalPrice = orderTotalPrice.add(bookOrder.bookTotalPrice());
-		}
-
-		ShippingPolicy shippingPolicy = shippingPolicyRepository.findClosedShippingPolicy(orderTotalPrice.intValue());
-
-		// todo : 쿠폰 & 잔여 포인트
-
-		return OrderInformationResponse.of(customer, addressResponseList, bookOrderResponses, shippingPolicy);
-	}
-
-	// 바로 주문 - 비회원
-	@Override
-	public OrderInformationResponse getCustomerOrderInformation(Long bookId, int quantity) {
-		// 도서 정보 가져오기
-		Optional<Book> book = bookRepository.findById(bookId);
-
-		// 도서 기여자 정보 가져오기
-		List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(bookId);
-
-		List<BookOrderResponse> bookOrderResponses = new ArrayList<>();
-		BookOrderResponse bookOrderResponse = BookOrderResponse.of(book.get(), contributors, quantity);
-		bookOrderResponses.add(bookOrderResponse);
-
-		BigDecimal orderTotalPrice = BigDecimal.ZERO;
-		for(BookOrderResponse bookOrder : bookOrderResponses){
-			orderTotalPrice = orderTotalPrice.add(bookOrder.bookTotalPrice());
-		}
-
-		ShippingPolicy shippingPolicy = shippingPolicyRepository.findClosedShippingPolicy(orderTotalPrice.intValue());
-		log.debug("{}",shippingPolicy);
-
-		// todo : 쿠폰 & 잔여 포인트
-
-		return OrderInformationResponse.of(bookOrderResponses, shippingPolicy);
-	}
-
 	/**
 	 * 주문 명 생성
 	 *
@@ -218,5 +225,59 @@ public class OrderServiceImpl implements OrderService{
 			int bookListCount = bookTitles.size() - 1;
 			return firstBook + " 외 " + bookListCount + "건";
 		}
+	}
+
+	/**
+	 * 사용자 확인
+	 * @param id 사용자 아이디
+	 * @return Customer
+	 */
+	private Customer getCustomerById(Long id) {
+		return customerRepository.findById(id)
+			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 사용자입니다."));
+	}
+
+	/**
+	 * 도서 정보 가져오기
+	 *
+	 * @param bookId 책 아이디
+	 * @param quantity 수량
+	 * @return BookOrderResponse
+	 */
+	private List<BookOrderResponse> getBookOrderResponses(Long bookId, int quantity) {
+		// 도서 정보 가져오기
+		Optional<Book> book = Optional.ofNullable(bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException(bookId)));
+
+		// 도서 기여자 정보 가져오기
+		List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(
+			bookId);
+
+		// 만족하는 객체 생성
+		List<BookOrderResponse> bookOrderResponses = new ArrayList<>();
+		BookOrderResponse bookOrderResponse = BookOrderResponse.of(book.get(), contributors, quantity);
+		bookOrderResponses.add(bookOrderResponse);
+		return bookOrderResponses;
+	}
+
+	/**
+	 * 도서 리스트의 총 가격 계산
+	 *
+	 * @param bookOrderResponses List<BookOrderResponse>
+	 * @return BigDecimal
+	 */
+	private BigDecimal calculateTotalPrice(List<BookOrderResponse> bookOrderResponses) {
+		BigDecimal totalPrice = BigDecimal.ZERO;
+		for (BookOrderResponse bookOrder : bookOrderResponses) {
+			totalPrice = totalPrice.add(bookOrder.bookTotalPrice());
+		}
+		return totalPrice;
+	}
+
+	/**
+	 * 	배송비 정책 조회
+ 	 */
+	private ShippingPolicy getShippingPolicy(int orderTotalPrice) {
+		return shippingPolicyRepository.findClosedShippingPolicy(orderTotalPrice);
 	}
 }

@@ -13,6 +13,26 @@ import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
 public interface OrderService {
 
 	/**
+	 * 주문 폼 정보 가져오기 - 바로 주문(회원)
+	 *
+	 * @param id 사용자 아이디
+	 * @param bookId 상품 아이디
+	 * @param quantity 상품 갯수
+	 * @return OrderInformationResponse
+	 */
+	OrderInformationResponse getMemberOrderInformation(Long id, Long bookId, int quantity);
+
+	/**
+	 * 주문 폼 정보 가져오기 - 바로 주문(비회원)
+	 *
+	 * @param id 사용자 아이디
+	 * @param bookId 상품 아이디
+	 * @param quantity 상품 갯수
+	 * @return OrderInformationResponse
+	 */
+	OrderInformationResponse getCustomerOrderInformation(Long bookId, int quantity);
+
+	/**
 	 * 회원 주문 임시 등록
 	 *
 	 * @param id UserId pk
@@ -28,8 +48,5 @@ public interface OrderService {
 	 * @return 주문 임시 등록 response
 	 */
 	OrderTempRegisterResponse registerTempOrderForCustomer(@Valid OrderTempRegisterRequest orderTempRegisterRequest);
-
-	OrderInformationResponse getMemberOrderInformation(Long id, Long bookId, int quantity);
-
-	OrderInformationResponse getCustomerOrderInformation(Long bookId, int quantity);
+	
 }

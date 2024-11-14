@@ -1,8 +1,7 @@
 package shop.nuribooks.books.order.order.controller;
 
-import java.awt.print.Pageable;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
@@ -39,6 +37,13 @@ public class OrderController {
 
 	private final OrderService orderService;
 
+	/**
+	 * 주문 폼 정보 가져오기 - 바로 구매 ( 단일 상품)
+	 *
+	 * @param bookId 상품 아이디
+	 * @param quantity 상품 갯수
+	 * @return OrderInformationResponse
+	 */
 	@GetMapping("/{book-id}")
 	public ResponseEntity<OrderInformationResponse> getOrderInformation(
 		@PathVariable("book-id") Long bookId, @RequestParam Integer quantity){
@@ -50,6 +55,8 @@ public class OrderController {
 			.map(id -> orderService.getMemberOrderInformation(id, bookId, quantity))
 			// 비회원 주문에 필요한 정보 가져오기
 			.orElseGet(() -> orderService.getCustomerOrderInformation(bookId, quantity));
+
+		AtomicReference<OrderInformationResponse> orderInformationResponse = new AtomicReference<>();
 
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
