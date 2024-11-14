@@ -14,6 +14,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 
 @Entity
@@ -62,5 +63,16 @@ public class Coupon {
 		this.expiredAt = expiredAt;
 		this.period = period;
 		this.expirationType = expirationType;
+	}
+
+	public void update(CouponRequest request) {
+		this.name = request.name();
+		this.discount = request.discount();
+		this.minimumOrderPrice = request.minimumOrderPrice();
+		this.maximumDiscountPrice = request.maximumDiscountPrice();
+		this.createdAt = request.createdAt();
+		this.expiredAt = request.expiredAt();
+		this.period = request.period();
+		this.expirationType = request.expirationType();
 	}
 }

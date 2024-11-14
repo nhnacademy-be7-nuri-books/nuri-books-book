@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.coupon.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
@@ -60,11 +61,29 @@ public class CouponServiceImpl implements CouponService {
 	}
 
 	/**
+	 * 쿠폰 정보 업데이트하는 메서드
+	 *
+	 * @param id
+	 * @param request
+	 * @return
+	 */
+	@Override
+	@Transactional
+	public Coupon updateCoupon(Long id, CouponRequest request) {
+		Coupon coupon = couponRepository.findById(id)
+			.orElseThrow(() -> new CouponNotFoundException());
+
+		coupon.update(request);
+		return coupon;
+	}
+
+	/**
 	 * 쿠폰 삭제하는 메서드
 	 *
 	 * @param id
 	 */
 	@Override
+	@Transactional
 	public void deleteCoupon(Long id) {
 		Coupon coupon = couponRepository.findById(id)
 			.orElseThrow(() -> new CouponNotFoundException());

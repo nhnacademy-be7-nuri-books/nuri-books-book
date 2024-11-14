@@ -15,4 +15,6 @@ public interface CouponService {
 	Coupon getCouponById(Long id);
 
 	void deleteCoupon(Long id);
+
+	Coupon updateCoupon(Long id, CouponRequest request);
 }
