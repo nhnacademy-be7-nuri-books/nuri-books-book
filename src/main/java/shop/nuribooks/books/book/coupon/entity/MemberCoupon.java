@@ -11,9 +11,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shop.nuribooks.books.member.member.entity.Member;
+import shop.nuribooks.books.book.coupon.enums.ExpirationType;
+import shop.nuribooks.books.exception.coupon.MemberCouponExpiredException;
 
 @Entity
 @Getter
@@ -32,9 +34,7 @@ public class MemberCoupon {
 	private Coupon coupon;
 
 	@NotNull
-	@ManyToOne
-	@JoinColumn(name = "customer_id")
-	private Member member;
+	private Long memberId;
 
 	@NotNull
 	private boolean isUsed = false;
@@ -44,4 +44,28 @@ public class MemberCoupon {
 
 	@NotNull
 	private LocalDate expiredAt;
+
+	@Builder
+	MemberCoupon(Coupon coupon, Long memberId) {
+		this.coupon = coupon;
+		this.memberId = memberId;
+		this.isUsed = false;
+		this.createdAt = LocalDate.now();
+		setExpiredAt(coupon);
+	}
+
+	private void setExpiredAt(Coupon coupon) {
+		if (coupon.getExpirationType().equals(ExpirationType.DATE)) {
+			this.expiredAt = coupon.getCreatedAt();
+		} else {
+			this.expiredAt = createdAt.plusDays(coupon.getPeriod());
+		}
+		if (LocalDate.now().isAfter(expiredAt)) {
+			throw new MemberCouponExpiredException("쿠폰 기한이 만료되었습니다.");
+		}
+	}
+
+	public void setUsed() {
+		this.isUsed = true;
+	}
 }
