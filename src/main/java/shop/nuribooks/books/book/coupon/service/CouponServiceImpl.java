@@ -10,8 +10,8 @@ import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
-import shop.nuribooks.books.exception.CouponAlreadExistsException;
-import shop.nuribooks.books.exception.CouponNotFoundException;
+import shop.nuribooks.books.exception.coupon.CouponAlreadyExistsException;
+import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
 
 @RequiredArgsConstructor
 @Service
@@ -27,7 +27,7 @@ public class CouponServiceImpl implements CouponService {
 	@Override
 	public Coupon registerCoupon(CouponRequest request) {
 		if (couponRepository.existsByNameIgnoreCase(request.name())) {
-			throw new CouponAlreadExistsException();
+			throw new CouponAlreadyExistsException();
 		}
 
 		Coupon coupon = request.toEntity();

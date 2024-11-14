@@ -1,4 +1,6 @@
-package shop.nuribooks.books.exception;
+package shop.nuribooks.books.exception.coupon;
+
+import shop.nuribooks.books.exception.ResourceNotFoundException;
 
 public class CouponNotFoundException extends ResourceNotFoundException {
 	public CouponNotFoundException() {
