@@ -34,11 +34,11 @@ aladin:
 cloud:
   nhn:
     key-manager:
-      url: "https://api-keymanager.nhncloudservice.com"
+      url: https://api-keymanager.nhncloudservice.com
       app-key: 500rMJPT021TnyNl
       access-key-id: KtrUJ2n2CTnIVlYVj1uU
       secret-access-key: aeKFO2c6QdlMblEU
     image-manager:
-      url: "https://api-image.nhncloudservice.com/image/v2.0/appkeys"
+      url: https://api-image.nhncloudservice.com/image/v2.0/appkeys
       app-key: rUN43QEwj1P6jThk
       secret-id: 6f5396562412430883fbd023ef2c50d9
