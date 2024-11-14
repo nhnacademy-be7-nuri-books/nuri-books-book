@@ -18,7 +18,7 @@ import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
 import shop.nuribooks.books.cart.dto.response.CartBookResponse;
 import shop.nuribooks.books.cart.service.CartService;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
-import shop.nuribooks.books.exception.cart.customer.CustomerCartNotFoundException;
+import shop.nuribooks.books.exception.cart.CartNotFoundException;
 
 @RequiredArgsConstructor
 @RestController
@@ -86,7 +86,7 @@ public class CartController {
     private String getSessionId(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (Objects.isNull(session)) {
-            throw new CustomerCartNotFoundException();
+            throw new CartNotFoundException();
         }
         return session.getId();
     }

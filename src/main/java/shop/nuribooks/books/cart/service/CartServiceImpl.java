@@ -3,6 +3,7 @@ package shop.nuribooks.books.cart.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import shop.nuribooks.books.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
 import shop.nuribooks.books.cart.dto.response.CartBookResponse;
 import shop.nuribooks.books.cart.entity.Cart;
-import shop.nuribooks.books.cart.repository.DBCartRepository;
+import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class CartServiceImpl implements CartService {
 
     private final BookRepository bookRepository;
     private final RedisCartRepository redisCartRepository;
-    private final DBCartRepository dbCartRepository;
+    private final CartRepository dbCartRepository;
     private final CartDetailRepository cartDetailRepository;
 
     @Override
@@ -74,10 +75,15 @@ public class CartServiceImpl implements CartService {
             redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
             return;
         }
-        List<CartDetail> cartDetailList = cartDetailRepository.findByCart_Id(cart.getId());
-        List<RedisCartDetail> redisCartDetailList = cartDetailList.stream()
-            .map(cartDetail -> new RedisCartDetail(cartDetail.getBook().getId().toString(), cartDetail.getQuantity())).toList();
-        redisCartRepository.saveAll(cartId, redisCartDetailList);
+        Optional<List<CartDetail>> allByCartId = cartDetailRepository.findAllByCart_Id(cart.getId());
+        if (allByCartId.isEmpty()) {
+            return;
+        }
+        List<CartDetail> cartDetailList = allByCartId.get();
+        List<RedisCartDetail> redisCartDetails = cartDetailList.stream()
+            .map(cartDetail -> new RedisCartDetail(cartDetail.getBook().getId().toString(), cartDetail.getQuantity()))
+            .toList();
+        redisCartRepository.saveAll(cartId, redisCartDetails);
         redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
     }
 
