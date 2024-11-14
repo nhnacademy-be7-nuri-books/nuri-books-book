@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
@@ -31,7 +32,7 @@ public class Coupon {
 	private String name;
 
 	@NotNull
-	private Long discount;
+	private int discount;
 
 	@NotNull
 	private BigDecimal minimumOrderPrice;
@@ -49,4 +50,17 @@ public class Coupon {
 	@NotNull
 	private ExpirationType expirationType;
 
+	@Builder
+	public Coupon(String name, int discount, BigDecimal minimumOrderPrice,
+		BigDecimal maximumDiscountPrice, LocalDate createdAt, LocalDate expiredAt,
+		int period, ExpirationType expirationType) {
+		this.name = name;
+		this.discount = discount;
+		this.minimumOrderPrice = minimumOrderPrice;
+		this.maximumDiscountPrice = maximumDiscountPrice;
+		this.createdAt = createdAt;
+		this.expiredAt = expiredAt;
+		this.period = period;
+		this.expirationType = expirationType;
+	}
 }
