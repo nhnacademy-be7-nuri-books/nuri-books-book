@@ -1,5 +1,8 @@
 package shop.nuribooks.books.order.shipping.service;
 
+import java.math.BigDecimal;
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -23,8 +26,11 @@ public class ShippingServiceImpl implements ShippingService {
 	@Override
 	public void registerShipping(Order order, ShippingRegisterRequest shippingRegisterRequest) {
 
-		ShippingPolicy shippingPolicy = shippingPolicyRepository.findTopByOrderByAppliedDatetimeDesc()
-			.orElseThrow(ShippingPolicyNotFoundException::new);
+		ShippingPolicy shippingPolicy = shippingPolicyRepository.findClosedShippingPolicy(order.getPaymentPrice().intValue());
+
+		if(Objects.isNull(shippingPolicy)){
+			throw  new ShippingPolicyNotFoundException();
+		};
 
 		Shipping shipping = Shipping.builder()
 			.order(order)
