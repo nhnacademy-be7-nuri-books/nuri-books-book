@@ -13,4 +13,6 @@ public interface CouponService {
 	Page<CouponResponse> getCoupons(Pageable pageable);
 
 	Coupon getCouponById(Long id);
+
+	void deleteCoupon(Long id);
 }
