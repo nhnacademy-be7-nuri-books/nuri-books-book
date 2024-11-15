@@ -14,7 +14,6 @@ import shop.nuribooks.books.common.config.keymanager.dto.KeyManagerResponse;
 @Component
 @RequiredArgsConstructor
 public class KeyManagerConfig {
-
 	@Value("${cloud.nhn.key-manager.url}")
 	private String keyManagerUrl;
 
