@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
-import shop.nuribooks.books.cart.dto.response.CartResponse;
+import shop.nuribooks.books.cart.dto.response.CartBookResponse;
 import shop.nuribooks.books.cart.service.CartService;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
-import shop.nuribooks.books.exception.cart.customer.CustomerCartNotFoundException;
+import shop.nuribooks.books.exception.cart.CartNotFoundException;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,7 +29,7 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/api/cart")
-    private ResponseEntity addToCart(@RequestBody @Valid CartAddRequest cartAddRequest) {
+    public ResponseEntity addToCart(@RequestBody @Valid CartAddRequest cartAddRequest) {
         String cartId;
         Long memberId = MemberIdContext.getMemberId();
         // 비회원인 경우
@@ -44,7 +44,7 @@ public class CartController {
     }
 
     @GetMapping("/api/cart/{cart-id}")
-    private ResponseEntity<List<CartResponse>> getCartList(@PathVariable("cart-id") String requestCartId) {
+    public ResponseEntity<List<CartBookResponse>> getCartList(@PathVariable("cart-id") String requestCartId) {
         Long memberId = MemberIdContext.getMemberId();
         String cartId;
         if (Objects.isNull(memberId)) {
@@ -52,35 +52,41 @@ public class CartController {
         } else {
             cartId = MEMBER_CART_KEY + requestCartId;
         }
-        List<CartResponse> cartResponseList = cartService.getCart(cartId);
+        List<CartBookResponse> cartResponseList = cartService.getCart(cartId);
         return ResponseEntity.ok().body(cartResponseList);
     }
 
     @PostMapping("/api/cart/load-to-redis")
-    private ResponseEntity<Void> loadCartToRedis(@RequestBody CartLoadRequest request) {
+    public ResponseEntity<Void> loadCartToRedis(@RequestBody CartLoadRequest request) {
         cartService.loadCart(request);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/api/customer/cart")
-    private ResponseEntity removeCustomerCart(HttpServletRequest request) {
+    public ResponseEntity removeCart(HttpServletRequest request) {
         String sessionId = getSessionId(request);
         cartService.removeCart(sessionId);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/api/customer/cart/{bookId}")
-    private ResponseEntity removeCustomerCartItem(@PathVariable Long bookId,
-                                                  HttpServletRequest request) {
-        String sessionId = getSessionId(request);
-        cartService.removeCartItem(sessionId, bookId);
+    @DeleteMapping("/api/cart/{cart-id}/book/{book-id}")
+    public ResponseEntity removeCartItem(@PathVariable("cart-id") String requestCartId,
+        @PathVariable("book-id") Long bookId) {
+        Long memberId = MemberIdContext.getMemberId();
+        String cartId;
+        if (Objects.isNull(memberId)) {
+            cartId = CUSTOMER_CART_KEY + requestCartId;
+        } else {
+            cartId = MEMBER_CART_KEY + requestCartId;
+        }
+        cartService.removeCartItem(cartId, bookId);
         return ResponseEntity.noContent().build();
     }
 
     private String getSessionId(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (Objects.isNull(session)) {
-            throw new CustomerCartNotFoundException();
+            throw new CartNotFoundException();
         }
         return session.getId();
     }

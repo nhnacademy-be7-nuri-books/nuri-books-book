@@ -38,8 +38,7 @@ public class Customer {
 	@Column(unique = true)
 	private String email;
 
-	public void changeCustomerInformation(String name, String password) {
-		this.name = name;
+	public void changeCustomerPassword(String password) {
 		this.password = password;
 	}
 

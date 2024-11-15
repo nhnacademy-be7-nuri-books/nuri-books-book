@@ -7,9 +7,9 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,8 +25,6 @@ import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeListResponse;
-import shop.nuribooks.books.member.grade.dto.response.GradeRegisterResponse;
-import shop.nuribooks.books.member.grade.dto.response.GradeUpdateResponse;
 import shop.nuribooks.books.member.grade.service.GradeService;
 
 /**
@@ -49,10 +47,12 @@ public class GradeController {
 		@ApiResponse(responseCode = "409", description = "등록된 등급이 이미 존재함")
 	})
 	@PostMapping
-	public ResponseEntity<GradeRegisterResponse> gradeRegister(@RequestBody @Valid GradeRegisterRequest request) {
-		GradeRegisterResponse response = gradeService.registerGrade(request);
+	public ResponseEntity<ResponseMessage> gradeRegister(@RequestBody @Valid GradeRegisterRequest request) {
 
-		return ResponseEntity.status(CREATED).body(response);
+		gradeService.registerGrade(request);
+
+		return ResponseEntity.status(CREATED).body(
+			new ResponseMessage(CREATED.value(), "등급이 성공적으로 생성되었습니다."));
 	}
 
 	/**
@@ -79,12 +79,14 @@ public class GradeController {
 		@ApiResponse(responseCode = "400", description = "등급 수정 요청 데이터가 유효하지 않음"),
 		@ApiResponse(responseCode = "404", description = "등급이 존재하지 않음")
 	})
-	@PatchMapping("/{name}")
-	public ResponseEntity<GradeUpdateResponse> gradeUpdate(
+	@PutMapping("/{name}")
+	public ResponseEntity<ResponseMessage> gradeUpdate(
 		@PathVariable String name, @RequestBody @Valid GradeUpdateRequest request) {
-		GradeUpdateResponse response = gradeService.updateGrade(name, request);
 
-		return ResponseEntity.status(OK).body(response);
+		gradeService.updateGrade(name, request);
+
+		return ResponseEntity.status(OK).body(
+			new ResponseMessage(OK.value(), "등급이 성공적으로 수정되었습니다."));
 	}
 
 	/**
@@ -100,8 +102,8 @@ public class GradeController {
 	public ResponseEntity<ResponseMessage> gradeDelete(@PathVariable String name) {
 		gradeService.deleteGrade(name);
 
-		return ResponseEntity.status(OK).body(
-			new ResponseMessage(OK.value(), "등급이 성공적으로 삭제되었습니다."));
+		return ResponseEntity.status(NO_CONTENT).body(
+			new ResponseMessage(NO_CONTENT.value(), "등급이 성공적으로 삭제되었습니다."));
 	}
 
 	/**

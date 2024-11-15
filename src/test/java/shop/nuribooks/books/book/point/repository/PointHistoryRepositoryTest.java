@@ -98,7 +98,8 @@ public class PointHistoryRepositoryTest {
 		assertEquals(2,
 			PointHistoryRepository.countPointHistories(
 				member.getId(),
-				new PointHistoryPeriodRequest()
+				new PointHistoryPeriodRequest(),
+				HistoryType.ALL
 			)
 		);
 	}
@@ -106,9 +107,10 @@ public class PointHistoryRepositoryTest {
 	@Test
 	void countUsedHistoriesTest() {
 		assertEquals(0,
-			PointHistoryRepository.countUsedPointHistories(
+			PointHistoryRepository.countPointHistories(
 				member.getId(),
-				new PointHistoryPeriodRequest()
+				new PointHistoryPeriodRequest(),
+				HistoryType.USED
 			)
 		);
 	}
@@ -116,9 +118,10 @@ public class PointHistoryRepositoryTest {
 	@Test
 	void countEarnedHistoriesTest() {
 		assertEquals(2,
-			PointHistoryRepository.countEarnedPointHistories(
+			PointHistoryRepository.countPointHistories(
 				member.getId(),
-				new PointHistoryPeriodRequest()
+				new PointHistoryPeriodRequest(),
+				HistoryType.SAVED
 			)
 		);
 	}

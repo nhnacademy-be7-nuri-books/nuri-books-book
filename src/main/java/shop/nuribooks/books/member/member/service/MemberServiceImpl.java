@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
+import shop.nuribooks.books.cart.entity.Cart;
+import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
@@ -28,7 +30,7 @@ import shop.nuribooks.books.member.member.dto.DtoMapper;
 import shop.nuribooks.books.member.member.dto.EntityMapper;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberSearchRequest;
-import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
+import shop.nuribooks.books.member.member.dto.request.MemberPasswordUpdateRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
@@ -51,6 +53,7 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberRepository memberRepository;
 	private final GradeRepository gradeRepository;
 	private final PointHistoryService pointHistoryService;
+	private final CartRepository cartRepository;
 
 	/**
 	 * 회원등록 <br>
@@ -94,6 +97,7 @@ public class MemberServiceImpl implements MemberService {
 			.build();
 
 		Member savedMember = memberRepository.save(newMember);
+		createCart(savedMember);
 
 		pointHistoryService.registerPointHistory(new PointHistoryRequest(savedMember), PolicyName.WELCOME);
 		return DtoMapper.toRegisterDto(savedCustomer, savedMember);
@@ -125,12 +129,12 @@ public class MemberServiceImpl implements MemberService {
 	 */
 	@Override
 	@Transactional
-	public void updateMember(Long memberId, MemberUpdateRequest request) {
+	public void updateMember(Long memberId, MemberPasswordUpdateRequest request) {
 
 		Customer foundCustomer = customerRepository.findById(memberId)
 			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
 
-		foundCustomer.changeCustomerInformation(request.name(), request.password());
+		foundCustomer.changeCustomerPassword(request.password());
 	}
 
 	/**
@@ -239,5 +243,10 @@ public class MemberServiceImpl implements MemberService {
 	private Grade standard() {
 		return gradeRepository.findByName("STANDARD")
 			.orElseThrow(() -> new GradeNotFoundException("STANDARD 등급이 존재하지 않습니다."));
+	}
+
+	private void createCart(Member savedMember) {
+		Cart cart = new Cart(savedMember);
+		cartRepository.save(cart);
 	}
 }

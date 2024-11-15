@@ -67,7 +67,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 		PointHistoryPeriodRequest period) {
 		List<PointHistoryResponse> result = this.pointHistoryRepository.findPointHistories(period, pageable, memberId,
 			type);
-		int count = (int)this.pointHistoryRepository.countPointHistories(memberId, period);
+		int count = (int)this.pointHistoryRepository.countPointHistories(memberId, period, type);
 		Page<PointHistoryResponse> response = new PageImpl(result, pageable, count);
 		return response;
 	}
