@@ -5,13 +5,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -19,15 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.book.book.dto.BookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.BookRegisterResponse;
-import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.book.entity.BookStateEnum;
-import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.common.ControllerTestSupport;
-import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
-import shop.nuribooks.books.exception.ResourceNotFoundException;
 
 public class BookControllerTest extends ControllerTestSupport {
 
