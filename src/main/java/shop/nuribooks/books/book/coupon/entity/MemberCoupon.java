@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 import shop.nuribooks.books.exception.coupon.MemberCouponExpiredException;
+import shop.nuribooks.books.member.member.entity.Member;
 
 @Entity
 @Getter
@@ -34,8 +35,9 @@ public class MemberCoupon {
 	private Coupon coupon;
 
 	@NotNull
+	@ManyToOne
 	@JoinColumn(name = "customer_id")
-	private Long memberId;
+	private Member member;
 
 	@NotNull
 	private boolean isUsed = false;
@@ -47,9 +49,9 @@ public class MemberCoupon {
 	private LocalDate expiredAt;
 
 	@Builder
-	MemberCoupon(Coupon coupon, Long memberId) {
+	MemberCoupon(Coupon coupon, Member member) {
 		this.coupon = coupon;
-		this.memberId = memberId;
+		this.member = member;
 		this.isUsed = false;
 		this.createdAt = LocalDate.now();
 		setExpiredAt(coupon);
