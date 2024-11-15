@@ -41,4 +41,4 @@ cloud:
     image-manager:
       url: https://api-image.nhncloudservice.com/image/v2.0/appkeys
       app-key: rUN43QEwj1P6jThk
-      secret-id: ${NHN_IMAGE_MANAGER_SECRET_ID}
+      secret-id: 6f5396562412430883fbd023ef2c50d9
