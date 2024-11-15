@@ -1,4 +1,4 @@
-package shop.nuribooks.books.Image;
+package shop.nuribooks.books.common.Image;
 
 import java.io.IOException;
 import java.net.URLEncoder;
