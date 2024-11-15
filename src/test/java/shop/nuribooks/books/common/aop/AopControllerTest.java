@@ -67,7 +67,7 @@ public class AopControllerTest {
         Member saved = memberRepository.saveAndFlush(member);
 
         // when
-        mockMvc.perform(get("/api/member/me/address")
+        mockMvc.perform(get("/api/members/me/addresses")
                         .header("X-USER-ID", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -89,7 +89,7 @@ public class AopControllerTest {
         Member saved = memberRepository.saveAndFlush(member);
 
         // when
-        mockMvc.perform(get("/api/member/me/address")
+        mockMvc.perform(get("/api/members/me/addresses")
                         .header("X-USER-ID", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                 )

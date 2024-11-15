@@ -7,16 +7,19 @@ public class AddressEditor {
 
     private final String name;
 
+    private final String zipcode;
+
     private final String address;
 
-    private final String addressDetail;
+    private final String detailAddress;
 
     private final boolean isDefault;
 
-    private AddressEditor(String name, String address, String addressDetail, boolean isDefault) {
+    private AddressEditor(String name, String zipcode, String address, String detailAddress, boolean isDefault) {
         this.name = name;
-        this.address = address;
-        this.addressDetail = addressDetail;
+		this.zipcode = zipcode;
+		this.address = address;
+        this.detailAddress = detailAddress;
         this.isDefault = isDefault;
     }
 
@@ -26,8 +29,9 @@ public class AddressEditor {
 
     public static class AddressEditorBuilder {
         private String name;
+        private String zipcode;
         private String address;
-        private String addressDetail;
+        private String detailAddress;
         private boolean isDefault;
 
         AddressEditorBuilder() {
@@ -40,6 +44,13 @@ public class AddressEditor {
             return this;
         }
 
+        public AddressEditor.AddressEditorBuilder zipcode(final String zipcode) {
+            if (zipcode != null) {
+                this.zipcode = zipcode;
+            }
+            return this;
+        }
+
         public AddressEditor.AddressEditorBuilder address(final String address) {
             if (address != null) {
                 this.address = address;
@@ -47,9 +58,9 @@ public class AddressEditor {
             return this;
         }
 
-        public AddressEditor.AddressEditorBuilder addressDetail(final String addressDetail) {
-            if (addressDetail != null) {
-                this.addressDetail = addressDetail;
+        public AddressEditor.AddressEditorBuilder detailAddress(final String detailAddress) {
+            if (detailAddress != null) {
+                this.detailAddress = detailAddress;
             }
             return this;
         }
@@ -60,7 +71,7 @@ public class AddressEditor {
         }
 
         public AddressEditor build() {
-            return new AddressEditor(this.name, this.address, this.addressDetail, this.isDefault);
+            return new AddressEditor(this.name, this.zipcode, this.address, this.detailAddress, this.isDefault);
         }
 
     }

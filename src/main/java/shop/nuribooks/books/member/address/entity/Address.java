@@ -19,46 +19,50 @@ import shop.nuribooks.books.member.member.entity.Member;
 @Entity
 public class Address {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "address_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "address_id")
+	private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Setter
-    private Member member;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@Setter
+	private Member member;
 
-    private String name;
+	private String name;
 
-    private String address;
+	private String zipcode;
 
-    private String addressDetail;
+	private String address;
 
-    private boolean isDefault;
+	private String detailAddress;
 
-    @Builder
-    private Address(String name, String address, String addressDetail, boolean isDefault) {
-        this.name = name;
-        this.address = address;
-        this.addressDetail = addressDetail;
-        this.isDefault = isDefault;
-    }
+	private boolean isDefault;
 
-    public AddressEditor.AddressEditorBuilder toEditor() {
-        return AddressEditor.builder()
-                .name(name)
-                .address(address)
-                .addressDetail(addressDetail)
-                .isDefault(isDefault);
+	@Builder
+	private Address(String name, String zipcode, String address, String detailAddress, boolean isDefault) {
+		this.name = name;
+		this.zipcode = zipcode;
+		this.address = address;
+		this.detailAddress = detailAddress;
+		this.isDefault = isDefault;
+	}
 
-    }
+	public AddressEditor.AddressEditorBuilder toEditor() {
+		return AddressEditor.builder()
+			.name(name)
+			.zipcode(zipcode)
+			.address(address)
+			.detailAddress(detailAddress)
+			.isDefault(isDefault);
 
-    public void edit(AddressEditor addressEditor) {
-        name = addressEditor.getName();
-        address = addressEditor.getAddress();
-        addressDetail = addressEditor.getAddressDetail();
-        isDefault = addressEditor.isDefault();
-    }
+	}
 
+	public void edit(AddressEditor addressEditor) {
+		name = addressEditor.getName();
+		zipcode = addressEditor.getZipcode();
+		address = addressEditor.getAddress();
+		detailAddress = addressEditor.getDetailAddress();
+		isDefault = addressEditor.isDefault();
+	}
 
 }
