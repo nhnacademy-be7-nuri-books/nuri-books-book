@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
 
@@ -31,8 +33,7 @@ public class MemberCouponController {
 	/**
 	 * 회원에게 쿠폰을 등록합니다.
 	 *
-	 * @param memberId 회원 ID
-	 * @param couponId 등록할 쿠폰 ID
+	 * @param memberCouponRegisterRequest 쿠폰 등록을 위한 정보를 포함한 요청
 	 * @return 성공 시 상태 코드 201 반환
 	 */
 	@Operation(summary = "회원 쿠폰 등록", description = "회원에게 쿠폰을 등록합니다.")
@@ -42,9 +43,10 @@ public class MemberCouponController {
 		@ApiResponse(responseCode = "404", description = "회원 또는 쿠폰을 찾을 수 없음"),
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
-	@PostMapping("/{memberId}/register/{couponId}")
-	public ResponseEntity<Void> registerMemberCoupon(@PathVariable Long memberId, @PathVariable Long couponId) {
-		memberCouponService.registerMemberCoupon(memberId, couponId);
+	@PostMapping
+	public ResponseEntity<Void> registerMemberCoupon(
+		@RequestBody MemberCouponRegisterRequest memberCouponRegisterRequest) {
+		memberCouponService.registerMemberCoupon(memberCouponRegisterRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
@@ -78,7 +80,7 @@ public class MemberCouponController {
 		@ApiResponse(responseCode = "404", description = "회원 쿠폰을 찾을 수 없음"),
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
-	@PatchMapping("/{memberCouponId}/use")
+	@PatchMapping("/{memberCouponId}")
 	public ResponseEntity<Void> updateIsUsed(@PathVariable Long memberCouponId) {
 		memberCouponService.updateIsUsed(memberCouponId);
 		return ResponseEntity.ok().build();

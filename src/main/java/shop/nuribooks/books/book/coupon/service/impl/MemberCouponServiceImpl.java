@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
@@ -30,18 +31,17 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	/**
 	 * 회원에게 쿠폰을 등록합니다.
 	 *
-	 * @param memberId 회원 ID
-	 * @param couponId 등록할 쿠폰의 ID
+	 * @param memberCouponRegisterRequest 쿠폰 등록을 위한 정보를 포함한 요청
 	 * @throws CouponNotFoundException 존재하지 않는 쿠폰일 경우 예외 발생
 	 */
 	@Override
-	public void registerMemberCoupon(Long memberId, Long couponId) {
-		Coupon coupon = couponRepository.findById(couponId)
+	public void registerMemberCoupon(MemberCouponRegisterRequest memberCouponRegisterRequest) {
+		Coupon coupon = couponRepository.findById(memberCouponRegisterRequest.couponId())
 			.orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
 
 		MemberCoupon memberCoupon = MemberCoupon.builder()
 			.coupon(coupon)
-			.memberId(memberId)
+			.memberId(memberCouponRegisterRequest.memberId())
 			.build();
 		memberCouponRepository.save(memberCoupon);
 	}
