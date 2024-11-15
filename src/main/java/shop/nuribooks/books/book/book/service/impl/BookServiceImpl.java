@@ -1,6 +1,5 @@
 package shop.nuribooks.books.book.book.service.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +47,7 @@ import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
-import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
+import shop.nuribooks.books.exception.book.InvalidBookStateException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
@@ -94,7 +93,7 @@ public class BookServiceImpl implements BookService {
 			BookStateEnum bookStateEnum;
 			try {
 				bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.getState()));
-			} catch(IllegalArgumentException ex) {
+			} catch(InvalidBookStateException ex) {
 				log.error("Error parsing book state from request: {}", ex.getMessage(), ex);
 				throw ex;
 			}
