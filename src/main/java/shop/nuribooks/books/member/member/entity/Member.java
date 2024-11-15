@@ -113,7 +113,6 @@ public class Member {
 	private LocalDateTime withdrawnAt;
 
 	@OneToOne(fetch = LAZY)
-	@JoinColumn(name = "cart_id")
 	private Cart cart;
 
 	/**
