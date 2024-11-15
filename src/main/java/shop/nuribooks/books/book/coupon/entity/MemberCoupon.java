@@ -34,6 +34,7 @@ public class MemberCoupon {
 	private Coupon coupon;
 
 	@NotNull
+	@JoinColumn(name = "customer_id")
 	private Long memberId;
 
 	@NotNull
