@@ -3,6 +3,7 @@ package shop.nuribooks.books.cart.service;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -16,8 +17,9 @@ import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.cart.cartdetail.entity.CartDetail;
 import shop.nuribooks.books.cart.cartdetail.repository.CartDetailRepository;
 import shop.nuribooks.books.cart.entity.Cart;
-import shop.nuribooks.books.cart.repository.DBCartRepository;
+import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
+import shop.nuribooks.books.exception.cart.CartNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -29,7 +31,6 @@ public class RedisKeyExpirationListener implements MessageListener {
 	private static final String MEMBER_CART_KEY = "member:";
 
 	private final RedisCartRepository redisCartRepository;
-	private final DBCartRepository dbCartRepository;
 	private final BookRepository bookRepository;
 	private final CartDetailRepository cartDetailRepository;
 	private final MemberRepository memberRepository;
@@ -42,14 +43,14 @@ public class RedisKeyExpirationListener implements MessageListener {
 		if (expiredKey.startsWith(SHADOW_KEY + MEMBER_CART_KEY)) {
 			String parsedKey = expiredKey.substring((SHADOW_KEY + MEMBER_CART_KEY).length());
 			Long memberId = Long.parseLong(parsedKey);
-			//TODO: 기존에 카트를 가지고 있었으면 날리고 새로 만들어 주어야 한다
 
-			Cart cart = dbCartRepository.findByMember_Id(memberId)
-				.orElseGet(() -> createCartForMember(memberId));
-			cartDetailRepository.deleteByCart(cart);
+			Cart cart = getMemberCart(memberId);
 
 			String memberCartId = MEMBER_CART_KEY + parsedKey;
 			Map<Long, Integer> cartDetails = redisCartRepository.getCart(memberCartId);
+			if (Objects.isNull(cartDetails)) {
+				return;
+			}
 
 			List<CartDetail> cartDetailList = getCartDetailList(cartDetails, cart);
 			cartDetailRepository.saveAll(cartDetailList);
@@ -67,12 +68,13 @@ public class RedisKeyExpirationListener implements MessageListener {
 			.toList();
 	}
 
-	private Cart createCartForMember(Long memberId) {
-		// 회원이 존재하지 않을때 어떻게 해야하나?
+	private Cart getMemberCart(Long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-
-		Cart newCart = new Cart(member);
-		return dbCartRepository.save(newCart);
+		Cart cart = member.getCart();
+		if (Objects.isNull(cart)) {
+			throw new CartNotFoundException();
+		}
+		return cart;
 	}
 }

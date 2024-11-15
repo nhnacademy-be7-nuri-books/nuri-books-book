@@ -1,17 +1,21 @@
 package shop.nuribooks.books.book.coupon.entity;
 
-import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import jakarta.ws.rs.DefaultValue;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-import shop.nuribooks.books.book.coupon.enums.CouponType;
-import shop.nuribooks.books.book.point.entity.PointPolicy;
-
-import java.time.LocalDate;
+import shop.nuribooks.books.book.coupon.dto.CouponRequest;
+import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 
 @Entity
 @Getter
@@ -19,29 +23,56 @@ import java.time.LocalDate;
 @Table(name = "coupons")
 public class Coupon {
 
-    @Id
-    @Column(name = "coupon_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@Column(name = "coupon_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @NotNull
-    private CouponType couponType;
+	@NotNull
+	@Size(min = 3, max = 50)
+	private String name;
 
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "coupon_policy_id")
-    private CouponPolicy couponPolicy;
+	@NotNull
+	private int discount;
 
-    @NotNull
-    @Size(min = 3, max = 50)
-    private String name;
+	@NotNull
+	private BigDecimal minimumOrderPrice;
 
-    @NotNull
-    private LocalDate createdAt;
+	@NotNull
+	private BigDecimal maximumDiscountPrice;
 
-    @NotNull
-    private LocalDate expiredAt;
+	@NotNull
+	private LocalDate createdAt;
 
-    private int period = 0;
+	private LocalDate expiredAt;
 
+	private int period;
+
+	@NotNull
+	private ExpirationType expirationType;
+
+	@Builder
+	public Coupon(String name, int discount, BigDecimal minimumOrderPrice,
+		BigDecimal maximumDiscountPrice, LocalDate createdAt, LocalDate expiredAt,
+		int period, ExpirationType expirationType) {
+		this.name = name;
+		this.discount = discount;
+		this.minimumOrderPrice = minimumOrderPrice;
+		this.maximumDiscountPrice = maximumDiscountPrice;
+		this.createdAt = createdAt;
+		this.expiredAt = expiredAt;
+		this.period = period;
+		this.expirationType = expirationType;
+	}
+
+	public void update(CouponRequest request) {
+		this.name = request.name();
+		this.discount = request.discount();
+		this.minimumOrderPrice = request.minimumOrderPrice();
+		this.maximumDiscountPrice = request.maximumDiscountPrice();
+		this.createdAt = request.createdAt();
+		this.expiredAt = request.expiredAt();
+		this.period = request.period();
+		this.expirationType = request.expirationType();
+	}
 }

@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -23,14 +24,14 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "shipping_policies")
+@Getter
 @Comment("배송비 정책")
 public class ShippingPolicy {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Comment("배송비 정책 ID")
 	private Long id;
-
-	@Column(nullable = false)
+	
 	@Comment("배송비")
 	private int shippingFee;
 

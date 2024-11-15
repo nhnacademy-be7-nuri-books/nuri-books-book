@@ -29,6 +29,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.nuribooks.books.cart.entity.Cart;
 import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
@@ -92,12 +93,12 @@ public class Member {
 
 	private LocalDateTime createdAt;
 
-	@Column(precision = 10, scale = 2)
+	@Column(precision = 10)
 	@NotNull
 	@Setter
 	private BigDecimal point;
 
-	@Column(precision = 10, scale = 2)
+	@Column(precision = 10)
 	@NotNull
 	private BigDecimal totalPaymentAmount;
 
@@ -110,6 +111,10 @@ public class Member {
 	 * 탈퇴 일시
 	 */
 	private LocalDateTime withdrawnAt;
+
+	@OneToOne(fetch = LAZY)
+	@JoinColumn(name = "cart_id")
+	private Cart cart;
 
 	/**
 	 * 마지막 로그일 날짜로부터 90일이 지나면 상태를 INACTIVE로 변경
@@ -124,6 +129,7 @@ public class Member {
 	public void changeToWithdrawn() {
 		this.status = WITHDRAWN;
 		this.withdrawnAt = LocalDateTime.now();
+		this.point = ZERO;
 	}
 
 	/**

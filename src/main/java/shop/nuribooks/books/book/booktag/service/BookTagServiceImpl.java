@@ -92,7 +92,6 @@ public class BookTagServiceImpl implements BookTagService {
         return BookTagGetResponse.of(bookTagId, bookId, tagNames);
     }
 
-    //TODO:  QUERYDSL로 변경해야됨
     /**
      * getBooksByTagId : 해당하는 태그가 달린 모든 도서 조회
      *

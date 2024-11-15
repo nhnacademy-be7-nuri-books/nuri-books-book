@@ -25,8 +25,20 @@ eureka:
       defaultZone: http://admin:1234@localhost:8761/eureka
       #,http://admin:1234@localhost:8762/eureka
   instance:
-    prefer-ip-address: false
+    prefer-ip-address: true
 
 aladin:
   api:
     key: ttbljb06271100001
+
+cloud:
+  nhn:
+    key-manager:
+      url: https://api-keymanager.nhncloudservice.com
+      app-key: 500rMJPT021TnyNl
+      access-key-id: KtrUJ2n2CTnIVlYVj1uU
+      secret-access-key: ${NHN_KEY_MANAGER_SECRET_ACCESS_KEY}
+    image-manager:
+      url: https://api-image.nhncloudservice.com/image/v2.0/appkeys
+      app-key: rUN43QEwj1P6jThk
+      secret-id: 6f5396562412430883fbd023ef2c50d9
