@@ -92,7 +92,7 @@ class AddressControllerTest extends ControllerTestSupport {
 			.name("name")
 			.zipcode("1234")
 			.address("address")
-			.addressDetail("addressDetail")
+			.detailAddress("addressDetail")
 			.isDefault(false)
 			.build();
 
@@ -100,7 +100,7 @@ class AddressControllerTest extends ControllerTestSupport {
 			.name("name")
 			.zipcode("1234")
 			.address("address")
-			.addressDetail("addressDetail")
+			.detailAddress("addressDetail")
 			.isDefault(false)
 			.build();
 
@@ -134,7 +134,7 @@ class AddressControllerTest extends ControllerTestSupport {
 			.name("name")
 			.zipcode("1234")
 			.address("address")
-			.addressDetail("addressDetail")
+			.detailAddress("addressDetail")
 			.isDefault(false)
 			.build();
 

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.exception.address.AddressNotFoundException;
 import shop.nuribooks.books.exception.address.AddressOverMaximumSizeException;
+import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.address.dto.requset.AddressEditRequest;
 import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
@@ -28,20 +29,26 @@ public class AddressServiceImpl implements AddressService {
 
 	@Transactional
 	public AddressResponse registerAddress(AddressRegisterRequest request, Long memberId) {
-		if (addressRepository.findAllByMemberId(memberId).size() >= ADDRESS_MAXIMUM_SIZE) {
+		int size = addressRepository.findAllByMemberId(memberId).size();
+		if (size >= ADDRESS_MAXIMUM_SIZE) {
 			throw new AddressOverMaximumSizeException("주소는 최대 10개 등록 가능합니다");
 		}
 
-		Member member = memberRepository.findById(memberId).get();
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
-		Address address = request.toEntity();
+		boolean isDefault = getIsDefault(size);
+		Address address = request.toEntity(isDefault);
 		member.addAddress(address);
 		return AddressResponse.of(address);
 	}
 
+	private boolean getIsDefault(int size) {
+		return size == 0;
+	}
+
 	@Transactional(readOnly = true)
 	public List<AddressResponse> findAddressesByMemberId(Long memberId) {
-		//TODO: 주소 없는 경우 예외처리
 		List<Address> addressesByMemberId = addressRepository.findAllByMemberId(memberId);
 		return addressesByMemberId.stream()
 			.map(AddressResponse::of)
