@@ -111,8 +111,8 @@ public class Member {
 	 * 탈퇴 일시
 	 */
 	private LocalDateTime withdrawnAt;
-
-	@OneToOne(fetch = LAZY)
+  
+	@OneToOne(mappedBy = "member")
 	private Cart cart;
 
 	/**
