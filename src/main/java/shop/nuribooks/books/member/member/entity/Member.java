@@ -112,7 +112,7 @@ public class Member {
 	 */
 	private LocalDateTime withdrawnAt;
 
-	@OneToOne(fetch = LAZY)
+	@OneToOne(mappedBy = "member")
 	private Cart cart;
 
 	/**
