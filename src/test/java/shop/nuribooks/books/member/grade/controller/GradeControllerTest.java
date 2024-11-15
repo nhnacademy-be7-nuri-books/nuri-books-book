@@ -28,7 +28,6 @@ import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeListResponse;
-import shop.nuribooks.books.member.grade.dto.response.GradeRegisterResponse;
 import shop.nuribooks.books.member.grade.entity.Grade;
 
 public class GradeControllerTest extends ControllerTestSupport {
@@ -44,9 +43,8 @@ public class GradeControllerTest extends ControllerTestSupport {
 	void gradeRegister() throws Exception {
 	    //given
 		GradeRegisterRequest request = getGradeRegisterRequest();
-		GradeRegisterResponse response = getGradeRegisterResponse();
 
-		when(gradeService.registerGrade(any(GradeRegisterRequest.class))).thenReturn(response);
+		doNothing().when(gradeService).registerGrade(any(GradeRegisterRequest.class));
 
 		//when
 		ResultActions result = mockMvc.perform(post("/api/members/grades")
@@ -55,9 +53,8 @@ public class GradeControllerTest extends ControllerTestSupport {
 
 		//then
 		result.andExpect(status().isCreated())
-			.andExpect(jsonPath("name").value(response.name()))
-			.andExpect(jsonPath("pointRate").value(response.pointRate()))
-			.andExpect(jsonPath("requirement").value(response.requirement()));
+			.andExpect(jsonPath("statusCode").value("201"))
+			.andExpect(jsonPath("message").value("등급이 성공적으로 생성되었습니다."));
 	}
 
 	@DisplayName("등급 등록 실패 - validation 에러")
@@ -197,17 +194,6 @@ public class GradeControllerTest extends ControllerTestSupport {
 			.name("  ")
 			.pointRate(-1)
 			.requirement(BigDecimal.valueOf(100_000_001))
-			.build();
-	}
-
-	/**
-	 * 테스트를 위한 GradeRegisterResponse 생성
-	 */
-	private GradeRegisterResponse getGradeRegisterResponse() {
-		return GradeRegisterResponse.builder()
-			.name("STANDARD")
-			.pointRate(3)
-			.requirement(BigDecimal.valueOf(100_000))
 			.build();
 	}
 

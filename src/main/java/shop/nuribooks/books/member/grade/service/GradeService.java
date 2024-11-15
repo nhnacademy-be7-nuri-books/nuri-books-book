@@ -6,14 +6,13 @@ import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeListResponse;
-import shop.nuribooks.books.member.grade.dto.response.GradeRegisterResponse;
 
 /**
  * @author Jprotection
  */
 public interface GradeService {
 
-	GradeRegisterResponse registerGrade(GradeRegisterRequest request);
+	void registerGrade(GradeRegisterRequest request);
 
 	GradeDetailsResponse getGradeDetails(String name);
 
