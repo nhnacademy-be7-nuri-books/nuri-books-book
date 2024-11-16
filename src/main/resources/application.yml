@@ -14,6 +14,12 @@ spring:
       password: "*N2vya7H@muDTwdNMR!"
       database: 140
 
+  elasticsearch:
+    uris: d1d6ef21388d4cc5ad957d5114ed4a3a
+    socket-timeout: 10s
+    username: elastic
+    password: 5e29faf8e1034d6ba57a5f14b46ab3e1
+
 server:
   port: 8083
 

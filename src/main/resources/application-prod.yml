@@ -17,9 +17,3 @@ spring:
       port: 6379
       password: "*N2vya7H@muDTwdNMR!"
       database: 140
-
-  elasticsearch:
-    uris: http://115.94.72.197:9200
-    socket-timeout: 10s
-    username: elastic
-    password: nhnacademy123!
