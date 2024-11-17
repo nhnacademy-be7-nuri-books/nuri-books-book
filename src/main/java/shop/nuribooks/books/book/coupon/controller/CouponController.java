@@ -70,7 +70,7 @@ public class CouponController {
 
 	@Operation(summary = "쿠폰 업데이트", description = "쿠폰 정보를 업데이트합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "업데이트 성공"),
+		@ApiResponse(responseCode = "200", description = "업데이트 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	// @HasRole(role = AuthorityType.ADMIN)
@@ -78,8 +78,8 @@ public class CouponController {
 	public ResponseEntity<ResponseMessage> updateCoupon(@PathVariable("coupon-id") Long id,
 		@Valid @RequestBody CouponRequest couponRequest) {
 		couponService.updateCoupon(id, couponRequest);
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(new ResponseMessage(HttpStatus.CREATED.value(), "쿠폰 업데이트 성공"));
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(new ResponseMessage(HttpStatus.OK.value(), "쿠폰 업데이트 성공"));
 	}
 
 	@Operation(summary = "쿠폰 삭제", description = "쿠폰을 삭제합니다.")
