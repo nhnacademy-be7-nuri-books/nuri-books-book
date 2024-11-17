@@ -1,0 +1,34 @@
+{
+  "properties": {
+    "id": {
+      "type": "long"
+    },
+    "publisherName": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "state": {
+      "type": "keyword"
+    },
+    "title": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "description": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "thumbnailImageUrl": {
+      "type": "text"
+    },
+    "price": {
+      "type": "double"
+    },
+    "salePrice": {
+      "type": "double"
+    },
+    "discountRate": {
+      "type": "integer"
+    }
+  }
+}
