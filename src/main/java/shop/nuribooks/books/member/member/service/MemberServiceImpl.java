@@ -1,5 +1,7 @@
 package shop.nuribooks.books.member.member.service;
 
+import static shop.nuribooks.books.member.member.entity.AuthorityType.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -14,10 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
+import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.member.PasswordDuplicateException;
 import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
 import shop.nuribooks.books.exception.member.UsernameAlreadyExistsException;
 import shop.nuribooks.books.member.customer.entity.Customer;
@@ -82,7 +86,7 @@ public class MemberServiceImpl implements MemberService {
 
 		Member newMember = Member.builder()
 			.customer(savedCustomer)
-			.authority(AuthorityType.MEMBER)
+			.authority(MEMBER)
 			.grade(standard())
 			.status(StatusType.ACTIVE)
 			.gender(request.gender())
@@ -113,6 +117,10 @@ public class MemberServiceImpl implements MemberService {
 		Member foundMember = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
+		if (foundMember.getAuthority() == ADMIN) {
+			throw new BadRequestException("관리자 등급은 탈퇴할 수 없습니다.");
+		}
+
 		foundMember.changeToWithdrawn();
 	}
 
@@ -129,6 +137,10 @@ public class MemberServiceImpl implements MemberService {
 
 		Customer foundCustomer = customerRepository.findById(memberId)
 			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
+
+		if (request.password().equals(foundCustomer.getPassword())) {
+			throw new PasswordDuplicateException("기존 비밀번호와 다른 비밀번호를 입력해야 합니다.");
+		}
 
 		foundCustomer.changeCustomerPassword(request.password());
 	}
@@ -190,6 +202,18 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public Page<MemberSearchResponse> searchMembersWithPaging(MemberSearchRequest request, Pageable pageable) {
 		return memberRepository.searchMembersWithPaging(request, pageable);
+	}
+
+	/**
+	 * 회원의 최근 로그인 시간을 업데이트
+	 */
+	@Override
+	public void updateMemberLatestLoginAt(Long memberId) {
+
+		Member foundMember = memberRepository.findById(memberId)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+
+		foundMember.updateLatestLoginAt();
 	}
 
 	/**
