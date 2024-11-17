@@ -6,10 +6,12 @@ import java.time.LocalDate;
 import lombok.Builder;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
+import shop.nuribooks.books.book.point.enums.PolicyType;
 
 @Builder
 public record CouponResponse(
 	Long id,
+	PolicyType policyType,
 	String name,
 	int discount,
 	BigDecimal minimumOrderPrice,
@@ -23,6 +25,7 @@ public record CouponResponse(
 		return CouponResponse.builder()
 			.id(coupon.getId())
 			.name(coupon.getName())
+			.policyType(coupon.getPolicyType())
 			.discount(coupon.getDiscount())
 			.minimumOrderPrice(coupon.getMinimumOrderPrice())
 			.maximumDiscountPrice(coupon.getMaximumDiscountPrice())
