@@ -42,6 +42,7 @@ import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.book.contributor.repository.role.ContributorRoleRepository;
+import shop.nuribooks.books.book.elasticsearch.service.BookSearchService;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.common.message.PagedResponse;
@@ -66,6 +67,7 @@ public class BookServiceImpl implements BookService {
 	private final BookCategoryRepository bookCategoryRepository;
 	private final BookTagService bookTagService;
 	private final BookCategoryService bookCategoryService;
+	private final BookSearchService bookSearchService;
 
 	@Transactional
 	@Override
@@ -93,7 +95,7 @@ public class BookServiceImpl implements BookService {
 			BookStateEnum bookStateEnum;
 			try {
 				bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.getState()));
-			} catch(InvalidBookStateException ex) {
+			} catch (InvalidBookStateException ex) {
 				log.error("Error parsing book state from request: {}", ex.getMessage(), ex);
 				throw ex;
 			}
@@ -116,7 +118,7 @@ public class BookServiceImpl implements BookService {
 			}
 
 			try {
-				if(reqDto instanceof AladinBookRegisterRequest aladinReq) {
+				if (reqDto instanceof AladinBookRegisterRequest aladinReq) {
 					registerAladinCategories(aladinReq.getCategoryName(), book);
 				} else if (reqDto instanceof PersonallyBookRegisterRequest personallyReq) {
 					registerPersonallyCategories(personallyReq.getCategoryIds(), book);
@@ -126,7 +128,7 @@ public class BookServiceImpl implements BookService {
 				throw ex;
 			}
 
-			try{
+			try {
 				if (reqDto.getTagIds() != null && !reqDto.getTagIds().isEmpty()) {
 					List<Long> tagIdList = reqDto.getTagIds();
 					bookTagService.registerTagToBook(book.getId(), tagIdList);
@@ -136,6 +138,8 @@ public class BookServiceImpl implements BookService {
 				throw ex;
 			}
 			log.info("Book with ISBN {} successfully saved.", reqDto.getIsbn());
+
+			bookSearchService.saveBook(book, publisher);
 		} catch (Exception ex) {
 			log.error("Error saving book with ISBN {}: {}", reqDto.getIsbn(), ex.getMessage(), ex);
 			throw ex;
@@ -216,7 +220,7 @@ public class BookServiceImpl implements BookService {
 	public void deleteBook(Long bookId) {
 		log.info("deleteBook attempt - bookId: {}", bookId);
 
-		if(bookId == null) {
+		if (bookId == null) {
 			log.error("Book Delete fail - bookId is Null");
 			throw new BookIdNotFoundException();
 		}
@@ -230,7 +234,7 @@ public class BookServiceImpl implements BookService {
 
 	//Contributor 저장 메서드
 	private void saveContributors(List<ParsedContributor> parsedContributors, Book book) {
-		for(ParsedContributor parsedContributor : parsedContributors) {
+		for (ParsedContributor parsedContributor : parsedContributors) {
 			Contributor contributor = contributorRepository.findByName(parsedContributor.getName())
 				.orElseGet(() -> contributorRepository.save(
 					Contributor.builder()
