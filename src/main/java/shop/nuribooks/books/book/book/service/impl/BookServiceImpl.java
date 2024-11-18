@@ -42,7 +42,6 @@ import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.book.contributor.repository.role.ContributorRoleRepository;
-import shop.nuribooks.books.book.elasticsearch.service.BookSearchService;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.common.message.PagedResponse;
@@ -67,7 +66,6 @@ public class BookServiceImpl implements BookService {
 	private final BookCategoryRepository bookCategoryRepository;
 	private final BookTagService bookTagService;
 	private final BookCategoryService bookCategoryService;
-	private final BookSearchService bookSearchService;
 
 	@Transactional
 	@Override
@@ -110,8 +108,9 @@ public class BookServiceImpl implements BookService {
 				throw ex;
 			}
 
+			List<ParsedContributor> parsedContributors = List.of();
 			try {
-				List<ParsedContributor> parsedContributors = parseContributors(reqDto.getAuthor());
+				parsedContributors = parseContributors(reqDto.getAuthor());
 				saveContributors(parsedContributors, book);
 			} catch (Exception ex) {
 				log.error("Error parsing or saving contributors: {}", ex.getMessage(), ex);
@@ -139,7 +138,6 @@ public class BookServiceImpl implements BookService {
 			}
 			log.info("Book with ISBN {} successfully saved.", reqDto.getIsbn());
 
-			bookSearchService.saveBook(book, publisher);
 		} catch (Exception ex) {
 			log.error("Error saving book with ISBN {}: {}", reqDto.getIsbn(), ex.getMessage(), ex);
 			throw ex;

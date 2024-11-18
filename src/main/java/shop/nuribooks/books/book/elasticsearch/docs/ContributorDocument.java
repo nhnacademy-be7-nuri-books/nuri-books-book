@@ -3,9 +3,13 @@ package shop.nuribooks.books.book.elasticsearch.docs;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Data
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ContributorDocument {
 
 	@Field(type = FieldType.Keyword)

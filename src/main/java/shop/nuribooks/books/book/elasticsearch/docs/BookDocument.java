@@ -1,73 +1,47 @@
 package shop.nuribooks.books.book.elasticsearch.docs;
 
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.springframework.data.elasticsearch.annotations.Mapping;
-import org.springframework.data.elasticsearch.annotations.Setting;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shop.nuribooks.books.book.book.entity.Book;
-import shop.nuribooks.books.book.publisher.entity.Publisher;
+import lombok.Setter;
 
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
 @Document(indexName = "#{indexNameProperty.resolveIndexName()}")
-@Setting(settingPath = "/elasticsearch/settings/nori-settings.json")
-@Mapping(mappingPath = "/elasticsearch/mappings/nori-mappings.json")
-@Builder
 public class BookDocument {
 
 	@Id
-	@Field(type = FieldType.Long)
 	private Long id;
 
-	@Field(name = "publisher_name", type = FieldType.Keyword)
-	private String publisherName;
+	private String publisher_name;
 
-	@Field(name = "state", type = FieldType.Keyword)
 	private String state;
 
-	@Field(type = FieldType.Text, analyzer = "nori")
 	private String title;
 
-	@Field(type = FieldType.Text, analyzer = "nori")
 	private String description;
 
-	@Field(type = FieldType.Double)
 	private BigDecimal price;
 
-	@Field(name = "sale_price", type = FieldType.Double)
-	private BigDecimal salePrice;
+	private BigDecimal sale_price;
 
-	@Field(name = "discount_rate", type = FieldType.Integer)
-	private int discountRate;
+	private int discount_rate;
 
-	@Field(name = "thumbnail_image_url", type = FieldType.Text, index = false)
-	private String thumbnailImageUrl;
+	private String thumbnail_image_url;
 
-	// @Field(type = FieldType.Nested) // Nested 타입으로 설정
-	// private List<ContributorDocument> contributors;
+	// localdatetime -> date로 타입 변경.
+	// jackson이 Localdatetime 변환 지원 x
+	// 추가 라이브러리가 elastic search의 object mapper에 적용안됨.
+	private Date publication_date;
 
-	public static BookDocument of(Book book, Publisher publisher) {
-		return BookDocument.builder()
-			.id(book.getId())
-			.publisherName(publisher.getName())
-			.state(book.getState().getKorName())
-			.title(book.getTitle())
-			.description(book.getDescription())
-			.price(book.getPrice())
-			.salePrice(book.getPrice()
-				.divide(BigDecimal.valueOf(100))
-				.multiply(BigDecimal.valueOf(100 - book.getDiscountRate())))
-			.thumbnailImageUrl(book.getThumbnailImageUrl())
-			.build();
-	}
+	private List<String> tags; // 태그 리스트
+
+	private List<ContributorDocument> contributors; // 기여자 리스트
 }
