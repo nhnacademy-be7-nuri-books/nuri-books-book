@@ -2,6 +2,8 @@ package shop.nuribooks.books.book.coupon.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,6 +50,46 @@ public class MemberCouponController {
 		@RequestBody MemberCouponRegisterRequest memberCouponRegisterRequest) {
 		memberCouponService.registerMemberCoupon(memberCouponRegisterRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	/**
+	 * 회원 ID로 사용 가능한 쿠폰을 조회합니다.
+	 *
+	 * @param memberId 회원 ID
+	 * @param pageable 페이징 정보
+	 * @return 사용 가능한 쿠폰 정보를 담은 페이지
+	 */
+	@Operation(summary = "사용 가능한 쿠폰 조회", description = "회원 ID로 사용 가능한 쿠폰을 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "사용 가능한 쿠폰 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음"),
+		@ApiResponse(responseCode = "500", description = "서버 오류")
+	})
+	@GetMapping("/{memberId}/available")
+	public ResponseEntity<Page<MemberCouponResponse>> getAvailableCouponsByMemberId(@PathVariable Long memberId,
+		Pageable pageable) {
+		Page<MemberCouponResponse> coupons = memberCouponService.getAvailableCouponsByMemberId(memberId, pageable);
+		return ResponseEntity.ok(coupons);
+	}
+
+	/**
+	 * 회원 ID로 만료되었거나 사용된 쿠폰을 조회합니다.
+	 *
+	 * @param memberId 회원 ID
+	 * @param pageable 페이징 정보
+	 * @return 만료되었거나 사용된 쿠폰 정보를 담은 페이지
+	 */
+	@Operation(summary = "만료 또는 사용된 쿠폰 조회", description = "회원 ID로 만료되었거나 사용된 쿠폰을 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "만료 또는 사용된 쿠폰 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음"),
+		@ApiResponse(responseCode = "500", description = "서버 오류")
+	})
+	@GetMapping("/{memberId}/expired-or-used")
+	public ResponseEntity<Page<MemberCouponResponse>> getExpiredOrUsedCouponsByMemberId(@PathVariable Long memberId,
+		Pageable pageable) {
+		Page<MemberCouponResponse> coupons = memberCouponService.getExpiredOrUsedCouponsByMemberId(memberId, pageable);
+		return ResponseEntity.ok(coupons);
 	}
 
 	/**
