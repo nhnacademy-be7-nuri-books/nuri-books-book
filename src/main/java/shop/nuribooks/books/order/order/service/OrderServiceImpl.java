@@ -1,14 +1,18 @@
 package shop.nuribooks.books.order.order.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.dto.BookOrderResponse;
@@ -16,14 +20,24 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
+import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
+import shop.nuribooks.books.exception.order.NoStockAvailableException;
+import shop.nuribooks.books.exception.order.PriceMismatchException;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.address.repository.AddressRepository;
+import shop.nuribooks.books.member.customer.dto.DtoMapper;
+import shop.nuribooks.books.member.customer.dto.EntityMapper;
+import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
+import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.dto.MemberPointDTO;
+import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
@@ -31,10 +45,13 @@ import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderDetail.dto.OrderDetailRequest;
+import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderDetail.service.OrderDetailService;
 import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
 import shop.nuribooks.books.order.shipping.repository.ShippingPolicyRepository;
 import shop.nuribooks.books.order.shipping.service.ShippingService;
+import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
+import shop.nuribooks.books.payment.payment.dto.PaymentSuccessRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -133,16 +150,30 @@ public class OrderServiceImpl implements OrderService{
 
 		// 사용자 확인
 		Customer customer = getCustomerById(id);
+		BigDecimal usedPoint = orderTempRegisterRequest.usingPoint();
+
+		// 사용자 포인트를 사용헀다면 차감 처리
+		if(usedPoint.intValue() > 0){
+			Optional<Member> member = memberRepository.findById(id);
+
+			member.ifPresent(value -> {
+				BigDecimal currentPoint = memberRepository.findPointById(id).get().point();
+				BigDecimal resultPoint = currentPoint.subtract(usedPoint);
+
+				value.setPoint(resultPoint);
+				memberRepository.save(value);
+			});
+		}
 
 		// todo : 회원 쿠폰 처리
-		// todo : 회원 포인트 차감
 
 		// 임시 주문 등록
 		Order order = Order.builder()
 			.customer(customer)
 			.paymentPrice(orderTempRegisterRequest.paymentPrice())
-			.orderedAt(orderTempRegisterRequest.orderedAt())
+			.orderedAt(LocalDateTime.now())
 			.wrappingPrice(orderTempRegisterRequest.wrappingPrice())
+			.expectedDeliveryAt(orderTempRegisterRequest.expectedDeliveryAt())
 			.build();
 
 		orderRepository.save(order);
@@ -159,6 +190,9 @@ public class OrderServiceImpl implements OrderService{
 
 		// 배송지 등록
 		shippingService.registerShipping(order, orderTempRegisterRequest.shippingRegister());
+
+		order.setTitle(makeOrderName(bookTitles));
+		orderRepository.save(order);
 
 		// 응답 반환
 		return OrderTempRegisterResponse.of(order, makeOrderName(bookTitles));
@@ -173,15 +207,17 @@ public class OrderServiceImpl implements OrderService{
 	@Override
 	@Transactional
 	public OrderTempRegisterResponse registerTempOrderForCustomer(OrderTempRegisterRequest orderTempRegisterRequest) {
-		// todo :  사용자 생성
-		Customer customer = null;
+
+		// 사용자 생성
+		Customer customer = registerCustomer(orderTempRegisterRequest.customerRegister());
 
 		// 임시 주문 등록
 		Order order = Order.builder()
 			.customer(customer)
 			.paymentPrice(orderTempRegisterRequest.paymentPrice())
-			.orderedAt(orderTempRegisterRequest.orderedAt())
+			.orderedAt(LocalDateTime.now())
 			.wrappingPrice(orderTempRegisterRequest.wrappingPrice())
+			.expectedDeliveryAt(orderTempRegisterRequest.expectedDeliveryAt())
 			.build();
 
 		orderRepository.save(order);
@@ -197,8 +233,42 @@ public class OrderServiceImpl implements OrderService{
 		// 배송지 등록
 		shippingService.registerShipping(order, orderTempRegisterRequest.shippingRegister());
 
+		order.setTitle(makeOrderName(bookTitles));
+		orderRepository.save(order);
+
 		// 응답 반환
 		return OrderTempRegisterResponse.of(order, makeOrderName(bookTitles));
+	}
+
+	/**
+	 * 주문 금액 & 재고 검증
+	 *
+	 * @param paymentRequest 토스 페이먼츠에서 전달받은 데이터
+	 * @return 성공/실패 메시지
+	 */
+	@Override
+	public ResponseMessage verifyOrderInformation(PaymentRequest paymentRequest) {
+
+		String frontOrderId = paymentRequest.orderId();
+		Long orderId = Long.parseLong(frontOrderId.substring(frontOrderId.length() - 2));
+
+		Optional<Order> order = orderRepository.findById(orderId);
+
+		if(order.isPresent()){
+			if(!orderDetailService.checkStock(order.get())){
+				throw new NoStockAvailableException();
+			}
+			if(order.get().getPaymentPrice().intValue() != paymentRequest.amount()){
+				throw new PriceMismatchException();
+			}
+		}
+
+		log.debug("재고 최종 검증 성공");
+
+		return ResponseMessage.builder()
+			.statusCode(200)
+			.message("토스 페이먼츠 검증 완료")
+			.build();
 	}
 
 	/**
@@ -279,5 +349,27 @@ public class OrderServiceImpl implements OrderService{
  	 */
 	private ShippingPolicy getShippingPolicy(int orderTotalPrice) {
 		return shippingPolicyRepository.findClosedShippingPolicy(orderTotalPrice);
+	}
+
+	/**
+	 * 비회원 저장 <br>
+	 * 고객 생성 후 customerRepository에 저장
+	 * @throws EmailAlreadyExistsException 이미 존재하는 이메일입니다.
+	 * @param request
+	 * CustomerCreateRequest로 이름, 비밀번호, 전화번호, 이메일을 받는다. <br>
+	 * 이메일로 비회원 조회 후 이미 존재하는 이메일이면 예외 던짐
+	 * @return customer 등록 후 입력한 이름, 전화번호, 이메일을 그대로 CustomerCreateResponse에 담아서 반환
+	 */
+	public Customer registerCustomer(CustomerRegisterRequest request) {
+		if (customerRepository.existsByEmail(request.email())) {
+			throw new EmailAlreadyExistsException("이미 존재하는 이메일입니다.");
+		}
+		if (customerRepository.existsByPhoneNumber(request.phoneNumber())) {
+			throw new PhoneNumberAlreadyExistsException("이미 존재하는 전화번호입니다.");
+		}
+
+		Customer customer = EntityMapper.toCustomerEntity(request);
+
+		return customerRepository.save(customer);
 	}
 }
