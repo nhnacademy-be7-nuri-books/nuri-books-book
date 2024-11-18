@@ -33,7 +33,7 @@ public class RedisKeyExpirationListener implements MessageListener {
 	private final RedisCartRepository redisCartRepository;
 	private final BookRepository bookRepository;
 	private final CartDetailRepository cartDetailRepository;
-	private final MemberRepository memberRepository;
+	private final CartRepository cartRepository;
 
 	@Override
 	@Transactional
@@ -43,25 +43,18 @@ public class RedisKeyExpirationListener implements MessageListener {
 		if (expiredKey.startsWith(SHADOW_KEY + MEMBER_CART_KEY)) {
 			String parsedKey = expiredKey.substring((SHADOW_KEY + MEMBER_CART_KEY).length());
 			Long memberId = Long.parseLong(parsedKey);
-			Cart cart;
-			try {
-				 cart = getMemberCart(memberId);
-			} catch (IllegalArgumentException e) {
-				return;
-			}
-
-			if (Objects.isNull(cart)) {
-				return;
-			}
 			String memberCartId = MEMBER_CART_KEY + parsedKey;
-			Map<Long, Integer> cartDetails = redisCartRepository.getCart(memberCartId);
-			if (Objects.isNull(cartDetails)) {
-				return;
+			try {
+				Cart cart = cartRepository.findByMember_Id(memberId).orElseThrow(CartNotFoundException::new);
+				Map<Long, Integer> cartDetails = redisCartRepository.getCart(memberCartId);
+				List<CartDetail> cartDetailList = getCartDetailList(cartDetails, cart);
+				cartDetailRepository.deleteByCart(cart);
+				cartDetailRepository.saveAll(cartDetailList);
+			} catch (Exception e) {
+				log.error("에러를 무시합니다.");
+			} finally {
+				redisCartRepository.removeCart(memberCartId);
 			}
-
-			List<CartDetail> cartDetailList = getCartDetailList(cartDetails, cart);
-			cartDetailRepository.saveAll(cartDetailList);
-			redisCartRepository.removeCart(memberCartId);
 		}
 	}
 
@@ -73,11 +66,5 @@ public class RedisKeyExpirationListener implements MessageListener {
 				}
 			)
 			.toList();
-	}
-
-	private Cart getMemberCart(Long memberId) {
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-		return member.getCart();
 	}
 }
