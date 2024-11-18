@@ -39,7 +39,7 @@ public class Category {
 	private Category parentCategory;
 
 	@BatchSize(size = 100)
-	@OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = false)
 	private List<Category> subCategory = new ArrayList<>();
 
 	@Builder

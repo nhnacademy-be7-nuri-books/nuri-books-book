@@ -28,6 +28,7 @@ import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.service.MemberService;
@@ -165,18 +166,24 @@ public class MemberController {
 	@GetMapping("/api/members")
 	public ResponseEntity<Page<MemberSearchResponse>> memberSearchWithPaging(
 		@RequestParam(value = "name", required = false) String name,
+		@RequestParam(value = "username", required = false) String username,
 		@RequestParam(value = "email", required = false) String email,
 		@RequestParam(value = "phoneNumber", required = false) String phoneNumber,
 		@RequestParam(value = "gender", required = false) String gender,
+		@RequestParam(value = "gradeName", required = false) String gradeName,
 		@RequestParam(value = "status", required = false) String status,
+		@RequestParam(value = "authority", required = false) String authority,
 		Pageable pageable) {
 
 		MemberSearchRequest request = MemberSearchRequest.builder()
 			.name(name)
+			.username(username)
 			.email(email)
 			.phoneNumber(phoneNumber)
 			.gender(GenderType.fromValue(gender))
+			.gradeName(gradeName)
 			.status(StatusType.fromValue(status))
+			.authority(AuthorityType.fromValue(authority))
 			.build();
 
 		Page<MemberSearchResponse> response = memberService.searchMembersWithPaging(request, pageable);
