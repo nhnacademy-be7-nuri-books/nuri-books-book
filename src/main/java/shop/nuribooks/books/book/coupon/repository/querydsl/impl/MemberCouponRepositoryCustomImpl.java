@@ -25,13 +25,13 @@ public class MemberCouponRepositoryCustomImpl implements MemberCouponRepositoryC
 		return queryFactory.select(Projections.constructor(MemberCouponResponse.class,
 				memberCoupon.id,
 				memberCoupon.coupon.id,
-				memberCoupon.memberId,
+				memberCoupon.member.id,
 				memberCoupon.isUsed,
 				memberCoupon.createdAt,
 				memberCoupon.expiredAt
 			))
 			.from(memberCoupon)
-			.where(memberCoupon.memberId.eq(memberId))
+			.where(memberCoupon.member.id.eq(memberId))
 			.fetch();
 	}
 }
