@@ -35,7 +35,7 @@ public class ShippingPolicy {
 	@Comment("배송비")
 	private int shippingFee;
 
-	@Column(nullable = false)
+	@Column(nullable = true)
 	@Comment("적용 날짜")
 	private LocalDateTime appliedDatetime;
 

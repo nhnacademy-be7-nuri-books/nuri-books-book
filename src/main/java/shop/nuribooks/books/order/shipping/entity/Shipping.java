@@ -64,7 +64,6 @@ public class Shipping {
 
 	@Column(length = 50, nullable = false)
 	@Comment("받는 사람 상세 주소")
-	@NotBlank
 	private String recipientAddressDetail;
 
 	@Column(length = 50, nullable = false)
