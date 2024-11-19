@@ -46,7 +46,7 @@ public class PublisherController {
 	})
 	@PostMapping
 	public ResponseEntity<ResponseMessage> registerPublisher(@Valid @RequestBody PublisherRequest request) {
-		PublisherResponse response = publisherService.registerPublisher(request);
+		publisherService.registerPublisher(request);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(new ResponseMessage(HttpStatus.CREATED.value(), "출판사 등록 성공"));
 
