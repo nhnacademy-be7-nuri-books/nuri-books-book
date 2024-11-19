@@ -18,6 +18,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.order.order.entity.Order;
@@ -47,6 +48,7 @@ public class OrderDetail {
 
 	@Column(nullable = false)
 	@Comment("주문 상태")
+	@Setter
 	private OrderState orderState = OrderState.PENDING;
 
 	@ManyToOne(fetch = FetchType.LAZY)

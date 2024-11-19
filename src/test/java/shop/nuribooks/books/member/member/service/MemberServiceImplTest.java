@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Import;
 
 import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
+import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
@@ -63,6 +64,9 @@ class MemberServiceImplTest {
 
 	@Mock
 	private PointHistoryService pointHistoryService;
+
+	@Mock
+	private CartRepository cartRepository;
 
 	@BeforeEach
 	void setUp() {

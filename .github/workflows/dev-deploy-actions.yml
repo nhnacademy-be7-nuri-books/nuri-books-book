@@ -6,6 +6,7 @@ on:
 
 env:
   JASYPT_PASSWORD: ${{secrets.JASYPT_PASSWORD}}
+  NHN_KEY_MANAGER_SECRET_ACCESS_KEY: ${{secrets.NHN_KEY_MANAGER_SECRET_ACCESS_KEY}}
 
 jobs:
   dev-deploy:

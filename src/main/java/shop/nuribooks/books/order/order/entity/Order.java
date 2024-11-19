@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.member.customer.entity.Customer;
 
@@ -61,6 +62,10 @@ public class Order {
 
 	@Comment("예상 배송 날짜")
 	private LocalDate expectedDeliveryAt;
+
+	@Comment("주문명")
+	@Setter
+	private String title;
 
 	/**
 	 * 주문 생성자 (builder)

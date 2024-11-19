@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.point.repository.impl;
 import static shop.nuribooks.books.book.point.entity.QPointHistory.*;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -40,8 +41,8 @@ public class PointHistoryCustomRepositoryImpl implements PointHistoryCustomRepos
 					pointHistory.createdAt
 				)
 			).from(pointHistory)
-			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart(),
-				pointHistoryPeriodRequest.getEnd()))
+			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart().atStartOfDay(),
+				pointHistoryPeriodRequest.getEnd().atTime(LocalTime.now())))
 			.where(pointHistory.deletedAt.isNull())
 			.where(pointHistory.member.id.eq(memberId))
 			.where(type.getBe())
@@ -59,48 +60,13 @@ public class PointHistoryCustomRepositoryImpl implements PointHistoryCustomRepos
 	 * @return
 	 */
 	@Override
-	public long countPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest) {
+	public long countPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest,
+		HistoryType type) {
 		return queryFactory.select(pointHistory.id.count())
 			.from(pointHistory)
-			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart(),
-				pointHistoryPeriodRequest.getEnd()))
-			.where(pointHistory.deletedAt.isNull())
-			.where(pointHistory.member.id.eq(memberId))
-			.fetchOne();
-	}
-
-	/**
-	 * 유저의 사용 포인트 내역 전체 개수
-	 *
-	 * @param memberId
-	 * @param pointHistoryPeriodRequest
-	 * @return
-	 */
-	@Override
-	public long countUsedPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest) {
-		return queryFactory.select(pointHistory.id.count())
-			.from(pointHistory)
-			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart(),
-				pointHistoryPeriodRequest.getEnd()))
-			.where(pointHistory.deletedAt.isNull())
-			.where(pointHistory.member.id.eq(memberId))
-			.where(pointHistory.amount.lt(BigDecimal.ZERO))
-			.fetchOne();
-	}
-
-	/**
-	 * 유저의 적립 포인트 내역 전체 개수
-	 *
-	 * @param memberId
-	 * @param pointHistoryPeriodRequest
-	 * @return
-	 */
-	@Override
-	public long countEarnedPointHistories(long memberId, PointHistoryPeriodRequest pointHistoryPeriodRequest) {
-		return queryFactory.select(pointHistory.id.count())
-			.from(pointHistory)
-			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart(),
-				pointHistoryPeriodRequest.getEnd()))
+			.where(pointHistory.createdAt.between(pointHistoryPeriodRequest.getStart().atStartOfDay(),
+				pointHistoryPeriodRequest.getEnd().atTime(LocalTime.now())))
+			.where(type.getBe())
 			.where(pointHistory.deletedAt.isNull())
 			.where(pointHistory.member.id.eq(memberId))
 			.where(pointHistory.amount.goe(BigDecimal.ZERO))

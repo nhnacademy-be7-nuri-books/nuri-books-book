@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public record AddressEditRequest(
         @NotBlank String name,
+		@NotBlank String zipcode,
         @NotBlank String address,
-        @NotBlank String addressDetail,
+        @NotBlank String detailAddress,
         boolean isDefault) {
 }

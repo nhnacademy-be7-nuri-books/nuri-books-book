@@ -21,4 +21,6 @@ public interface RedisCartRepository {
     void setShadowExpireKey(String key, int value, TimeUnit timeUnit);
 
     void saveAll(String cartId, List<RedisCartDetail> redisCartDetailList);
+
+    boolean isExist(String cartId);
 }

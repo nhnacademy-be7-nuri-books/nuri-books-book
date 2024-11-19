@@ -27,7 +27,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
-import shop.nuribooks.books.cart.dto.response.CartResponse;
 import shop.nuribooks.books.common.ControllerTestSupport;
 
 class CustomerCartControllerTest extends ControllerTestSupport {

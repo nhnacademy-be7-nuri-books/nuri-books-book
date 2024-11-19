@@ -1,6 +1,6 @@
 package shop.nuribooks.books.book.point.dto.request;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PointHistoryPeriodRequest {
-	private LocalDateTime end = LocalDateTime.now();
-	private LocalDateTime start = end.minusDays(30);
+	private LocalDate end = LocalDate.now();
+	private LocalDate start = end.minusDays(30);
 }
