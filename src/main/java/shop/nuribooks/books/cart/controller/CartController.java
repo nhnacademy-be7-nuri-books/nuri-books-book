@@ -1,5 +1,7 @@
 package shop.nuribooks.books.cart.controller;
 
+import static shop.nuribooks.books.cart.entity.RedisCartKey.*;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -16,14 +18,13 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
 import shop.nuribooks.books.cart.dto.response.CartBookResponse;
+import shop.nuribooks.books.cart.entity.RedisCartKey;
 import shop.nuribooks.books.cart.service.CartService;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 
 @RequiredArgsConstructor
 @RestController
 public class CartController {
-	private static final String MEMBER_CART_KEY = "member:";
-	private static final String CUSTOMER_CART_KEY = "customer:";
 
 	private final CartService cartService;
 
@@ -33,10 +34,10 @@ public class CartController {
 		Long memberId = MemberIdContext.getMemberId();
 		// 비회원인 경우
 		if (Objects.isNull(memberId)) {
-			cartId = CUSTOMER_CART_KEY + cartAddRequest.cartId();
+			cartId = CUSTOMER_KEY.withSuffix(cartAddRequest.cartId());
 			cartService.addCustomerCart(cartId, cartAddRequest);
 		} else {
-			cartId = MEMBER_CART_KEY + memberId;
+			cartId = MEMBER_CART.withSuffix(memberId.toString());
 			cartService.addMemberCart(cartId, cartAddRequest);
 		}
 		return ResponseEntity.ok().build();
@@ -47,9 +48,9 @@ public class CartController {
 		Long memberId = MemberIdContext.getMemberId();
 		String cartId;
 		if (Objects.isNull(memberId)) {
-			cartId = CUSTOMER_CART_KEY + requestCartId;
+			cartId = CUSTOMER_KEY.withSuffix(requestCartId);
 		} else {
-			cartId = MEMBER_CART_KEY + requestCartId;
+			cartId = MEMBER_CART.withSuffix(requestCartId);
 		}
 		List<CartBookResponse> cartResponseList = cartService.getCart(cartId);
 		return ResponseEntity.ok().body(cartResponseList);
@@ -67,9 +68,9 @@ public class CartController {
 		Long memberId = MemberIdContext.getMemberId();
 		String cartId;
 		if (Objects.isNull(memberId)) {
-			cartId = CUSTOMER_CART_KEY + requestCartId;
+			cartId = CUSTOMER_KEY.withSuffix(requestCartId);
 		} else {
-			cartId = MEMBER_CART_KEY + requestCartId;
+			cartId = MEMBER_CART.withSuffix(requestCartId);
 		}
 		cartService.removeCartItem(cartId, bookId);
 		return ResponseEntity.noContent().build();

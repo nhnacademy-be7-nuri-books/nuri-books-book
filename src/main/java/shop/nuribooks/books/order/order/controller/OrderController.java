@@ -1,6 +1,10 @@
 package shop.nuribooks.books.order.order.controller;
 
+import static shop.nuribooks.books.cart.entity.RedisCartKey.*;
+
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -21,6 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.nuribooks.books.cart.dto.response.CartBookResponse;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
@@ -66,6 +71,24 @@ public class OrderController {
 
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
+
+	// 장바구니 주문 정보 가져오기
+	@GetMapping("/cart/{cart-id}")
+	public ResponseEntity<OrderInformationResponse> getCartOrderInformation(@PathVariable("cart-id") String requestCartId){
+
+		OrderInformationResponse result;
+		Long memberId = MemberIdContext.getMemberId();
+		String cartId;
+		if (Objects.nonNull(memberId)) {
+			result = orderService.getMemberCartOrderInformation(memberId);
+		} else {
+			cartId = CUSTOMER_KEY.withSuffix(requestCartId);
+			result = orderService.getCustomerCartOrderInformation(cartId);
+		}
+
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
 
 	/**
 	 * 결제 전 임시 주문 저장
