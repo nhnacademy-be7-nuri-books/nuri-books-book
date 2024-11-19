@@ -13,6 +13,7 @@ import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
 import shop.nuribooks.books.order.shipping.repository.ShippingPolicyRepository;
 import shop.nuribooks.books.order.shipping.service.ShippingPolicyService;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class ShippingPolicyServiceImpl implements ShippingPolicyService {
