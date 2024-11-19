@@ -27,7 +27,7 @@ import shop.nuribooks.books.member.member.repository.MemberRepository;
 @RequiredArgsConstructor
 @Service
 public class RedisKeyExpirationListener implements MessageListener {
-	private static final String SHADOW_KEY = "shadow:";
+	private static final String SHADOW_KEY = "expire:timer:";
 	private static final String MEMBER_CART_KEY = "member:";
 
 	private final RedisCartRepository redisCartRepository;
@@ -38,12 +38,13 @@ public class RedisKeyExpirationListener implements MessageListener {
 	@Override
 	@Transactional
 	public void onMessage(Message message, byte[] pattern) {
+
 		String expiredKey = new String(message.getBody(), StandardCharsets.UTF_8);
 
 		if (expiredKey.startsWith(SHADOW_KEY + MEMBER_CART_KEY)) {
-			String parsedKey = expiredKey.substring((SHADOW_KEY + MEMBER_CART_KEY).length());
-			Long memberId = Long.parseLong(parsedKey);
-			String memberCartId = MEMBER_CART_KEY + parsedKey;
+			String parsedMemberId = expiredKey.substring((SHADOW_KEY + MEMBER_CART_KEY).length());
+			Long memberId = Long.parseLong(parsedMemberId);
+			String memberCartId = MEMBER_CART_KEY + parsedMemberId;
 			try {
 				Cart cart = cartRepository.findByMember_Id(memberId).orElseThrow(CartNotFoundException::new);
 				Map<Long, Integer> cartDetails = redisCartRepository.getCart(memberCartId);

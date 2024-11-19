@@ -27,7 +27,7 @@ import shop.nuribooks.books.member.member.repository.MemberRepository;
 @RequiredArgsConstructor
 @Service
 public class CartServiceImpl implements CartService {
-    private static final String SHADOW_KEY = "shadow:";
+    private static final String SHADOW_KEY = "expire:timer:";
     private static final String MEMBER_CART_KEY = "member:";
 
     private final BookRepository bookRepository;
