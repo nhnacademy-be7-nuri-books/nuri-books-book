@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -31,12 +30,10 @@ import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
-import shop.nuribooks.books.order.order.service.OrderService;
 import shop.nuribooks.books.order.orderDetail.dto.OrderDetailRequest;
-import shop.nuribooks.books.order.shipping.dto.ShippingPolicyRequest;
 import shop.nuribooks.books.order.shipping.dto.ShippingRegisterRequest;
 
-class OrderControllerTest extends ControllerTestSupport  {
+class OrderControllerTest extends ControllerTestSupport {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -98,7 +95,7 @@ class OrderControllerTest extends ControllerTestSupport  {
 			new BookContributorInfoResponse(1L,
 				"고구마", 1L, "저자");
 		BookContributorInfoResponse contributor2 =
-			new BookContributorInfoResponse(2L, "김철수", 2L,"편집자");
+			new BookContributorInfoResponse(2L, "김철수", 2L, "편집자");
 
 		BookOrderResponse bookOrderResponse = new BookOrderResponse(
 			1L,
@@ -120,7 +117,7 @@ class OrderControllerTest extends ControllerTestSupport  {
 			null,
 			null,
 			BigDecimal.valueOf(1000),
-			List.of(new AddressResponse(1L, "집", "11111","대전 00로 222-11","",false)),
+			List.of(new AddressResponse(1L, "집", "11111", "대전 00로 222-11", "", false)),
 			List.of(bookOrderResponse),
 			1L,
 			3000,
@@ -151,7 +148,6 @@ class OrderControllerTest extends ControllerTestSupport  {
 	void getOrderInformationMemberTest() throws Exception {
 
 		MemberIdContext.setMemberId(1L);
-
 
 		when(orderService.getMemberOrderInformation(anyLong(), anyLong(), anyInt()))
 			.thenReturn(memberOrderResponse);
