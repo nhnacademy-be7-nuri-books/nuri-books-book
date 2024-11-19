@@ -15,12 +15,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.nuribooks.books.order.shipping.dto.ShippingPolicyRequest;
+import shop.nuribooks.books.order.shipping.dto.ShippingPolicyResponse;
 
-/**
- * 배송비 정책 entity
- *
- * @author nuri
- */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Comment("배송비 정책")
@@ -55,5 +52,24 @@ public class ShippingPolicy {
 		this.shippingFee = shippingFee;
 		this.expiration = expiration;
 		this.minimumOrderPrice = minimumOrderPrice;
+	}
+
+	public ShippingPolicyResponse toResponseDto() {
+		return ShippingPolicyResponse.builder()
+			.id(id)
+			.expiration(expiration)
+			.minimumOrderPrice(minimumOrderPrice)
+			.shippingFee(shippingFee)
+			.build();
+	}
+
+	public void update(ShippingPolicyRequest request) {
+		this.shippingFee = request.shippingFee();
+		this.expiration = request.expiration();
+		this.minimumOrderPrice = request.minimumOrderPrice();
+	}
+
+	public void expire() {
+		this.expiration = LocalDateTime.now();
 	}
 }
