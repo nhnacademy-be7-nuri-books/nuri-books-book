@@ -208,6 +208,7 @@ public class MemberServiceImpl implements MemberService {
 	 * 회원의 최근 로그인 시간을 업데이트
 	 */
 	@Override
+	@Transactional
 	public void updateMemberLatestLoginAt(String username) {
 
 		Member foundMember = memberRepository.findByUsername(username)
