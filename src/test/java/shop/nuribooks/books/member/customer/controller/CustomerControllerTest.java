@@ -81,7 +81,7 @@ public class CustomerControllerTest extends ControllerTestSupport {
 		return CustomerRegisterRequest.builder()
 			.name("nuri")
 			.password("abc123")
-			.phoneNumber("042-8282-8282")
+			.phoneNumber("01082828282")
 			.email("nuri@nhnacademy.com")
 			.build();
 	}
@@ -92,7 +92,7 @@ public class CustomerControllerTest extends ControllerTestSupport {
 	private CustomerRegisterResponse getCustomerRegisterResponse() {
 		return CustomerRegisterResponse.builder()
 			.name("nuri")
-			.phoneNumber("042-8282-8282")
+			.phoneNumber("01082828282")
 			.email("nuri@nhnacademy.com")
 			.build();
 	}

@@ -1,5 +1,6 @@
 package shop.nuribooks.books.order.order.controller;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -19,11 +20,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
 import shop.nuribooks.books.order.order.service.OrderService;
+import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
+import shop.nuribooks.books.payment.payment.dto.PaymentSuccessRequest;
 
 /**
  * 주문 관련 Controller
@@ -33,6 +38,7 @@ import shop.nuribooks.books.order.order.service.OrderService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/orders")
+@Slf4j
 public class OrderController {
 
 	private final OrderService orderService;
@@ -64,7 +70,6 @@ public class OrderController {
 	/**
 	 * 결제 전 임시 주문 저장
 	 *
-	 * @param request 요청 헤더 정보를 얻어오기 위한 HttpServletRequest
 	 * @param orderTempRegisterRequest 임시 주문 등록 요청
 	 * @return 임시 주문 등록 응답
 	 */
@@ -76,7 +81,6 @@ public class OrderController {
 	})
 	@PostMapping
 	public ResponseEntity<OrderTempRegisterResponse> registerTempOrder(
-		HttpServletRequest request,
 		@Valid @RequestBody OrderTempRegisterRequest orderTempRegisterRequest) {
 
 		Optional<Long> userId = Optional.ofNullable(MemberIdContext.getMemberId());
@@ -88,6 +92,20 @@ public class OrderController {
 			.orElseGet(() -> orderService.registerTempOrderForCustomer(orderTempRegisterRequest));
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(result);
+	}
+
+	/**
+	 * 최종 결제 전 검증
+	 *
+	 * @param paymentRequest 토스 페이먼츠 요청 값
+	 * @return 응답 메시지
+	 */
+	@PostMapping("/verify")
+	public ResponseEntity<ResponseMessage> verifyOrderInformation(PaymentRequest paymentRequest){
+
+		ResponseMessage responseMessage = orderService.verifyOrderInformation(paymentRequest);
+
+		return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
 	}
 
 }

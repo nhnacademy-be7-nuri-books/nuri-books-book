@@ -1,5 +1,5 @@
 <configuration>
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%level] [%thread] [%logger{36}] - %msg%n" />
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%level] [%thread] [%logger{36}] - %msg%n"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -19,25 +19,25 @@
 
     <!-- local -->
     <springProfile name="local">
-        <root level="DEBUG">
-            <appender-ref ref="CONSOLE" />
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
 
     <!-- dev -->
     <springProfile name="dev">
-        <property name="LOG_PATH" value="log/dev" />
-        <property name="LOG_FILE_NAME" value="book-dev" />
+        <property name="LOG_PATH" value="log/dev"/>
+        <property name="LOG_FILE_NAME" value="book-dev"/>
         <root level="INFO">
-            <appender-ref ref="CONSOLE" />
-            <appender-ref ref="FILE" />
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
         </root>
     </springProfile>
 
     <!-- prod -->
     <springProfile name="prod">
-        <property name="LOG_PATH" value="log/prod" />
-        <property name="LOG_FILE_NAME" value="book-prod" />
+        <property name="LOG_PATH" value="log/prod"/>
+        <property name="LOG_FILE_NAME" value="book-prod"/>
         <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                 <level>ERROR</level>
@@ -51,8 +51,8 @@
             </encoder>
         </appender>
         <root level="WARN">
-            <appender-ref ref="CONSOLE" />
-            <appender-ref ref="PROD_FILE" />
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="PROD_FILE"/>
         </root>
     </springProfile>
 </configuration>

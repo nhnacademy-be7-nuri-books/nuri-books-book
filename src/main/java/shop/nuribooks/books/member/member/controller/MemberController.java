@@ -148,12 +148,22 @@ public class MemberController {
 	@PutMapping("/api/members/me")
 	public ResponseEntity<ResponseMessage> memberUpdate(
 		@RequestBody @Valid MemberPasswordUpdateRequest request) {
+		// TODO: 동일한 password를 입력해도 항상 다른 암호화된 비밀번호가 넘어옴.
 
 		Long memberId = MemberIdContext.getMemberId();
 		memberService.updateMember(memberId, request);
 
 		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),
 			"회원 정보가 수정되었습니다."));
+	}
+
+	@PutMapping("/api/members/{username}/login-time")
+	public ResponseEntity<ResponseMessage> memberLatestLoginAtUpdate(@PathVariable String username) {
+
+		memberService.updateMemberLatestLoginAt(username);
+
+		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),
+			"최근 로그인 시간이 수정되었습니다."));
 	}
 
 	/**

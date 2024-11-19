@@ -141,7 +141,7 @@ class MemberRepositoryTest {
 		return Customer.builder()
 			.name("nuri")
 			.password("abc123")
-			.phoneNumber("042-8282-8282")
+			.phoneNumber("01082828282")
 			.email("nhnacademy@nuriBooks.com")
 			.build();
 	}

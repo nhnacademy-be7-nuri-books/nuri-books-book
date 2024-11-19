@@ -1,9 +1,14 @@
 package shop.nuribooks.books.payment.payment.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.Comment;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,6 +18,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.nuribooks.books.order.order.entity.Order;
@@ -34,22 +40,32 @@ public class Payment {
 	@Comment("결제 아이디")
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "payment_method_id", nullable = false,
-	foreignKey =  @ForeignKey(name = "FK_payments_to_payment_methods_1)"))
-	@Comment("연결된 결제 수단 정보")
-	private PaymentMethod paymentMethod;
-
 	@OneToOne
 	@JoinColumn(name = "order_id", nullable = false,
 		foreignKey = @ForeignKey(name = "FK_payments_to_orders_1"))
 	@Comment("연결된 주문 정보")
 	private Order order;
 
+	@Column(nullable = false, unique = true)
+	String tossPaymentKey;
+
+	@Column(nullable = false)
+	@Enumerated(value = EnumType.STRING)
+	@Comment("연결된 결제 수단 정보")
+	private PaymentMethod paymentMethod;
 
 	@Column(nullable = false)
 	@Comment("결제 상태")
-	private PaymentState paymentState = PaymentState.PENDING;
+	private PaymentState paymentState = PaymentState.READY;
+
+	@Column(precision = 9, nullable = false)
+	@Comment("결제 금액")
+	private BigDecimal unitPrice;
+
+	@Column(nullable = false)
+	LocalDateTime requestedAt;
+
+	LocalDateTime approvedAt;
 
 	/**
 	 * 결제 정보 생성자 (Builder)
@@ -58,9 +74,15 @@ public class Payment {
 	 * @param order 주문 정보
 	 * @param paymentState 결제 상태
 	 */
-	public Payment(PaymentMethod paymentMethod, Order order, PaymentState paymentState) {
-		this.paymentMethod = paymentMethod;
+	@Builder
+	public Payment(Order order, String tossPaymentKey, PaymentMethod paymentMethod, PaymentState paymentState,
+		BigDecimal unitPrice, LocalDateTime requestedAt, LocalDateTime approvedAt) {
 		this.order = order;
+		this.tossPaymentKey = tossPaymentKey;
+		this.paymentMethod = paymentMethod;
 		this.paymentState = paymentState;
+		this.unitPrice = unitPrice;
+		this.requestedAt = requestedAt;
+		this.approvedAt = approvedAt;
 	}
 }
