@@ -52,7 +52,7 @@ public class OrderController {
 	 */
 	@GetMapping("/{book-id}")
 	public ResponseEntity<OrderInformationResponse> getOrderInformation(
-		@PathVariable("book-id") Long bookId, @RequestParam Integer quantity){
+		@PathVariable("book-id") Long bookId, @RequestParam Integer quantity) {
 
 		Optional<Long> userId = Optional.ofNullable(MemberIdContext.getMemberId());
 
@@ -101,7 +101,7 @@ public class OrderController {
 	 * @return 응답 메시지
 	 */
 	@PostMapping("/verify")
-	public ResponseEntity<ResponseMessage> verifyOrderInformation(PaymentRequest paymentRequest){
+	public ResponseEntity<ResponseMessage> verifyOrderInformation(PaymentRequest paymentRequest) {
 
 		ResponseMessage responseMessage = orderService.verifyOrderInformation(paymentRequest);
 

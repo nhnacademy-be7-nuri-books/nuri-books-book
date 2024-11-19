@@ -16,5 +16,5 @@ public interface PaymentService {
 	 * @param paymentSuccessRequest 결제 테이블 저장용
 	 * @return 성공/실패 메시지
 	 */
-	ResponseMessage DonePayment(PaymentSuccessRequest paymentSuccessRequest);
+	ResponseMessage donePayment(PaymentSuccessRequest paymentSuccessRequest);
 }
