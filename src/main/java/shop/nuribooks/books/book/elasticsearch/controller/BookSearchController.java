@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.elasticsearch.controller;
 
+import java.io.IOException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import shop.nuribooks.books.book.elasticsearch.docs.BookDocument;
 import shop.nuribooks.books.book.elasticsearch.enums.SearchType;
+import shop.nuribooks.books.book.elasticsearch.enums.SortType;
 import shop.nuribooks.books.book.elasticsearch.service.BookSearchService;
 
 @RestController
@@ -24,9 +27,10 @@ public class BookSearchController {
 	@GetMapping
 	public Page<BookDocument> searchBooks(
 		@RequestParam("keyword") String keyword,
-		@RequestParam("search_type") SearchType searchType,
+		@RequestParam(name = "search_type", required = false, defaultValue = "ALL") SearchType searchType,
+		@RequestParam(name = "sort_type", required = false, defaultValue = "ACCURACY") SortType sortType,
 		Pageable pageable
-	) {
-		return bookSearchService.searchBooks(keyword, searchType, pageable);
+	) throws IOException {
+		return bookSearchService.searchBooks(keyword, searchType, sortType, pageable);
 	}
 }

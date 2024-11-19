@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.elasticsearch.docs.BookDocument;
 import shop.nuribooks.books.book.elasticsearch.enums.SearchType;
+import shop.nuribooks.books.book.elasticsearch.enums.SortType;
 import shop.nuribooks.books.book.elasticsearch.service.BookSearchService;
 import shop.nuribooks.books.common.provider.IndexNameProvider;
 
@@ -31,12 +32,17 @@ public class BookSearchServiceImpl implements BookSearchService {
 	/**
 	 * 책 검색 (검색 쿼리 DSL)
 	 */
-	public Page<BookDocument> searchBooks(String keyword, SearchType searchType, Pageable pageable) {
+	public Page<BookDocument> searchBooks(String keyword, SearchType searchType, SortType sortType,
+		Pageable pageable) throws IOException {
 		SearchRequest request = SearchRequest.of(s -> s
 			.index(indexNameProvider.resolveIndexName())
 			.query(q -> q
 				.bool(b -> searchType.apply(b, keyword)
 				)
+			)
+			.sort(
+				sortType.getSortOptions(),
+				SortType.POPULAR.getSortOptions()
 			)
 			.from((int)pageable.getOffset())
 			.size(pageable.getPageSize())
@@ -44,12 +50,7 @@ public class BookSearchServiceImpl implements BookSearchService {
 
 		SearchResponse<BookDocument> response = null;
 
-		try {
-			response = elasticsearchClient.search(request, BookDocument.class);
-		} catch (IOException e) {
-			log.error("{}", e.getMessage());
-			throw new RuntimeException(e);
-		}
+		response = elasticsearchClient.search(request, BookDocument.class);
 
 		List<BookDocument> books = response.hits().hits().stream()
 			.map(Hit::source)
