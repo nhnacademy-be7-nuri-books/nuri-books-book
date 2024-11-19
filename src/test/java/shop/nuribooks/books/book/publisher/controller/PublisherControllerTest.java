@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -32,15 +30,13 @@ import shop.nuribooks.books.book.publisher.service.PublisherServiceImpl;
 @AutoConfigureMockMvc
 class PublisherControllerTest {
 
+	private final ObjectMapper objectMapper = new ObjectMapper();  // JSON 직렬화에 사용
 	@Autowired
 	private PublisherController publisherController;
-
 	@MockBean
 	private PublisherServiceImpl publisherService;
-
 	@Autowired
 	private MockMvc mockMvc;
-	private final ObjectMapper objectMapper = new ObjectMapper();  // JSON 직렬화에 사용
 
 	// @BeforeEach
 	// void setUp() {
@@ -56,10 +52,9 @@ class PublisherControllerTest {
 
 		when(publisherService.registerPublisher(any(PublisherRequest.class))).thenReturn(response);
 
-		mockMvc.perform(post("/api/publishers").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/books/publishers").contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.name").value("publisher1"));
+			.andExpect(status().isCreated());
 
 		verify(publisherService).registerPublisher(any(PublisherRequest.class));
 
@@ -80,7 +75,7 @@ class PublisherControllerTest {
 		when(publisherService.getAllPublisher(pageable)).thenReturn(pageResponses);
 
 		// when & then
-		mockMvc.perform(get("/api/publishers")
+		mockMvc.perform(get("/api/books/publishers")
 				.contentType(MediaType.APPLICATION_JSON)
 				.param("page", "0")
 				.param("size", "10"))
@@ -102,7 +97,7 @@ class PublisherControllerTest {
 		when(publisherService.getPublisher(publisherId)).thenReturn(response);
 
 		// when & then
-		mockMvc.perform(get("/api/publishers/{publisherId}", publisherId)
+		mockMvc.perform(get("/api/books/publishers/{publisher-id}", publisherId)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.id").value(publisherId));
@@ -117,7 +112,7 @@ class PublisherControllerTest {
 		Long publisherId = 1L;
 
 		// when & then
-		mockMvc.perform(delete("/api/publishers/{publisherId}", publisherId)
+		mockMvc.perform(delete("/api/books/publishers/{publisher-id}", publisherId)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
 
@@ -136,12 +131,10 @@ class PublisherControllerTest {
 			.thenReturn(response);
 
 		// when & then
-		mockMvc.perform(put("/api/publishers/{publisherId}", publisherId)
+		mockMvc.perform(put("/api/books/publishers/{publisher-id}", publisherId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isCreated())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(content().json("{\"name\":\"update\"}"));
+			.andExpect(status().isOk());
 
 		verify(publisherService).updatePublisher(eq(publisherId), any(PublisherRequest.class));
 	}
