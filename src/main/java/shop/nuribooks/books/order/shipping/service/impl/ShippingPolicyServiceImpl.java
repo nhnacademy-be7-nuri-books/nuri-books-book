@@ -3,6 +3,7 @@ package shop.nuribooks.books.order.shipping.service.impl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.exception.shipping.ShippingPolicyNotFoundException;
@@ -22,11 +23,13 @@ public class ShippingPolicyServiceImpl implements ShippingPolicyService {
 		return shippingPolicyRepository.findAll(pageable).map(ShippingPolicy::toResponseDto);
 	}
 
+	@Transactional
 	@Override
 	public ShippingPolicy registerShippingPolicy(ShippingPolicyRequest shippingPolicyRequest) {
 		return shippingPolicyRepository.save(shippingPolicyRequest.toEntity());
 	}
 
+	@Transactional
 	@Override
 	public ShippingPolicy updateShippingPolicy(Long id, ShippingPolicyRequest shippingPolicyRequest) {
 		ShippingPolicy shippingPolicy = shippingPolicyRepository.findById(id)
@@ -35,6 +38,7 @@ public class ShippingPolicyServiceImpl implements ShippingPolicyService {
 		return shippingPolicy;
 	}
 
+	@Transactional
 	@Override
 	public void expireShippingPolicy(Long id) {
 		ShippingPolicy shippingPolicy = shippingPolicyRepository.findById(id)
