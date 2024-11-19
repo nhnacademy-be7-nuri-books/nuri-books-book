@@ -37,7 +37,6 @@ import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
-import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
