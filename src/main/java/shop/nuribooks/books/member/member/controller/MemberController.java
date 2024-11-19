@@ -157,12 +157,10 @@ public class MemberController {
 			"회원 정보가 수정되었습니다."));
 	}
 
-	@PostMapping("/api/members/me/login-time")
-	public ResponseEntity<ResponseMessage> memberLatestLoginAtUpdate() {
+	@PutMapping("/api/members/{username}/login-time")
+	public ResponseEntity<ResponseMessage> memberLatestLoginAtUpdate(@PathVariable String username) {
 
-		Long memberId = MemberIdContext.getMemberId();
-
-		memberService.updateMemberLatestLoginAt(memberId);
+		memberService.updateMemberLatestLoginAt(username);
 
 		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),
 			"최근 로그인 시간이 수정되었습니다."));

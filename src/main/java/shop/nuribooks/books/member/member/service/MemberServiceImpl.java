@@ -208,9 +208,9 @@ public class MemberServiceImpl implements MemberService {
 	 * 회원의 최근 로그인 시간을 업데이트
 	 */
 	@Override
-	public void updateMemberLatestLoginAt(Long memberId) {
+	public void updateMemberLatestLoginAt(String username) {
 
-		Member foundMember = memberRepository.findById(memberId)
+		Member foundMember = memberRepository.findByUsername(username)
 			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
 		foundMember.updateLatestLoginAt();

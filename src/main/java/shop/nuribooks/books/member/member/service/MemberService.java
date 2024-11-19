@@ -30,5 +30,5 @@ public interface MemberService {
 
 	Page<MemberSearchResponse> searchMembersWithPaging(MemberSearchRequest request, Pageable pageable);
 
-	void updateMemberLatestLoginAt(Long memberId);
+	void updateMemberLatestLoginAt(String username);
 }
