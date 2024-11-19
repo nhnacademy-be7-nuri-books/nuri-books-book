@@ -11,9 +11,9 @@ package shop.nuribooks.books.payment.payment.entity;
  * @author nuri
  */
 public enum PaymentState {
-	PENDING(1, "결제 대기"),
-	COMPLETED(2, "결제 완료"),
-	CANCELED(3, "결제 취소");
+	READY(0, "결제 대기"),
+	DONE(1, "결제 완료"),
+	CANCELED(2, "결제 취소");
 
 	private final int code;
 	private final String korName;

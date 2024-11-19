@@ -1,44 +1,59 @@
 package shop.nuribooks.books.payment.payment.entity;
 
-import org.hibernate.annotations.Comment;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 /**
- * 결제 수단 정보 entity
+ * 결제 상태 Enum
+ * <ul>
+ *     <li><b>PENDING</b>: 결제 대기 상태 (사용자가 결제를 시작했으나 아직 완료되지 않음)</li>
+ *     <li><b>COMPLETED</b>: 결제 완료 상태 (결제가 성공적으로 이루어진 상태)</li>
+ *     <li><b>CANCELED</b>: 결제 취소 상태 (결제가 취소된 상태)</li>
+ * </ul>
  *
  * @author nuri
  */
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "payment_methods")
-@Comment("결제 수단 정보")
-public class PaymentMethod {
+public enum PaymentMethod {
+	CARD(0, "카드"),
+	EASY_PAY(1, "간편결제"),
+	VIRTUAL_ACCOUNT(2, "가상계좌"),
+	MOBILE_PHONE(3, "휴대폰"),
+	TRANSFER(4, "계좌이체"),
+	CULTURE_GIFT_CERTIFICATE(5, "문화상품권"),
+	BOOK_GIFT_CERTIFICATE(6, "도서문화상품권"),
+	GAME_GIFT_CERTIFICATE(7, "게임문화상품권");
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Comment("결제 수단 아이디")
-	private Long id;
 
-	@Column(nullable = false)
-	@Comment("결제 수단 명")
-	@NotBlank
-	private String name;
+	private final int code;
+	private final String korName;
 
 	/**
-	 * 결제 수단 생성자 (Builder)
-	 *
-	 * @param name 결제 수단 명
+	 * 결제 상태 생성자
+	 * @param code 결제 상태 코드
+	 * @param korName 결제 상태의 한국어 이름
 	 */
-	public PaymentMethod(String name) {
-		this.name = name;
+	PaymentMethod(int code, String korName) {
+		this.code = code;
+		this.korName = korName;
+	}
+
+	/**
+	 * 결제 상태의 코드 값 반환
+	 * @return 결제 상태의 코드
+	 */
+	public int getCode() {
+		return code;
+	}
+
+	/**
+	 * 결제 상태의 한국어 이름을 반환
+	 * @return 결제 상태의 한국어 이름
+	 */
+	public String getKorName() {return korName;}
+
+	public static PaymentMethod fromKoreanName(String korName) {
+		for (PaymentMethod method : PaymentMethod.values()) {
+			if (method.korName.equalsIgnoreCase(korName)) {
+				return method;
+			}
+		}
+		throw new IllegalArgumentException("Unknown Korean name: " + korName);
 	}
 }

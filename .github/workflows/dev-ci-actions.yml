@@ -7,6 +7,7 @@ on:
       - main
       - develop
 
+
 jobs:
   dev-build:
     runs-on: ubuntu-latest
@@ -36,7 +37,7 @@ jobs:
           cache: maven
 
       - name: test with Maven
-        run: mvn -B test jacoco:report --file pom.xml
+        run: mvn -B test jacoco:report --file pom.xml -DNHN_KEY_MANAGER_SECRET_ACCESS_KEY="${{ secrets.NHN_KEY_MANAGER_SECRET_ACCESS_KEY }}"
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v3

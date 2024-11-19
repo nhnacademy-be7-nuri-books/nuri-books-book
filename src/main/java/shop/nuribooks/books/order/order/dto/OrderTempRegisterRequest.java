@@ -3,6 +3,7 @@ package shop.nuribooks.books.order.order.dto;
 import static com.fasterxml.jackson.annotation.JsonFormat.Shape.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,8 +22,8 @@ public record OrderTempRegisterRequest(
 	BigDecimal paymentPrice, // 총 결제 금액 = 상품 금액 + 포장 금액 + 배송금액 - 포인트 - 쿠폰 할인가
 	@PositiveOrZero(message = "포장 금액은 0 이상이어야 합니다.")
 	BigDecimal wrappingPrice, // 포장 비용
-	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-	LocalDateTime orderedAt, // 주문 시간
+	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+	LocalDate expectedDeliveryAt, // 주문 예상 날짜
 	@NotNull(message = "주문 상세는 1개 이상이어야 합니다.")
 	List<OrderDetailRequest> orderDetails, // 주문 상세
 	@NotNull(message = "배송 정보 입력은 필수 입니다.")

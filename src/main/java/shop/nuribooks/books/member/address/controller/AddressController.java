@@ -26,8 +26,8 @@ public class AddressController {
 
     private final AddressService addressService;
 
-    @PostMapping("/api/member/address")
-    public ResponseEntity<AddressResponse> addressRegister(@Valid @RequestBody AddressRegisterRequest request) {
+    @PostMapping("/api/members/addresses")
+    public ResponseEntity<AddressResponse> addressRegister(@RequestBody @Valid AddressRegisterRequest request) {
         Long memberId = MemberIdContext.getMemberId();
         AddressResponse response = addressService.registerAddress(request, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -36,7 +36,7 @@ public class AddressController {
     // 관리자가 회원의 주소들을 조회하는 엔드포인트는 따로 생각해야한다.
 
     @HasRole(role = AuthorityType.MEMBER)
-    @GetMapping("/api/member/me/address")
+    @GetMapping("/api/members/me/addresses")
     public ResponseEntity<List<AddressResponse>> addressList() {
         Long memberId = MemberIdContext.getMemberId();
         List<AddressResponse> addressesByMemberUsername = addressService.findAddressesByMemberId(memberId);
@@ -44,14 +44,14 @@ public class AddressController {
     }
 
 
-    @PatchMapping("/api/member/address/{addressId}")
+    @PatchMapping("/api/members/addresses/{addressId}")
     public ResponseEntity<AddressResponse> addressModify(@PathVariable Long addressId,
                                                          @Valid @RequestBody AddressEditRequest request) {
         AddressResponse addressResponse = addressService.modifyAddress(addressId, request);
         return ResponseEntity.ok(addressResponse);
     }
 
-    @DeleteMapping("/api/member/address/{addressId}")
+    @DeleteMapping("/api/members/addresses/{addressId}")
     public void addressRemove(@PathVariable Long addressId) {
         addressService.removeAddress(addressId);
     }

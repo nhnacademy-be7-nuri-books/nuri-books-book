@@ -1,5 +1,7 @@
 package shop.nuribooks.books.order.shipping.repository;
 
+import static shop.nuribooks.books.order.shipping.entity.QShippingPolicy.*;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;

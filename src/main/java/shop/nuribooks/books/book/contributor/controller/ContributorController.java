@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.dto.ContributorResponse;
 import shop.nuribooks.books.book.contributor.service.ContributorService;
-import java.util.List;
+import shop.nuribooks.books.common.message.ResponseMessage;
 
 /**
  * @author kyongmin
@@ -46,9 +46,10 @@ public class ContributorController {
 		@ApiResponse(responseCode = "500", description = "서버 내부 오류")
 	})
 	@PostMapping
-	public ResponseEntity<ContributorResponse> registerContributor(@Valid @RequestBody ContributorRequest request) {
-		ContributorResponse response = contributorService.registerContributor(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	public ResponseEntity<ResponseMessage> registerContributor(@Valid @RequestBody ContributorRequest request) {
+		contributorService.registerContributor(request);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(new ResponseMessage(HttpStatus.CREATED.value(), "기여자 등록 성공"));
 	}
 
 	/**
@@ -65,11 +66,12 @@ public class ContributorController {
 		@ApiResponse(responseCode = "404", description = "기여자를 찾을 수 없음"),
 		@ApiResponse(responseCode = "500", description = "서버 내부 오류")
 	})
-	@PutMapping("/{contributorId}")
-	public ResponseEntity<ContributorResponse> updateContributor(
-		@PathVariable Long contributorId, @Valid @RequestBody ContributorRequest request) {
-		ContributorResponse response = contributorService.updateContributor(contributorId, request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	@PutMapping("/{contributor-id}")
+	public ResponseEntity<ResponseMessage> updateContributor(
+		@PathVariable(name = "contributor-id") Long contributorId, @Valid @RequestBody ContributorRequest request) {
+		contributorService.updateContributor(contributorId, request);
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(new ResponseMessage(HttpStatus.OK.value(), "기여자 수정 성공"));
 	}
 
 	/**
@@ -85,9 +87,9 @@ public class ContributorController {
 		@ApiResponse(responseCode = "404", description = "기여자를 찾을 수 없음")
 
 	})
-	@GetMapping("/{contributorId}")
+	@GetMapping("/{contributor-id}")
 	public ResponseEntity<ContributorResponse> getContributor(
-		@PathVariable Long contributorId) {
+		@PathVariable(name = "contributor-id") Long contributorId) {
 		ContributorResponse response = contributorService.getContributor(contributorId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
@@ -99,9 +101,9 @@ public class ContributorController {
 	 */
 	@Operation(summary = "모든 기여자 정보 조회", description = "모든 기여자의 정보를 조회합니다.")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "기여자 목록 조회 성공"),
-			@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-			@ApiResponse(responseCode = "500", description = "서버 오류")
+		@ApiResponse(responseCode = "200", description = "기여자 목록 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	@GetMapping
 	public ResponseEntity<Page<ContributorResponse>> getAllContributor(Pageable pageable) {
@@ -121,9 +123,11 @@ public class ContributorController {
 		@ApiResponse(responseCode = "404", description = "기여자를 찾을 수 없음"),
 		@ApiResponse(responseCode = "500", description = "서버 내부 오류")
 	})
-	@DeleteMapping("/{contributorId}")
-	public ResponseEntity<HttpStatus> deleteContributor(@PathVariable Long contributorId) {
+	@DeleteMapping("/{contributor-id}")
+	public ResponseEntity<ResponseMessage> deleteContributor(
+		@PathVariable(name = "contributor-id") Long contributorId) {
 		contributorService.deleteContributor(contributorId);
-		return ResponseEntity.status(HttpStatus.OK).build();
+		return ResponseEntity.status(HttpStatus.NO_CONTENT)
+			.body(new ResponseMessage(HttpStatus.NO_CONTENT.value(), "기여자 삭제 성공"));
 	}
 }

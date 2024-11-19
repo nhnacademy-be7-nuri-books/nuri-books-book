@@ -15,9 +15,6 @@ import lombok.NoArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.cart.entity.Cart;
 
-/**
- * @author Jprotection
- */
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
