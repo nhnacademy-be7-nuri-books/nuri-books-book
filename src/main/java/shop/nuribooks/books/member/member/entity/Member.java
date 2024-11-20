@@ -21,6 +21,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -42,6 +43,7 @@ import shop.nuribooks.books.member.grade.entity.Grade;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "members")
 public class Member {
 
 	@Id
@@ -85,9 +87,7 @@ public class Member {
 	private GenderType gender;
 
 	@NotBlank
-	@Column(unique = true, length = 20)
-	@Pattern(regexp = "^(?=.*[a-z])(?=.*[0-9]).{8,20}$",
-		message = "아이디는 8자 이상 20자 이하, 영어 소문자와 숫자가 각각 1개 이상 포함되어야 합니다.")
+	@Column(unique = true, length = 100)
 	private String username;
 
 	private LocalDate birthday;
