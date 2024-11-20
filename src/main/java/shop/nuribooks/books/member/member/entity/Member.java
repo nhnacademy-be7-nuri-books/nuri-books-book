@@ -62,7 +62,7 @@ public class Member {
 	private AuthorityType authority;
 
 	/**
-	 * STANDARD, SILVER, GOLD, PLATINUM, ROYAL
+	 * STANDARD, ROYAL, GOLD, PLATINUM
 	 */
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "grade_id")
