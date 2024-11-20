@@ -15,3 +15,4 @@ public interface GradeRepository extends JpaRepository<Grade, Integer> {
 
 	Optional<Grade> findByName(String name);
 }
+
