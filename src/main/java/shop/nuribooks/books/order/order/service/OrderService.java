@@ -34,6 +34,10 @@ public interface OrderService {
 	 */
 	OrderInformationResponse getCustomerOrderInformation(Long bookId, int quantity);
 
+	OrderInformationResponse getMemberCartOrderInformation(Long memberId);
+
+	OrderInformationResponse getCustomerCartOrderInformation(String cartId);
+
 	/**
 	 * 회원 주문 임시 등록
 	 *
