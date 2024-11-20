@@ -1,27 +1,23 @@
 package shop.nuribooks.books.member.address.repository;
 
-import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.*;
-import static shop.nuribooks.books.member.member.entity.AuthorityType.MEMBER;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+
+import shop.nuribooks.books.common.TestUtils;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
-import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.member.member.entity.StatusType;
-import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @DataJpaTest
@@ -109,5 +105,6 @@ class AddressRepositoryTest {
             .requirement(BigDecimal.valueOf(100_000))
             .build();
     }
+
 
 }

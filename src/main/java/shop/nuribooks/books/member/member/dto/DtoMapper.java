@@ -41,6 +41,7 @@ public class DtoMapper {
 			.username(member.getUsername())
 			.password(customer.getPassword())
 			.role("ROLE_" + member.getAuthority().name())
+			.status("STATUS_" + member.getStatus().name())
 			.build();
 	}
 

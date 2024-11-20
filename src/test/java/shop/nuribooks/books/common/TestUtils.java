@@ -57,7 +57,7 @@ public class TestUtils {
 			.customer(customer)
 			.authority(MEMBER)
 			.grade(grade)
-			.username("nuriaaaaaa")
+			.username("nuriaaaaaa123")
 			.status(StatusType.ACTIVE)
 			.birthday(LocalDate.of(1988, 8, 12))
 			.createdAt(LocalDateTime.now())
@@ -72,7 +72,7 @@ public class TestUtils {
 		return Customer.builder()
 			.name("name")
 			.password("password")
-			.phoneNumber("042-8282-8282")
+			.phoneNumber("01082828282")
 			.email("nhnacademy@nuriBooks.com")
 			.build();
 	}

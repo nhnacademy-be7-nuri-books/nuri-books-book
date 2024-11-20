@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,8 +50,8 @@ public class PointHistoryControllerTest {
 				.queryParam("type", "ALL")
 				.queryParam("page", "0")
 				.queryParam("size", "3")
-				.queryParam("start", LocalDateTime.now().minusDays(30).toString())
-				.queryParam("end", LocalDateTime.now().toString()))
+				.queryParam("start", LocalDate.now().minusDays(30).toString())
+				.queryParam("end", LocalDate.now().toString()))
 			.andExpect(status().isOk());
 	}
 
@@ -64,8 +65,8 @@ public class PointHistoryControllerTest {
 				.queryParam("type", "all")
 				.queryParam("page", "0")
 				.queryParam("size", "3")
-				.queryParam("start", LocalDateTime.now().minusDays(30).toString())
-				.queryParam("end", LocalDateTime.now().toString()))
+				.queryParam("start", LocalDate.now().minusDays(30).toString())
+				.queryParam("end", LocalDate.now().toString()))
 			.andExpect(status().isOk());
 	}
 
@@ -79,8 +80,8 @@ public class PointHistoryControllerTest {
 				.queryParam("type", "alla")
 				.queryParam("page", "0")
 				.queryParam("size", "3")
-				.queryParam("start", LocalDateTime.now().minusDays(30).toString())
-				.queryParam("end", LocalDateTime.now().toString()))
+				.queryParam("start", LocalDate.now().minusDays(30).toString())
+				.queryParam("end", LocalDate.now().toString()))
 			.andExpect(status().isOk());
 	}
 
@@ -94,8 +95,8 @@ public class PointHistoryControllerTest {
 	// 			.queryParam("type", "ALL")
 	// 			.queryParam("page", "0")
 	// 			.queryParam("size", "3")
-	// 			.queryParam("start", LocalDateTime.now().minusDays(30).toString())
-	// 			.queryParam("end", LocalDateTime.now().toString()))
+	// 			.queryParam("start", LocalDate.now().minusDays(30).toString())
+	// 			.queryParam("end", LocalDate.now().toString()))
 	// 		.andExpect(status().isOk());
 	// }
 	//
@@ -109,8 +110,8 @@ public class PointHistoryControllerTest {
 	// 			.queryParam("type", "ALL")
 	// 			.queryParam("page", "0")
 	// 			.queryParam("size", "3")
-	// 			.queryParam("start", LocalDateTime.now().minusDays(30).toString())
-	// 			.queryParam("end", LocalDateTime.now().toString()))
+	// 			.queryParam("start", LocalDate.now().minusDays(30).toString())
+	// 			.queryParam("end", LocalDate.now().toString()))
 	// 		.andExpect(status().isOk());
 	// }
 }

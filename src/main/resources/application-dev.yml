@@ -4,6 +4,8 @@ spring:
     username: ENC(E7wzC9kl4nVwfEV7JsZ09WVAXwAQhSwy)
     password: ENC(udeUrEU3cfiVaNkqv4zwgEhifPvD2iRzsL5Jr/E2/u4=)
     driver-class-name: com.mysql.cj.jdbc.Driver
+    type: org.apache.commons.dbcp2.BasicDataSource
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,6 +20,9 @@ spring:
       port: 6379
       password: "*N2vya7H@muDTwdNMR!"
       database: 133
+        
+  elasticsearch:
+    index: nuribooks
 
 logging:
   level:

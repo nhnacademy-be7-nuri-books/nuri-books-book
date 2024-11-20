@@ -1,5 +1,7 @@
 package shop.nuribooks.books.member.member.service;
 
+import static shop.nuribooks.books.member.member.entity.AuthorityType.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -14,10 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
+import shop.nuribooks.books.exception.BadRequestException;
+import shop.nuribooks.books.cart.entity.Cart;
+import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.member.PasswordDuplicateException;
 import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
 import shop.nuribooks.books.exception.member.UsernameAlreadyExistsException;
 import shop.nuribooks.books.member.customer.entity.Customer;
@@ -28,12 +34,11 @@ import shop.nuribooks.books.member.member.dto.DtoMapper;
 import shop.nuribooks.books.member.member.dto.EntityMapper;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberSearchRequest;
-import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
+import shop.nuribooks.books.member.member.dto.request.MemberPasswordUpdateRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
-import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -51,6 +56,7 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberRepository memberRepository;
 	private final GradeRepository gradeRepository;
 	private final PointHistoryService pointHistoryService;
+	private final CartRepository cartRepository;
 
 	/**
 	 * 회원등록 <br>
@@ -82,7 +88,7 @@ public class MemberServiceImpl implements MemberService {
 
 		Member newMember = Member.builder()
 			.customer(savedCustomer)
-			.authority(AuthorityType.MEMBER)
+			.authority(MEMBER)
 			.grade(standard())
 			.status(StatusType.ACTIVE)
 			.gender(request.gender())
@@ -94,6 +100,7 @@ public class MemberServiceImpl implements MemberService {
 			.build();
 
 		Member savedMember = memberRepository.save(newMember);
+		createCart(savedMember);
 
 		pointHistoryService.registerPointHistory(new PointHistoryRequest(savedMember), PolicyName.WELCOME);
 		return DtoMapper.toRegisterDto(savedCustomer, savedMember);
@@ -113,6 +120,10 @@ public class MemberServiceImpl implements MemberService {
 		Member foundMember = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
+		if (foundMember.getAuthority() == ADMIN) {
+			throw new BadRequestException("관리자 등급은 탈퇴할 수 없습니다.");
+		}
+
 		foundMember.changeToWithdrawn();
 	}
 
@@ -125,12 +136,16 @@ public class MemberServiceImpl implements MemberService {
 	 */
 	@Override
 	@Transactional
-	public void updateMember(Long memberId, MemberUpdateRequest request) {
+	public void updateMember(Long memberId, MemberPasswordUpdateRequest request) {
 
 		Customer foundCustomer = customerRepository.findById(memberId)
 			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
 
-		foundCustomer.changeCustomerInformation(request.name(), request.password());
+		if (request.password().equals(foundCustomer.getPassword())) {
+			throw new PasswordDuplicateException("기존 비밀번호와 다른 비밀번호를 입력해야 합니다.");
+		}
+
+		foundCustomer.changeCustomerPassword(request.password());
 	}
 
 	/**
@@ -193,6 +208,32 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	/**
+	 * 회원의 최근 로그인 시간을 업데이트
+	 */
+	@Override
+	@Transactional
+	public void updateMemberLatestLoginAt(String username) {
+
+		Member foundMember = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+
+		foundMember.updateLatestLoginAt();
+	}
+
+	/**
+	 * 회원의 휴면 상태를 ACTIVE로 재활성화
+	 */
+	@Override
+	@Transactional
+	public void reactiveMember(String username) {
+
+		Member foundMember = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+
+		foundMember.reactiveMemberStatus();
+	}
+
+	/**
 	 * 매일 04:00시 정각에 마지막 로그인 날짜가 90일이 지난 회원들을 찾아, <br>
 	 * 그 중에서 상태가 ACTIVE인 회원들을 INACTIVE로 변경
 	 */
@@ -239,5 +280,10 @@ public class MemberServiceImpl implements MemberService {
 	private Grade standard() {
 		return gradeRepository.findByName("STANDARD")
 			.orElseThrow(() -> new GradeNotFoundException("STANDARD 등급이 존재하지 않습니다."));
+	}
+
+	private void createCart(Member savedMember) {
+		Cart cart = new Cart(savedMember);
+		cartRepository.save(cart);
 	}
 }

@@ -15,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
@@ -74,6 +75,8 @@ public class Book {
 	private int discountRate;
 
 	@NotBlank
+	@Lob
+	@Column(columnDefinition = "TEXT")
 	private String description;
 
 	@NotBlank
@@ -83,7 +86,6 @@ public class Book {
 	@NotBlank
 	private String isbn;
 
-	//TODO: Profile 어노테이션을 사용 OR 운영환경 설정 시 mysql 셋팅 후 주석 해제
 	@ColumnDefault("false")
 	@Column(nullable = false)
 	//@Column(nullable = false, columnDefinition = "tinyint(1) default 0")

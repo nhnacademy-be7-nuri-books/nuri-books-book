@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.tag.dto.TagRequest;
 import shop.nuribooks.books.book.tag.dto.TagResponse;
 import shop.nuribooks.books.book.tag.service.TagService;
+import shop.nuribooks.books.common.message.ResponseMessage;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,9 +43,10 @@ public class TagController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
 	})
 	@PostMapping
-	public ResponseEntity<TagResponse> registerTag(@Valid @RequestBody TagRequest request) {
-		TagResponse response = tagService.registerTag(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	public ResponseEntity<ResponseMessage> registerTag(@Valid @RequestBody TagRequest request) {
+		tagService.registerTag(request);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(new ResponseMessage(HttpStatus.CREATED.value(), "태그 등록 성공"));
 	}
 
 	/**
@@ -95,14 +97,15 @@ public class TagController {
 	 */
 	@Operation(summary = "특정 태그 수정", description = "ID에 해당하는 태그를 수정합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "태그 수정 성공"),
+		@ApiResponse(responseCode = "200", description = "태그 수정 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 		@ApiResponse(responseCode = "404", description = "태그를 찾을 수 없음")
 	})
 	@PutMapping("/{tagId}")
-	public ResponseEntity<TagResponse> updateTag(@Valid @PathVariable Long tagId, @RequestBody TagRequest request) {
-		TagResponse response = tagService.updateTag(tagId, request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	public ResponseEntity<ResponseMessage> updateTag(@Valid @PathVariable Long tagId, @RequestBody TagRequest request) {
+		tagService.updateTag(tagId, request);
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(new ResponseMessage(HttpStatus.OK.value(), "태그 수정 성공"));
 	}
 
 	/**

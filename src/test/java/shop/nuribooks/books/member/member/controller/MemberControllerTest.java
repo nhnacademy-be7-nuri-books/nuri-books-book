@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,9 +29,9 @@ import jakarta.annotation.PostConstruct;
 import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.grade.entity.Grade;
+import shop.nuribooks.books.member.member.dto.request.MemberPasswordUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberSearchRequest;
-import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
@@ -40,7 +39,6 @@ import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.StatusType;
-import shop.nuribooks.books.member.member.service.MemberService;
 
 class MemberControllerTest extends ControllerTestSupport {
 
@@ -107,11 +105,11 @@ class MemberControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("성별은 반드시 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
-				.value(Matchers.containsString("아이디는 반드시 8자 이상 입력해야 합니다.")))
+				.value(Matchers.containsString("아이디는 8자 이상 20자 이하, 영어 소문자와 숫자가 각각 1개 이상 포함되어야 합니다.")))
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("비밀번호는 반드시 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
-				.value(Matchers.containsString("전화번호는 반드시 입력해야 합니다.")))
+				.value(Matchers.containsString("전화번호는 '-' 없이 '010'으로 시작하는 11자리의 숫자로 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("유효한 이메일 형식으로 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
@@ -204,12 +202,12 @@ class MemberControllerTest extends ControllerTestSupport {
 	void memberUpdate() throws Exception {
 		//given
 		Long memberId = MemberIdContext.getMemberId();
-		MemberUpdateRequest request = getMemberUpdateRequest();
+		MemberPasswordUpdateRequest request = getMemberUpdateRequest();
 
-		doNothing().when(memberService).updateMember(eq(memberId), any(MemberUpdateRequest.class));
+		doNothing().when(memberService).updateMember(eq(memberId), any(MemberPasswordUpdateRequest.class));
 
 		//when
-		ResultActions result = mockMvc.perform(patch("/api/members/me")
+		ResultActions result = mockMvc.perform(put("/api/members/me")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -224,17 +222,15 @@ class MemberControllerTest extends ControllerTestSupport {
 	@Test
 	void memberUpdate_invalidRequest() throws Exception {
 	    //given
-		MemberUpdateRequest badRequest = getBadMemberUpdateRequest();
+		MemberPasswordUpdateRequest badRequest = getBadMemberUpdateRequest();
 
 		//when
-		ResultActions badResult = mockMvc.perform(patch("/api/members/me")
+		ResultActions badResult = mockMvc.perform(put("/api/members/me")
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 
 		//then
 		badResult.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.message")
-				.value(Matchers.containsString("이름은 반드시 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("비밀번호는 반드시 입력해야 합니다.")));
 	}
@@ -274,9 +270,9 @@ class MemberControllerTest extends ControllerTestSupport {
 		return MemberRegisterRequest.builder()
 			.name("boho")
 			.gender(GenderType.MALE)
-			.username("nuribooks")
-			.password("abc123")
-			.phoneNumber("042-8282-8282")
+			.username("nuribooks1")
+			.password("abc123!@#")
+			.phoneNumber("01082828282")
 			.email("nhnacademy@nuriBooks.com")
 			.birthday(LocalDate.of(1988, 8, 12))
 			.build();
@@ -353,21 +349,19 @@ class MemberControllerTest extends ControllerTestSupport {
 	}
 
 	/**
-	 * 테스트를 위한 MemberUpdateRequest 생성
+	 * 테스트를 위한 MemberPasswordUpdateRequest 생성
 	 */
-	private MemberUpdateRequest getMemberUpdateRequest() {
-		return MemberUpdateRequest.builder()
-			.name("수정하고 싶은 이름")
+	private MemberPasswordUpdateRequest getMemberUpdateRequest() {
+		return MemberPasswordUpdateRequest.builder()
 			.password("수정하고 싶은 비밀번호")
 			.build();
 	}
 
 	/**
-	 * 테스트를 위한 잘못된 MemberUpdateRequest 생성
+	 * 테스트를 위한 잘못된 MemberPasswordUpdateRequest 생성
 	 */
-	private MemberUpdateRequest getBadMemberUpdateRequest() {
-		return MemberUpdateRequest.builder()
-			.name("   ")
+	private MemberPasswordUpdateRequest getBadMemberUpdateRequest() {
+		return MemberPasswordUpdateRequest.builder()
 			.password("   ")
 			.build();
 	}

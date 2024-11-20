@@ -28,10 +28,7 @@ import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeListResponse;
-import shop.nuribooks.books.member.grade.dto.response.GradeRegisterResponse;
-import shop.nuribooks.books.member.grade.dto.response.GradeUpdateResponse;
 import shop.nuribooks.books.member.grade.entity.Grade;
-import shop.nuribooks.books.member.grade.service.GradeService;
 
 public class GradeControllerTest extends ControllerTestSupport {
 
@@ -46,9 +43,8 @@ public class GradeControllerTest extends ControllerTestSupport {
 	void gradeRegister() throws Exception {
 	    //given
 		GradeRegisterRequest request = getGradeRegisterRequest();
-		GradeRegisterResponse response = getGradeRegisterResponse();
 
-		when(gradeService.registerGrade(any(GradeRegisterRequest.class))).thenReturn(response);
+		doNothing().when(gradeService).registerGrade(any(GradeRegisterRequest.class));
 
 		//when
 		ResultActions result = mockMvc.perform(post("/api/members/grades")
@@ -57,9 +53,8 @@ public class GradeControllerTest extends ControllerTestSupport {
 
 		//then
 		result.andExpect(status().isCreated())
-			.andExpect(jsonPath("name").value(response.name()))
-			.andExpect(jsonPath("pointRate").value(response.pointRate()))
-			.andExpect(jsonPath("requirement").value(response.requirement()));
+			.andExpect(jsonPath("statusCode").value("201"))
+			.andExpect(jsonPath("message").value("등급이 성공적으로 생성되었습니다."));
 	}
 
 	@DisplayName("등급 등록 실패 - validation 에러")
@@ -97,6 +92,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 
 		//then
 		result.andExpect(status().isOk())
+			.andExpect(jsonPath("id").value(response.id()))
 			.andExpect(jsonPath("name").value(response.name()))
 			.andExpect(jsonPath("pointRate").value(response.pointRate()))
 			.andExpect(jsonPath("requirement").value(response.requirement()));
@@ -107,22 +103,19 @@ public class GradeControllerTest extends ControllerTestSupport {
 	public void gradeUpdate() throws Exception{
 	    //given
 		GradeUpdateRequest request = getGradeUpdateRequest();
-		GradeUpdateResponse response = getGradeUpdateResponse();
 		String requestName = "MASTER";
 
-		when(gradeService.updateGrade(eq(requestName), any(GradeUpdateRequest.class)))
-			.thenReturn(response);
+		doNothing().when(gradeService).updateGrade(eq(requestName), any(GradeUpdateRequest.class));
 
 	    //when
-		ResultActions result = mockMvc.perform(patch("/api/members/grades/{name}", requestName)
+		ResultActions result = mockMvc.perform(put("/api/members/grades/{name}", requestName)
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
 		//then
 		result.andExpect(status().isOk())
-			.andExpect(jsonPath("name").value(response.name()))
-			.andExpect(jsonPath("pointRate").value(response.pointRate()))
-			.andExpect(jsonPath("requirement").value(response.requirement()));
+			.andExpect(jsonPath("statusCode").value("200"))
+			.andExpect(jsonPath("message").value("등급이 성공적으로 수정되었습니다."));
 	}
 
 	@DisplayName("등급명으로 등급 수정 - validation 에러")
@@ -133,7 +126,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 		String requiredName = "STANDARD";
 
 		//when
-		ResultActions badResult = mockMvc.perform(patch("/api/members/grades/{name}", requiredName)
+		ResultActions badResult = mockMvc.perform(put("/api/members/grades/{name}", requiredName)
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(badRequest)));
 
@@ -144,7 +137,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("포인트 적립률은 100을 초과할 수 없습니다.")))
 			.andExpect(jsonPath("$.message")
-				.value(Matchers.containsString("등급의 승급 조건 금액은 0원을 초과해야 합니다.")));
+				.value(Matchers.containsString("등급의 승급 조건 금액은 0원 이상이어야 합니다.")));
 	}
 
 	@DisplayName("등급명으로 등급 삭제 성공")
@@ -159,8 +152,8 @@ public class GradeControllerTest extends ControllerTestSupport {
 		ResultActions result = mockMvc.perform(delete("/api/members/grades/{name}", requiredName));
 
 		//then
-		result.andExpect(status().isOk())
-			.andExpect(jsonPath("statusCode").value("200"))
+		result.andExpect(status().isNoContent())
+			.andExpect(jsonPath("statusCode").value("204"))
 			.andExpect(jsonPath("message").value("등급이 성공적으로 삭제되었습니다."));
 	}
 
@@ -205,21 +198,11 @@ public class GradeControllerTest extends ControllerTestSupport {
 	}
 
 	/**
-	 * 테스트를 위한 GradeRegisterResponse 생성
-	 */
-	private GradeRegisterResponse getGradeRegisterResponse() {
-		return GradeRegisterResponse.builder()
-			.name("STANDARD")
-			.pointRate(3)
-			.requirement(BigDecimal.valueOf(100_000))
-			.build();
-	}
-
-	/**
 	 * 테스트를 위한 GradeDetailsResponse 생성
 	 */
 	private GradeDetailsResponse getGradeDetailsResponse() {
 		return GradeDetailsResponse.builder()
+			.id(1)
 			.name("STANDARD")
 			.pointRate(3)
 			.requirement(BigDecimal.valueOf(100_000))
@@ -245,17 +228,6 @@ public class GradeControllerTest extends ControllerTestSupport {
 			.name("  ")
 			.pointRate(200)
 			.requirement(BigDecimal.valueOf(-100_000))
-			.build();
-	}
-
-	/**
-	 * 테스트를 위한 GradeUpdateResponse 생성
-	 */
-	private GradeUpdateResponse getGradeUpdateResponse() {
-		return GradeUpdateResponse.builder()
-			.name("GOLD")
-			.pointRate(6)
-			.requirement(BigDecimal.valueOf(300_000))
 			.build();
 	}
 

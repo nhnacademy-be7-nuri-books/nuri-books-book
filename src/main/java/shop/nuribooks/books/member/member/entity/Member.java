@@ -21,14 +21,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shop.nuribooks.books.cart.entity.Cart;
 import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
@@ -41,6 +43,7 @@ import shop.nuribooks.books.member.grade.entity.Grade;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "members")
 public class Member {
 
 	@Id
@@ -61,7 +64,7 @@ public class Member {
 	private AuthorityType authority;
 
 	/**
-	 * STANDARD, SILVER, GOLD, PLATINUM, ROYAL
+	 * STANDARD, ROYAL, GOLD, PLATINUM
 	 */
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "grade_id")
@@ -84,20 +87,19 @@ public class Member {
 	private GenderType gender;
 
 	@NotBlank
-	@Size(min = 8, max = 200)
-	@Column(unique = true)
+	@Column(unique = true, length = 100)
 	private String username;
 
 	private LocalDate birthday;
 
 	private LocalDateTime createdAt;
 
-	@Column(precision = 10, scale = 2)
+	@Column(precision = 10)
 	@NotNull
 	@Setter
 	private BigDecimal point;
 
-	@Column(precision = 10, scale = 2)
+	@Column(precision = 10)
 	@NotNull
 	private BigDecimal totalPaymentAmount;
 
@@ -110,6 +112,9 @@ public class Member {
 	 * 탈퇴 일시
 	 */
 	private LocalDateTime withdrawnAt;
+
+	@OneToOne(mappedBy = "member")
+	private Cart cart;
 
 	/**
 	 * 마지막 로그일 날짜로부터 90일이 지나면 상태를 INACTIVE로 변경
@@ -124,6 +129,21 @@ public class Member {
 	public void changeToWithdrawn() {
 		this.status = WITHDRAWN;
 		this.withdrawnAt = LocalDateTime.now();
+		this.point = ZERO;
+	}
+
+	/**
+	 * 최근 로그인 시간을 업데이트
+	 */
+	public void updateLatestLoginAt() {
+		this.latestLoginAt = LocalDateTime.now();
+	}
+
+	/**
+	 * 휴면 상태를 해지하면 status를 ACTIVE로 업데이트
+	 */
+	public void reactiveMemberStatus() {
+		this.status = ACTIVE;
 	}
 
 	/**

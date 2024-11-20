@@ -14,6 +14,12 @@ spring:
       password: "*N2vya7H@muDTwdNMR!"
       database: 140
 
+  elasticsearch:
+    uris: d1d6ef21388d4cc5ad957d5114ed4a3a
+    socket-timeout: 10s
+    username: elastic
+    password: 5e29faf8e1034d6ba57a5f14b46ab3e1
+
 server:
   port: 8083
 
@@ -30,3 +36,15 @@ eureka:
 aladin:
   api:
     key: ttbljb06271100001
+
+cloud:
+  nhn:
+    key-manager:
+      url: https://api-keymanager.nhncloudservice.com
+      app-key: 500rMJPT021TnyNl
+      access-key-id: KtrUJ2n2CTnIVlYVj1uU
+      secret-access-key: ${NHN_KEY_MANAGER_SECRET_ACCESS_KEY}
+    image-manager:
+      url: https://api-image.nhncloudservice.com/image/v2.0/appkeys
+      app-key: rUN43QEwj1P6jThk
+      secret-id: 6f5396562412430883fbd023ef2c50d9

@@ -1,62 +1,59 @@
 package shop.nuribooks.books.member.address.service;
 
-import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.*;
-import static shop.nuribooks.books.member.member.entity.AuthorityType.MEMBER;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
+
+import shop.nuribooks.books.common.TestUtils;
+import shop.nuribooks.books.exception.address.AddressNotFoundException;
 import shop.nuribooks.books.member.address.dto.requset.AddressEditRequest;
+import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 import shop.nuribooks.books.member.address.entity.Address;
+import shop.nuribooks.books.member.address.repository.AddressRepository;
 import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
-import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.member.member.entity.StatusType;
-import shop.nuribooks.books.exception.address.AddressNotFoundException;
-import shop.nuribooks.books.member.address.repository.AddressRepository;
-import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @Transactional
 @SpringBootTest
 class AddressServiceTest {
 
-    @Autowired
-    private AddressServiceImpl addressService;
+	@Autowired
+	private AddressServiceImpl addressService;
 
-    @Autowired
-    private AddressRepository addressRepository;
+	@Autowired
+	private AddressRepository addressRepository;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+	@Autowired
+	private CustomerRepository customerRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
+	@Autowired
+	private MemberRepository memberRepository;
 
-    @Autowired
-    private GradeRepository gradeRepository;
+	@Autowired
+	private GradeRepository gradeRepository;
 
-    @DisplayName("회원의 주소를 생성한다.")
-    @Test
-    void addAddress() {
-        // given
-        Customer customer = createCustomer();
-        customerRepository.save(customer);
+	@DisplayName("회원의 주소를 생성한다.")
+	@Test
+	void addAddress() {
+		// given
+		Customer customer = TestUtils.createCustomer();
+		customerRepository.save(customer);
 
-        Grade grade = creategrade();
-        gradeRepository.save(grade);
+		Grade grade = creategrade();
+		gradeRepository.save(grade);
 
         Member member = createMember(customer, grade);
         memberRepository.save(member);

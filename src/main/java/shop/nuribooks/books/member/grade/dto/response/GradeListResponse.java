@@ -7,6 +7,7 @@ import lombok.Builder;
 @Builder
 public record GradeListResponse(
 
+	Integer id,
 	String name,
 	Integer pointRate,
 	BigDecimal requirement

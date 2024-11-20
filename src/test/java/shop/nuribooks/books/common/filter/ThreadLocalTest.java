@@ -1,5 +1,6 @@
 package shop.nuribooks.books.common.filter;
 
+
 import static java.math.BigDecimal.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -20,15 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
+import shop.nuribooks.books.common.TestUtils;
 import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
 import shop.nuribooks.books.member.address.service.AddressServiceImpl;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
-import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @SpringBootTest
@@ -64,6 +65,7 @@ public class ThreadLocalTest {
 		Customer savedCustomer = customerRepository.save(customer);
 
 		Member member = createMember(savedCustomer, savedGrade);
+
 		Member saved = memberRepository.save(member);
 
 		AddressRegisterRequest request = AddressRegisterRequest.builder()
@@ -118,4 +120,5 @@ public class ThreadLocalTest {
 			.requirement(BigDecimal.valueOf(100_000))
 			.build();
 	}
+
 }

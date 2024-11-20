@@ -1,6 +1,5 @@
 package shop.nuribooks.books.book.book.service.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +47,7 @@ import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
-import shop.nuribooks.books.exception.book.PublisherIdNotFoundException;
+import shop.nuribooks.books.exception.book.InvalidBookStateException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
@@ -94,7 +93,7 @@ public class BookServiceImpl implements BookService {
 			BookStateEnum bookStateEnum;
 			try {
 				bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.getState()));
-			} catch(IllegalArgumentException ex) {
+			} catch (InvalidBookStateException ex) {
 				log.error("Error parsing book state from request: {}", ex.getMessage(), ex);
 				throw ex;
 			}
@@ -109,15 +108,16 @@ public class BookServiceImpl implements BookService {
 				throw ex;
 			}
 
+			List<ParsedContributor> parsedContributors = List.of();
 			try {
-				List<ParsedContributor> parsedContributors = parseContributors(reqDto.getAuthor());
+				parsedContributors = parseContributors(reqDto.getAuthor());
 				saveContributors(parsedContributors, book);
 			} catch (Exception ex) {
 				log.error("Error parsing or saving contributors: {}", ex.getMessage(), ex);
 			}
 
 			try {
-				if(reqDto instanceof AladinBookRegisterRequest aladinReq) {
+				if (reqDto instanceof AladinBookRegisterRequest aladinReq) {
 					registerAladinCategories(aladinReq.getCategoryName(), book);
 				} else if (reqDto instanceof PersonallyBookRegisterRequest personallyReq) {
 					registerPersonallyCategories(personallyReq.getCategoryIds(), book);
@@ -127,7 +127,7 @@ public class BookServiceImpl implements BookService {
 				throw ex;
 			}
 
-			try{
+			try {
 				if (reqDto.getTagIds() != null && !reqDto.getTagIds().isEmpty()) {
 					List<Long> tagIdList = reqDto.getTagIds();
 					bookTagService.registerTagToBook(book.getId(), tagIdList);
@@ -137,6 +137,7 @@ public class BookServiceImpl implements BookService {
 				throw ex;
 			}
 			log.info("Book with ISBN {} successfully saved.", reqDto.getIsbn());
+
 		} catch (Exception ex) {
 			log.error("Error saving book with ISBN {}: {}", reqDto.getIsbn(), ex.getMessage(), ex);
 			throw ex;
@@ -144,7 +145,6 @@ public class BookServiceImpl implements BookService {
 	}
 
 	//도서 상세 조회 시 조회수 증가 추가
-	//TODO:성능 고려한 비동기 업데이트나 조회기능과 독립적으로 관리하는 방안 생각중
 	@Transactional
 	@Override
 	public BookResponse getBookById(Long bookId) {
@@ -157,8 +157,6 @@ public class BookServiceImpl implements BookService {
 		return bookMapper.toBookResponse(book);
 	}
 
-	//TODO: 도서 목록조회를 하여 도서를 관리하기 위한 메서드 (관리자로 로그인 했을때는 수정버튼을 보이게해서 수정하도록 하는게 좋을까?)
-	//TODO: 추후 엘라스틱 서치 적용 시 사용자를 위한 도서 검색 기능을 따로 구현 예정
 	@Override
 	public PagedResponse<BookContributorsResponse> getBooks(Pageable pageable) {
 		if (pageable.getPageNumber() < 0) {
@@ -199,8 +197,6 @@ public class BookServiceImpl implements BookService {
 		);
 	}
 
-	//TODO: 좋아요나 조회수에 대한 업데이트는 따로 메서드를 구현할 계획입니다.
-
 	@Transactional
 	@Override
 	public void updateBook(Long bookId, BookUpdateRequest bookUpdateReq) {
@@ -222,7 +218,7 @@ public class BookServiceImpl implements BookService {
 	public void deleteBook(Long bookId) {
 		log.info("deleteBook attempt - bookId: {}", bookId);
 
-		if(bookId == null) {
+		if (bookId == null) {
 			log.error("Book Delete fail - bookId is Null");
 			throw new BookIdNotFoundException();
 		}
@@ -236,7 +232,7 @@ public class BookServiceImpl implements BookService {
 
 	//Contributor 저장 메서드
 	private void saveContributors(List<ParsedContributor> parsedContributors, Book book) {
-		for(ParsedContributor parsedContributor : parsedContributors) {
+		for (ParsedContributor parsedContributor : parsedContributors) {
 			Contributor contributor = contributorRepository.findByName(parsedContributor.getName())
 				.orElseGet(() -> contributorRepository.save(
 					Contributor.builder()

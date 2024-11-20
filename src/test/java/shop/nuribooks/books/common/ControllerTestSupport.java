@@ -23,6 +23,8 @@ import shop.nuribooks.books.member.grade.controller.GradeController;
 import shop.nuribooks.books.member.grade.service.GradeService;
 import shop.nuribooks.books.member.member.controller.MemberController;
 import shop.nuribooks.books.member.member.service.MemberService;
+import shop.nuribooks.books.order.order.controller.OrderController;
+import shop.nuribooks.books.order.order.service.OrderService;
 
 @WebMvcTest(controllers = {
         BookController.class,
@@ -35,6 +37,7 @@ import shop.nuribooks.books.member.member.service.MemberService;
         CustomerController.class,
         GradeController.class,
         MemberController.class,
+        OrderController.class
 })
 public abstract class ControllerTestSupport {
 
@@ -67,5 +70,8 @@ public abstract class ControllerTestSupport {
 
     @MockBean
     protected MemberService memberService;
+
+    @MockBean
+    protected OrderService orderService;
 
 }

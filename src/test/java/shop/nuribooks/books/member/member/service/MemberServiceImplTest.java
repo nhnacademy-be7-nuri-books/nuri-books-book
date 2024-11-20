@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Import;
 
 import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
+import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
@@ -34,8 +35,8 @@ import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.dto.EntityMapper;
+import shop.nuribooks.books.member.member.dto.request.MemberPasswordUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
-import shop.nuribooks.books.member.member.dto.request.MemberUpdateRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
@@ -63,6 +64,9 @@ class MemberServiceImplTest {
 
 	@Mock
 	private PointHistoryService pointHistoryService;
+
+	@Mock
+	private CartRepository cartRepository;
 
 	@BeforeEach
 	void setUp() {
@@ -173,7 +177,7 @@ class MemberServiceImplTest {
 	void updateMember() {
 		//given
 		Long memberId = MemberIdContext.getMemberId();
-		MemberUpdateRequest request = getMemberUpdateRequest();
+		MemberPasswordUpdateRequest request = getMemberUpdateRequest();
 		Customer existingCustomer = spy(getSavedCustomer());
 
 		when(customerRepository.findById(memberId)).thenReturn(Optional.of(existingCustomer));
@@ -183,8 +187,7 @@ class MemberServiceImplTest {
 
 		//then
 		verify(existingCustomer, times(1))
-			.changeCustomerInformation(request.name(), request.password());
-		assertThat(existingCustomer.getName()).isEqualTo(request.name());
+			.changeCustomerPassword(request.password());
 		assertThat(existingCustomer.getPassword()).isEqualTo(request.password());
 	}
 
@@ -193,7 +196,7 @@ class MemberServiceImplTest {
 	void updateMember_CustomerNotFound() {
 		//given
 		Long memberId = MemberIdContext.getMemberId();
-		MemberUpdateRequest request = getMemberUpdateRequest();
+		MemberPasswordUpdateRequest request = getMemberUpdateRequest();
 
 		when(customerRepository.findById(memberId)).thenReturn(Optional.empty());
 
@@ -439,11 +442,10 @@ class MemberServiceImplTest {
 	}
 
 	/**
-	 * 테스트를 위한 MemberUpdateRequest 생성
+	 * 테스트를 위한 MemberPasswordUpdateRequest 생성
 	 */
-	private MemberUpdateRequest getMemberUpdateRequest() {
-		return MemberUpdateRequest.builder()
-			.name("수정된 이름")
+	private MemberPasswordUpdateRequest getMemberUpdateRequest() {
+		return MemberPasswordUpdateRequest.builder()
 			.password("수정된 비밀번호")
 			.build();
 	}

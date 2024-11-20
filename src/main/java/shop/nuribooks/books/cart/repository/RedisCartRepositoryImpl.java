@@ -45,7 +45,6 @@ public class RedisCartRepositoryImpl implements RedisCartRepository {
             e.printStackTrace();
         }
         return cartItems;
-
     }
 
     @Override
@@ -72,6 +71,11 @@ public class RedisCartRepositoryImpl implements RedisCartRepository {
     @Override
     public void saveAll(String cartId, List<RedisCartDetail> redisCartDetailList) {
         redisCartDetailList.forEach(redisCartDetail -> hashOperations.put(cartId, redisCartDetail.getBookId(), redisCartDetail.getQuantity()));
+    }
+
+    @Override
+    public boolean isExist(String cartId) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(cartId));
     }
 
 }
