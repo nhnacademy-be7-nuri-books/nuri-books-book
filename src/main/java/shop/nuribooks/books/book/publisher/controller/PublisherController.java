@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,14 +20,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.publisher.dto.PublisherRequest;
 import shop.nuribooks.books.book.publisher.dto.PublisherResponse;
-import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.service.PublisherService;
+import shop.nuribooks.books.common.message.ResponseMessage;
 
 /**
  * @author kyongmin
  */
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/books/publishers")
 public class PublisherController {
 	private final PublisherService publisherService;
 
@@ -42,10 +44,11 @@ public class PublisherController {
 		@ApiResponse(responseCode = "409", description = "출판사가 이미 존재함"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
 	})
-	@PostMapping("/api/publishers")
-	public ResponseEntity<PublisherResponse> registerPublisher(@Valid @RequestBody PublisherRequest request) {
-		PublisherResponse response = publisherService.registerPublisher(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	@PostMapping
+	public ResponseEntity<ResponseMessage> registerPublisher(@Valid @RequestBody PublisherRequest request) {
+		publisherService.registerPublisher(request);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(new ResponseMessage(HttpStatus.CREATED.value(), "출판사 등록 성공"));
 
 	}
 
@@ -59,7 +62,7 @@ public class PublisherController {
 		@ApiResponse(responseCode = "200", description = "출판사 목록 조회 성공"),
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
-	@GetMapping("/api/publishers")
+	@GetMapping
 	public ResponseEntity<Page<PublisherResponse>> getAllPublisher(Pageable pageable) {
 		Page<PublisherResponse> publisherResponses = publisherService.getAllPublisher(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(publisherResponses);
@@ -77,8 +80,9 @@ public class PublisherController {
 		@ApiResponse(responseCode = "404", description = "출판사 미존재"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청")
 	})
-	@GetMapping("/api/publishers/{publisherId}")
-	public ResponseEntity<PublisherResponse> getPublisher(@Valid @PathVariable Long publisherId) {
+	@GetMapping("/{publisher-id}")
+	public ResponseEntity<PublisherResponse> getPublisher(
+		@Valid @PathVariable(name = "publisher-id") Long publisherId) {
 		PublisherResponse response = publisherService.getPublisher(publisherId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 
@@ -96,8 +100,8 @@ public class PublisherController {
 		@ApiResponse(responseCode = "404", description = "출판사 미존재"),
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
-	@DeleteMapping("/api/publishers/{publisherId}")
-	public ResponseEntity<HttpStatus> deletePublisher(@Valid @PathVariable Long publisherId) {
+	@DeleteMapping("/{publisher-id}")
+	public ResponseEntity<HttpStatus> deletePublisher(@Valid @PathVariable(name = "publisher-id") Long publisherId) {
 		publisherService.deletePublisher(publisherId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
@@ -112,15 +116,16 @@ public class PublisherController {
 	 */
 	@Operation(summary = "출판사 수정", description = "주어진 이름의 출판사를 수정합니다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "출판사 수정 성공"),
+		@ApiResponse(responseCode = "200", description = "출판사 수정 성공"),
 		@ApiResponse(responseCode = "404", description = "출판사 미존재"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
-	@PutMapping("/api/publishers/{publisherId}")
-	public ResponseEntity<PublisherResponse> updatePublisher(@Valid @PathVariable Long publisherId,
+	@PutMapping("/{publisher-id}")
+	public ResponseEntity<ResponseMessage> updatePublisher(@Valid @PathVariable(name = "publisher-id") Long publisherId,
 		@RequestBody PublisherRequest request) {
-		PublisherResponse response = publisherService.updatePublisher(publisherId, request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		publisherService.updatePublisher(publisherId, request);
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(new ResponseMessage(HttpStatus.OK.value(), "출판사 수정 성공"));
 	}
 }
