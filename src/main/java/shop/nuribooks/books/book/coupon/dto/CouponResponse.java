@@ -2,14 +2,17 @@ package shop.nuribooks.books.book.coupon.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.Builder;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
+import shop.nuribooks.books.book.point.enums.PolicyType;
 
 @Builder
 public record CouponResponse(
 	Long id,
+	PolicyType policyType,
 	String name,
 	int discount,
 	BigDecimal minimumOrderPrice,
@@ -17,12 +20,14 @@ public record CouponResponse(
 	LocalDate createdAt,
 	LocalDate expiredAt,
 	int period,
-	ExpirationType expirationType
+	ExpirationType expirationType,
+	LocalDateTime expireDate
 ) {
 	public static CouponResponse of(Coupon coupon) {
 		return CouponResponse.builder()
 			.id(coupon.getId())
 			.name(coupon.getName())
+			.policyType(coupon.getPolicyType())
 			.discount(coupon.getDiscount())
 			.minimumOrderPrice(coupon.getMinimumOrderPrice())
 			.maximumDiscountPrice(coupon.getMaximumDiscountPrice())
@@ -30,6 +35,7 @@ public record CouponResponse(
 			.expiredAt(coupon.getExpiredAt())
 			.expirationType(coupon.getExpirationType())
 			.period(coupon.getPeriod())
+			.expireDate(coupon.getExpireDate())
 			.build();
 	}
 }

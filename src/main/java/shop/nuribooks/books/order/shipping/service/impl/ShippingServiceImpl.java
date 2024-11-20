@@ -1,6 +1,5 @@
-package shop.nuribooks.books.order.shipping.service;
+package shop.nuribooks.books.order.shipping.service.impl;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import shop.nuribooks.books.order.shipping.entity.Shipping;
 import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
 import shop.nuribooks.books.order.shipping.repository.ShippingPolicyRepository;
 import shop.nuribooks.books.order.shipping.repository.ShippingRepository;
+import shop.nuribooks.books.order.shipping.service.ShippingService;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +26,13 @@ public class ShippingServiceImpl implements ShippingService {
 	@Override
 	public void registerShipping(Order order, ShippingRegisterRequest shippingRegisterRequest) {
 
-		ShippingPolicy shippingPolicy = shippingPolicyRepository.findClosedShippingPolicy(order.getPaymentPrice().intValue());
+		ShippingPolicy shippingPolicy = shippingPolicyRepository.findClosedShippingPolicy(
+			order.getPaymentPrice().intValue());
 
-		if(Objects.isNull(shippingPolicy)){
-			throw  new ShippingPolicyNotFoundException();
-		};
+		if (Objects.isNull(shippingPolicy)) {
+			throw new ShippingPolicyNotFoundException();
+		}
+		;
 
 		Shipping shipping = Shipping.builder()
 			.order(order)
@@ -44,7 +46,7 @@ public class ShippingServiceImpl implements ShippingService {
 			.senderPhoneNumber(shippingRegisterRequest.senderPhoneNumber())
 			.build();
 
-			shippingRepository.save(shipping);
+		shippingRepository.save(shipping);
 
 	}
 }

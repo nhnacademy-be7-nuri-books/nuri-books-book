@@ -23,7 +23,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,7 +62,7 @@ public class Member {
 	private AuthorityType authority;
 
 	/**
-	 * STANDARD, SILVER, GOLD, PLATINUM, ROYAL
+	 * STANDARD, ROYAL, GOLD, PLATINUM
 	 */
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "grade_id")
@@ -85,8 +85,9 @@ public class Member {
 	private GenderType gender;
 
 	@NotBlank
-	@Size(min = 8, max = 200)
-	@Column(unique = true)
+	@Column(unique = true, length = 20)
+	@Pattern(regexp = "^(?=.*[a-z])(?=.*[0-9]).{8,20}$",
+		message = "아이디는 8자 이상 20자 이하, 영어 소문자와 숫자가 각각 1개 이상 포함되어야 합니다.")
 	private String username;
 
 	private LocalDate birthday;
@@ -111,7 +112,7 @@ public class Member {
 	 * 탈퇴 일시
 	 */
 	private LocalDateTime withdrawnAt;
-  
+
 	@OneToOne(mappedBy = "member")
 	private Cart cart;
 
@@ -129,6 +130,20 @@ public class Member {
 		this.status = WITHDRAWN;
 		this.withdrawnAt = LocalDateTime.now();
 		this.point = ZERO;
+	}
+
+	/**
+	 * 최근 로그인 시간을 업데이트
+	 */
+	public void updateLatestLoginAt() {
+		this.latestLoginAt = LocalDateTime.now();
+	}
+
+	/**
+	 * 휴면 상태를 해지하면 status를 ACTIVE로 업데이트
+	 */
+	public void reactiveMemberStatus() {
+		this.status = ACTIVE;
 	}
 
 	/**

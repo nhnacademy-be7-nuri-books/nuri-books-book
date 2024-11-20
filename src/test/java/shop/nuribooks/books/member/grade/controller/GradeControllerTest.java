@@ -137,7 +137,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("포인트 적립률은 100을 초과할 수 없습니다.")))
 			.andExpect(jsonPath("$.message")
-				.value(Matchers.containsString("등급의 승급 조건 금액은 0원을 초과해야 합니다.")));
+				.value(Matchers.containsString("등급의 승급 조건 금액은 0원 이상이어야 합니다.")));
 	}
 
 	@DisplayName("등급명으로 등급 삭제 성공")

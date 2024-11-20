@@ -15,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
@@ -74,6 +75,8 @@ public class Book {
 	private int discountRate;
 
 	@NotBlank
+	@Lob
+	@Column(columnDefinition = "TEXT")
 	private String description;
 
 	@NotBlank
