@@ -93,7 +93,7 @@ public class BookServiceImpl implements BookService {
 			BookStateEnum bookStateEnum;
 			try {
 				bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.getState()));
-			} catch(InvalidBookStateException ex) {
+			} catch (InvalidBookStateException ex) {
 				log.error("Error parsing book state from request: {}", ex.getMessage(), ex);
 				throw ex;
 			}
@@ -108,15 +108,16 @@ public class BookServiceImpl implements BookService {
 				throw ex;
 			}
 
+			List<ParsedContributor> parsedContributors = List.of();
 			try {
-				List<ParsedContributor> parsedContributors = parseContributors(reqDto.getAuthor());
+				parsedContributors = parseContributors(reqDto.getAuthor());
 				saveContributors(parsedContributors, book);
 			} catch (Exception ex) {
 				log.error("Error parsing or saving contributors: {}", ex.getMessage(), ex);
 			}
 
 			try {
-				if(reqDto instanceof AladinBookRegisterRequest aladinReq) {
+				if (reqDto instanceof AladinBookRegisterRequest aladinReq) {
 					registerAladinCategories(aladinReq.getCategoryName(), book);
 				} else if (reqDto instanceof PersonallyBookRegisterRequest personallyReq) {
 					registerPersonallyCategories(personallyReq.getCategoryIds(), book);
@@ -126,7 +127,7 @@ public class BookServiceImpl implements BookService {
 				throw ex;
 			}
 
-			try{
+			try {
 				if (reqDto.getTagIds() != null && !reqDto.getTagIds().isEmpty()) {
 					List<Long> tagIdList = reqDto.getTagIds();
 					bookTagService.registerTagToBook(book.getId(), tagIdList);
@@ -136,6 +137,7 @@ public class BookServiceImpl implements BookService {
 				throw ex;
 			}
 			log.info("Book with ISBN {} successfully saved.", reqDto.getIsbn());
+
 		} catch (Exception ex) {
 			log.error("Error saving book with ISBN {}: {}", reqDto.getIsbn(), ex.getMessage(), ex);
 			throw ex;
@@ -216,7 +218,7 @@ public class BookServiceImpl implements BookService {
 	public void deleteBook(Long bookId) {
 		log.info("deleteBook attempt - bookId: {}", bookId);
 
-		if(bookId == null) {
+		if (bookId == null) {
 			log.error("Book Delete fail - bookId is Null");
 			throw new BookIdNotFoundException();
 		}
@@ -230,7 +232,7 @@ public class BookServiceImpl implements BookService {
 
 	//Contributor 저장 메서드
 	private void saveContributors(List<ParsedContributor> parsedContributors, Book book) {
-		for(ParsedContributor parsedContributor : parsedContributors) {
+		for (ParsedContributor parsedContributor : parsedContributors) {
 			Contributor contributor = contributorRepository.findByName(parsedContributor.getName())
 				.orElseGet(() -> contributorRepository.save(
 					Contributor.builder()

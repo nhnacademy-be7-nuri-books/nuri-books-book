@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -88,10 +87,10 @@ public class CouponController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	// @HasRole(role = AuthorityType.ADMIN)
-	@DeleteMapping("/{coupon-id}")
-	public ResponseEntity<ResponseMessage> deleteCoupon(@PathVariable("coupon-id") Long id) {
-		couponService.deleteCoupon(id);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT)
-			.body(new ResponseMessage(HttpStatus.NO_CONTENT.value(), "쿠폰 삭제 성공"));
+	@PutMapping("/{coupon-id}/expire")
+	public ResponseEntity<ResponseMessage> expireCoupon(@PathVariable("coupon-id") Long id) {
+		couponService.expireCoupon(id);
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(new ResponseMessage(HttpStatus.OK.value(), "쿠폰 삭제 성공"));
 	}
 }

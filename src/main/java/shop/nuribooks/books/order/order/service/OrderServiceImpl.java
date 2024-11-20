@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -23,6 +24,8 @@ import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
 import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
+import shop.nuribooks.books.cart.entity.RedisCartKey;
+import shop.nuribooks.books.cart.repository.RedisCartRepository;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
@@ -66,6 +69,7 @@ public class OrderServiceImpl implements OrderService {
 	private final BookContributorRepository bookContributorRepository;
 	private final ShippingPolicyRepository shippingPolicyRepository;
 	private final PointPolicyRepository pointPolicyRepository;
+	private final RedisCartRepository redisCartRepository;
 
 	private final OrderDetailService orderDetailService;
 	private final ShippingService shippingService;
@@ -93,8 +97,9 @@ public class OrderServiceImpl implements OrderService {
 			.toList();
 
 		// 도서 정보 가져오기
-		List<BookOrderResponse> bookOrderResponses = getBookOrderResponses(bookId,
+		BookOrderResponse bookOrderResponse = getBookOrderResponses(bookId,
 			quantity);
+		List<BookOrderResponse> bookOrderResponses = List.of(bookOrderResponse);
 
 		// 도서 리스트의 총 가격 반환
 		BigDecimal orderTotalPrice = calculateTotalPrice(bookOrderResponses);
@@ -126,8 +131,65 @@ public class OrderServiceImpl implements OrderService {
 	public OrderInformationResponse getCustomerOrderInformation(Long bookId, int quantity) {
 
 		// 도서 정보 가져오기
-		List<BookOrderResponse> bookOrderResponses = getBookOrderResponses(bookId,
-			quantity);
+		BookOrderResponse bookOrderResponse = getBookOrderResponses(bookId, quantity);
+		List<BookOrderResponse> bookOrderResponses = List.of(bookOrderResponse);
+
+		// 도서 리스트의 총 가격 반환
+		BigDecimal orderTotalPrice = calculateTotalPrice(bookOrderResponses);
+
+		// 배송비 정보 가져오기
+		ShippingPolicy shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
+
+		return OrderInformationResponse.of(bookOrderResponses, shippingPolicy);
+	}
+
+	//회원 장바구니 도서 정보 가져오기
+	@Override
+	public OrderInformationResponse getMemberCartOrderInformation(Long memberId) {
+
+		Customer customer = getCustomerById(memberId);
+		String cartId = RedisCartKey.MEMBER_CART.withSuffix(memberId.toString());
+
+		// 주소 정보 가져오기
+		List<Address> addressesByMemberId = addressRepository.findAllByMemberId(customer.getId());
+		List<AddressResponse> addressResponseList = addressesByMemberId.stream()
+			.map(AddressResponse::of)
+			.toList();
+
+		// 도서 정보 가져오기
+		Map<Long, Integer> cart = redisCartRepository.getCart(cartId);
+		ArrayList<BookOrderResponse> bookOrderResponses = new ArrayList<>(cart.entrySet().stream()
+			.map(entry -> getBookOrderResponses(entry.getKey(), entry.getValue()))
+			.toList());
+
+		// 도서 리스트의 총 가격 반환
+		BigDecimal orderTotalPrice = calculateTotalPrice(bookOrderResponses);
+
+		// 배송비 정보 가져오기
+		ShippingPolicy shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
+
+		// 포인트 가져오기
+		Optional<MemberPointDTO> point = memberRepository.findPointById(memberId);
+
+		// todo : 쿠폰
+
+		return OrderInformationResponse.of(
+			customer,
+			addressResponseList,
+			bookOrderResponses,
+			shippingPolicy,
+			point.get().point());
+	}
+
+	// 비회원 장바구니 도서정보 가져오기
+	@Override
+	public OrderInformationResponse getCustomerCartOrderInformation(String cartId) {
+
+		// 도서 정보 가져오기
+		Map<Long, Integer> cart = redisCartRepository.getCart(cartId);
+		ArrayList<BookOrderResponse> bookOrderResponses = new ArrayList<>(cart.entrySet().stream()
+			.map(entry -> getBookOrderResponses(entry.getKey(), entry.getValue()))
+			.toList());
 
 		// 도서 리스트의 총 가격 반환
 		BigDecimal orderTotalPrice = calculateTotalPrice(bookOrderResponses);
@@ -326,7 +388,7 @@ public class OrderServiceImpl implements OrderService {
 	 * @param quantity 수량
 	 * @return BookOrderResponse
 	 */
-	private List<BookOrderResponse> getBookOrderResponses(Long bookId, int quantity) {
+	private BookOrderResponse getBookOrderResponses(Long bookId, int quantity) {
 		// 도서 정보 가져오기
 		Optional<Book> book = Optional.ofNullable(bookRepository.findById(bookId)
 			.orElseThrow(() -> new BookNotFoundException(bookId)));
@@ -336,10 +398,7 @@ public class OrderServiceImpl implements OrderService {
 			bookId);
 
 		// 만족하는 객체 생성
-		List<BookOrderResponse> bookOrderResponses = new ArrayList<>();
-		BookOrderResponse bookOrderResponse = BookOrderResponse.of(book.get(), contributors, quantity);
-		bookOrderResponses.add(bookOrderResponse);
-		return bookOrderResponses;
+		return BookOrderResponse.of(book.get(), contributors, quantity);
 	}
 
 	/**

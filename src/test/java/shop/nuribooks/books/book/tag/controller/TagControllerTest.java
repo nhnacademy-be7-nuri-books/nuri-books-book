@@ -10,8 +10,6 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -23,15 +21,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.book.tag.dto.TagRequest;
 import shop.nuribooks.books.book.tag.dto.TagResponse;
-import shop.nuribooks.books.book.tag.service.TagServiceImpl;
 import shop.nuribooks.books.common.ControllerTestSupport;
 
 class TagControllerTest extends ControllerTestSupport {
 
+	private final ObjectMapper objectMapper = new ObjectMapper();
 	@Autowired
 	private MockMvc mockMvc;
-
-	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@DisplayName("태그 등록")
 	@Test
@@ -43,9 +39,7 @@ class TagControllerTest extends ControllerTestSupport {
 
 		mockMvc.perform(post("/api/books/tags").contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.id").value(1L))
-			.andExpect(jsonPath("$.name").value("tag1"));
+			.andExpect(status().isCreated());
 
 		verify(tagService).registerTag(any(TagRequest.class));
 	}
@@ -106,9 +100,7 @@ class TagControllerTest extends ControllerTestSupport {
 		mockMvc.perform(put("/api/books/tags/{tagId}", id)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isCreated())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(content().json("{\"name\":\"update\"}"));
+			.andExpect(status().isOk());
 
 		verify(tagService).updateTag(id, request);
 

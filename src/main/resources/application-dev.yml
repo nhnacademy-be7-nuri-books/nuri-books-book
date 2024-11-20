@@ -20,6 +20,9 @@ spring:
       port: 6379
       password: "*N2vya7H@muDTwdNMR!"
       database: 133
+        
+  elasticsearch:
+    index: nuribooks
 
 logging:
   level:
