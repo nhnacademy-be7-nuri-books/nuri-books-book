@@ -78,17 +78,17 @@ public class CouponServiceImpl implements CouponService {
 	}
 
 	/**
-	 * 쿠폰 삭제하는 메서드
+	 * 쿠폰 비활성화 메서드
 	 *
 	 * @param id
 	 */
 	@Override
 	@Transactional
-	public void deleteCoupon(Long id) {
+	public void expireCoupon(Long id) {
 		Coupon coupon = couponRepository.findById(id)
 			.orElseThrow(() -> new CouponNotFoundException());
 
-		couponRepository.delete(coupon);
+		coupon.expire();
 	}
 
 }

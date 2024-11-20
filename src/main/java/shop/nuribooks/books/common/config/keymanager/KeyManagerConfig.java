@@ -8,11 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.common.config.keymanager.dto.KeyManagerResponse;
 
 @Component
-@RequiredArgsConstructor
 public class KeyManagerConfig {
 	@Value("${cloud.nhn.key-manager.url}")
 	private String keyManagerUrl;
@@ -39,8 +37,10 @@ public class KeyManagerConfig {
 
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 
-		ResponseEntity<KeyManagerResponse> response = restTemplate.exchange(url, HttpMethod.GET, entity, KeyManagerResponse.class);
+		ResponseEntity<KeyManagerResponse> response = restTemplate.exchange(url, HttpMethod.GET, entity,
+			KeyManagerResponse.class);
 
-		return response.getBody() != null && response.getBody().body() != null ? response.getBody().body().secret() : null;
+		return response.getBody() != null && response.getBody().body() != null ? response.getBody().body().secret() :
+			null;
 	}
 }
