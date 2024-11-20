@@ -23,6 +23,9 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
+import shop.nuribooks.books.common.annotation.HasRole;
+import shop.nuribooks.books.common.threadlocal.MemberIdContext;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,7 +58,6 @@ public class MemberCouponController {
 	/**
 	 * 회원 ID로 사용 가능한 쿠폰을 조회합니다.
 	 *
-	 * @param memberId 회원 ID
 	 * @param pageable 페이징 정보
 	 * @return 사용 가능한 쿠폰 정보를 담은 페이지
 	 */
@@ -65,9 +67,12 @@ public class MemberCouponController {
 		@ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음"),
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
-	@GetMapping("/{memberId}/available")
-	public ResponseEntity<Page<MemberCouponResponse>> getAvailableCouponsByMemberId(@PathVariable Long memberId,
-		Pageable pageable) {
+	@HasRole(role = AuthorityType.MEMBER)
+	@GetMapping("/available")
+	public ResponseEntity<Page<MemberCouponResponse>> getAvailableCouponsByMemberId(Pageable pageable) {
+
+		Long memberId = MemberIdContext.getMemberId();
+
 		Page<MemberCouponResponse> coupons = memberCouponService.getAvailableCouponsByMemberId(memberId, pageable);
 		return ResponseEntity.ok(coupons);
 	}
@@ -75,7 +80,6 @@ public class MemberCouponController {
 	/**
 	 * 회원 ID로 만료되었거나 사용된 쿠폰을 조회합니다.
 	 *
-	 * @param memberId 회원 ID
 	 * @param pageable 페이징 정보
 	 * @return 만료되었거나 사용된 쿠폰 정보를 담은 페이지
 	 */
@@ -85,9 +89,12 @@ public class MemberCouponController {
 		@ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음"),
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
-	@GetMapping("/{memberId}/expired-or-used")
-	public ResponseEntity<Page<MemberCouponResponse>> getExpiredOrUsedCouponsByMemberId(@PathVariable Long memberId,
-		Pageable pageable) {
+	@HasRole(role = AuthorityType.MEMBER)
+	@GetMapping("/expired-or-used")
+	public ResponseEntity<Page<MemberCouponResponse>> getExpiredOrUsedCouponsByMemberId(Pageable pageable) {
+
+		Long memberId = MemberIdContext.getMemberId();
+
 		Page<MemberCouponResponse> coupons = memberCouponService.getExpiredOrUsedCouponsByMemberId(memberId, pageable);
 		return ResponseEntity.ok(coupons);
 	}

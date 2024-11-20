@@ -11,6 +11,6 @@ public record MemberCouponResponse(
 	@NotNull Long couponId,
 	@NotNull Long memberId,
 	@NotNull boolean isUsed,
-	@NotNull @PastOrPresent LocalDate createdAt,
-	@NotNull @FutureOrPresent LocalDate expiredAt) {
+	@NotNull LocalDate createdAt,
+	@NotNull LocalDate expiredAt) {
 }
