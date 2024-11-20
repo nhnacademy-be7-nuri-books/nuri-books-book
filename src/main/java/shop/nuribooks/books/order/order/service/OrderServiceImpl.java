@@ -19,10 +19,10 @@ import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.point.dto.request.register.OrderUsingPointRequest;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
-import shop.nuribooks.books.book.point.entity.child.OrderUsingPoint;
 import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
 import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
+import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
@@ -70,6 +70,7 @@ public class OrderServiceImpl implements OrderService {
 	private final OrderDetailService orderDetailService;
 	private final ShippingService shippingService;
 	private final PointHistoryRepository pointHistoryRepository;
+	private final PointHistoryService pointHistoryService;
 
 	/**
 	 * 주문 폼 정보 가져오기 - 바로 주문(회원)
@@ -182,14 +183,8 @@ public class OrderServiceImpl implements OrderService {
 					orderTempRegisterRequest.usingPoint()
 				);
 
-				if (pointPolicy.isPresent()) {
-					OrderUsingPoint orderUsingPoint = orderUsingPointRequest.toEntity(pointPolicy.get());
-
-					member.get().setPoint(member.get().getPoint().add(orderUsingPoint.getAmount()));
-
-					// 포인트 기록 저장
-					pointHistoryRepository.save(orderUsingPoint);
-				}
+				// 포인트 차감, 내역 저장
+				this.pointHistoryService.registerPointHistory(orderUsingPointRequest, PolicyName.USING);
 
 			});
 
