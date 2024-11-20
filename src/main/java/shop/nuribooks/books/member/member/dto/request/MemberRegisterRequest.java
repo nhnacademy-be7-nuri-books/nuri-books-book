@@ -14,7 +14,7 @@ import lombok.Builder;
 import shop.nuribooks.books.member.member.entity.GenderType;
 
 @Builder
-public record MemberRegisterRequest (
+public record MemberRegisterRequest(
 
 	@NotBlank(message = "이름은 반드시 입력해야 합니다.")
 	@Size(min = 2, max = 30, message = "이름은 반드시 2자 이상 30자 이하로 입력해야 합니다.")
@@ -24,8 +24,6 @@ public record MemberRegisterRequest (
 	GenderType gender,
 
 	@NotBlank(message = "아이디는 반드시 입력해야 합니다.")
-	@Pattern(regexp = "^(?=.*[a-z])(?=.*[0-9]).{8,20}$",
-		message = "아이디는 8자 이상 20자 이하, 영어 소문자와 숫자가 각각 1개 이상 포함되어야 합니다.")
 	String username,
 
 	@NotBlank(message = "비밀번호는 반드시 입력해야 합니다.")
@@ -45,5 +43,6 @@ public record MemberRegisterRequest (
 	@NotNull(message = "생일은 반드시 입력해야 합니다.")
 	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	LocalDate birthday
-) {}
+) {
+}
 
