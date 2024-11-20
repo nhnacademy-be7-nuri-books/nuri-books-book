@@ -140,6 +140,13 @@ public class Member {
 	}
 
 	/**
+	 * 휴면 상태를 해지하면 status를 ACTIVE로 업데이트
+	 */
+	public void reactiveMemberStatus() {
+		this.status = ACTIVE;
+	}
+
+	/**
 	 * 회원 탈퇴 후 1년이 지나면 username, status, withdrawnAt을 제외한 나머지 필드 soft delete
 	 */
 	public void changeToSoftDeleted() {
