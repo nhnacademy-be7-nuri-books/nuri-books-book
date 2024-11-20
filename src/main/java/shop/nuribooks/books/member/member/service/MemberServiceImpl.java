@@ -221,6 +221,19 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	/**
+	 * 회원의 휴면 상태를 ACTIVE로 재활성화
+	 */
+	@Override
+	@Transactional
+	public void reactiveMember(String username) {
+
+		Member foundMember = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+
+		foundMember.reactiveMemberStatus();
+	}
+
+	/**
 	 * 매일 04:00시 정각에 마지막 로그인 날짜가 90일이 지난 회원들을 찾아, <br>
 	 * 그 중에서 상태가 ACTIVE인 회원들을 INACTIVE로 변경
 	 */

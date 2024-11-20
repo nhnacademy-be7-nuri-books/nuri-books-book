@@ -28,7 +28,7 @@ public class Grade {
 	private Integer id;
 
 	/**
-	 * STANDARD, SILVER, GOLD, PLATINUM, ROYAL
+	 * STANDARD, ROYAL, GOLD, PLATINUM
 	 */
 	@NotBlank
 	@Column(unique = true)

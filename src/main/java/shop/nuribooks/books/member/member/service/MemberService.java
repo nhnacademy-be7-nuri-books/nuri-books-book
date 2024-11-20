@@ -31,4 +31,6 @@ public interface MemberService {
 	Page<MemberSearchResponse> searchMembersWithPaging(MemberSearchRequest request, Pageable pageable);
 
 	void updateMemberLatestLoginAt(String username);
+
+	void reactiveMember(String username);
 }

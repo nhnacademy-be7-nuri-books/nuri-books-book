@@ -166,6 +166,15 @@ public class MemberController {
 			"최근 로그인 시간이 수정되었습니다."));
 	}
 
+	@PutMapping("/api/members/{username}/active")
+	public ResponseEntity<ResponseMessage> memberReactive(@PathVariable String username) {
+
+		memberService.reactiveMember(username);
+
+		return ResponseEntity.status(OK).body(new ResponseMessage(OK.value(),
+			"회원의 휴면 상태가 해제되었습니다."));
+	}
+
 	/**
 	 * 관리자가 다양한 검색 조건을 이용하여 회원 목록 조회
 	 */

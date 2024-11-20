@@ -62,7 +62,7 @@ public class Member {
 	private AuthorityType authority;
 
 	/**
-	 * STANDARD, SILVER, GOLD, PLATINUM, ROYAL
+	 * STANDARD, ROYAL, GOLD, PLATINUM
 	 */
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "grade_id")
@@ -137,6 +137,13 @@ public class Member {
 	 */
 	public void updateLatestLoginAt() {
 		this.latestLoginAt = LocalDateTime.now();
+	}
+
+	/**
+	 * 휴면 상태를 해지하면 status를 ACTIVE로 업데이트
+	 */
+	public void reactiveMemberStatus() {
+		this.status = ACTIVE;
 	}
 
 	/**
