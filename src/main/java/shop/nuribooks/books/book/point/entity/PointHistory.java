@@ -14,7 +14,6 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -38,7 +37,7 @@ public class PointHistory {
 	private Long id;
 
 	@NotNull
-	@Min(0)
+	//@Min(0) - 사용일땐 마이너스 들어감...
 	private BigDecimal amount;
 
 	@NotBlank

@@ -1,7 +1,6 @@
 package shop.nuribooks.books.order.order.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +8,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.dto.BookOrderResponse;
@@ -21,6 +18,12 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
+import shop.nuribooks.books.book.point.dto.request.register.OrderUsingPointRequest;
+import shop.nuribooks.books.book.point.entity.PointPolicy;
+import shop.nuribooks.books.book.point.enums.PolicyName;
+import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
+import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
+import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.entity.RedisCartKey;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 import shop.nuribooks.books.common.message.ResponseMessage;
@@ -33,10 +36,8 @@ import shop.nuribooks.books.exception.order.PriceMismatchException;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.address.repository.AddressRepository;
-import shop.nuribooks.books.member.customer.dto.DtoMapper;
 import shop.nuribooks.books.member.customer.dto.EntityMapper;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
-import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.dto.MemberPointDTO;
@@ -48,19 +49,17 @@ import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderDetail.dto.OrderDetailRequest;
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderDetail.service.OrderDetailService;
 import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
 import shop.nuribooks.books.order.shipping.repository.ShippingPolicyRepository;
 import shop.nuribooks.books.order.shipping.service.ShippingService;
 import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
-import shop.nuribooks.books.payment.payment.dto.PaymentSuccessRequest;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
-public class OrderServiceImpl implements OrderService{
+public class OrderServiceImpl implements OrderService {
 
 	private final CustomerRepository customerRepository;
 	private final MemberRepository memberRepository;
@@ -69,10 +68,13 @@ public class OrderServiceImpl implements OrderService{
 	private final AddressRepository addressRepository;
 	private final BookContributorRepository bookContributorRepository;
 	private final ShippingPolicyRepository shippingPolicyRepository;
+	private final PointPolicyRepository pointPolicyRepository;
 	private final RedisCartRepository redisCartRepository;
 
 	private final OrderDetailService orderDetailService;
 	private final ShippingService shippingService;
+	private final PointHistoryRepository pointHistoryRepository;
+	private final PointHistoryService pointHistoryService;
 
 	/**
 	 * 주문 폼 정보 가져오기 - 바로 주문(회원)
@@ -127,7 +129,7 @@ public class OrderServiceImpl implements OrderService{
 	 */
 	@Override
 	public OrderInformationResponse getCustomerOrderInformation(Long bookId, int quantity) {
-		
+
 		// 도서 정보 가져오기
 		BookOrderResponse bookOrderResponse = getBookOrderResponses(bookId, quantity);
 		List<BookOrderResponse> bookOrderResponses = List.of(bookOrderResponse);
@@ -214,19 +216,6 @@ public class OrderServiceImpl implements OrderService{
 		Customer customer = getCustomerById(id);
 		BigDecimal usedPoint = orderTempRegisterRequest.usingPoint();
 
-		// 사용자 포인트를 사용헀다면 차감 처리
-		if(usedPoint.intValue() > 0){
-			Optional<Member> member = memberRepository.findById(id);
-
-			member.ifPresent(value -> {
-				BigDecimal currentPoint = memberRepository.findPointById(id).get().point();
-				BigDecimal resultPoint = currentPoint.subtract(usedPoint);
-
-				value.setPoint(resultPoint);
-				memberRepository.save(value);
-			});
-		}
-
 		// todo : 회원 쿠폰 처리
 
 		// 임시 주문 등록
@@ -238,11 +227,34 @@ public class OrderServiceImpl implements OrderService{
 			.expectedDeliveryAt(orderTempRegisterRequest.expectedDeliveryAt())
 			.build();
 
-		orderRepository.save(order);
+		Order savedOrder = orderRepository.save(order);
+
+		// 사용자 포인트를 사용헀다면 차감 처리
+		if (usedPoint.intValue() > 0) {
+			Optional<Member> member = memberRepository.findById(id);
+
+			member.ifPresent(value -> {
+
+				// 포인트 불러오기
+				Optional<PointPolicy> pointPolicy = pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(
+					PolicyName.USING.toString());
+
+				OrderUsingPointRequest orderUsingPointRequest = new OrderUsingPointRequest(
+					member.get(),
+					savedOrder,
+					orderTempRegisterRequest.usingPoint()
+				);
+
+				// 포인트 차감, 내역 저장
+				this.pointHistoryService.registerPointHistory(orderUsingPointRequest, PolicyName.USING);
+
+			});
+
+		}
 
 		// 주문 상세 등록
 		List<String> bookTitles = new ArrayList<>();
-		for(OrderDetailRequest detail : orderTempRegisterRequest.orderDetails() ){
+		for (OrderDetailRequest detail : orderTempRegisterRequest.orderDetails()) {
 			orderDetailService.registerOrderDetail(order, detail);
 
 			// 책 제목 추출
@@ -286,7 +298,7 @@ public class OrderServiceImpl implements OrderService{
 
 		// 주문 상세 등록
 		List<String> bookTitles = new ArrayList<>();
-		for(OrderDetailRequest detail : orderTempRegisterRequest.orderDetails() ){
+		for (OrderDetailRequest detail : orderTempRegisterRequest.orderDetails()) {
 			orderDetailService.registerOrderDetail(order, detail);
 			// 책 제목 추출
 			bookTitles.add(orderDetailService.getBookTitle(detail.bookId()));
@@ -316,11 +328,11 @@ public class OrderServiceImpl implements OrderService{
 
 		Optional<Order> order = orderRepository.findById(orderId);
 
-		if(order.isPresent()){
-			if(!orderDetailService.checkStock(order.get())){
+		if (order.isPresent()) {
+			if (!orderDetailService.checkStock(order.get())) {
 				throw new NoStockAvailableException();
 			}
-			if(order.get().getPaymentPrice().intValue() != paymentRequest.amount()){
+			if (order.get().getPaymentPrice().intValue() != paymentRequest.amount()) {
 				throw new PriceMismatchException();
 			}
 		}
@@ -344,15 +356,15 @@ public class OrderServiceImpl implements OrderService{
 	 * @param bookTitles 주문 도서 타이틀 목록
 	 * @return 주문 도서를 이용해서 생성한 주문 명
 	 */
-	private String makeOrderName(List<String> bookTitles){
+	private String makeOrderName(List<String> bookTitles) {
 
 		if (Objects.isNull(bookTitles)) {
 			return "";
 		}
 
-		if(bookTitles.size() == 1){
+		if (bookTitles.size() == 1) {
 			return bookTitles.getFirst() + " 1건";
-		}else{
+		} else {
 			String firstBook = bookTitles.getFirst();
 			int bookListCount = bookTitles.size() - 1;
 			return firstBook + " 외 " + bookListCount + "건";
@@ -405,7 +417,7 @@ public class OrderServiceImpl implements OrderService{
 
 	/**
 	 * 	배송비 정책 조회
- 	 */
+	 */
 	private ShippingPolicy getShippingPolicy(int orderTotalPrice) {
 		return shippingPolicyRepository.findClosedShippingPolicy(orderTotalPrice);
 	}
