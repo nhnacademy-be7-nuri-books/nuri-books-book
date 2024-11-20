@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.coupon.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.Builder;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
@@ -19,7 +20,8 @@ public record CouponResponse(
 	LocalDate createdAt,
 	LocalDate expiredAt,
 	int period,
-	ExpirationType expirationType
+	ExpirationType expirationType,
+	LocalDateTime expireDate
 ) {
 	public static CouponResponse of(Coupon coupon) {
 		return CouponResponse.builder()
@@ -33,6 +35,7 @@ public record CouponResponse(
 			.expiredAt(coupon.getExpiredAt())
 			.expirationType(coupon.getExpirationType())
 			.period(coupon.getPeriod())
+			.expireDate(coupon.getExpireDate())
 			.build();
 	}
 }
