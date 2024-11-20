@@ -1,18 +1,22 @@
 package shop.nuribooks.books.payment.payment.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.exception.order.OrderNotFoundException;
+import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
@@ -41,10 +45,11 @@ public class PaymentServiceImpl implements PaymentService{
 	 * @return 성공/실패 메시지
 	 */
 	@Override
-	public ResponseMessage DonePayment(PaymentSuccessRequest paymentSuccessRequest) {
+	@Transactional
+	public ResponseMessage donePayment(PaymentSuccessRequest paymentSuccessRequest) {
 
 		String tossOrderId = paymentSuccessRequest.orderId();
-		Long orderId = Long.parseLong(tossOrderId.substring(17));
+		Long orderId = Long.parseLong(tossOrderId.substring(10));
 		Order order = orderRepository.findById(orderId).orElseThrow(
 			() -> new OrderNotFoundException("해당되는 주문을 찾을 수 없습니다.")
 		);
@@ -56,8 +61,8 @@ public class PaymentServiceImpl implements PaymentService{
 			.paymentMethod(PaymentMethod.fromKoreanName(paymentSuccessRequest.method()))
 			.paymentState(PaymentState.valueOf(paymentSuccessRequest.status()))
 			.unitPrice(BigDecimal.valueOf(paymentSuccessRequest.totalAmount()))
-			.requestedAt(paymentSuccessRequest.requestedAt().toLocalDateTime())
-			.approvedAt(paymentSuccessRequest.approvedAt().toLocalDateTime())
+			.requestedAt(paymentSuccessRequest.requestedAt())
+			.approvedAt(paymentSuccessRequest.approvedAt())
 			.build();
 
 		paymentRepository.save(payment);
@@ -77,9 +82,8 @@ public class PaymentServiceImpl implements PaymentService{
 
 		orderDetailRepository.saveAll(orderDetailList);
 
-		// todo : 포인트 내역, 쿠폰 사용
+		// todo : 포인트 내역, 쿠폰 사용, 사용자 총 결제 금액 및 변동되는 등급 확인
 
-
-		return null;
+		return ResponseMessage.builder().message("성공").statusCode(201).build();
 	}
 }
