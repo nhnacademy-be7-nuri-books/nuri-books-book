@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
@@ -56,13 +55,10 @@ public class ReviewServiceImpl implements ReviewService {
 		Member member = this.memberRepository.findById(ownerId)
 			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 유저입니다."));
 
-		Book book = this.bookRepository.findById(reviewRequest.bookId())
-			.orElseThrow(BookIdNotFoundException::new);
-
 		OrderDetail orderDetail = this.orderDetailRepository.findById(reviewRequest.orderDetailId())
 			.orElseThrow(OrderDetailNotFoundException::new);
 
-		Review review = reviewRequest.toEntity(member, book, orderDetail);
+		Review review = reviewRequest.toEntity(member, orderDetail);
 		Review result = this.reviewRepository.save(review);
 
 		return ReviewMemberResponse.of(result);

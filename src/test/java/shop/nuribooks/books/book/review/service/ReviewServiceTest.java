@@ -82,7 +82,6 @@ public class ReviewServiceTest {
 			"title",
 			"content",
 			4,
-			book.getId(),
 			orderDetail.getId(),
 			List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
 		);
@@ -108,18 +107,8 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void registerBookNotFound() {
-		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-		when(bookRepository.findById(anyLong())).thenReturn(Optional.empty());
-		MemberIdContext.setMemberId(member.getId());
-		assertThrows(BookIdNotFoundException.class,
-			() -> reviewService.registerReview(reviewRequest));
-	}
-
-	@Test
 	public void registerOrderDetailNotFound() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(orderDetailRepository.findById(anyLong())).thenReturn(Optional.empty());
 		MemberIdContext.setMemberId(member.getId());
 		assertThrows(OrderDetailNotFoundException.class,
@@ -129,7 +118,6 @@ public class ReviewServiceTest {
 	@Test
 	public void registerSuccess() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(reviewRepository.save(any())).thenReturn(review);
 		when(orderDetailRepository.findById(anyLong())).thenReturn(Optional.of(orderDetail));
 		MemberIdContext.setMemberId(member.getId());

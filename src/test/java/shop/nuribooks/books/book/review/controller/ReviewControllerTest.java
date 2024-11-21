@@ -37,7 +37,6 @@ public class ReviewControllerTest extends ControllerTestSupport {
 			"contentcontent",
 			4,
 			1L,
-			1L,
 			List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
 		);
 
@@ -111,7 +110,6 @@ public class ReviewControllerTest extends ControllerTestSupport {
 			"title",
 			"contentnew",
 			4,
-			1L,
 			1L,
 			List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
 		);

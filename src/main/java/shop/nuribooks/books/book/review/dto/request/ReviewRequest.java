@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.entity.ReviewImage;
 import shop.nuribooks.books.member.member.entity.Member;
@@ -27,22 +26,19 @@ public record ReviewRequest(
 	@Max(value = 5, message = "별점은 5점 이하여야 합니다.")
 	int score,
 
-	@NotNull(message = "도서 id가 필요합니다.")
-	long bookId,
-
 	@NotNull(message = "주문 상세 id가 필요합니다.")
 	long orderDetailId,
 
 	@Size(max = 10)
 	List<String> reviewImages
 ) {
-	public Review toEntity(Member member, Book book, OrderDetail orderDetail) {
+	public Review toEntity(Member member, OrderDetail orderDetail) {
 		Review review = Review.builder()
 			.title(this.title)
 			.content(this.content)
 			.score(this.score)
 			.member(member)
-			.book(book)
+			.book(orderDetail.getBook())
 			.orderDetail(orderDetail)
 			.build();
 
