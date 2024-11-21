@@ -10,11 +10,6 @@ public enum AuthorityType {
 
 	ADMIN, MEMBER, SELLER;
 
-	@JsonValue
-	public String getValue() {
-		return name();
-	}
-
 	@JsonCreator
 	public static AuthorityType fromValue(String value) {
 
@@ -27,4 +22,10 @@ public enum AuthorityType {
 			.findFirst()
 			.orElse(null);
 	}
+
+	@JsonValue
+	public String getValue() {
+		return name();
+	}
 }
+

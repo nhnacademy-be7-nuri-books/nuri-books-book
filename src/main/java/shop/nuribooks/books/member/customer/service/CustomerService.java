@@ -10,5 +10,3 @@ public interface CustomerService {
 
 	CustomerRegisterResponse registerCustomer(CustomerRegisterRequest request);
 }
-
-
