@@ -1,15 +1,10 @@
 package shop.nuribooks.books.member.address.controller;
 
-import static java.math.BigDecimal.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static shop.nuribooks.books.member.member.entity.AuthorityType.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.hamcrest.Matchers;
@@ -25,19 +20,13 @@ import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.member.address.dto.requset.AddressEditRequest;
 import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
-import shop.nuribooks.books.member.customer.entity.Customer;
-import shop.nuribooks.books.member.grade.entity.Grade;
-import shop.nuribooks.books.member.member.entity.GenderType;
-import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.member.member.entity.StatusType;
 
 class AddressControllerTest extends ControllerTestSupport {
 
 	@Autowired
-	private MockMvc mockMvc;
-
-	@Autowired
 	ObjectMapper objectMapper;
+	@Autowired
+	private MockMvc mockMvc;
 
 	@DisplayName("회원의 주소를 등록한다.")
 	@Test
@@ -143,7 +132,6 @@ class AddressControllerTest extends ControllerTestSupport {
 			.zipcode("1234")
 			.address("장말로")
 			.detailAddress("103호")
-			.isDefault(false)
 			.build();
 
 		when(addressService.modifyAddress(1L, addressEditRequest)).thenReturn(addressResponse);
@@ -155,6 +143,5 @@ class AddressControllerTest extends ControllerTestSupport {
 			)
 			.andExpect(status().isOk());
 	}
-
 
 }

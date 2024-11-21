@@ -141,7 +141,6 @@ class AddressServiceTest {
 			.name("test")
 			.address("장말로")
 			.detailAddress("103호")
-			.isDefault(false)
 			.build();
 		// when
 		addressService.modifyAddress(saved.getId(), addressEditRequest);
