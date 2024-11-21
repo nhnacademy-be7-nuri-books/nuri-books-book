@@ -12,6 +12,7 @@ import shop.nuribooks.books.book.book.dto.AladinBookListResponse;
 import shop.nuribooks.books.book.book.service.AladinBookService;
 import shop.nuribooks.books.book.client.AladinFeignClient;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
+import shop.nuribooks.books.exception.book.AladinApiException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class AladinBookServiceImpl implements AladinBookService {
 			return response.item();
 		} catch (Exception ex) {
 			log.error("Error: ", ex);
-			throw new RuntimeException("Failed to retrieve new books from Aladin");
+			throw new AladinApiException();
 		}
 	}
 
