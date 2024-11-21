@@ -3,8 +3,6 @@ package shop.nuribooks.books.book.review.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -30,14 +28,18 @@ import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
+import shop.nuribooks.books.common.TestUtils;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.order.detail.OrderDetailNotFoundException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
+import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderDetail.repository.OrderDetailRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class ReviewServiceTest {
@@ -51,46 +53,36 @@ public class ReviewServiceTest {
 	private ReviewRepository reviewRepository;
 	@Mock
 	private ReviewImageRepository reviewImageRepository;
+	@Mock
+	private OrderDetailRepository orderDetailRepository;
 
 	private Book book;
 	private Member member;
 	private Review review;
 	private ReviewRequest reviewRequest;
 	private ReviewImageResponse reviewImageResponse;
+	private OrderDetail orderDetail;
 
 	@BeforeEach
 	public void setUp() {
-		this.book = Book.builder()
-			.title("Original Book Title")
-			.thumbnailImageUrl("original_thumbnail.jpg")
-			.detailImageUrl("original_detail.jpg")
-			.publicationDate(LocalDate.now())
-			.price(BigDecimal.valueOf(20000))
-			.discountRate(10)
-			.description("Original Description")
-			.contents("Original Contents")
-			.isbn("1234567890123")
-			.isPackageable(true)
-			.stock(100)
-			.likeCount(0)
-			.viewCount(0L)
-			.build();
+		this.book = TestUtils.createBook(TestUtils.createPublisher());
 
-		ReflectionTestUtils.setField(book, "id", 1L);
+		TestUtils.setIdForEntity(book, 1L);
+
+		this.orderDetail = TestUtils.orderDetail();
+		TestUtils.setIdForEntity(orderDetail, 1l);
 
 		reviewRequest = new ReviewRequest(
 			"title",
 			"content",
 			4,
 			book.getId(),
+			orderDetail.getId(),
 			List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
 		);
 
-		member = Member.builder()
-			.username("nuribooks95")
-			.birthday(LocalDate.of(1988, 8, 12))
-			.build();
-		ReflectionTestUtils.setField(member, "id", 1L);
+		member = TestUtils.createMember(TestUtils.createCustomer(), TestUtils.creategrade());
+		TestUtils.setIdForEntity(member, 1L);
 
 		review = Review.builder()
 			.title("title")
@@ -98,6 +90,7 @@ public class ReviewServiceTest {
 			.score(4)
 			.member(member)
 			.book(book)
+			.orderDetail(orderDetail)
 			.build();
 		ReflectionTestUtils.setField(review, "id", 1L);
 		reviewImageResponse = ReviewImageResponse.builder().id(1L).imageUrl("good").build();
@@ -121,10 +114,21 @@ public class ReviewServiceTest {
 	}
 
 	@Test
+	public void registerOrderDetailNotFound() {
+		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
+		when(orderDetailRepository.findById(anyLong())).thenReturn(Optional.empty());
+		MemberIdContext.setMemberId(member.getId());
+		assertThrows(OrderDetailNotFoundException.class,
+			() -> reviewService.registerReview(reviewRequest));
+	}
+
+	@Test
 	public void registerSuccess() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(reviewRepository.save(any())).thenReturn(review);
+		when(orderDetailRepository.findById(anyLong())).thenReturn(Optional.of(orderDetail));
 		MemberIdContext.setMemberId(member.getId());
 		assertEquals(ReviewMemberResponse.of(review),
 			reviewService.registerReview(reviewRequest));

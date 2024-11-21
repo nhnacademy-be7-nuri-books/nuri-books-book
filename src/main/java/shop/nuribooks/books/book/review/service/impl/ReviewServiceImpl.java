@@ -27,9 +27,12 @@ import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.order.detail.OrderDetailNotFoundException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
+import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderDetail.repository.OrderDetailRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +41,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final BookRepository bookRepository;
 	private final ReviewRepository reviewRepository;
 	private final ReviewImageRepository reviewImageRepository;
+	private final OrderDetailRepository orderDetailRepository;
 
 	/**
 	 * 리뷰 등록. 리뷰 이미지도 함께 등록합니다.
@@ -51,10 +55,14 @@ public class ReviewServiceImpl implements ReviewService {
 
 		Member member = this.memberRepository.findById(ownerId)
 			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 유저입니다."));
+		
 		Book book = this.bookRepository.findById(reviewRequest.bookId())
 			.orElseThrow(() -> new BookIdNotFoundException());
 
-		Review review = reviewRequest.toEntity(member, book);
+		OrderDetail orderDetail = this.orderDetailRepository.findById(reviewRequest.orderDetailId())
+			.orElseThrow(() -> new OrderDetailNotFoundException());
+
+		Review review = reviewRequest.toEntity(member, book, orderDetail);
 		Review result = this.reviewRepository.save(review);
 
 		return ReviewMemberResponse.of(result);
@@ -158,7 +166,8 @@ public class ReviewServiceImpl implements ReviewService {
 		}
 		prevReview.updated();
 
-		Review newReview = reviewRequest.toEntity(prevReview.getMember(), prevReview.getBook());
+		Review newReview = reviewRequest.toEntity(prevReview.getMember(), prevReview.getBook(),
+			prevReview.getOrderDetail());
 		Review result = reviewRepository.save(newReview);
 		return ReviewMemberResponse.of(result);
 	}

@@ -11,6 +11,7 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.entity.ReviewImage;
 import shop.nuribooks.books.member.member.entity.Member;
+import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
 
 public record ReviewRequest(
 	@NotBlank(message = "리뷰 제목은 필수입니다.")
@@ -29,20 +30,20 @@ public record ReviewRequest(
 	@NotNull(message = "도서 id가 필요합니다.")
 	long bookId,
 
-	// @NotNull(message = "주문 상세 id가 필요합니다.")
-	// long orderDetailId,
+	@NotNull(message = "주문 상세 id가 필요합니다.")
+	long orderDetailId,
 
 	@Size(max = 10)
 	List<String> reviewImages
 ) {
-	public Review toEntity(Member member, Book book /* , OrderDetail orderDetail */) {
+	public Review toEntity(Member member, Book book, OrderDetail orderDetail) {
 		Review review = Review.builder()
 			.title(this.title)
 			.content(this.content)
 			.score(this.score)
 			.member(member)
 			.book(book)
-			// .orderDetail(orderDetail)
+			.orderDetail(orderDetail)
 			.build();
 
 		for (String image : reviewImages) {

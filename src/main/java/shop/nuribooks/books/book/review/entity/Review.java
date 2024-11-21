@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -26,6 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.member.member.entity.Member;
+import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
 
 @Entity
 @NoArgsConstructor
@@ -65,20 +67,23 @@ public class Review {
 	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
 
-	// TODO:: 상세 주문 필드 추가
+	@OneToOne
+	@JoinColumn(name = "order_detail_id", nullable = false)
+	private OrderDetail orderDetail;
 
 	// 조회 시 사용될듯?
 	@OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
 	private List<ReviewImage> reviewImages;
 
 	@Builder
-	private Review(String title, String content, int score, Member member, Book book) {
+	private Review(String title, String content, int score, Member member, Book book, OrderDetail orderDetail) {
 		this.title = title;
 		this.content = content;
 		this.score = score;
 		this.createdAt = LocalDateTime.now();
 		this.member = member;
 		this.book = book;
+		this.orderDetail = orderDetail;
 		this.reviewImages = new LinkedList<>();
 	}
 

@@ -19,6 +19,9 @@ import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusType;
+import shop.nuribooks.books.order.order.entity.Order;
+import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderDetail.entity.OrderState;
 
 public class TestUtils {
 	public static void setIdForEntity(Object entity, Long id) {
@@ -138,6 +141,27 @@ public class TestUtils {
 		return BookCategory.builder()
 			.book(book)
 			.category(category)
+			.build();
+	}
+
+	public static Order createOrder() {
+		return Order.builder()
+			.customer(createCustomer())
+			.expectedDeliveryAt(LocalDate.of(2024, 07, 01))
+			.orderedAt(LocalDateTime.of(2024, 06, 01, 12, 0))
+			.paymentPrice(BigDecimal.valueOf(50000))
+			.wrappingPrice(BigDecimal.valueOf(3000))
+			.build();
+	}
+
+	public static OrderDetail orderDetail() {
+		return OrderDetail.builder()
+			.book(createBook(createPublisher()))
+			.count(5)
+			.isWrapped(false)
+			.order(createOrder())
+			.orderState(OrderState.PENDING)
+			.unitPrice(BigDecimal.valueOf(10000))
 			.build();
 	}
 }
