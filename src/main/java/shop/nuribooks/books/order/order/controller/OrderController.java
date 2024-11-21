@@ -5,6 +5,8 @@ import static shop.nuribooks.books.cart.entity.RedisCartKey.*;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +22,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
+import shop.nuribooks.books.order.order.dto.OrderListPeriodRequest;
+import shop.nuribooks.books.order.order.dto.OrderListResponse;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
 import shop.nuribooks.books.order.order.service.OrderService;
@@ -66,7 +72,12 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
-	// 장바구니 주문 정보 가져오기
+	/**
+	 * 장바구니 주문 폼 정보 가져오기
+	 *
+	 * @param requestCartId 장바구니 아이디
+	 * @return OrderInformationResponse
+	 */
 	@Operation(summary = "장바구니 주문 폼 정보", description = "장바구니에 담긴 상품들에 대해 주문 정보를 가져옵니다.")
 	@ApiResponse(responseCode = "200", description = "주문 정보 조회 성공")
 	@ApiResponse(responseCode = "400", description = "잘못된 요청")
@@ -127,6 +138,26 @@ public class OrderController {
 		ResponseMessage responseMessage = orderService.verifyOrderInformation(paymentRequest);
 
 		return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+	}
+
+	/**
+	 * 주문 목록 조회
+	 *
+	 * @return 주문 목록
+	 */
+	@HasRole(role = AuthorityType.MEMBER)
+	@GetMapping
+	public ResponseEntity<Page<OrderListResponse>> getOrderList(
+		OrderListPeriodRequest orderListPeriodRequest,
+		boolean includeOrdersInPendingStatus,
+		Pageable pageable) {
+
+		Optional<Long> userId = Optional.ofNullable(MemberIdContext.getMemberId());
+
+		Page<OrderListResponse> result = orderService.getOrderList(includeOrdersInPendingStatus, pageable,
+			orderListPeriodRequest, userId);
+
+		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
 }

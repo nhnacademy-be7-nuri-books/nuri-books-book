@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +25,6 @@ import shop.nuribooks.books.book.point.dto.request.register.OrderUsingPointReque
 import shop.nuribooks.books.book.point.entity.PointPolicy;
 import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
-import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
 import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.entity.RedisCartKey;
@@ -46,6 +48,9 @@ import shop.nuribooks.books.member.member.dto.MemberPointDTO;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
+import shop.nuribooks.books.order.order.dto.OrderListPeriodRequest;
+import shop.nuribooks.books.order.order.dto.OrderListResponse;
+import shop.nuribooks.books.order.order.dto.OrderPageResponse;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
 import shop.nuribooks.books.order.order.entity.Order;
@@ -75,7 +80,6 @@ public class OrderServiceImpl implements OrderService {
 
 	private final OrderDetailService orderDetailService;
 	private final ShippingService shippingService;
-	private final PointHistoryRepository pointHistoryRepository;
 	private final PointHistoryService pointHistoryService;
 
 	/**
@@ -108,6 +112,8 @@ public class OrderServiceImpl implements OrderService {
 
 		// 포인트 가져오기
 		Optional<MemberPointDTO> point = memberRepository.findPointById(id);
+
+		// todo: 포장
 
 		// todo : 쿠폰
 
@@ -302,6 +308,25 @@ public class OrderServiceImpl implements OrderService {
 			.statusCode(200)
 			.message("토스 페이먼츠 검증 완료")
 			.build();
+	}
+
+	@Override
+	public Page<OrderListResponse> getOrderList(
+		boolean includeOrdersInPendingStatus,
+		Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest,
+		Optional<Long> userId) {
+
+		OrderPageResponse result = null;
+		if (userId.isPresent()) {
+			result = orderRepository.findOrders(includeOrdersInPendingStatus, userId.get(),
+				pageable, orderListPeriodRequest);
+		}
+
+		Page<OrderListResponse> response =
+			new PageImpl(result.orders(), pageable, result.totalCount());
+
+		return response;
 	}
 
 	// -------------- private
