@@ -29,9 +29,11 @@ public class MemberCouponRepositoryCustomImpl implements MemberCouponRepositoryC
 		QMemberCoupon memberCoupon = QMemberCoupon.memberCoupon;
 
 		return queryFactory.select(Projections.constructor(MemberCouponResponse.class,
-				memberCoupon.id,
-				memberCoupon.coupon.id,
-				memberCoupon.member.id,
+				memberCoupon.coupon.name,
+				memberCoupon.coupon.policyType,
+				memberCoupon.coupon.discount,
+				memberCoupon.coupon.minimumOrderPrice,
+				memberCoupon.coupon.maximumDiscountPrice,
 				memberCoupon.isUsed,
 				memberCoupon.createdAt,
 				memberCoupon.expiredAt
@@ -47,9 +49,11 @@ public class MemberCouponRepositoryCustomImpl implements MemberCouponRepositoryC
 			.select(
 				Projections.constructor(
 					MemberCouponResponse.class,
-					memberCoupon.id,
-					memberCoupon.coupon.id,
-					memberCoupon.member.id,
+					memberCoupon.coupon.name,
+					memberCoupon.coupon.policyType,
+					memberCoupon.coupon.discount,
+					memberCoupon.coupon.minimumOrderPrice,
+					memberCoupon.coupon.maximumDiscountPrice,
 					memberCoupon.isUsed,
 					memberCoupon.createdAt,
 					memberCoupon.expiredAt
@@ -81,9 +85,11 @@ public class MemberCouponRepositoryCustomImpl implements MemberCouponRepositoryC
 			.select(
 				Projections.constructor(
 					MemberCouponResponse.class,
-					memberCoupon.id,
-					memberCoupon.coupon.id,
-					memberCoupon.member.id,
+					memberCoupon.coupon.name,
+					memberCoupon.coupon.policyType,
+					memberCoupon.coupon.discount,
+					memberCoupon.coupon.minimumOrderPrice,
+					memberCoupon.coupon.maximumDiscountPrice,
 					memberCoupon.isUsed,
 					memberCoupon.createdAt,
 					memberCoupon.expiredAt
