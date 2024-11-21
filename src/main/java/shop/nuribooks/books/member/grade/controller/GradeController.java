@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
@@ -120,3 +119,4 @@ public class GradeController {
 		return ResponseEntity.status(OK).body(response);
 	}
 }
+

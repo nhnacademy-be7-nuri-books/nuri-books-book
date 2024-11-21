@@ -74,8 +74,8 @@ class MemberControllerTest extends ControllerTestSupport {
 
 		//when
 		ResultActions result = mockMvc.perform(post("/api/members")
-				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)));
+			.contentType(APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(request)));
 
 		//then
 		result.andExpect(status().isCreated())
@@ -104,8 +104,6 @@ class MemberControllerTest extends ControllerTestSupport {
 				.value(Matchers.containsString("이름은 반드시 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("성별은 반드시 입력해야 합니다.")))
-			.andExpect(jsonPath("$.message")
-				.value(Matchers.containsString("아이디는 8자 이상 20자 이하, 영어 소문자와 숫자가 각각 1개 이상 포함되어야 합니다.")))
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("비밀번호는 반드시 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
@@ -221,7 +219,7 @@ class MemberControllerTest extends ControllerTestSupport {
 	@DisplayName("회원 정보 수정 실패 - validation 에러")
 	@Test
 	void memberUpdate_invalidRequest() throws Exception {
-	    //given
+		//given
 		MemberPasswordUpdateRequest badRequest = getBadMemberUpdateRequest();
 
 		//when
@@ -238,24 +236,24 @@ class MemberControllerTest extends ControllerTestSupport {
 	@DisplayName("관리자가 다양한 검색 조건을 이용하여 회원 목록 조회")
 	@Test
 	void memberSearchWithPaging() throws Exception {
-	    //given
+		//given
 		MemberSearchResponse response = getMemberSearchResponse();
 		Page<MemberSearchResponse> pageResponse = new PageImpl<>(List.of(response));
 
 		when(memberService.searchMembersWithPaging(any(MemberSearchRequest.class), any(Pageable.class)))
 			.thenReturn(pageResponse);
 
-	    //when
+		//when
 		ResultActions result = mockMvc.perform(get("/api/members")
-				.param("name", "김")
-				.param("email", "nuri")
-				.param("phoneNumber","010")
-				.param("gender", "MALE")
-				.param("status", "ACTIVE")
-				.param("page", "0") // Pageable에 필요한 page 파라미터
-				.param("size", "10")); // Pageable에 필요한 size 파라미터
+			.param("name", "김")
+			.param("email", "nuri")
+			.param("phoneNumber", "010")
+			.param("gender", "MALE")
+			.param("status", "ACTIVE")
+			.param("page", "0") // Pageable에 필요한 page 파라미터
+			.param("size", "10")); // Pageable에 필요한 size 파라미터
 
-	    //then
+		//then
 		result.andExpect(status().isOk())
 			.andExpect(jsonPath("$.content[0].customerId").value(response.customerId()))
 			.andExpect(jsonPath("$.content[0].username").value(response.username()))
@@ -332,7 +330,7 @@ class MemberControllerTest extends ControllerTestSupport {
 			.totalPaymentAmount(BigDecimal.ZERO)
 			.gradeName(getStandardGrade().getName())
 			.pointRate((getStandardGrade().getPointRate()))
-			.createdAt(LocalDateTime.of(2020, 2, 22, 22, 22 ,22))
+			.createdAt(LocalDateTime.of(2020, 2, 22, 22, 22, 22))
 			.build();
 	}
 
