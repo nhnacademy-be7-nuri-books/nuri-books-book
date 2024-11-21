@@ -26,3 +26,4 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
 	Optional<MemberPointDTO> findPointById(Long id);
 }
+

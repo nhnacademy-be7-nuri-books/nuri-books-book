@@ -4,13 +4,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
 import shop.nuribooks.books.member.customer.dto.DtoMapper;
 import shop.nuribooks.books.member.customer.dto.EntityMapper;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
-import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 
 /**
@@ -49,3 +49,4 @@ public class CustomerServiceImpl implements CustomerService {
 		return DtoMapper.toRegisterDto(savedCustomer);
 	}
 }
+

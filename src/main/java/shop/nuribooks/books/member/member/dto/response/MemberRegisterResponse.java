@@ -10,7 +10,7 @@ import lombok.Builder;
 import shop.nuribooks.books.member.member.entity.GenderType;
 
 @Builder
-public record MemberRegisterResponse (
+public record MemberRegisterResponse(
 
 	String name,
 	GenderType gender,
@@ -20,4 +20,6 @@ public record MemberRegisterResponse (
 
 	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	LocalDate birthday
-) {}
+) {
+}
+

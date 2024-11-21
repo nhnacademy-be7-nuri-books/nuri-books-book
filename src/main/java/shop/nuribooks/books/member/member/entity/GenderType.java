@@ -10,11 +10,6 @@ public enum GenderType {
 
 	MALE, FEMALE, OTHER;
 
-	@JsonValue
-	public String getValue() {
-		return name();
-	}
-
 	@JsonCreator
 	public static GenderType fromValue(String value) {
 
@@ -27,4 +22,10 @@ public enum GenderType {
 			.findFirst()
 			.orElse(null);
 	}
+
+	@JsonValue
+	public String getValue() {
+		return name();
+	}
 }
+

@@ -13,3 +13,4 @@ public interface MemberRepositoryCustom {
 
 	Page<MemberSearchResponse> searchMembersWithPaging(MemberSearchRequest request, Pageable pageable);
 }
+

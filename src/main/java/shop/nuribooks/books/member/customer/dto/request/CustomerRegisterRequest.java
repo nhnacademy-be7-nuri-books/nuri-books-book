@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
-public record CustomerRegisterRequest (
+public record CustomerRegisterRequest(
 
 	@NotBlank(message = "이름은 반드시 입력해야 합니다.")
 	@Size(min = 2, max = 30, message = "이름은 반드시 2자 이상 30자 이하로 입력해야 합니다.")
@@ -25,4 +25,6 @@ public record CustomerRegisterRequest (
 		message = "유효한 이메일 형식으로 입력해야 합니다.")
 	@Size(max = 30, message = "이메일은 30자 이내로 입력해야 합니다.")
 	String email
-) {}
+) {
+}
+

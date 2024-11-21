@@ -8,4 +8,5 @@ public record MemberPasswordUpdateRequest(
 
 	@NotBlank(message = "비밀번호는 반드시 입력해야 합니다.")
 	String password
-) {}
+) {
+}
