@@ -1,5 +1,7 @@
 package shop.nuribooks.books.order.orderDetail.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -7,10 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.order.NoStockAvailableException;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.orderDetail.dto.OrderDetailRequest;
 import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderDetail.entity.OrderState;
+import shop.nuribooks.books.order.orderDetail.repository.OrderDetailCustomRepository;
 import shop.nuribooks.books.order.orderDetail.repository.OrderDetailRepository;
 
 @Service
@@ -31,10 +35,8 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		// todo : 재고 확인 (동시성 고려) - RabbitMQ
 		if(orderDetailRequest.count() > book.getStock()){
 			// 예외 처리
-
+			throw new NoStockAvailableException();
 		}
-
-		// todo : 재고 차감은 최종 결제 시에 재고 확인하고 처리
 
 		// 주문 상세 추가
 		OrderDetail orderDetail = OrderDetail.builder()
@@ -53,5 +55,30 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	public String getBookTitle(Long bookId) {
 		return bookRepository.findById(bookId)
 			.map(Book::getTitle).orElse("정보 없음");
+	}
+
+	/**
+	 * 주문 상세 중 하나라도 재고가 없는 지 확인
+	 *
+	 * @param order 주문 정보
+	 * @return 재고 여부
+	 */
+	@Override
+	public boolean checkStock(Order order) {
+
+		List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(order.getId());
+
+		boolean availableStock = true;
+
+		for (OrderDetail orderDetail : orderDetailList){
+			Book book = orderDetail.getBook();
+
+			// 재고 확인
+			if(orderDetail.getCount() > book.getStock()){
+				availableStock = false;
+			}
+		}
+
+		return availableStock;
 	}
 }

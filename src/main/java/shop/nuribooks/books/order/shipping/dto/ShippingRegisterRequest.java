@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record ShippingRegisterRequest(
 	@NotNull(message = "배송 정책은 필수입니다.")
-	ShippingPolicyRequest shippingPolicy,
+	Long shippingPolicyId,
 
 	@NotBlank(message = "받는 사람 이름은 필수 입니다.")
 	String recipientName,

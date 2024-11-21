@@ -11,4 +11,6 @@ public record GradeDetailsResponse(
 	String name,
 	Integer pointRate,
 	BigDecimal requirement
-) {}
+) {
+}
+

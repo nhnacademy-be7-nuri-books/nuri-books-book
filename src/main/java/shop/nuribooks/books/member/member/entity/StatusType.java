@@ -10,11 +10,6 @@ public enum StatusType {
 
 	ACTIVE, INACTIVE, WITHDRAWN;
 
-	@JsonValue
-	public String getValue() {
-		return name();
-	}
-
 	@JsonCreator
 	public static StatusType fromValue(String value) {
 
@@ -27,4 +22,10 @@ public enum StatusType {
 			.findFirst()
 			.orElse(null);
 	}
+
+	@JsonValue
+	public String getValue() {
+		return name();
+	}
 }
+

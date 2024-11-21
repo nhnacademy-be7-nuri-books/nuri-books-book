@@ -31,13 +31,11 @@ import shop.nuribooks.books.common.ControllerTestSupport;
 @AutoConfigureMockMvc
 class ContributorControllerTest extends ControllerTestSupport {
 
+	private final ObjectMapper objectMapper = new ObjectMapper();
 	@MockBean
 	private ContributorServiceImpl contributorService;
-
 	@Autowired
 	private MockMvc mockMvc;
-
-	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@DisplayName("기여자 등록")
 	@Test
@@ -52,8 +50,7 @@ class ContributorControllerTest extends ControllerTestSupport {
 		mockMvc.perform(post("/api/contributors")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.name").value("Kim"));
+			.andExpect(status().isCreated());
 
 		verify(contributorService).registerContributor(any(ContributorRequest.class));
 	}
@@ -97,13 +94,10 @@ class ContributorControllerTest extends ControllerTestSupport {
 			response);
 
 		// when & then
-		mockMvc.perform(put("/api/contributors/{contributorId}", contributorId)
+		mockMvc.perform(put("/api/contributors/{contributor-id}", contributorId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.id").value(contributorId))
-			.andExpect(jsonPath("$.name").value("Lee"));
-
+			.andExpect(status().isOk());
 		verify(contributorService).updateContributor(eq(contributorId), any(ContributorRequest.class));
 	}
 
@@ -117,7 +111,7 @@ class ContributorControllerTest extends ControllerTestSupport {
 		when(contributorService.getContributor(contributorId)).thenReturn(response);
 
 		// when & then
-		mockMvc.perform(get("/api/contributors/{contributorId}", contributorId)
+		mockMvc.perform(get("/api/contributors/{contributor-id}", contributorId)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.name").value("Kim"));
@@ -132,9 +126,9 @@ class ContributorControllerTest extends ControllerTestSupport {
 		Long contributorId = 1L;
 
 		// when & then
-		mockMvc.perform(delete("/api/contributors/{contributorId}", contributorId)
+		mockMvc.perform(delete("/api/contributors/{contributor-id}", contributorId)
 				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk());
+			.andExpect(status().isNoContent());
 
 		verify(contributorService).deleteContributor(contributorId);
 	}

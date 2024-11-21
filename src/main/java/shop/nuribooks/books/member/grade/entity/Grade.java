@@ -8,6 +8,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "grades")
 public class Grade {
 
 	@Id
@@ -28,7 +30,7 @@ public class Grade {
 	private Integer id;
 
 	/**
-	 * STANDARD, SILVER, GOLD, PLATINUM, ROYAL
+	 * STANDARD, ROYAL, GOLD, PLATINUM
 	 */
 	@NotBlank
 	@Column(unique = true)

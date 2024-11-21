@@ -1,13 +1,7 @@
 package shop.nuribooks.books.common.filter;
 
-import static java.math.BigDecimal.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static shop.nuribooks.books.member.member.entity.AuthorityType.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,15 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import shop.nuribooks.books.common.TestUtils;
 import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
 import shop.nuribooks.books.member.address.service.AddressServiceImpl;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
-import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @SpringBootTest
@@ -57,13 +50,13 @@ public class ThreadLocalTest {
 	@Transactional
 	void registerAddress() throws Exception {
 		// given
-		Grade creategrade = creategrade();
+		Grade creategrade = TestUtils.creategrade();
 		Grade savedGrade = gradeRepository.save(creategrade);
 
-		Customer customer = createCustomer();
+		Customer customer = TestUtils.createCustomer();
 		Customer savedCustomer = customerRepository.save(customer);
 
-		Member member = createMember(savedCustomer, savedGrade);
+		Member member = TestUtils.createMember(savedCustomer, savedGrade);
 		Member saved = memberRepository.save(member);
 
 		AddressRegisterRequest request = AddressRegisterRequest.builder()
@@ -84,38 +77,4 @@ public class ThreadLocalTest {
 		// then
 	}
 
-	private Member createMember(Customer customer, Grade grade) {
-		return Member.builder()
-			.customer(customer)
-			.authority(MEMBER)
-			.grade(grade)
-			.gender(GenderType.MALE)
-			.username("nuriaaaaaa")
-			.status(StatusType.ACTIVE)
-			.birthday(LocalDate.of(1988, 8, 12))
-			.createdAt(LocalDateTime.now())
-			.point(ZERO)
-			.totalPaymentAmount(ZERO)
-			.latestLoginAt(null)
-			.withdrawnAt(null)
-			.build();
-	}
-
-	private Customer createCustomer() {
-		return Customer.builder()
-			.id(1L)
-			.name("name")
-			.password("password")
-			.phoneNumber("042-8282-8282")
-			.email("nhnacademy@nuriBooks.com")
-			.build();
-	}
-
-	private Grade creategrade() {
-		return Grade.builder()
-			.name("STANDARD")
-			.pointRate(3)
-			.requirement(BigDecimal.valueOf(100_000))
-			.build();
-	}
 }

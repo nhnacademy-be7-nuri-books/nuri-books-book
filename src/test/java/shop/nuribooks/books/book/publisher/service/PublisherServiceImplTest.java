@@ -20,9 +20,9 @@ import org.springframework.data.domain.Pageable;
 import shop.nuribooks.books.book.publisher.dto.PublisherRequest;
 import shop.nuribooks.books.book.publisher.dto.PublisherResponse;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
+import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.exception.publisher.PublisherAlreadyExistsException;
 import shop.nuribooks.books.exception.publisher.PublisherNotFoundException;
-import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 
 @SpringBootTest
 class PublisherServiceImplTest {
@@ -162,6 +162,7 @@ class PublisherServiceImplTest {
 		verify(publisherRepository).findById(publisherId);
 
 	}
+
 	@DisplayName("출판사 수정 성공")
 	@Test
 	void updatePublisher() {
@@ -195,7 +196,6 @@ class PublisherServiceImplTest {
 		assertThatThrownBy(() -> publisherService.updatePublisher(publisherId, editRequest)
 		).isInstanceOf(PublisherNotFoundException.class)
 			.hasMessage("출판사가 존재하지 않습니다.");
-
 
 	}
 

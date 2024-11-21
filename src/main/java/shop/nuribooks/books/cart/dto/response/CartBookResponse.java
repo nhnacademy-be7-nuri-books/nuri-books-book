@@ -15,6 +15,7 @@ public record CartBookResponse(
 	BigDecimal salePrice,
 	BigDecimal totalPrice,
 	String thumbnailImageUrl,
+	boolean isPackageable,
 	int quantity) {
 
 	public static CartBookResponse of(Book book, int quantity) {
@@ -29,6 +30,7 @@ public record CartBookResponse(
 			.salePrice(salePrice)
 			.totalPrice(totalPrice)
 			.thumbnailImageUrl(book.getThumbnailImageUrl())
+			.isPackageable(book.isPackageable())
 			.quantity(quantity)
 			.build();
 	}

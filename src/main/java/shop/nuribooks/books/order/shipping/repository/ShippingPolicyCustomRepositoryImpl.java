@@ -7,7 +7,7 @@ import shop.nuribooks.books.order.shipping.entity.QShippingPolicy;
 import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
 
 @RequiredArgsConstructor
-public class ShippingPolicyCustomRepositoryImpl implements ShippingPolicyCustomRepository{
+public class ShippingPolicyCustomRepositoryImpl implements ShippingPolicyCustomRepository {
 
 	private final JPAQueryFactory queryFactory;
 
@@ -31,7 +31,7 @@ public class ShippingPolicyCustomRepositoryImpl implements ShippingPolicyCustomR
 		return queryFactory.select(shippingPolicy)
 			.from(shippingPolicy)
 			.where(shippingPolicy.minimumOrderPrice.loe(cost)
-				.and(shippingPolicy.appliedDatetime.isNull()))
+				.and(shippingPolicy.expiration.isNull()))
 			.orderBy(shippingPolicy.minimumOrderPrice.subtract(cost).abs().asc())
 			.limit(1)
 			.fetchOne();

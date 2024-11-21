@@ -45,7 +45,6 @@ public class RedisCartRepositoryImpl implements RedisCartRepository {
             e.printStackTrace();
         }
         return cartItems;
-
     }
 
     @Override

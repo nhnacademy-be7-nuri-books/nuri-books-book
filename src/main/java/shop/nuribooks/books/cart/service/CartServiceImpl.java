@@ -1,5 +1,7 @@
 package shop.nuribooks.books.cart.service;
 
+import static shop.nuribooks.books.cart.entity.RedisCartKey.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,18 +20,19 @@ import shop.nuribooks.books.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
 import shop.nuribooks.books.cart.dto.response.CartBookResponse;
 import shop.nuribooks.books.cart.entity.Cart;
+import shop.nuribooks.books.cart.entity.RedisCartKey;
 import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
+import shop.nuribooks.books.exception.cart.CartNotFoundException;
+import shop.nuribooks.books.member.member.entity.Member;
+import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @RequiredArgsConstructor
 @Service
 public class CartServiceImpl implements CartService {
-    private static final String SHADOW_KEY = "shadow:";
-    private static final String MEMBER_CART_KEY = "member:";
-
     private final BookRepository bookRepository;
     private final RedisCartRepository redisCartRepository;
-    private final CartRepository dbCartRepository;
+    private final CartRepository cartRepository;
     private final CartDetailRepository cartDetailRepository;
 
     @Override
@@ -43,7 +46,7 @@ public class CartServiceImpl implements CartService {
     public void addMemberCart(String cartId, CartAddRequest request) {
         RedisCartDetail redisCartDetail = new RedisCartDetail(request.bookId().toString(), request.quantity());
         redisCartRepository.addCart(cartId, redisCartDetail);
-        redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
+        redisCartRepository.setShadowExpireKey(RedisCartKey.SHADOW_KEY.withSuffix(cartId), 1, TimeUnit.MINUTES);
     }
 
     @Override
@@ -66,13 +69,13 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void loadCart(CartLoadRequest request) {
-        Cart cart = dbCartRepository.findByMember_Id(request.userId()).orElse(null);
+        Cart cart = cartRepository.findByMember_Id(request.userId()).orElseThrow(CartNotFoundException::new);
         if (Objects.isNull(cart)) {
             return;
         }
-        String cartId = MEMBER_CART_KEY + request.userId();
+        String cartId = MEMBER_CART.withSuffix(request.userId().toString());
+        redisCartRepository.setShadowExpireKey(RedisCartKey.SHADOW_KEY.withSuffix(cartId), 1, TimeUnit.SECONDS);
         if (redisCartRepository.isExist(cartId)) {
-            redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
             return;
         }
         Optional<List<CartDetail>> allByCartId = cartDetailRepository.findAllByCart_Id(cart.getId());
@@ -84,7 +87,6 @@ public class CartServiceImpl implements CartService {
             .map(cartDetail -> new RedisCartDetail(cartDetail.getBook().getId().toString(), cartDetail.getQuantity()))
             .toList();
         redisCartRepository.saveAll(cartId, redisCartDetails);
-        redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
     }
 
     private List<CartBookResponse> convertRedisCartList(Map<Long, Integer> cart) {
@@ -98,8 +100,8 @@ public class CartServiceImpl implements CartService {
     }
 
     private void refreshExpireKey(String cartId) {
-        if (cartId.startsWith(MEMBER_CART_KEY)) {
-            redisCartRepository.setShadowExpireKey(SHADOW_KEY + cartId, 1, TimeUnit.MINUTES);
+        if (cartId.startsWith(MEMBER_CART.getKey())) {
+            redisCartRepository.setShadowExpireKey(RedisCartKey.SHADOW_KEY.withSuffix(cartId), 1, TimeUnit.MINUTES);
         }
         else {
             redisCartRepository.setExpire(cartId, 1, TimeUnit.MINUTES);

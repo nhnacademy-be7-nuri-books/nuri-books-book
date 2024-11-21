@@ -21,9 +21,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,6 +42,7 @@ import shop.nuribooks.books.member.grade.entity.Grade;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "members")
 public class Member {
 
 	@Id
@@ -62,7 +63,7 @@ public class Member {
 	private AuthorityType authority;
 
 	/**
-	 * STANDARD, SILVER, GOLD, PLATINUM, ROYAL
+	 * STANDARD, ROYAL, GOLD, PLATINUM
 	 */
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "grade_id")
@@ -85,8 +86,7 @@ public class Member {
 	private GenderType gender;
 
 	@NotBlank
-	@Size(min = 8, max = 200)
-	@Column(unique = true)
+	@Column(unique = true, length = 100)
 	private String username;
 
 	private LocalDate birthday;
@@ -111,7 +111,7 @@ public class Member {
 	 * 탈퇴 일시
 	 */
 	private LocalDateTime withdrawnAt;
-  
+
 	@OneToOne(mappedBy = "member")
 	private Cart cart;
 
@@ -129,6 +129,20 @@ public class Member {
 		this.status = WITHDRAWN;
 		this.withdrawnAt = LocalDateTime.now();
 		this.point = ZERO;
+	}
+
+	/**
+	 * 최근 로그인 시간을 업데이트
+	 */
+	public void updateLatestLoginAt() {
+		this.latestLoginAt = LocalDateTime.now();
+	}
+
+	/**
+	 * 휴면 상태를 해지하면 status를 ACTIVE로 업데이트
+	 */
+	public void reactiveMemberStatus() {
+		this.status = ACTIVE;
 	}
 
 	/**
@@ -150,5 +164,4 @@ public class Member {
 		address.setMember(this);
 		addressList.add(address);
 	}
-
 }

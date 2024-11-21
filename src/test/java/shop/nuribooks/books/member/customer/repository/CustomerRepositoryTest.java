@@ -26,7 +26,7 @@ public class CustomerRepositoryTest {
 		Customer newCustomer = Customer.builder()
 			.name("nuri")
 			.password("abc123")
-			.phoneNumber("042-8282-8282")
+			.phoneNumber("01082828282")
 			.email("nuri@nhnacademy.com")
 			.build();
 
@@ -50,7 +50,7 @@ public class CustomerRepositoryTest {
 	@Test
 	void existsByPhoneNumber() {
 		//given
-		String phoneNumber = "042-8282-8282";
+		String phoneNumber = "01082828282";
 
 		//when
 		boolean exists = customerRepository.existsByPhoneNumber(phoneNumber);

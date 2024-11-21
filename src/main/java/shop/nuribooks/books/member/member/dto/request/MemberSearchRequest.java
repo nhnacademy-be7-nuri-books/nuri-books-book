@@ -14,7 +14,7 @@ import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.StatusType;
 
 @Builder
-public record MemberSearchRequest (
+public record MemberSearchRequest(
 
 	String name,
 	GenderType gender,
@@ -47,4 +47,6 @@ public record MemberSearchRequest (
 
 	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
 	LocalDateTime latestLoginAtLoe
-) {}
+) {
+}
+
