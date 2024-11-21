@@ -49,6 +49,7 @@ import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
+import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -288,9 +289,7 @@ public class BookServiceImpl implements BookService {
 		if (lastMatchEnd < author.length()) {
 			String remainingNames = author.substring(lastMatchEnd).trim();
 			if (!remainingNames.isBlank()) {
-				for (String name : remainingNames.split(",")) {
-					contributors.add(new ParsedContributor(name.trim(), ""));
-				}
+				throw new InvalidContributorRoleException("입력 마지막에 괄호로 역할이 지정되지 않아 작가-역할 저장에 실패합니다.");
 			}
 		}
 
