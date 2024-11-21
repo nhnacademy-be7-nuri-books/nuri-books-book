@@ -1,10 +1,7 @@
 package shop.nuribooks.books.payment.payment.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -15,8 +12,6 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.exception.order.OrderNotFoundException;
-import shop.nuribooks.books.member.customer.entity.Customer;
-import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
@@ -31,7 +26,7 @@ import shop.nuribooks.books.payment.payment.repository.PaymentRepository;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PaymentServiceImpl implements PaymentService{
+public class PaymentServiceImpl implements PaymentService {
 
 	private final OrderRepository orderRepository;
 	private final PaymentRepository paymentRepository;
@@ -70,7 +65,7 @@ public class PaymentServiceImpl implements PaymentService{
 		// 주문 상태 변경 & 재고 차감
 		List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(orderId);
 
-		for(OrderDetail orderDetail : orderDetailList){
+		for (OrderDetail orderDetail : orderDetailList) {
 			orderDetail.setOrderState(OrderState.PAID);
 			Book book = orderDetail.getBook();
 			book.updateStock(orderDetail.getCount());
@@ -78,7 +73,7 @@ public class PaymentServiceImpl implements PaymentService{
 
 		bookRepository.saveAll(orderDetailList.stream()
 			.map(OrderDetail::getBook)  // Book 객체만 추출
-			.collect(Collectors.toList()));  // 일괄 저장
+			.toList());  // 일괄 저장
 
 		orderDetailRepository.saveAll(orderDetailList);
 
