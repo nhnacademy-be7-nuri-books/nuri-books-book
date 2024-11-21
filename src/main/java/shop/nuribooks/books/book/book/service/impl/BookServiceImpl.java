@@ -262,25 +262,38 @@ public class BookServiceImpl implements BookService {
 
 	/**
 	 * 알라딘 api 조회를 통해 author응답을 작가이름과 작가역할로 분리하기위한 메서드
-	 * ((?:[^,(]+(?:,\\s)?)+): 쉼표로 구분된 여러 단어를 하나의 이름으로 처리
-	 * (?:\\s*\\(([^)]+)\\))?: 괄호로 묶인 역할 부분을 선택적으로 매칭
+	 * (?:,\s*[^,(]+)*: 쉼표로 구분된 여러 단어를 하나의 이름으로 처리
+	 * \s*\(([^)]+)\): 괄호로 묶인 역할 부분을 선택적으로 매칭
 	 * \\s*: 역할 앞에 공백이 있을 수 있으므로 제거.
 	 * @param author - ex) 모구랭 (지은이), 이르 (원작)  또는 정승례, 최보름, 양지은, 윤희 (지은이)
 	 * @return 기여자, 기여자역할 리스트
 	 */
 	private List<ParsedContributor> parseContributors(String author) {
 		List<ParsedContributor> contributors = new ArrayList<>();
-		Matcher matcher = Pattern.compile("((?:[^,(]+(?:,\\s)?)+)(?:\\s*\\(([^)]+)\\))?").matcher(author);
+
+		Matcher matcher = Pattern.compile("([^,(]+(?:,\\s*[^,(]+)*)\\s*\\(([^)]+)\\)").matcher(author);
+		int lastMatchEnd = 0;
 
 		while (matcher.find()) {
 			String names = matcher.group(1).trim();
-			String role = matcher.group(2) != null ? matcher.group(2).trim() : "";
+			String role = matcher.group(2).trim();
 
-			for (String name : names.split("\\s*,\\s*")) {
-
+			for (String name : names.split(",")) {
 				contributors.add(new ParsedContributor(name.trim(), role));
 			}
+
+			lastMatchEnd = matcher.end();
 		}
+
+		if (lastMatchEnd < author.length()) {
+			String remainingNames = author.substring(lastMatchEnd).trim();
+			if (!remainingNames.isBlank()) {
+				for (String name : remainingNames.split(",")) {
+					contributors.add(new ParsedContributor(name.trim(), ""));
+				}
+			}
+		}
+
 		return contributors;
 	}
 
