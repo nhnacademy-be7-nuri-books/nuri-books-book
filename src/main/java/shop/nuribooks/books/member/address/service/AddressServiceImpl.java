@@ -59,8 +59,10 @@ public class AddressServiceImpl implements AddressService {
 
 	@Transactional(readOnly = true)
 	public List<AddressResponse> findAddressesByMemberId(Long memberId) {
-		List<Address> addressesByMemberId = addressRepository.findAllByMemberId(memberId);
-		return addressesByMemberId.stream()
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+		List<Address> addressList = member.getAddressList();
+		return addressList.stream()
 			.map(AddressResponse::of)
 			.toList();
 	}
