@@ -1,8 +1,5 @@
 package shop.nuribooks.books.order.orderDetail.service;
 
-import java.util.List;
-import java.util.Optional;
-
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.orderDetail.dto.OrderDetailRequest;
 import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
@@ -18,4 +15,8 @@ public interface OrderDetailService {
 	String getBookTitle(Long bookId);
 
 	boolean checkStock(Order order);
+
+	void refundUpdateStateAndStock(OrderDetail orderDetail);
+
+	OrderDetail getOrderDetail(Long orderDetailId);
 }
