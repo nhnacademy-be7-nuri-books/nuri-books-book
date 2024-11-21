@@ -2,6 +2,8 @@ package shop.nuribooks.books.order.wrapping.entity;
 
 import java.math.BigDecimal;
 
+import lombok.Builder;
+import lombok.Getter;
 import org.hibernate.annotations.Comment;
 
 import jakarta.persistence.Column;
@@ -19,10 +21,11 @@ import lombok.NoArgsConstructor;
  *
  * @author nuri
  */
-@Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "wrapping_papers")
 @Comment("포장지 정보")
+@Table(name = "wrapping_papers")
+@Entity
 public class WrappingPaper {
 
 	@Id
@@ -51,6 +54,7 @@ public class WrappingPaper {
 	 * @param imageUrl 이미지 경로
 	 * @param wrappingPrice 포장 비용
 	 */
+	@Builder
 	public WrappingPaper(String title, String imageUrl, BigDecimal wrappingPrice) {
 		this.title = title;
 		this.imageUrl = imageUrl;
