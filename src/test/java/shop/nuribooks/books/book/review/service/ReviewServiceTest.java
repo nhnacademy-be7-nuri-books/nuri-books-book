@@ -38,6 +38,7 @@ import shop.nuribooks.books.exception.order.detail.OrderDetailNotFoundException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
+import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderDetail.repository.OrderDetailRepository;
 
@@ -65,11 +66,16 @@ public class ReviewServiceTest {
 
 	@BeforeEach
 	public void setUp() {
+		member = TestUtils.createMember(TestUtils.createCustomer(), TestUtils.creategrade());
+		TestUtils.setIdForEntity(member, 1L);
+
 		this.book = TestUtils.createBook(TestUtils.createPublisher());
 
 		TestUtils.setIdForEntity(book, 1L);
 
-		this.orderDetail = TestUtils.orderDetail();
+		Order order = TestUtils.createOrder(member.getCustomer());
+
+		this.orderDetail = TestUtils.createOrderDetail(order, book);
 		TestUtils.setIdForEntity(orderDetail, 1l);
 
 		reviewRequest = new ReviewRequest(
@@ -80,9 +86,6 @@ public class ReviewServiceTest {
 			orderDetail.getId(),
 			List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
 		);
-
-		member = TestUtils.createMember(TestUtils.createCustomer(), TestUtils.creategrade());
-		TestUtils.setIdForEntity(member, 1L);
 
 		review = Review.builder()
 			.title("title")
@@ -167,7 +170,6 @@ public class ReviewServiceTest {
 	@Test
 	public void updateSuccess() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
-		when(reviewRepository.save(any())).thenReturn(review);
 		MemberIdContext.setMemberId(member.getId());
 		assertEquals(ReviewMemberResponse.of(review),
 			reviewService.updateReview(reviewRequest, review.getId()));

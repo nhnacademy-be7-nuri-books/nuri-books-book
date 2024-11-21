@@ -164,11 +164,8 @@ public class ReviewServiceImpl implements ReviewService {
 		if (prevReview.getMember().getId() != ownerId) {
 			throw new ReviewNotFoundException();
 		}
-		prevReview.updated();
+		prevReview.update(reviewRequest);
 
-		Review newReview = reviewRequest.toEntity(prevReview.getMember(), prevReview.getBook(),
-			prevReview.getOrderDetail());
-		Review result = reviewRepository.save(newReview);
-		return ReviewMemberResponse.of(result);
+		return ReviewMemberResponse.of(prevReview);
 	}
 }
