@@ -86,6 +86,7 @@ class AddressServiceTest {
 
 		Address address = createAddress(member);
 		addressRepository.save(address);
+		member.addAddress(address);
 
 		// when
 		List<AddressResponse> addressesByMemberId = addressService.findAddressesByMemberId(member.getId());
