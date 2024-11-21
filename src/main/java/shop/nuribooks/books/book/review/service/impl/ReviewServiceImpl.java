@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.point.dto.request.register.ReviewSavingPointRequest;
+import shop.nuribooks.books.book.point.enums.PolicyName;
+import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
@@ -42,6 +45,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ReviewRepository reviewRepository;
 	private final ReviewImageRepository reviewImageRepository;
 	private final OrderDetailRepository orderDetailRepository;
+	private final PointHistoryService pointHistoryService;
 
 	/**
 	 * 리뷰 등록. 리뷰 이미지도 함께 등록합니다.
@@ -68,6 +72,10 @@ public class ReviewServiceImpl implements ReviewService {
 		Review review = reviewRequest.toEntity(member, book, orderDetails.getFirst());
 		Review result = this.reviewRepository.save(review);
 
+		ReviewSavingPointRequest reviewSavingPointRequest = new ReviewSavingPointRequest(member, result);
+		PolicyName policyName = result.getReviewImages().size() > 0 ? PolicyName.IMAGE_REVIEW : PolicyName.REVIEW;
+		
+		this.pointHistoryService.registerPointHistory(reviewSavingPointRequest, policyName);
 		return ReviewMemberResponse.of(result);
 	}
 

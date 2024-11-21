@@ -50,7 +50,7 @@ public class Review {
 
 	@NotNull
 	@ColumnDefault("0")
-	@Min(value = 0, message = "별점은 0 이상이어야합니다.")
+	@Min(value = 1, message = "별점은 1 이상이어야합니다.")
 	@Max(value = 5, message = "별점은 5 이하여야합니다.")
 	@Column(nullable = false)
 	//@Column(nullable = false, columnDefinition = "tinyint(1)")
@@ -97,7 +97,7 @@ public class Review {
 		this.content = reviewRequest.content();
 		this.score = reviewRequest.score();
 		this.updateAt = LocalDateTime.now();
-		
+
 		clearImages(reviewImageRepository);
 
 		for (String image : reviewRequest.reviewImages()) {
