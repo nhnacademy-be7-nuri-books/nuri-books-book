@@ -51,16 +51,16 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public ReviewMemberResponse registerReview(ReviewRequest reviewRequest) {
 		Long ownerId = Optional.ofNullable(MemberIdContext.getMemberId())
-			.orElseThrow(() -> new RequiredHeaderIsNullException());
+			.orElseThrow(RequiredHeaderIsNullException::new);
 
 		Member member = this.memberRepository.findById(ownerId)
 			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 유저입니다."));
-		
+
 		Book book = this.bookRepository.findById(reviewRequest.bookId())
-			.orElseThrow(() -> new BookIdNotFoundException());
+			.orElseThrow(BookIdNotFoundException::new);
 
 		OrderDetail orderDetail = this.orderDetailRepository.findById(reviewRequest.orderDetailId())
-			.orElseThrow(() -> new OrderDetailNotFoundException());
+			.orElseThrow(OrderDetailNotFoundException::new);
 
 		Review review = reviewRequest.toEntity(member, book, orderDetail);
 		Review result = this.reviewRepository.save(review);
@@ -158,9 +158,9 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional
 	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId) {
 		Long ownerId = Optional.ofNullable(MemberIdContext.getMemberId())
-			.orElseThrow(() -> new RequiredHeaderIsNullException());
+			.orElseThrow(RequiredHeaderIsNullException::new);
 		// 기존 review update 처리
-		Review prevReview = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException());
+		Review prevReview = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
 		if (prevReview.getMember().getId() != ownerId) {
 			throw new ReviewNotFoundException();
 		}
