@@ -47,7 +47,6 @@ import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
-import shop.nuribooks.books.exception.book.InvalidBookStateException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
@@ -77,71 +76,30 @@ public class BookServiceImpl implements BookService {
 			throw new ResourceAlreadyExistIsbnException(reqDto.getIsbn());
 		}
 
-		try {
-			Publisher publisher;
-			try {
-				publisher = publisherRepository.findByName(reqDto.getPublisherName())
-					.orElseGet(() -> publisherRepository.save(Publisher.builder()
-						.name(reqDto.getPublisherName())
-						.build()
-					));
-			} catch (Exception ex) {
-				log.error("Error saving book entity: {}", ex.getMessage(), ex);
-				throw ex;
-			}
+		Publisher publisher = publisherRepository.findByName(reqDto.getPublisherName())
+			.orElseGet(() -> publisherRepository.save(Publisher.builder()
+				.name(reqDto.getPublisherName())
+				.build()));
 
-			BookStateEnum bookStateEnum;
-			try {
-				bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.getState()));
-			} catch (InvalidBookStateException ex) {
-				log.error("Error parsing book state from request: {}", ex.getMessage(), ex);
-				throw ex;
-			}
+		BookStateEnum bookStateEnum = BookStateEnum.fromStringKor(reqDto.getState());
 
-			Book book;
-			try {
-				book = reqDto.toEntity(publisher, bookStateEnum);
-				log.info("Saving book entity: {}", book);
-				bookRepository.save(book);
-			} catch (Exception ex) {
-				log.error("Error saving book entity: {}", ex.getMessage(), ex);
-				throw ex;
-			}
+		Book book = bookRepository.save(reqDto.toEntity(publisher, bookStateEnum));
+		log.info("Book entity saved: {}", book);
 
-			List<ParsedContributor> parsedContributors = List.of();
-			try {
-				parsedContributors = parseContributors(reqDto.getAuthor());
-				saveContributors(parsedContributors, book);
-			} catch (Exception ex) {
-				log.error("Error parsing or saving contributors: {}", ex.getMessage(), ex);
-			}
+		List<ParsedContributor> parsedContributors = parseContributors(reqDto.getAuthor());
+		saveContributors(parsedContributors, book);
 
-			try {
-				if (reqDto instanceof AladinBookRegisterRequest aladinReq) {
-					registerAladinCategories(aladinReq.getCategoryName(), book);
-				} else if (reqDto instanceof PersonallyBookRegisterRequest personallyReq) {
-					registerPersonallyCategories(personallyReq.getCategoryIds(), book);
-				}
-			} catch (Exception ex) {
-				log.error("Error registering categories: {}", ex.getMessage(), ex);
-				throw ex;
-			}
-
-			try {
-				if (reqDto.getTagIds() != null && !reqDto.getTagIds().isEmpty()) {
-					List<Long> tagIdList = reqDto.getTagIds();
-					bookTagService.registerTagToBook(book.getId(), tagIdList);
-				}
-			} catch (Exception ex) {
-				log.error("Error registering tags: {}", ex.getMessage(), ex);
-				throw ex;
-			}
-			log.info("Book with ISBN {} successfully saved.", reqDto.getIsbn());
-
-		} catch (Exception ex) {
-			log.error("Error saving book with ISBN {}: {}", reqDto.getIsbn(), ex.getMessage(), ex);
-			throw ex;
+		if (reqDto instanceof AladinBookRegisterRequest aladinReq) {
+			registerAladinCategories(aladinReq.getCategoryName(), book);
+		} else if (reqDto instanceof PersonallyBookRegisterRequest personallyReq) {
+			registerPersonallyCategories(personallyReq.getCategoryIds(), book);
 		}
+
+		if (reqDto.getTagIds() != null && !reqDto.getTagIds().isEmpty()) {
+			bookTagService.registerTagToBook(book.getId(), reqDto.getTagIds());
+		}
+
+		log.info("Book with ISBN {} saved successfully", reqDto.getIsbn());
 	}
 
 	//도서 상세 조회 시 조회수 증가 추가
