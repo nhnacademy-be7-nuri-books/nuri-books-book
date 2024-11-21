@@ -27,6 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
+import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
 
@@ -91,10 +92,26 @@ public class Review {
 	/**
 	 * 기존 리뷰 업데이트 처리해주는 함수
 	 */
-	public void update(ReviewRequest reviewRequest) {
+	public void update(ReviewRequest reviewRequest, ReviewImageRepository reviewImageRepository) {
 		this.title = reviewRequest.title();
 		this.content = reviewRequest.content();
 		this.score = reviewRequest.score();
 		this.updateAt = LocalDateTime.now();
+		
+		clearImages(reviewImageRepository);
+
+		for (String image : reviewRequest.reviewImages()) {
+			ReviewImage reviewImage = ReviewImage.builder()
+				.imageUrl(image)
+				.review(this)
+				.build();
+			this.getReviewImages().add(reviewImage);
+		}
+
+	}
+
+	private void clearImages(ReviewImageRepository reviewImageRepository) {
+		reviewImageRepository.deleteAll(this.reviewImages);
+		this.reviewImages = new LinkedList<>();
 	}
 }

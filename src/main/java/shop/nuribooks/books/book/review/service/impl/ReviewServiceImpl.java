@@ -160,12 +160,12 @@ public class ReviewServiceImpl implements ReviewService {
 		Long ownerId = Optional.ofNullable(MemberIdContext.getMemberId())
 			.orElseThrow(RequiredHeaderIsNullException::new);
 		// 기존 review update 처리
-		Review prevReview = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
-		if (prevReview.getMember().getId() != ownerId) {
+		Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+		if (review.getMember().getId() != ownerId) {
 			throw new ReviewNotFoundException();
 		}
-		prevReview.update(reviewRequest);
+		review.update(reviewRequest, reviewImageRepository);
 
-		return ReviewMemberResponse.of(prevReview);
+		return ReviewMemberResponse.of(review);
 	}
 }
