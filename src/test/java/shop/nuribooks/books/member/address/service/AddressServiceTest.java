@@ -148,7 +148,7 @@ class AddressServiceTest {
 		// then
 		Address changedAddress = addressRepository.findById(saved.getId())
 			.orElseThrow(() -> new AddressNotFoundException("주소가 없습니다."));
-		Assertions.assertThat(changedAddress.isDefault()).isFalse();
+		Assertions.assertThat(changedAddress.isDefault()).isTrue();
 	}
 
 	private Address createAddress(Member member) {

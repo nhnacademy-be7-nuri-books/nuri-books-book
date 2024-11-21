@@ -137,7 +137,7 @@ class AddressControllerTest extends ControllerTestSupport {
 		when(addressService.modifyAddress(1L, addressEditRequest)).thenReturn(addressResponse);
 
 		// when // then
-		mockMvc.perform(patch("/api/members/addresses/{addressId}", 1L)
+		mockMvc.perform(put("/api/members/addresses/{addressId}", 1L)
 				.content(objectMapper.writeValueAsString(addressEditRequest))
 				.contentType(MediaType.APPLICATION_JSON)
 			)

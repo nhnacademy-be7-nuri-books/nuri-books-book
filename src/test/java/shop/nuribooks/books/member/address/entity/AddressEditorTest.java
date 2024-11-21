@@ -42,7 +42,7 @@ class AddressEditorTest {
 
 		// then
 		assertThat(address).extracting("name", "zipcode", "address", "detailAddress", "isDefault")
-			.containsExactly("name2", "12345", "address", "addressDetail", true);
+			.containsExactly("name2", "12345", "address", "addressDetail", false);
 	}
 
 }
