@@ -13,14 +13,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.order.order.entity.Order;
 
 /**
@@ -68,6 +69,9 @@ public class OrderDetail {
 	@Column(nullable = false)
 	@Comment("포장 여부")
 	private Boolean isWrapped = false;
+
+	@OneToOne(mappedBy = "orderDetail")
+	private Review review;
 
 	/**
 	 * 주문 상세 생성자 (Builder)

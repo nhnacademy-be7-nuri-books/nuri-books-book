@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
@@ -26,7 +27,7 @@ import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.exception.order.detail.OrderDetailNotFoundException;
+import shop.nuribooks.books.exception.review.NoOrderDetailForReviewException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -55,10 +56,16 @@ public class ReviewServiceImpl implements ReviewService {
 		Member member = this.memberRepository.findById(ownerId)
 			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 유저입니다."));
 
-		OrderDetail orderDetail = this.orderDetailRepository.findById(reviewRequest.orderDetailId())
-			.orElseThrow(OrderDetailNotFoundException::new);
+		Book book = this.bookRepository.findById(reviewRequest.bookId())
+			.orElseThrow(BookIdNotFoundException::new);
 
-		Review review = reviewRequest.toEntity(member, orderDetail);
+		List<OrderDetail> orderDetails = this.orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNull(
+			reviewRequest.bookId(), ownerId);
+		if (orderDetails.size() == 0) {
+			throw new NoOrderDetailForReviewException();
+		}
+
+		Review review = reviewRequest.toEntity(member, book, orderDetails.getFirst());
 		Review result = this.reviewRepository.save(review);
 
 		return ReviewMemberResponse.of(result);
