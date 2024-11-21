@@ -15,6 +15,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import shop.nuribooks.books.order.wrapping.dto.WrappingPaperRequest;
+import shop.nuribooks.books.order.wrapping.dto.WrappingPaperResponse;
 
 /**
  * 포장지 entity
@@ -44,7 +46,7 @@ public class WrappingPaper {
 	private String imageUrl;
 
 	@Column(precision = 9, nullable = false)
-	@Comment("포장 비용")
+	@Comment("포장지 가격")
 	private BigDecimal wrappingPrice = BigDecimal.ZERO;
 
 	/**
@@ -59,5 +61,20 @@ public class WrappingPaper {
 		this.title = title;
 		this.imageUrl = imageUrl;
 		this.wrappingPrice = wrappingPrice;
+	}
+
+	public WrappingPaperResponse toResponseDto() {
+		return WrappingPaperResponse.builder()
+				.id(id)
+				.title(title)
+				.imageUrl(imageUrl)
+				.wrappingPrice(wrappingPrice)
+				.build();
+	}
+
+	public void update(WrappingPaperRequest request) {
+		this.title = request.title();
+		this.imageUrl = request.imageUrl();
+		this.wrappingPrice = request.wrappingPrice();
 	}
 }

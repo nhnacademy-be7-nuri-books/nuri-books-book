@@ -9,6 +9,6 @@ public record WrappingPaperResponse(
         Long id,
         String title,
         String imageUrl,
-        BigDecimal wrapping_price
+        BigDecimal wrappingPrice
 ) {
 }
