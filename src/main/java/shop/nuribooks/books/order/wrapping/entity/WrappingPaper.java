@@ -2,8 +2,6 @@ package shop.nuribooks.books.order.wrapping.entity;
 
 import java.math.BigDecimal;
 
-import lombok.Builder;
-import lombok.Getter;
 import org.hibernate.annotations.Comment;
 
 import jakarta.persistence.Column;
@@ -14,6 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.nuribooks.books.order.wrapping.dto.WrappingPaperRequest;
 import shop.nuribooks.books.order.wrapping.dto.WrappingPaperResponse;
@@ -65,11 +65,11 @@ public class WrappingPaper {
 
 	public WrappingPaperResponse toResponseDto() {
 		return WrappingPaperResponse.builder()
-				.id(id)
-				.title(title)
-				.imageUrl(imageUrl)
-				.wrappingPrice(wrappingPrice)
-				.build();
+			.id(id)
+			.title(title)
+			.imageUrl(imageUrl)
+			.wrappingPrice(wrappingPrice)
+			.build();
 	}
 
 	public void update(WrappingPaperRequest request) {
