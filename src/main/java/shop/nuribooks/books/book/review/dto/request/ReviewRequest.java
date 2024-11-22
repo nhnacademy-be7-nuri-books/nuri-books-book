@@ -11,7 +11,7 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.entity.ReviewImage;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
 
 public record ReviewRequest(
 	@NotBlank(message = "리뷰 제목은 필수입니다.")

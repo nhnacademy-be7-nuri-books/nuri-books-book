@@ -1,11 +1,7 @@
-package shop.nuribooks.books.order.orderDetail.service;
-
-import java.util.List;
-import java.util.Optional;
+package shop.nuribooks.books.order.orderdetail.service;
 
 import shop.nuribooks.books.order.order.entity.Order;
-import shop.nuribooks.books.order.orderDetail.dto.OrderDetailRequest;
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailRequest;
 
 /**
  * 주문 상세 서비스 인터페이스

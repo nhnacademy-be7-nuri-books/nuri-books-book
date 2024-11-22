@@ -4,7 +4,6 @@ import static com.fasterxml.jackson.annotation.JsonFormat.Shape.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -12,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
-import shop.nuribooks.books.order.orderDetail.dto.OrderDetailRequest;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailRequest;
 import shop.nuribooks.books.order.shipping.dto.ShippingRegisterRequest;
 import shop.nuribooks.books.order.stub.coupon.AllAppliedCouponRequestStub;
 import shop.nuribooks.books.order.wrapping.dto.WrappingRegisterRequest;

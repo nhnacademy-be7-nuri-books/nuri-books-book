@@ -41,8 +41,8 @@ import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.entity.Order;
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
-import shop.nuribooks.books.order.orderDetail.repository.OrderDetailRepository;
+import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class ReviewServiceTest {
@@ -80,7 +80,7 @@ public class ReviewServiceTest {
 		Order order = TestUtils.createOrder(member.getCustomer());
 
 		this.orderDetail = TestUtils.createOrderDetail(order, book);
-		TestUtils.setIdForEntity(orderDetail, 1l);
+		TestUtils.setIdForEntity(orderDetail, 1L);
 
 		reviewRequest = new ReviewRequest(
 			"title",
@@ -125,7 +125,7 @@ public class ReviewServiceTest {
 	public void registerSuccessWithPolicyName() {
 		ReviewRequest newReviewRequest = new ReviewRequest("제에목", "내앵애애애애용", 1, book.getId(), List.of());
 		Review newReview = newReviewRequest.toEntity(member, book, orderDetail);
-		TestUtils.setIdForEntity(newReview, 1l);
+		TestUtils.setIdForEntity(newReview, 1L);
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(reviewRepository.save(any())).thenReturn(newReview);
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));

@@ -1,4 +1,4 @@
-package shop.nuribooks.books.order.orderDetail.dto;
+package shop.nuribooks.books.order.orderdetail.dto;
 
 import java.math.BigDecimal;
 

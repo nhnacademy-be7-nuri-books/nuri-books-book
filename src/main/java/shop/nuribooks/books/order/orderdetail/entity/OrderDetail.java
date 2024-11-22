@@ -1,4 +1,4 @@
-package shop.nuribooks.books.order.orderDetail.entity;
+package shop.nuribooks.books.order.orderdetail.entity;
 
 import java.math.BigDecimal;
 
@@ -95,6 +95,6 @@ public class OrderDetail {
 		this.book = book;
 		this.count = count;
 		this.unitPrice = unitPrice;
-		this.isWrapped = isWrapped != null ? isWrapped : false;
+		this.isWrapped = isWrapped;
 	}
 }
