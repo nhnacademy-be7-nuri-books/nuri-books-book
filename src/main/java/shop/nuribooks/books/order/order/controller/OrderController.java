@@ -2,12 +2,11 @@ package shop.nuribooks.books.order.order.controller;
 
 import static shop.nuribooks.books.cart.entity.RedisCartKey.*;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,20 +19,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.nuribooks.books.cart.dto.response.CartBookResponse;
+import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
+import shop.nuribooks.books.order.order.dto.OrderListPeriodRequest;
+import shop.nuribooks.books.order.order.dto.OrderListResponse;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
 import shop.nuribooks.books.order.order.service.OrderService;
 import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
-import shop.nuribooks.books.payment.payment.dto.PaymentSuccessRequest;
 
 /**
  * 주문 관련 Controller
@@ -55,6 +54,9 @@ public class OrderController {
 	 * @param quantity 상품 갯수
 	 * @return OrderInformationResponse
 	 */
+	@Operation(summary = "단일 상품 주문 폼 정보", description = "단일 상품에 대해 주문 정보를 가져옵니다.")
+	@ApiResponse(responseCode = "200", description = "주문 정보 조회 성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
 	@GetMapping("/{book-id}")
 	public ResponseEntity<OrderInformationResponse> getOrderInformation(
 		@PathVariable("book-id") Long bookId, @RequestParam Integer quantity) {
@@ -67,14 +69,21 @@ public class OrderController {
 			// 비회원 주문에 필요한 정보 가져오기
 			.orElseGet(() -> orderService.getCustomerOrderInformation(bookId, quantity));
 
-		AtomicReference<OrderInformationResponse> orderInformationResponse = new AtomicReference<>();
-
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
-	// 장바구니 주문 정보 가져오기
+	/**
+	 * 장바구니 주문 폼 정보 가져오기
+	 *
+	 * @param requestCartId 장바구니 아이디
+	 * @return OrderInformationResponse
+	 */
+	@Operation(summary = "장바구니 주문 폼 정보", description = "장바구니에 담긴 상품들에 대해 주문 정보를 가져옵니다.")
+	@ApiResponse(responseCode = "200", description = "주문 정보 조회 성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
 	@GetMapping("/cart/{cart-id}")
-	public ResponseEntity<OrderInformationResponse> getCartOrderInformation(@PathVariable("cart-id") String requestCartId){
+	public ResponseEntity<OrderInformationResponse> getCartOrderInformation(
+		@PathVariable("cart-id") String requestCartId) {
 
 		OrderInformationResponse result;
 		Long memberId = MemberIdContext.getMemberId();
@@ -89,7 +98,6 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
-
 	/**
 	 * 결제 전 임시 주문 저장
 	 *
@@ -97,11 +105,9 @@ public class OrderController {
 	 * @return 임시 주문 등록 응답
 	 */
 	@Operation(summary = "회원/비회원 주문 임시 저장", description = "회원 또는 비회원의 주문을 임시 저장합니다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "201", description = "주문 임시 저장 성공"),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청"),
-		@ApiResponse(responseCode = "404", description = "사용자 또는 상품을 찾을 수 없음")
-	})
+	@ApiResponse(responseCode = "201", description = "주문 임시 저장 성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	@ApiResponse(responseCode = "404", description = "사용자 또는 상품을 찾을 수 없음")
 	@PostMapping
 	public ResponseEntity<OrderTempRegisterResponse> registerTempOrder(
 		@Valid @RequestBody OrderTempRegisterRequest orderTempRegisterRequest) {
@@ -123,12 +129,35 @@ public class OrderController {
 	 * @param paymentRequest 토스 페이먼츠 요청 값
 	 * @return 응답 메시지
 	 */
+	@Operation(summary = "최종 결제 전 검증", description = "결제 전 주문 정보를 검증합니다.")
+	@ApiResponse(responseCode = "200", description = "검증 성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
 	@PostMapping("/verify")
 	public ResponseEntity<ResponseMessage> verifyOrderInformation(PaymentRequest paymentRequest) {
 
 		ResponseMessage responseMessage = orderService.verifyOrderInformation(paymentRequest);
 
 		return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+	}
+
+	/**
+	 * 주문 목록 조회
+	 *
+	 * @return 주문 목록
+	 */
+	@HasRole(role = AuthorityType.MEMBER)
+	@GetMapping
+	public ResponseEntity<Page<OrderListResponse>> getOrderList(
+		OrderListPeriodRequest orderListPeriodRequest,
+		boolean includeOrdersInPendingStatus,
+		Pageable pageable) {
+
+		Optional<Long> userId = Optional.ofNullable(MemberIdContext.getMemberId());
+
+		Page<OrderListResponse> result = orderService.getOrderList(includeOrdersInPendingStatus, pageable,
+			orderListPeriodRequest, userId);
+
+		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
 }

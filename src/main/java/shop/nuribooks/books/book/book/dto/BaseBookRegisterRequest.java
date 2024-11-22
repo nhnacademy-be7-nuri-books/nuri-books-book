@@ -23,10 +23,12 @@ public abstract class BaseBookRegisterRequest {
 	@Size(min = 1, max = 100, message = "제목은 1자 이상 100자 이하여야 합니다.")
 	private final String title;
 
-	@NotBlank(message = "저자명은 필수입니다.")
+	@NotBlank(message = "저자명과 역할은 필수입니다.")
+	@Size(max = 100, message = "저자명과 역할은 최대 100자 입니다.")
 	private final String author;
 
 	@NotBlank(message = "출판사명은 필수입니다.")
+	@Size(max = 100, message = "출판사명은 최대 100자 입니다.")
 	private final String publisherName;
 
 	@NotNull(message = "출판 날짜는 필수입니다.")

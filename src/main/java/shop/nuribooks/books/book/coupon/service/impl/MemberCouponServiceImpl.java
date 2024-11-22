@@ -2,6 +2,8 @@ package shop.nuribooks.books.book.coupon.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +46,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 
 		Member member = memberRepository.findById(memberCouponRegisterRequest.memberId())
 			.orElseThrow(() -> new MemberNotFoundException("멤버를 못찾아요."));
-		
+
 		MemberCoupon memberCoupon = MemberCoupon.builder()
 			.coupon(coupon)
 			.member(member)
@@ -87,6 +89,16 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 		MemberCoupon memberCoupon = memberCouponRepository.findById(memberCouponId)
 			.orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
 		memberCouponRepository.delete(memberCoupon);
+	}
+
+	@Override
+	public Page<MemberCouponResponse> getAvailableCouponsByMemberId(Long memberId, Pageable pageable) {
+		return memberCouponRepository.findAvailableCouponsByMemberId(memberId, pageable);
+	}
+
+	@Override
+	public Page<MemberCouponResponse> getExpiredOrUsedCouponsByMemberId(Long memberId, Pageable pageable) {
+		return memberCouponRepository.findExpiredOrUsedCouponsByMemberId(memberId, pageable);
 	}
 
 }
