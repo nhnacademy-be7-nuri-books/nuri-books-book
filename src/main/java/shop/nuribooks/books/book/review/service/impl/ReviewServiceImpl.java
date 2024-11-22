@@ -19,6 +19,7 @@ import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
@@ -167,7 +168,7 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Transactional
-	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId) {
+	public ReviewMemberResponse updateReview(ReviewUpdateRequest reviewUpdateRequest, long reviewId) {
 		Long ownerId = Optional.ofNullable(MemberIdContext.getMemberId())
 			.orElseThrow(RequiredHeaderIsNullException::new);
 		// 기존 review update 처리
@@ -175,7 +176,7 @@ public class ReviewServiceImpl implements ReviewService {
 		if (review.getMember().getId() != ownerId) {
 			throw new ReviewNotFoundException();
 		}
-		review.update(reviewRequest, reviewImageRepository);
+		review.update(reviewUpdateRequest);
 
 		return ReviewMemberResponse.of(review);
 	}
