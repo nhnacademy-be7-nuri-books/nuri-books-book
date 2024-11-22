@@ -17,7 +17,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.tag.dto.TagRequest;
 import shop.nuribooks.books.book.tag.dto.TagResponse;
 import shop.nuribooks.books.book.tag.entity.Tag;
@@ -54,8 +53,6 @@ class TagServiceImplTest {
 		verify(tagRepository).save(any(Tag.class));
 	}
 
-
-
 	@DisplayName("태그 등록 실패 - 중복")
 	@Test
 	void failed_registerTag() {
@@ -84,7 +81,6 @@ class TagServiceImplTest {
 
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Tag> publisherPage = new PageImpl<>(tags, pageable, tags.size());
-
 
 		//when
 		when(tagRepository.findAll(pageable)).thenReturn(publisherPage);
@@ -210,6 +206,7 @@ class TagServiceImplTest {
 		verify(tagRepository).findById(id);
 
 	}
+
 	private Tag registerTag() {
 		return Tag.builder().name("tag1").build();
 	}
