@@ -1,7 +1,5 @@
 package shop.nuribooks.books.book.publisher.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,9 +10,9 @@ import shop.nuribooks.books.book.publisher.dto.PublisherRequest;
 import shop.nuribooks.books.book.publisher.dto.PublisherResponse;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.entity.PublisherEditor;
+import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.exception.publisher.PublisherAlreadyExistsException;
 import shop.nuribooks.books.exception.publisher.PublisherNotFoundException;
-import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 
 /**
  * @author kyongmin
@@ -26,6 +24,20 @@ public class PublisherServiceImpl implements PublisherService {
 	private final PublisherRepository publisherRepository;
 
 	/**
+	 * getPublisherEditor : 수정사항을 반영한 빌더 생성
+	 *
+	 * @param request 수정된 정보가 담긴 요청 객체
+	 * @param publisher 기존 출판사 엔티티
+	 * @return 수정된 출판사 정보를 포함한 PublisherEditor
+	 */
+	private static PublisherEditor getPublisherEditor(PublisherRequest request, Publisher publisher) {
+		PublisherEditor.PublisherEditorBuilder builder = publisher.toEditor();
+		return builder
+			.name(request.name())
+			.build();
+	}
+
+	/**
 	 * registerPublisher : 출판사 이름 등록
 	 *
 	 * @param request 출판사 이름 등록
@@ -35,7 +47,7 @@ public class PublisherServiceImpl implements PublisherService {
 	@Override
 	public PublisherResponse registerPublisher(PublisherRequest request) {
 		if (publisherRepository.existsByName(request.name())) {
-			throw new PublisherAlreadyExistsException("출판사가 이미 등록되어 있습니다.");
+			throw new PublisherAlreadyExistsException();
 		}
 		Publisher publisher = request.toEntity();
 		Publisher saved = publisherRepository.save(publisher);
@@ -63,7 +75,7 @@ public class PublisherServiceImpl implements PublisherService {
 	@Override
 	public PublisherResponse getPublisher(Long id) {
 		Publisher publisher = publisherRepository.findById(id)
-			.orElseThrow(() -> new PublisherNotFoundException("출판사가 존재하지 않습니다."));
+			.orElseThrow(() -> new PublisherNotFoundException());
 		return PublisherResponse.of(publisher);
 	}
 
@@ -76,7 +88,7 @@ public class PublisherServiceImpl implements PublisherService {
 	@Override
 	public void deletePublisher(Long id) {
 		Publisher publisher = publisherRepository.findById(id)
-			.orElseThrow(() -> new PublisherNotFoundException("출판사가 존재하지 않습니다."));
+			.orElseThrow(() -> new PublisherNotFoundException());
 
 		publisherRepository.delete(publisher);
 	}
@@ -92,28 +104,14 @@ public class PublisherServiceImpl implements PublisherService {
 	@Override
 	public PublisherResponse updatePublisher(Long id, PublisherRequest request) {
 		Publisher publisher = publisherRepository.findById(id)
-			.orElseThrow(() -> new PublisherNotFoundException("출판사가 존재하지 않습니다."));
+			.orElseThrow(() -> new PublisherNotFoundException());
 
 		if (publisherRepository.existsByName(request.name())) {
-			throw new PublisherAlreadyExistsException("출판사가 이미 등록되어 있습니다.");
+			throw new PublisherAlreadyExistsException();
 		}
 
 		PublisherEditor publisherEditor = getPublisherEditor(request, publisher);
 		publisher.edit(publisherEditor);
 		return PublisherResponse.of(publisher);
-	}
-
-	/**
-	 * getPublisherEditor : 수정사항을 반영한 빌더 생성
-	 *
-	 * @param request 수정된 정보가 담긴 요청 객체
-	 * @param publisher 기존 출판사 엔티티
-	 * @return 수정된 출판사 정보를 포함한 PublisherEditor
-	 */
-	private static PublisherEditor getPublisherEditor(PublisherRequest request, Publisher publisher) {
-		PublisherEditor.PublisherEditorBuilder builder = publisher.toEditor();
-		return builder
-			.name(request.name())
-			.build();
 	}
 }
