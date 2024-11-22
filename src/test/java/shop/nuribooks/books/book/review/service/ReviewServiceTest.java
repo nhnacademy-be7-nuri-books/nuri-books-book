@@ -19,6 +19,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.point.entity.PointHistory;
+import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
@@ -34,7 +36,7 @@ import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.exception.order.detail.OrderDetailNotFoundException;
+import shop.nuribooks.books.exception.review.NoOrderDetailForReviewException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -56,6 +58,8 @@ public class ReviewServiceTest {
 	private ReviewImageRepository reviewImageRepository;
 	@Mock
 	private OrderDetailRepository orderDetailRepository;
+	@Mock
+	private PointHistoryService pointHistoryService;
 
 	private Book book;
 	private Member member;
@@ -109,17 +113,38 @@ public class ReviewServiceTest {
 	@Test
 	public void registerOrderDetailNotFound() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-		when(orderDetailRepository.findById(anyLong())).thenReturn(Optional.empty());
+		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
+		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNull(anyLong(), anyLong())).thenReturn(
+			List.of());
 		MemberIdContext.setMemberId(member.getId());
-		assertThrows(OrderDetailNotFoundException.class,
+		assertThrows(NoOrderDetailForReviewException.class,
 			() -> reviewService.registerReview(reviewRequest));
+	}
+
+	@Test
+	public void registerSuccessWithPolicyName() {
+		ReviewRequest newReviewRequest = new ReviewRequest("제에목", "내앵애애애애용", 1, book.getId(), List.of());
+		Review newReview = newReviewRequest.toEntity(member, book, orderDetail);
+		TestUtils.setIdForEntity(newReview, 1l);
+		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+		when(reviewRepository.save(any())).thenReturn(newReview);
+		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
+		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNull(anyLong(), anyLong())).thenReturn(
+			List.of(orderDetail));
+		when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
+		MemberIdContext.setMemberId(member.getId());
+		assertEquals(ReviewMemberResponse.of(newReview),
+			reviewService.registerReview(newReviewRequest));
 	}
 
 	@Test
 	public void registerSuccess() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(reviewRepository.save(any())).thenReturn(review);
-		when(orderDetailRepository.findById(anyLong())).thenReturn(Optional.of(orderDetail));
+		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
+		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNull(anyLong(), anyLong())).thenReturn(
+			List.of(orderDetail));
+		when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
 		MemberIdContext.setMemberId(member.getId());
 		assertEquals(ReviewMemberResponse.of(review),
 			reviewService.registerReview(reviewRequest));
