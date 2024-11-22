@@ -7,10 +7,11 @@ import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 
 @Builder
-public record BookTagRequest(@NotNull(message = "bookId는 필수 입력 항목입니다")
-							 @Positive(message = "bookId는 양수여야 합니다")
-							 Long bookId,
+public record BookTagRequest(
+	@NotNull(message = "bookId는 필수 입력 항목입니다")
+	@Positive(message = "bookId는 양수여야 합니다")
+	Long bookId,
 
-							 @NotNull(message = "tagId는 필수 입력 항목입니다")
-							 List<@Positive(message = "tagId는 양수여야 합니다") Long> tagId) {
+	@NotNull(message = "tagId는 필수 입력 항목입니다")
+	List<@Positive(message = "tagId는 양수여야 합니다") Long> tagId) {
 }

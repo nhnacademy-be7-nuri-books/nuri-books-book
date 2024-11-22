@@ -15,8 +15,8 @@ import shop.nuribooks.books.order.order.dto.OrderListPeriodRequest;
 import shop.nuribooks.books.order.order.dto.OrderListResponse;
 import shop.nuribooks.books.order.order.dto.OrderPageResponse;
 import shop.nuribooks.books.order.order.entity.QOrder;
-import shop.nuribooks.books.order.orderDetail.entity.OrderState;
-import shop.nuribooks.books.order.orderDetail.entity.QOrderDetail;
+import shop.nuribooks.books.order.orderdetail.entity.OrderState;
+import shop.nuribooks.books.order.orderdetail.entity.QOrderDetail;
 import shop.nuribooks.books.order.shipping.entity.QShipping;
 
 @RequiredArgsConstructor
@@ -63,11 +63,14 @@ public class OrderCustomerRepositoryImpl implements OrderCustomerRepository {
 			.limit(pageable.getPageSize())
 			.fetch();
 
-		long totalCount = queryFactory.selectFrom(order)
+		Long totalCount = queryFactory.select(
+				order.count()
+			)
+			.from(order)
 			.leftJoin(shipping).on(shipping.order.eq(order))
 			.leftJoin(orderDetail).on(orderDetail.order.eq(order))
 			.where(whereClause)
-			.fetchCount();
+			.fetchOne();
 
 		return new OrderPageResponse(orders, totalCount);
 	}

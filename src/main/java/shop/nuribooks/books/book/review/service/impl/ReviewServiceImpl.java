@@ -34,8 +34,8 @@ import shop.nuribooks.books.exception.review.NoOrderDetailForReviewException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
-import shop.nuribooks.books.order.orderDetail.repository.OrderDetailRepository;
+import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +74,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		ReviewSavingPointRequest reviewSavingPointRequest = new ReviewSavingPointRequest(member, result);
 		PolicyName policyName = result.getReviewImages().size() > 0 ? PolicyName.IMAGE_REVIEW : PolicyName.REVIEW;
-		
+
 		this.pointHistoryService.registerPointHistory(reviewSavingPointRequest, policyName);
 		return ReviewMemberResponse.of(result);
 	}

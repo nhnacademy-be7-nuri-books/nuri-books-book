@@ -33,14 +33,12 @@ import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AopControllerTest {
-
-	@Autowired
-	private MockMvc mockMvc;
+class AopControllerTest {
 
 	@Autowired
 	ObjectMapper objectMapper;
-
+	@Autowired
+	private MockMvc mockMvc;
 	@Autowired
 	private AddressServiceImpl addressService;
 

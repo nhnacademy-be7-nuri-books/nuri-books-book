@@ -26,8 +26,8 @@ import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.order.repository.OrderRepository;
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
-import shop.nuribooks.books.order.orderDetail.repository.OrderDetailRepository;
+import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @DataJpaTest
 @Import({QuerydslConfiguration.class})
@@ -58,7 +58,7 @@ public class ReviewImageRepositoryTest {
 
 	private Member member;
 	private Book book;
-	private List<Review> reviews = new LinkedList<>();
+	private final List<Review> reviews = new LinkedList<>();
 
 	@BeforeEach
 	void setUp() {

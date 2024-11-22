@@ -1,4 +1,4 @@
-package shop.nuribooks.books.order.orderDetail.service;
+package shop.nuribooks.books.order.orderdetail.service;
 
 import java.util.List;
 
@@ -11,16 +11,15 @@ import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.order.NoStockAvailableException;
 import shop.nuribooks.books.order.order.entity.Order;
-import shop.nuribooks.books.order.orderDetail.dto.OrderDetailRequest;
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
-import shop.nuribooks.books.order.orderDetail.entity.OrderState;
-import shop.nuribooks.books.order.orderDetail.repository.OrderDetailCustomRepository;
-import shop.nuribooks.books.order.orderDetail.repository.OrderDetailRepository;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailRequest;
+import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.entity.OrderState;
+import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class OrderDetailServiceImpl implements OrderDetailService{
+public class OrderDetailServiceImpl implements OrderDetailService {
 
 	private final BookRepository bookRepository;
 	private final OrderDetailRepository orderDetailRepository;
@@ -32,8 +31,8 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		Book book = bookRepository.findById(orderDetailRequest.bookId())
 			.orElseThrow(() -> new BookNotFoundException(orderDetailRequest.bookId()));
 
-		// todo : 재고 확인 (동시성 고려) - RabbitMQ
-		if(orderDetailRequest.count() > book.getStock()){
+		// 재고 확인 (동시성 고려) - RabbitMQ
+		if (orderDetailRequest.count() > book.getStock()) {
 			// 예외 처리
 			throw new NoStockAvailableException();
 		}
@@ -70,12 +69,13 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 		boolean availableStock = true;
 
-		for (OrderDetail orderDetail : orderDetailList){
+		for (OrderDetail orderDetail : orderDetailList) {
 			Book book = orderDetail.getBook();
 
 			// 재고 확인
-			if(orderDetail.getCount() > book.getStock()){
+			if (orderDetail.getCount() > book.getStock()) {
 				availableStock = false;
+				break;
 			}
 		}
 

@@ -26,13 +26,11 @@ import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ThreadLocalTest {
-	@Autowired
-	private MockMvc mockMvc;
-
+class ThreadLocalTest {
 	@Autowired
 	ObjectMapper objectMapper;
-
+	@Autowired
+	private MockMvc mockMvc;
 	@Autowired
 	private AddressServiceImpl addressService;
 

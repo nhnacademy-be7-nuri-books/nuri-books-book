@@ -1,4 +1,4 @@
-package shop.nuribooks.books.order.orderDetail.entity;
+package shop.nuribooks.books.order.orderdetail.entity;
 
 /**
  * 주문 상태 Enum
@@ -15,12 +15,12 @@ package shop.nuribooks.books.order.orderDetail.entity;
  * @author nuri
  */
 public enum OrderState {
-	PENDING(0,"주문 대기"),
-	PAID(1,"결제 완료"), // 결제가 실패했을 때를 대비한 상태
-	DELIVERING(2,"배송중"),
-	COMPLETED(3,"주문 완료"),
-	RETURNED(4,"반품"),
-	CANCELED(5,"결제 취소");
+	PENDING(0, "주문 대기"),
+	PAID(1, "결제 완료"), // 결제가 실패했을 때를 대비한 상태
+	DELIVERING(2, "배송중"),
+	COMPLETED(3, "주문 완료"),
+	RETURNED(4, "반품"),
+	CANCELED(5, "결제 취소");
 
 	private final int code;
 	private final String korName;
@@ -50,7 +50,8 @@ public enum OrderState {
 	 *
 	 * @return 주문 상태의 한국어 이름
 	 */
-	public String getKorName() {return korName;}
-
+	public String getKorName() {
+		return korName;
+	}
 
 }

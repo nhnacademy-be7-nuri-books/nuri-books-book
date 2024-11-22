@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -288,7 +287,7 @@ class BookTagServiceImplTest {
 		TagNotFoundException exception = assertThrows(TagNotFoundException.class, () -> {
 			bookTagService.getBooksByTagId(tagId);
 		});
-		assertEquals("해당 태그가 존재하지 않습니다.", exception.getMessage());
+		assertEquals("태그가 존재하지 않습니다.", exception.getMessage());
 
 		verify(tagRepository, times(1)).findById(tagId);
 		verify(bookTagRepository, never()).findBookIdsByTagId(anyLong());
