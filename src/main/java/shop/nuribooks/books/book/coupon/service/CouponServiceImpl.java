@@ -10,6 +10,7 @@ import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
+import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.exception.coupon.CouponAlreadyExistsException;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
@@ -44,9 +45,9 @@ public class CouponServiceImpl implements CouponService {
 	 * @return
 	 */
 	@Override
-	public Page<CouponResponse> getCoupons(Pageable pageable) {
-		Page<Coupon> coupons = couponRepository.findAll(pageable);
-		return coupons.map(CouponResponse::of);
+	public Page<CouponResponse> getCoupons(CouponType type, Pageable pageable) {
+		Page<CouponResponse> coupons = couponRepository.findCouponsByCouponId(pageable, type);
+		return coupons;
 	}
 
 	/**
