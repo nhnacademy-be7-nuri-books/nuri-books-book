@@ -15,6 +15,7 @@ import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderDetail.service.OrderDetailService;
 import shop.nuribooks.books.order.refund.dto.request.RefundRequest;
+import shop.nuribooks.books.order.refund.dto.response.RefundInfoResponse;
 import shop.nuribooks.books.order.refund.dto.response.RefundResponse;
 import shop.nuribooks.books.order.refund.entity.Refund;
 import shop.nuribooks.books.order.refund.repository.RefundRepository;
@@ -27,6 +28,26 @@ public class RefundServiceImpl implements RefundService {
 	private final OrderDetailService orderDetailService;
 	private final MemberRepository memberRepository;
 	private final PointHistoryService pointHistoryService;
+
+	@Override
+	public RefundInfoResponse getRefundResponseInfo(Long orderDetailId) {
+		// 주문 상세 가져오기
+		OrderDetail orderDetail = orderDetailService.getOrderDetail(orderDetailId);
+		BigDecimal refundAmount = orderDetail.getUnitPrice().multiply(BigDecimal.valueOf(orderDetail.getCount()));
+
+		// TODO: 주문에 가서 만약 전체 쿠폰 조건을 만족시키지 못하면 차감받은 금액을 deductedAmount에 더해준다.
+
+		// 일단은 반품 배송비 2500원으로 생각
+		BigDecimal deductedAmount = BigDecimal.valueOf(2500L);
+
+		BigDecimal totalRefundAmount =
+			refundAmount.subtract(deductedAmount).compareTo(BigDecimal.ZERO) > 0 ?
+				refundAmount.subtract(deductedAmount) : BigDecimal.ZERO;
+
+		// 환불 받을 금액 계산
+		RefundInfoResponse refundInfoResponse = new RefundInfoResponse(refundAmount, deductedAmount, totalRefundAmount);
+		return refundInfoResponse;
+	}
 
 	@Override
 	@Transactional
