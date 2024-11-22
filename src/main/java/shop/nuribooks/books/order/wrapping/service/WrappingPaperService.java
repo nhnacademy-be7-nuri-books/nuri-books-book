@@ -1,4 +1,4 @@
-package shop.nuribooks.books.order.wrapping.Service;
+package shop.nuribooks.books.order.wrapping.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

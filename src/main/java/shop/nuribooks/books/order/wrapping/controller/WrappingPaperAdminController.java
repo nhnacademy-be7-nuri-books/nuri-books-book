@@ -18,9 +18,9 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
-import shop.nuribooks.books.order.wrapping.Service.WrappingPaperService;
 import shop.nuribooks.books.order.wrapping.dto.WrappingPaperRequest;
 import shop.nuribooks.books.order.wrapping.dto.WrappingPaperResponse;
+import shop.nuribooks.books.order.wrapping.service.WrappingPaperService;
 
 @RequiredArgsConstructor
 @RestController

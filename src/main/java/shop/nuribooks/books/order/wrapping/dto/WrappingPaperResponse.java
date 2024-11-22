@@ -1,14 +1,14 @@
 package shop.nuribooks.books.order.wrapping.dto;
 
-import lombok.Builder;
-
 import java.math.BigDecimal;
+
+import lombok.Builder;
 
 @Builder
 public record WrappingPaperResponse(
-        Long id,
-        String title,
-        String imageUrl,
-        BigDecimal wrappingPrice
+	Long id,
+	String title,
+	String imageUrl,
+	BigDecimal wrappingPrice
 ) {
 }
