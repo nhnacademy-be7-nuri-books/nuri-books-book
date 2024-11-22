@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import shop.nuribooks.books.book.book.dto.AladinBookListItemResponse;
 import shop.nuribooks.books.book.book.dto.AladinBookListResponse;
 import shop.nuribooks.books.book.book.service.AladinBookService;
 import shop.nuribooks.books.book.client.AladinFeignClient;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
+import shop.nuribooks.books.exception.book.AladinApiException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,19 +27,21 @@ public class AladinBookServiceImpl implements AladinBookService {
 	@Override
 	public List<AladinBookListItemResponse> getNewBooks(String queryType, String searchTarget, int maxResults) {
 		try {
-			AladinBookListResponse response = aladinFeignClient.getNewBooks(ttbKey, queryType, maxResults, 1, "Book", "JS", "20131101");
+			AladinBookListResponse response = aladinFeignClient.getNewBooks(ttbKey, queryType, maxResults, 1, "Book",
+				"JS", "20131101");
 			log.info("Received BookList response: {}", response);
 			return response.item();
 		} catch (Exception ex) {
 			log.error("Error: ", ex);
-			throw new RuntimeException("Failed to retrieve new books from Aladin");
+			throw new AladinApiException();
 		}
 	}
 
 	@Override
 	public AladinBookListItemResponse getBookByIsbnWithAladin(String isbn) {
 		try {
-			AladinBookListResponse response = aladinFeignClient.getBookDetails(ttbKey, "ISBN", isbn, "JS", "20131101");
+			AladinBookListResponse response = aladinFeignClient.getBookDetails(ttbKey, "ISBN", isbn, "Big", "JS",
+				"20131101");
 			log.info("Received Book response: {}", response);
 			return response.item().getFirst();
 		} catch (Exception ex) {

@@ -34,10 +34,9 @@ import shop.nuribooks.books.member.member.entity.StatusType;
 @RequiredArgsConstructor
 public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
-	private final JPAQueryFactory queryFactory;
-
 	// 터무니없이 큰 페이지 사이즈 요청에 대해 서버를 보호하기 위한 maxPageSize 설정
 	private static final int MAX_PAGE_SIZE = 100;
+	private final JPAQueryFactory queryFactory;
 
 	public Page<MemberSearchResponse> searchMembersWithPaging(MemberSearchRequest request, Pageable pageable) {
 
@@ -115,7 +114,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 		return getPage(content, validPageable, countQuery::fetchOne);
 	}
 
-
 	// 동적 쿼리 메서드 목록
 	private BooleanExpression nameContains(String name) {
 		return hasText(name) ? customer.name.contains(name) : null;
@@ -134,11 +132,11 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 	}
 
 	private BooleanExpression birthdayGoe(LocalDate birthdayGoe) {
-		return birthdayGoe != null	? member.birthday.goe(birthdayGoe) : null;
+		return birthdayGoe != null ? member.birthday.goe(birthdayGoe) : null;
 	}
 
 	private BooleanExpression birthdayLoe(LocalDate birthdayLoe) {
-		return birthdayLoe != null	? member.birthday.loe(birthdayLoe) : null;
+		return birthdayLoe != null ? member.birthday.loe(birthdayLoe) : null;
 	}
 
 	private BooleanExpression usernameContains(String username) {
@@ -189,3 +187,4 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 		return latestLoginAtLoe != null ? member.latestLoginAt.loe(latestLoginAtLoe) : null;
 	}
 }
+

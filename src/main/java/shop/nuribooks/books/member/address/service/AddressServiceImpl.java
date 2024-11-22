@@ -27,6 +27,16 @@ public class AddressServiceImpl implements AddressService {
 	private final AddressRepository addressRepository;
 	private final MemberRepository memberRepository;
 
+	private static AddressEditor getAddressEditor(AddressEditRequest request, Address address) {
+		AddressEditorBuilder addressEditorBuilder = address.toEditor();
+		return addressEditorBuilder
+			.name(request.name())
+			.zipcode(request.zipcode())
+			.address(request.address())
+			.detailAddress(request.detailAddress())
+			.build();
+	}
+
 	@Transactional
 	public AddressResponse registerAddress(AddressRegisterRequest request, Long memberId) {
 		int size = addressRepository.findAllByMemberId(memberId).size();
@@ -49,8 +59,10 @@ public class AddressServiceImpl implements AddressService {
 
 	@Transactional(readOnly = true)
 	public List<AddressResponse> findAddressesByMemberId(Long memberId) {
-		List<Address> addressesByMemberId = addressRepository.findAllByMemberId(memberId);
-		return addressesByMemberId.stream()
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+		List<Address> addressList = member.getAddressList();
+		return addressList.stream()
 			.map(AddressResponse::of)
 			.toList();
 	}
@@ -70,17 +82,6 @@ public class AddressServiceImpl implements AddressService {
 		AddressEditor addressEditor = getAddressEditor(request, address);
 		address.edit(addressEditor);
 		return AddressResponse.of(address);
-	}
-
-	private static AddressEditor getAddressEditor(AddressEditRequest request, Address address) {
-		AddressEditorBuilder addressEditorBuilder = address.toEditor();
-		return addressEditorBuilder
-			.name(request.name())
-			.zipcode(request.zipcode())
-			.address(request.address())
-			.detailAddress(request.detailAddress())
-			.isDefault(request.isDefault())
-			.build();
 	}
 
 }

@@ -2,6 +2,8 @@ package shop.nuribooks.books.order.wrapping.entity;
 
 import java.math.BigDecimal;
 
+import lombok.Builder;
+import lombok.Getter;
 import org.hibernate.annotations.Comment;
 
 import jakarta.persistence.Column;
@@ -13,16 +15,19 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import shop.nuribooks.books.order.wrapping.dto.WrappingPaperRequest;
+import shop.nuribooks.books.order.wrapping.dto.WrappingPaperResponse;
 
 /**
  * 포장지 entity
  *
  * @author nuri
  */
-@Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "wrapping_papers")
 @Comment("포장지 정보")
+@Table(name = "wrapping_papers")
+@Entity
 public class WrappingPaper {
 
 	@Id
@@ -41,7 +46,7 @@ public class WrappingPaper {
 	private String imageUrl;
 
 	@Column(precision = 9, nullable = false)
-	@Comment("포장 비용")
+	@Comment("포장지 가격")
 	private BigDecimal wrappingPrice = BigDecimal.ZERO;
 
 	/**
@@ -51,9 +56,25 @@ public class WrappingPaper {
 	 * @param imageUrl 이미지 경로
 	 * @param wrappingPrice 포장 비용
 	 */
+	@Builder
 	public WrappingPaper(String title, String imageUrl, BigDecimal wrappingPrice) {
 		this.title = title;
 		this.imageUrl = imageUrl;
 		this.wrappingPrice = wrappingPrice;
+	}
+
+	public WrappingPaperResponse toResponseDto() {
+		return WrappingPaperResponse.builder()
+				.id(id)
+				.title(title)
+				.imageUrl(imageUrl)
+				.wrappingPrice(wrappingPrice)
+				.build();
+	}
+
+	public void update(WrappingPaperRequest request) {
+		this.title = request.title();
+		this.imageUrl = request.imageUrl();
+		this.wrappingPrice = request.wrappingPrice();
 	}
 }

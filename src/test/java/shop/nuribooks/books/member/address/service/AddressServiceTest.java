@@ -86,6 +86,7 @@ class AddressServiceTest {
 
 		Address address = createAddress(member);
 		addressRepository.save(address);
+		member.addAddress(address);
 
 		// when
 		List<AddressResponse> addressesByMemberId = addressService.findAddressesByMemberId(member.getId());
@@ -141,7 +142,6 @@ class AddressServiceTest {
 			.name("test")
 			.address("장말로")
 			.detailAddress("103호")
-			.isDefault(false)
 			.build();
 		// when
 		addressService.modifyAddress(saved.getId(), addressEditRequest);
@@ -149,7 +149,7 @@ class AddressServiceTest {
 		// then
 		Address changedAddress = addressRepository.findById(saved.getId())
 			.orElseThrow(() -> new AddressNotFoundException("주소가 없습니다."));
-		Assertions.assertThat(changedAddress.isDefault()).isFalse();
+		Assertions.assertThat(changedAddress.isDefault()).isTrue();
 	}
 
 	private Address createAddress(Member member) {

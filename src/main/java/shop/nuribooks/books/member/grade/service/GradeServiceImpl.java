@@ -35,7 +35,6 @@ public class GradeServiceImpl implements GradeService {
 	/**
 	 * 등급 등록
 	 * @param request GradeRegisterRequest로 등급의 이름, 포인트 적립률, 승급 조건 금액을 받는다.
-	 * @return 입력받은 등급명이 이미 존재하면 예외를 반환하고, <br>
 	 * 등급 등록에 성공하면 입력 받았던 정보를 다시 GradeRegisterResponse에 담아서 반환
 	 */
 	@Override
@@ -65,8 +64,7 @@ public class GradeServiceImpl implements GradeService {
 	 * 등급 수정
 	 * @param name 수정하고 싶은 등급명을 받는다.
 	 * @param request 수정하고 싶은 내용의 등급명, 포인트 적립률, 승급 조건 금액을 GradeUpdateRequest로 받는다.
-	 * @return 입력받은 등급명이 존재하지 않으면 예외를 반환하고, <br>
-	 * 존재하면 해당 등급의 정보를 입력받은 것으로 수정하고 그 내용을 GradeUpdateResponse에 담아서 반환
+	 * 해당 등급의 정보를 입력받은 것으로 수정하고 그 내용을 GradeUpdateResponse에 담아서 반환
 	 */
 	@Override
 	@Transactional
@@ -117,5 +115,4 @@ public class GradeServiceImpl implements GradeService {
 		return gradeRepository.findByName(name.toUpperCase())
 			.orElseThrow(() -> new GradeNotFoundException("해당 이름의 등급이 존재하지 않습니다."));
 	}
-
 }

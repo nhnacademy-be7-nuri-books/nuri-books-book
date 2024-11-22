@@ -47,9 +47,5 @@ public class CustomerController {
 
 		return ResponseEntity.status(CREATED).body(response);
 	}
-
 }
-
-
-
 
