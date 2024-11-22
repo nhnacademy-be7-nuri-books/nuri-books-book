@@ -13,8 +13,6 @@ import shop.nuribooks.books.book.contributor.entity.ContributorEditor;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.exception.contributor.ContributorNotFoundException;
 
-import java.util.List;
-
 /**
  * @author kyongmin
  */
@@ -51,7 +49,7 @@ public class ContributorServiceImpl implements ContributorService {
 	public ContributorResponse updateContributor(Long contributorId, ContributorRequest request) {
 		Contributor contributor = contributorRepository.findById(contributorId)
 			.orElseThrow(
-				() -> new ContributorNotFoundException("해당 기여자가 존재하지 않습니다."));
+				() -> new ContributorNotFoundException());
 
 		ContributorEditor contributorEditor = getContributorEditor(request, contributor);
 		contributor.edit(contributorEditor);
@@ -69,7 +67,7 @@ public class ContributorServiceImpl implements ContributorService {
 	@Override
 	public ContributorResponse getContributor(Long contributorId) {
 		Contributor contributor = contributorRepository.findById(contributorId)
-			.orElseThrow(() -> new ContributorNotFoundException("해당 기여자가 존재하지 않습니다."));
+			.orElseThrow(() -> new ContributorNotFoundException());
 		return ContributorResponse.of(contributor);
 	}
 
@@ -93,7 +91,7 @@ public class ContributorServiceImpl implements ContributorService {
 	@Override
 	public void deleteContributor(Long contributorId) {
 		Contributor contributor = contributorRepository.findById(contributorId)
-			.orElseThrow(() -> new ContributorNotFoundException("해당 기여자가 존재하지 않습니다."));
+			.orElseThrow(() -> new ContributorNotFoundException());
 		contributorRepository.delete(contributor);
 	}
 

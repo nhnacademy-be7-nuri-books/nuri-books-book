@@ -30,18 +30,13 @@ import shop.nuribooks.books.book.publisher.service.PublisherServiceImpl;
 @AutoConfigureMockMvc
 class PublisherControllerTest {
 
-	private final ObjectMapper objectMapper = new ObjectMapper();  // JSON 직렬화에 사용
+	private final ObjectMapper objectMapper = new ObjectMapper();
 	@Autowired
 	private PublisherController publisherController;
 	@MockBean
 	private PublisherServiceImpl publisherService;
 	@Autowired
 	private MockMvc mockMvc;
-
-	// @BeforeEach
-	// void setUp() {
-	// 	mockMvc = MockMvcBuilders.standaloneSetup(publisherController).build();
-	// }
 
 	@DisplayName("출판사 등록")
 	@Test
