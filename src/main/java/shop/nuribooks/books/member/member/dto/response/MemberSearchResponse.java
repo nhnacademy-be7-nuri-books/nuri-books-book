@@ -14,7 +14,7 @@ import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.StatusType;
 
 @Builder
-public record MemberSearchResponse (
+public record MemberSearchResponse(
 
 	Long customerId,
 	String name,
@@ -37,4 +37,6 @@ public record MemberSearchResponse (
 
 	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
 	LocalDateTime latestLoginAt
-) {}
+) {
+}
+

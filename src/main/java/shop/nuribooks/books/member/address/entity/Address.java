@@ -54,9 +54,7 @@ public class Address {
 			.name(name)
 			.zipcode(zipcode)
 			.address(address)
-			.detailAddress(detailAddress)
-			.isDefault(isDefault);
-
+			.detailAddress(detailAddress);
 	}
 
 	public void edit(AddressEditor addressEditor) {
@@ -64,7 +62,6 @@ public class Address {
 		zipcode = addressEditor.getZipcode();
 		address = addressEditor.getAddress();
 		detailAddress = addressEditor.getDetailAddress();
-		isDefault = addressEditor.isDefault();
 	}
 
 }

@@ -52,7 +52,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 		PointHistory pointHistory = pointHistoryRequest.toEntity(pointPolicy);
 		Member member = pointHistoryRequest.getMember();
 		member.setPoint(member.getPoint().add(pointHistory.getAmount()));
-		return this.pointHistoryRepository.save(pointHistory);
+		return pointHistoryRepository.save(pointHistory);
 	}
 
 	/**
