@@ -25,7 +25,7 @@ public record ReviewMemberResponse(
 	List<ReviewImageResponse> reviewImages
 ) {
 	public static ReviewMemberResponse of(Review review) {
-		ReviewMemberResponse response = ReviewMemberResponse.builder()
+		return ReviewMemberResponse.builder()
 			.id(review.getId())
 			.title(review.getTitle())
 			.content(review.getContent())
@@ -33,6 +33,5 @@ public record ReviewMemberResponse(
 			.member(MemberBriefResponse.of(review.getMember()))
 			.reviewImages(new LinkedList<>())
 			.build();
-		return response;
 	}
 }
