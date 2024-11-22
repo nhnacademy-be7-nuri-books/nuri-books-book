@@ -83,13 +83,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 	}
 
 	@Override
-	public void refundUpdateStateAndStock(OrderDetail orderDetail) {
-		orderDetail.setOrderState(OrderState.RETURNED);
-		int increaseStock = -orderDetail.getCount();
-		orderDetail.getBook().updateStock(increaseStock);
-	}
-
-	@Override
 	public OrderDetail getOrderDetail(Long orderDetailId) {
 		return orderDetailRepository.findById(orderDetailId)
 			.orElseThrow(() -> new OrderDetailNotFoundException("주문 상세 정보를 찾을 수 없습니다."));

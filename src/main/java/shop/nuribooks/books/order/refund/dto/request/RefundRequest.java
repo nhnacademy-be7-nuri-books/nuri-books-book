@@ -2,15 +2,16 @@ package shop.nuribooks.books.order.refund.dto.request;
 
 import java.math.BigDecimal;
 
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
+import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.refund.entity.Refund;
 
-public record RefundRequest(Long orderDetailId,
+public record RefundRequest(Long orderId,
+							BigDecimal refundAmount,
 							String reason) {
 
-	public Refund toEntity(OrderDetail orderDetail, BigDecimal refundAmount) {
+	public Refund toEntity(Order order) {
 		return Refund.builder()
-			.orderDetail(orderDetail)
+			.order(order)
 			.refundAmount(refundAmount)
 			.reason(reason)
 			.build();

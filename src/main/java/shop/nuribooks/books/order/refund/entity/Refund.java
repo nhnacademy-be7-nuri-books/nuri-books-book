@@ -15,7 +15,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
+import shop.nuribooks.books.order.order.entity.Order;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,19 +24,21 @@ import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
 public class Refund {
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "order_detail_id")
-	OrderDetail orderDetail;
+	@JoinColumn(name = "order_id")
+	Order order;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "refund_id")
 	private Long id;
+
 	private String reason;
 
 	private BigDecimal refundAmount;
 
 	@Builder
-	private Refund(OrderDetail orderDetail, String reason, BigDecimal refundAmount) {
-		this.orderDetail = orderDetail;
+	private Refund(Order order, String reason, BigDecimal refundAmount) {
+		this.order = order;
 		this.reason = reason;
 		this.refundAmount = refundAmount;
 	}

@@ -6,7 +6,7 @@ import shop.nuribooks.books.order.refund.dto.response.RefundResponse;
 
 public interface RefundService {
 
-	RefundInfoResponse getRefundResponseInfo(Long orderDetailId);
+	RefundInfoResponse getRefundResponseInfo(Long orderId);
 
 	RefundResponse refund(RefundRequest refundRequest);
 }

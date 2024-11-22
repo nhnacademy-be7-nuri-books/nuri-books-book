@@ -1,10 +1,12 @@
 package shop.nuribooks.books.order.refund.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -23,10 +25,13 @@ import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.entity.Order;
+import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderDetail.entity.OrderState;
+import shop.nuribooks.books.order.orderDetail.repository.OrderDetailRepository;
 import shop.nuribooks.books.order.orderDetail.service.OrderDetailService;
 import shop.nuribooks.books.order.refund.dto.request.RefundRequest;
+import shop.nuribooks.books.order.refund.dto.response.RefundInfoResponse;
 import shop.nuribooks.books.order.refund.entity.Refund;
 import shop.nuribooks.books.order.refund.repository.RefundRepository;
 
@@ -40,7 +45,13 @@ class RefundServiceImplTest {
 	private RefundRepository refundRepository;
 
 	@Mock
+	private OrderRepository orderRepository;
+
+	@Mock
 	private OrderDetailService orderDetailService;
+
+	@Mock
+	private OrderDetailRepository orderDetailRepository;
 
 	@Mock
 	private MemberRepository memberRepository;
@@ -48,37 +59,55 @@ class RefundServiceImplTest {
 	@Mock
 	private PointHistoryService pointHistoryService;
 
-	@DisplayName("환불시 주문상태, 재고가 변경되고 금액을 포인트로 반환한다.")
+	@DisplayName("환불 받을 정보를 가져온다")
+	@Test
+	void getRefundResponseInfo() {
+		// given
+		Order order = createOrder();
+		BigDecimal paymentPrice = order.getPaymentPrice();
+		when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+		// when
+
+		RefundInfoResponse refundResponseInfo = refundService.getRefundResponseInfo(order.getId());
+		// then
+		assertThat(refundResponseInfo.totalRefundAmount())
+			.isEqualTo(paymentPrice.subtract(BigDecimal.valueOf(2500L)));
+	}
+
+	@DisplayName("환불시 주문상태가 변경되고 금액을 포인트로 반환한다.")
 	@Test
 	void refund() {
 		// given
 		Order order = createOrder();
+		RefundRequest refundRequest = new RefundRequest(order.getId(), order.getPaymentPrice(), "이유");
+
+		when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 		Publisher publisher = TestUtils.createPublisher();
 		Book book = TestUtils.createBook(publisher);
-		int bookStock = book.getStock();
 		int quantity = 3;
 		BigDecimal price = BigDecimal.valueOf(10000L);
 		OrderDetail orderDetail = new OrderDetail(order, OrderState.COMPLETED, book, quantity, price,
 			true);
-		when(orderDetailService.getOrderDetail(any())).thenReturn(orderDetail);
+		when(orderDetailRepository.findAllByOrderId(any())).thenReturn(List.of(orderDetail));
 
 		Customer customer = TestUtils.createCustomer();
 		Grade creategrade = TestUtils.creategrade();
 		Member member = TestUtils.createMember(customer, creategrade);
+
 		Refund refund = Refund.builder()
-			.orderDetail(orderDetail)
-			.refundAmount(price.multiply(BigDecimal.valueOf(quantity)))
-			.reason("이유")
+			.order(order)
+			.refundAmount(refundRequest.refundAmount())
+			.reason(refundRequest.reason())
 			.build();
 		when(refundRepository.save(any())).thenReturn(refund);
 		when(memberRepository.findById(any())).thenReturn(Optional.of(member));
 
-		RefundRequest refundRequest = new RefundRequest(orderDetail.getId(), "이유");
 		// when
 		refundService.refund(refundRequest);
 
 		// then
 		verify(pointHistoryService).registerPointHistory(any(), any());
+		assertThat(orderDetail.getOrderState()).isEqualByComparingTo(OrderState.RETURNED);
 
 	}
 

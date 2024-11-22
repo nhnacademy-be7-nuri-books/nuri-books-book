@@ -1,6 +1,7 @@
 package shop.nuribooks.books.order.refund.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,9 +11,14 @@ import shop.nuribooks.books.book.point.dto.request.register.RefundReturningPoint
 import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.exception.order.CustomerRefundException;
+import shop.nuribooks.books.exception.order.OrderNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
+import shop.nuribooks.books.order.order.entity.Order;
+import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderDetail.entity.OrderState;
+import shop.nuribooks.books.order.orderDetail.repository.OrderDetailRepository;
 import shop.nuribooks.books.order.orderDetail.service.OrderDetailService;
 import shop.nuribooks.books.order.refund.dto.request.RefundRequest;
 import shop.nuribooks.books.order.refund.dto.response.RefundInfoResponse;
@@ -26,63 +32,65 @@ public class RefundServiceImpl implements RefundService {
 
 	private final RefundRepository refundRepository;
 	private final OrderDetailService orderDetailService;
+	private final OrderDetailRepository orderDetailRepository;
+	private final OrderRepository orderRepository;
 	private final MemberRepository memberRepository;
 	private final PointHistoryService pointHistoryService;
 
+	// 단순 변심에 의한 반품
 	@Override
-	public RefundInfoResponse getRefundResponseInfo(Long orderDetailId) {
+	public RefundInfoResponse getRefundResponseInfo(Long orderId) {
 		// 주문 상세 가져오기
-		OrderDetail orderDetail = orderDetailService.getOrderDetail(orderDetailId);
-		BigDecimal refundAmount = orderDetail.getUnitPrice().multiply(BigDecimal.valueOf(orderDetail.getCount()));
 
-		// TODO: 주문에 가서 만약 전체 쿠폰 조건을 만족시키지 못하면 차감받은 금액을 deductedAmount에 더해준다.
+		Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
+
+		BigDecimal paymentPrice = order.getPaymentPrice();
 
 		// 일단은 반품 배송비 2500원으로 생각
 		BigDecimal deductedAmount = BigDecimal.valueOf(2500L);
 
 		BigDecimal totalRefundAmount =
-			refundAmount.subtract(deductedAmount).compareTo(BigDecimal.ZERO) > 0 ?
-				refundAmount.subtract(deductedAmount) : BigDecimal.ZERO;
+			paymentPrice.subtract(deductedAmount).compareTo(BigDecimal.ZERO) > 0 ?
+				paymentPrice.subtract(deductedAmount) : BigDecimal.ZERO;
 
 		// 환불 받을 금액 계산
-		RefundInfoResponse refundInfoResponse = new RefundInfoResponse(refundAmount, deductedAmount, totalRefundAmount);
-		return refundInfoResponse;
+		return new RefundInfoResponse(orderId, paymentPrice, deductedAmount, totalRefundAmount);
 	}
 
+	// 단순 변심에 의한 반품
 	@Override
 	@Transactional
 	public RefundResponse refund(RefundRequest refundRequest) {
 
 		// 주문상세 가져오기
-		OrderDetail orderDetail = orderDetailService.getOrderDetail(refundRequest.orderDetailId());
+		Order order = orderRepository.findById(refundRequest.orderId())
+			.orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
+		List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(refundRequest.orderId());
+
+		// 상태 변경
+		orderDetailList.forEach(
+			orderDetail -> orderDetail.setOrderState(OrderState.RETURNED)
+		);
 
 		// 멤버 가져오기
-		Member member = getMember(orderDetail);
+		Member member = getMember(order);
 
-		orderDetailService.refundUpdateStateAndStock(orderDetail);
-		// 회원 포인트로 변환 (현재는 구매한 금액에 대해서만 포인트로 반환한다.)
-		// TODO: 이후 쿠폰 적용 여부에 따라 금액 계산 적용
-		BigDecimal refundAmount = orderDetail.getUnitPrice().multiply(BigDecimal.valueOf(orderDetail.getCount()));
+		Refund refund = refundRequest.toEntity(order);
 
-		// TODO: 주문으로 인해 적립된 포인트 기록을 삭제해주어야 한다.
-
-		// 누적 구매금액도 다시 감소시켜야 한다.
-
-		// 쿠폰 반환
-
-		Refund refund = refundRequest.toEntity(orderDetail, refundAmount);
-
-		RefundReturningPointRequest refundReturningPointRequest = new RefundReturningPointRequest(member, refund,
-			refundAmount);
+		RefundReturningPointRequest refundReturningPointRequest = new RefundReturningPointRequest(member,
+			refund, refund.getRefundAmount());
 		//환불 포인트에 저장
 		pointHistoryService.registerPointHistory(refundReturningPointRequest, PolicyName.REFUND);
+		// 회원 포인트로 변환 (현재는 구매한 금액에 대해서만 포인트로 반환한다.)
+
+		// TODO: 주문으로 인해 적립된 포인트 기록을 삭제 및 누적 구매금액도 다시 감소시켜야 한다.
 
 		Refund saved = refundRepository.save(refund);
 		return RefundResponse.of(saved);
 	}
 
-	private Member getMember(OrderDetail orderDetail) {
-		Long customerId = orderDetail.getOrder().getCustomer().getId();
+	private Member getMember(Order order) {
+		Long customerId = order.getCustomer().getId();
 		return memberRepository.findById(customerId)
 			.orElseThrow(() -> new CustomerRefundException("비회원은 환불이 불가합니다."));
 	}

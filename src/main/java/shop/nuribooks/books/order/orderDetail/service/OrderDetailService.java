@@ -16,7 +16,5 @@ public interface OrderDetailService {
 
 	boolean checkStock(Order order);
 
-	void refundUpdateStateAndStock(OrderDetail orderDetail);
-
 	OrderDetail getOrderDetail(Long orderDetailId);
 }

@@ -21,10 +21,10 @@ public class RefundController {
 
 	private final RefundService refundService;
 
-	@GetMapping("/api/refunds/{order-detail-id}")
+	@GetMapping("/api/refunds/{order-id}")
 	public ResponseEntity<RefundInfoResponse> getRefundResponse(
-		@PathVariable(name = "order-detail-id") Long orderDetailId) {
-		RefundInfoResponse refundResponseInfo = refundService.getRefundResponseInfo(orderDetailId);
+		@PathVariable(name = "order-id") Long orderId) {
+		RefundInfoResponse refundResponseInfo = refundService.getRefundResponseInfo(orderId);
 		return ResponseEntity.ok().body(refundResponseInfo);
 	}
 
