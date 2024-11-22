@@ -33,7 +33,7 @@ public class Wrapping {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id", nullable = false,
-	foreignKey = @ForeignKey(name = "FK_orders_TO_wrappings_1"))
+		foreignKey = @ForeignKey(name = "FK_orders_TO_wrappings_1"))
 	@Comment("연결된 주문 정보")
 	private Order order;
 

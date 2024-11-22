@@ -21,7 +21,6 @@ import shop.nuribooks.books.book.contributor.dto.ContributorRequest;
 import shop.nuribooks.books.book.contributor.dto.ContributorResponse;
 import shop.nuribooks.books.book.contributor.entity.Contributor;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
-import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.exception.contributor.ContributorNotFoundException;
 
 @SpringBootTest
@@ -119,7 +118,8 @@ class ContributorServiceImplTest {
 	@Test
 	void getAllContributor() {
 		// given
-		List<Contributor> contributors = List.of(new Contributor(1L, "contributor1"), new Contributor(2L, "contributor2"));
+		List<Contributor> contributors = List.of(new Contributor(1L, "contributor1"),
+			new Contributor(2L, "contributor2"));
 
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Contributor> contributorPage = new PageImpl<>(contributors, pageable, contributors.size());
@@ -137,7 +137,7 @@ class ContributorServiceImplTest {
 		// 메서드 호출 여부 검증
 		verify(contributorRepository).findAll(pageable);
 	}
-	
+
 	@DisplayName("기여자 조회 실패")
 	@Test
 	void failed_getContributor() {

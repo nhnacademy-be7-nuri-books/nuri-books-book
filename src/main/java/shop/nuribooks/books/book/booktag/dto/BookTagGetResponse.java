@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record BookTagGetResponse(Long bookTagId, Long bookId, List<String> tagNames) {
-    public static BookTagGetResponse of(Long bookTagId, Long bookId, List<String> tagNames) {
-        return new BookTagGetResponse(bookTagId, bookId, tagNames);
-    }
+	public static BookTagGetResponse of(Long bookTagId, Long bookId, List<String> tagNames) {
+		return new BookTagGetResponse(bookTagId, bookId, tagNames);
+	}
 }
