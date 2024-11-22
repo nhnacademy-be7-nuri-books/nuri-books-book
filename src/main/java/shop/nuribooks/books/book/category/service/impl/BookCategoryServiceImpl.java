@@ -145,25 +145,5 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			bookContributorsResponsePage.getTotalElements()
 		);
 
-		/*List<AdminBookListResponse> adminBookListResponseList = bookCategoryRepository.findBooksByCategoryId(
-			categoryIds,
-			pageable);
-
-		int totalElements = (int) bookCategoryRepository.countBookByCategoryIds(categoryIds);
-
-		int totalPages = (int) Math.ceil((double) totalElements / pageable.getPageSize());
-
-		return new PagedResponse<>(
-			adminBookListResponseList,
-			pageable.getPageNumber(),
-			pageable.getPageSize(),
-			totalPages,
-			totalElements
-		);*/
-
-		//int total = (int)bookCategoryRepository.countBookByCategoryIds(categoryIds);
-
-		//return (PagedResponse<AdminBookListResponse>)PagedResponse.of(adminBookListResponseList, pageable, total);
 	}
-
 }

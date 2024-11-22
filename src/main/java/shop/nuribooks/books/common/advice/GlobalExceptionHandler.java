@@ -44,11 +44,6 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
 	}
 
-	// @ExceptionHandler(Exception.class)
-	// public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request) {
-	// 	return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request);
-	// }
-
 	private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, WebRequest request) {
 		ErrorResponse errorResponse = new ErrorResponse(
 			status.value(),

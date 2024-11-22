@@ -122,9 +122,6 @@ class BookCategoryRepositoryTest {
 	@Test
 	@Order(6)
 	void findCategoriesByBookId_NoCategory() {
-		// Given
-		Long nonExistentBookId = 999L;
-
 		// When
 		List<List<SimpleCategoryResponse>> categories = bookCategoryRepository.findCategoriesByBookId(book.getId());
 
@@ -146,10 +143,14 @@ class BookCategoryRepositoryTest {
 		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
 
 		// Then
-		assertThat(books).isNotNull();
-		assertThat(books.size()).isEqualTo(1);
-		assertThat(books.get(0).id()).isEqualTo(book.getId());
-		assertThat(books.get(0).title()).isEqualTo(book.getTitle());
+		assertThat(books)
+			.isNotNull()
+			.hasSize(1)
+			.first()
+			.satisfies(bookResponse -> {
+				assertThat(bookResponse.id()).isEqualTo(book.getId());
+				assertThat(bookResponse.title()).isEqualTo(book.getTitle());
+			});
 	}
 
 	@DisplayName("카테고리 ID 목록으로 책 개수 조회 성공")
@@ -178,8 +179,9 @@ class BookCategoryRepositoryTest {
 		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
 
 		// Then
-		assertThat(books).isNotNull();
-		assertThat(books.size()).isEqualTo(2);
+		assertThat(books)
+			.isNotNull()
+			.hasSize(2);
 	}
 
 	@DisplayName("복수의 카테고리 ID로 책 개수 조회 성공")
@@ -222,7 +224,7 @@ class BookCategoryRepositoryTest {
 		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
 
 		// Then
-		assertThat(count).isEqualTo(0);
+		assertThat(count).isZero();
 	}
 
 	@DisplayName("카테고리 ID 목록이 비어있을 때 책 조회 시 빈 결과 반환")
@@ -251,6 +253,6 @@ class BookCategoryRepositoryTest {
 		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
 
 		// Then
-		assertThat(count).isEqualTo(0);
+		assertThat(count).isZero();
 	}
 }
