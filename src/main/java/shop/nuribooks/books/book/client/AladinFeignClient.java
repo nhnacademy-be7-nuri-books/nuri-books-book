@@ -25,6 +25,7 @@ public interface AladinFeignClient {
 		@RequestParam("ttbkey") String ttbKey,
 		@RequestParam("itemIdType") String itemIdType,
 		@RequestParam("ItemId") String itemId,
+		@RequestParam("Cover") String cover,
 		@RequestParam("output") String output,
 		@RequestParam("Version") String version
 	);
