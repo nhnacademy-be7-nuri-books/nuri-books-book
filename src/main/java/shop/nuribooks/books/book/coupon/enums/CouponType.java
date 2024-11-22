@@ -1,29 +1,15 @@
 package shop.nuribooks.books.book.coupon.enums;
 
-import java.util.Objects;
-import java.util.stream.Stream;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-
 public enum CouponType {
-	ALL, BOOK, CATEGORY;
+	ALL("전체"), BOOK("도서"), CATEGORY("카테고리");
 
-	@JsonCreator
-	public static CouponType fromValue(String value) {
+	String korName;
 
-		if (Objects.isNull(value)) {
-			return null;
-		}
-
-		return Stream.of(CouponType.values())
-			.filter(couponType -> couponType.getValue().equals(value.toUpperCase()))
-			.findFirst()
-			.orElse(null);
+	CouponType(String korName) {
+		this.korName = korName;
 	}
 
-	@JsonValue
-	public String getValue() {
-		return name();
+	public String toString() {
+		return this.korName;
 	}
 }
