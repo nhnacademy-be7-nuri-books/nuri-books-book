@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import shop.nuribooks.books.book.coupon.service.CouponService;
 import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
@@ -57,6 +58,7 @@ public class MemberServiceImpl implements MemberService {
 	private final GradeRepository gradeRepository;
 	private final PointHistoryService pointHistoryService;
 	private final CartRepository cartRepository;
+	private final CouponService couponService;
 
 	/**
 	 * 회원등록 <br>
@@ -103,6 +105,7 @@ public class MemberServiceImpl implements MemberService {
 		createCart(savedMember);
 
 		pointHistoryService.registerPointHistory(new PointHistoryRequest(savedMember), PolicyName.WELCOME);
+		couponService.issueWelcomeCoupon(savedMember);
 		return DtoMapper.toRegisterDto(savedCustomer, savedMember);
 	}
 

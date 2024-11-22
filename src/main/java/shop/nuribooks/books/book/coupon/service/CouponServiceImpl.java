@@ -8,15 +8,18 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.exception.coupon.CouponAlreadyExistsException;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
+import shop.nuribooks.books.member.member.entity.Member;
 
 @RequiredArgsConstructor
 @Service
 public class CouponServiceImpl implements CouponService {
 	private final CouponRepository couponRepository;
+	private final MemberCouponService memberCouponService;
 
 	/**
 	 * 쿠폰 등록하는 메서드
@@ -26,7 +29,7 @@ public class CouponServiceImpl implements CouponService {
 	 */
 	@Override
 	public Coupon registerCoupon(CouponRequest request) {
-		if (couponRepository.existsByNameIgnoreCase(request.name())) {
+		if (couponRepository.existsByNameIgnoreCaseAndExpireDateIsNull(request.name())) {
 			throw new CouponAlreadyExistsException();
 		}
 
@@ -75,6 +78,19 @@ public class CouponServiceImpl implements CouponService {
 
 		coupon.update(request);
 		return coupon;
+	}
+
+	/**
+	 * 웰컴 쿠폰 발급하는 메서드
+	 *
+	 * @param member
+	 */
+	@Override
+	public void issueWelcomeCoupon(Member member) {
+		Coupon welcomeCoupon = couponRepository.findCouponsByNameLike("%WELCOME%");
+
+		MemberCouponRegisterRequest request = new MemberCouponRegisterRequest(member.getId(), welcomeCoupon.getId());
+		memberCouponService.registerMemberCoupon(request);
 	}
 
 	/**

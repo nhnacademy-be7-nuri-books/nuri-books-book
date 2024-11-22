@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
+import shop.nuribooks.books.member.member.entity.Member;
 
 public interface CouponService {
 	Coupon registerCoupon(CouponRequest request);
@@ -17,4 +18,6 @@ public interface CouponService {
 	void expireCoupon(Long id);
 
 	Coupon updateCoupon(Long id, CouponRequest request);
+
+	void issueWelcomeCoupon(Member member);
 }

@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
 
+import shop.nuribooks.books.book.coupon.service.CouponService;
 import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.repository.CartRepository;
@@ -68,6 +69,9 @@ class MemberServiceImplTest {
 	@Mock
 	private CartRepository cartRepository;
 
+	@Mock
+	private CouponService couponService;
+
 	@BeforeEach
 	void setUp() {
 		MemberIdContext.setMemberId(1L);
@@ -95,6 +99,8 @@ class MemberServiceImplTest {
 		when(memberRepository.save(any(Member.class)))
 			.thenReturn(savedMember);
 		when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
+
+		doNothing().when(couponService).issueWelcomeCoupon(any(Member.class));
 		// when
 		MemberRegisterResponse response = memberServiceImpl.registerMember(request);
 
@@ -107,6 +113,8 @@ class MemberServiceImplTest {
 		// verify
 		verify(customerRepository, times(1)).save(any(Customer.class));
 		verify(memberRepository, times(1)).save(any(Member.class));
+		verify(couponService, times(1)).issueWelcomeCoupon(any(Member.class));  // couponService 호출 확인
+
 	}
 
 	@DisplayName("회원 등록 실패 - 중복된 이메일")
@@ -345,13 +353,13 @@ class MemberServiceImplTest {
 		//then
 		assertThat(response.name()).isEqualTo(savedCustomer.getName());
 		assertThat(response.username()).isEqualTo(savedMember.getUsername());
-			assertThat(response.phoneNumber()).isEqualTo(savedCustomer.getPhoneNumber());
-			assertThat(response.email()).isEqualTo(savedCustomer.getEmail());
-			assertThat(response.point()).isEqualTo(savedMember.getPoint());
-			assertThat(response.totalPaymentAmount()).isEqualTo(savedMember.getTotalPaymentAmount());
-			assertThat(response.gradeName()).isEqualTo(savedMember.getGrade().getName());
-			assertThat(response.pointRate()).isEqualTo(savedMember.getGrade().getPointRate());
-			assertThat(response.createdAt()).isEqualTo(savedMember.getCreatedAt());
+		assertThat(response.phoneNumber()).isEqualTo(savedCustomer.getPhoneNumber());
+		assertThat(response.email()).isEqualTo(savedCustomer.getEmail());
+		assertThat(response.point()).isEqualTo(savedMember.getPoint());
+		assertThat(response.totalPaymentAmount()).isEqualTo(savedMember.getTotalPaymentAmount());
+		assertThat(response.gradeName()).isEqualTo(savedMember.getGrade().getName());
+		assertThat(response.pointRate()).isEqualTo(savedMember.getGrade().getPointRate());
+		assertThat(response.createdAt()).isEqualTo(savedMember.getCreatedAt());
 	}
 
 	@DisplayName("회원 상세 조회 실패 - 회원이 존재하지 않을 때")
