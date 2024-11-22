@@ -27,7 +27,6 @@ class AddressEditorTest {
 			.zipcode("12345")
 			.address(null)
 			.detailAddress(null)
-			.isDefault(true)
 			.build();
 
 		AddressEditorBuilder addressEditorBuilder = address.toEditor();
@@ -36,7 +35,6 @@ class AddressEditorTest {
 			.zipcode(request.zipcode())
 			.address(request.address())
 			.detailAddress(request.detailAddress())
-			.isDefault(request.isDefault())
 			.build();
 
 		// when
@@ -44,7 +42,7 @@ class AddressEditorTest {
 
 		// then
 		assertThat(address).extracting("name", "zipcode", "address", "detailAddress", "isDefault")
-			.containsExactly("name2", "12345", "address", "addressDetail", true);
+			.containsExactly("name2", "12345", "address", "addressDetail", false);
 	}
 
 }
