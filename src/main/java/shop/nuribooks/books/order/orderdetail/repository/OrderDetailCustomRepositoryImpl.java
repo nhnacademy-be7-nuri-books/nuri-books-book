@@ -1,14 +1,12 @@
-package shop.nuribooks.books.order.orderDetail.repository;
+package shop.nuribooks.books.order.orderdetail.repository;
 
 import java.util.List;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
-import shop.nuribooks.books.order.orderDetail.entity.QOrderDetail;
-import shop.nuribooks.books.order.shipping.entity.QShippingPolicy;
-import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
+import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.entity.QOrderDetail;
 
 @RequiredArgsConstructor
 public class OrderDetailCustomRepositoryImpl implements OrderDetailCustomRepository {

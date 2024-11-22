@@ -30,7 +30,7 @@ import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
 import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
-import shop.nuribooks.books.order.orderDetail.dto.OrderDetailRequest;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailRequest;
 import shop.nuribooks.books.order.shipping.dto.ShippingRegisterRequest;
 
 class OrderControllerTest extends ControllerTestSupport {
@@ -44,7 +44,7 @@ class OrderControllerTest extends ControllerTestSupport {
 	private OrderTempRegisterRequest orderTempRegisterRequest;
 	private OrderTempRegisterResponse orderTempRegisterResponse;
 	private OrderInformationResponse memberOrderResponse;
-	private OrderInformationResponse CustomerOrderResponse;
+	private OrderInformationResponse customerOrderResponse;
 
 	@BeforeEach
 	void setUp() {
@@ -124,7 +124,7 @@ class OrderControllerTest extends ControllerTestSupport {
 			null
 		);
 
-		CustomerOrderResponse = new OrderInformationResponse(
+		customerOrderResponse = new OrderInformationResponse(
 			1L,
 			"감자",
 			"010-4943-3703",
@@ -165,7 +165,7 @@ class OrderControllerTest extends ControllerTestSupport {
 	void getOrderInformationCustomerTest() throws Exception {
 
 		when(orderService.getCustomerOrderInformation(anyLong(), anyInt()))
-			.thenReturn(CustomerOrderResponse);
+			.thenReturn(customerOrderResponse);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/{book-id}", 1L)
 				.param("quantity", "2"))

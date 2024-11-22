@@ -3,7 +3,7 @@ package shop.nuribooks.books.order.order.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import shop.nuribooks.books.order.orderDetail.entity.OrderState;
+import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 
 public record OrderListResponse(
 	Long orderId,

@@ -29,7 +29,7 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
 
 @Entity
 @NoArgsConstructor
