@@ -29,7 +29,7 @@ public class CouponServiceImpl implements CouponService {
 	 */
 	@Override
 	public Coupon registerCoupon(CouponRequest request) {
-		if (couponRepository.existsByNameIgnoreCaseAndExpireDateIsNull(request.name())) {
+		if (couponRepository.existsByNameIgnoreCaseAndExpiredDateIsNull(request.name())) {
 			throw new CouponAlreadyExistsException();
 		}
 

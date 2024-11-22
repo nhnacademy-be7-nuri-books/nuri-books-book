@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
+import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 import shop.nuribooks.books.book.point.enums.PolicyType;
 
@@ -43,7 +44,9 @@ public record CouponRequest(
 	@NotNull(message = "만료유형은 필수입니다.") //기간 쿠폰, 만료일 쿠폰
 	ExpirationType expirationType,
 
-	LocalDateTime expireDate) {
+	LocalDateTime expiredDate,
+	@NotNull(message = "쿠폰유형은 필수입니다.") //전체 적용, 도서 적용, 카테고리 적용
+	CouponType couponType) {
 	public Coupon toEntity() {
 		return Coupon.builder()
 			.name(name)
@@ -55,7 +58,8 @@ public record CouponRequest(
 			.expiredAt(expiredAt)
 			.expirationType(expirationType)
 			.period(period != null ? period : 0)
-			.expireDate(expireDate)
+			.expiredDate(expiredDate)
+			.couponType(couponType)
 			.build();
 
 	}

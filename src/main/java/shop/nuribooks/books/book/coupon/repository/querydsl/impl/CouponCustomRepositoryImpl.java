@@ -19,7 +19,7 @@ public class CouponCustomRepositoryImpl implements CouponCustomRepository {
 		Coupon foundCoupon = queryFactory.selectFrom(coupon)
 			.where(coupon.name.likeIgnoreCase(name)
 				.or(coupon.name.likeIgnoreCase("%웰컴%"))
-				.and(coupon.expireDate.isNull()))
+				.and(coupon.expiredDate.isNull()))
 			.fetchFirst();
 
 		if (foundCoupon == null) {
