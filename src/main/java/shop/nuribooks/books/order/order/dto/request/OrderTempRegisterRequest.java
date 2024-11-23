@@ -1,4 +1,4 @@
-package shop.nuribooks.books.order.order.dto;
+package shop.nuribooks.books.order.order.dto.request;
 
 import static com.fasterxml.jackson.annotation.JsonFormat.Shape.*;
 

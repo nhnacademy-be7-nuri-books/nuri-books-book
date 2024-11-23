@@ -1,4 +1,4 @@
-package shop.nuribooks.books.order.order.dto;
+package shop.nuribooks.books.order.order.dto.response;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -45,7 +45,7 @@ public record OrderInformationResponse(
 		List<AddressResponse> addressList,
 		List<BookOrderResponse> bookOrderResponses,
 		ShippingPolicy shippingPolicy,
-		BigDecimal point){
+		BigDecimal point) {
 		return new OrderInformationResponse(
 			customer.getId(),
 			customer.getName(),
@@ -69,7 +69,7 @@ public record OrderInformationResponse(
 	 */
 	public static OrderInformationResponse of(
 		List<BookOrderResponse> bookOrderResponses,
-		ShippingPolicy shippingPolicy){
+		ShippingPolicy shippingPolicy) {
 		return new OrderInformationResponse(
 			null,
 			null,

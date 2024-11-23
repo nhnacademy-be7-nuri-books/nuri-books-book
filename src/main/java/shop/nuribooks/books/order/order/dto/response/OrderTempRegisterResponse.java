@@ -1,4 +1,4 @@
-package shop.nuribooks.books.order.order.dto;
+package shop.nuribooks.books.order.order.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,7 +12,7 @@ public record OrderTempRegisterResponse(
 	BigDecimal wrappingPrice, // 포장 비용
 	LocalDateTime orderedAt // 주문 시간
 ) {
-	public static OrderTempRegisterResponse of(Order order, String orderName){
+	public static OrderTempRegisterResponse of(Order order, String orderName) {
 		return new OrderTempRegisterResponse(
 			order.getId(),
 			orderName,

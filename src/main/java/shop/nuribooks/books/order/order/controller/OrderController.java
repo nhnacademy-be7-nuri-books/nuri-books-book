@@ -26,12 +26,13 @@ import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
-import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
-import shop.nuribooks.books.order.order.dto.OrderListPeriodRequest;
-import shop.nuribooks.books.order.order.dto.OrderListResponse;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
+import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
+import shop.nuribooks.books.order.order.dto.request.OrderTempRegisterRequest;
+import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderListResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderTempRegisterResponse;
 import shop.nuribooks.books.order.order.service.OrderService;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailResponse;
 import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
 
 /**
@@ -157,6 +158,21 @@ public class OrderController {
 		Page<OrderListResponse> result = orderService.getOrderList(includeOrdersInPendingStatus, pageable,
 			orderListPeriodRequest, userId);
 
+		log.debug("주문 목록 조회 성공");
+
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
+	@GetMapping("/details/{order-id}")
+	public ResponseEntity<OrderDetailResponse> getOrderDetail(
+		@PathVariable("order-id") Long orderId,
+		Pageable pageable
+	) {
+		Optional<Long> userId = Optional.ofNullable(MemberIdContext.getMemberId());
+
+		log.debug("주문 상세 조회 성공");
+
+		OrderDetailResponse result = orderService.getOrderDetail(userId, orderId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
