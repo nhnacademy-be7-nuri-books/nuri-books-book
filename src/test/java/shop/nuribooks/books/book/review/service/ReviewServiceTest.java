@@ -23,6 +23,7 @@ import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
@@ -65,6 +66,7 @@ public class ReviewServiceTest {
 	private Member member;
 	private Review review;
 	private ReviewRequest reviewRequest;
+	private ReviewUpdateRequest reviewUpdateRequest;
 	private ReviewImageResponse reviewImageResponse;
 	private OrderDetail orderDetail;
 
@@ -86,8 +88,15 @@ public class ReviewServiceTest {
 			"title",
 			"content",
 			4,
-			orderDetail.getId(),
+			book.getId(),
 			List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
+		);
+
+		reviewUpdateRequest = new ReviewUpdateRequest(
+			"title",
+			"content",
+			4,
+			book.getId()
 		);
 
 		review = Review.builder()
@@ -140,13 +149,15 @@ public class ReviewServiceTest {
 	@Test
 	public void registerSuccess() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-		when(reviewRepository.save(any())).thenReturn(review);
+		Review review1 = reviewRequest.toEntity(member, book, orderDetail);
+		TestUtils.setIdForEntity(review1, 1l);
+		when(reviewRepository.save(any())).thenReturn(review1);
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNull(anyLong(), anyLong())).thenReturn(
 			List.of(orderDetail));
 		when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
 		MemberIdContext.setMemberId(member.getId());
-		assertEquals(ReviewMemberResponse.of(review),
+		assertEquals(ReviewMemberResponse.of(review1),
 			reviewService.registerReview(reviewRequest));
 	}
 
@@ -162,7 +173,7 @@ public class ReviewServiceTest {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.empty());
 		MemberIdContext.setMemberId(member.getId());
 		assertThrows(ReviewNotFoundException.class,
-			() -> reviewService.updateReview(reviewRequest, review.getId()));
+			() -> reviewService.updateReview(reviewUpdateRequest, review.getId()));
 	}
 
 	@Test
@@ -170,14 +181,14 @@ public class ReviewServiceTest {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
 		MemberIdContext.setMemberId(member.getId() + 10);
 		assertThrows(ReviewNotFoundException.class,
-			() -> reviewService.updateReview(reviewRequest, review.getId()));
+			() -> reviewService.updateReview(reviewUpdateRequest, review.getId()));
 	}
 
 	@Test
 	public void updatedByNullUser() {
 		MemberIdContext.setMemberId(null);
 		assertThrows(RequiredHeaderIsNullException.class,
-			() -> reviewService.updateReview(reviewRequest, review.getId()));
+			() -> reviewService.updateReview(reviewUpdateRequest, review.getId()));
 	}
 
 	@Test
@@ -185,7 +196,7 @@ public class ReviewServiceTest {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
 		MemberIdContext.setMemberId(member.getId());
 		assertEquals(ReviewMemberResponse.of(review),
-			reviewService.updateReview(reviewRequest, review.getId()));
+			reviewService.updateReview(reviewUpdateRequest, review.getId()));
 	}
 
 	@Test
