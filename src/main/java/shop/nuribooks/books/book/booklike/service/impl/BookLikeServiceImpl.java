@@ -9,14 +9,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.book.entity.Book;
+import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.book.utility.BookUtils;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.booklike.dto.BookLikeResponse;
+import shop.nuribooks.books.book.booklike.entity.BookLike;
+import shop.nuribooks.books.book.booklike.entity.BookLikeId;
 import shop.nuribooks.books.book.booklike.repository.BookLikeRepository;
 import shop.nuribooks.books.book.booklike.service.BookLikeService;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
+import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.booklike.ResourceAlreadyExistBookLikeIdException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
@@ -28,10 +34,24 @@ public class BookLikeServiceImpl implements BookLikeService {
 	private final BookLikeRepository bookLikeRepository;
 	private final BookContributorRepository bookContributorRepository;
 	private final MemberRepository memberRepository;
+	private final BookRepository bookRepository;
 
+	@Transactional
 	@Override
 	public void addLike(Long memberId, Long bookId) {
+		memberRepository.findById(memberId)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
+		Book book = bookRepository.findByIdAndDeletedAtIsNull(bookId)
+			.orElseThrow(() -> new BookNotFoundException(bookId));
+
+		if (bookLikeRepository.existsById(new BookLikeId(memberId, bookId))) {
+			throw new ResourceAlreadyExistBookLikeIdException();
+		}
+
+		book.incrementViewCount();
+
+		bookLikeRepository.save(new BookLike(new BookLikeId(memberId, bookId), book));
 	}
 
 	@Override

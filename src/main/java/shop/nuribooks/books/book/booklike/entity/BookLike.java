@@ -30,4 +30,9 @@ public class BookLike {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", insertable = false, updatable = false)
 	private Book book;
+
+	public BookLike(BookLikeId bookLikeId, Book book) {
+		this.bookLikeId = bookLikeId;
+		this.book = book;
+	}
 }
