@@ -127,7 +127,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		}
 
 		if (pageable.getPageNumber() < 0) {
-			throw new InvalidPageRequestException("페이지 번호는 0 이상이어야 합니다.");
+			throw new InvalidPageRequestException();
 		}
 
 		List<Long> categoryIds = categoryRepository.findAllChildCategoryIds(categoryId);

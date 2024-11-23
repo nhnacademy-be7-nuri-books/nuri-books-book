@@ -1,6 +1,5 @@
 package shop.nuribooks.books.book.book.controller;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -28,7 +27,7 @@ public class BookControllerTest extends ControllerTestSupport {
 	@Test
 	public void getBooks_ShouldReturnBadRequest_WhenPageIsOutOfRange() throws Exception {
 		Pageable pageable = PageRequest.of(10, 10);
-		when(bookService.getBooks(pageable)).thenThrow(new InvalidPageRequestException("조회 가능한 페이지 범위를 초과했습니다."));
+		when(bookService.getBooks(pageable)).thenThrow(new InvalidPageRequestException());
 
 		mockMvc.perform(get("/api/books")
 				.contentType(MediaType.APPLICATION_JSON)

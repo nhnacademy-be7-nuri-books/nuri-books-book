@@ -1,13 +1,14 @@
 package shop.nuribooks.books.book.booklike.service;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.booklike.dto.BookLikeResponse;
+import shop.nuribooks.books.common.message.PagedResponse;
 
 public interface BookLikeService {
 	void addLike(Long memberId, Long bookId);
 
 	void removeLike(Long memberId, Long bookId);
 
-	List<BookLikeResponse> getLikedBooks(Long memberId);
+	PagedResponse<BookLikeResponse> getLikedBooks(Long memberId, Pageable pageable);
 }
