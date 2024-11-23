@@ -7,7 +7,6 @@ import static shop.nuribooks.books.book.category.entity.QCategory.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -70,8 +69,7 @@ public class BookCategoryCustomImpl implements BookCategoryCustom {
 			.fetch();
 		return books.stream()
 			.map(AdminBookListResponse::of)
-			.collect(Collectors.toList());
-
+			.toList();
 	}
 
 	@Override
@@ -110,8 +108,7 @@ public class BookCategoryCustomImpl implements BookCategoryCustom {
 				// BookContributorsResponse 객체를 생성합니다.
 				return new BookContributorsResponse(bookDetails, contributorsByRole);
 			})
-			.collect(Collectors.toList());
-
+			.toList();
 		return new PageImpl<>(bookContributorsResponseList, pageable, totalElements);
 	}
 
