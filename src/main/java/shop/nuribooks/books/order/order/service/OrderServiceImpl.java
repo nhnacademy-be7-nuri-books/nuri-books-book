@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,9 @@ import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
 import shop.nuribooks.books.exception.order.NoStockAvailableException;
+import shop.nuribooks.books.exception.order.OrderNotFoundException;
 import shop.nuribooks.books.exception.order.PriceMismatchException;
+import shop.nuribooks.books.exception.order.detail.OrderNotBelongsToUserException;
 import shop.nuribooks.books.exception.point.PointNotFoundException;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 import shop.nuribooks.books.member.address.entity.Address;
@@ -47,20 +50,30 @@ import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.dto.MemberPointDTO;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
-import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
-import shop.nuribooks.books.order.order.dto.OrderListPeriodRequest;
-import shop.nuribooks.books.order.order.dto.OrderListResponse;
-import shop.nuribooks.books.order.order.dto.OrderPageResponse;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
+import shop.nuribooks.books.order.order.dto.OrderSummaryDto;
+import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
+import shop.nuribooks.books.order.order.dto.request.OrderTempRegisterRequest;
+import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderListResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderPageResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderTempRegisterResponse;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.order.repository.OrderRepository;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailItemDto;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailItemPageDto;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailRequest;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailResponse;
+import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 import shop.nuribooks.books.order.orderdetail.service.OrderDetailService;
+import shop.nuribooks.books.order.shipping.dto.ShippingInfoDto;
+import shop.nuribooks.books.order.shipping.entity.Shipping;
 import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
 import shop.nuribooks.books.order.shipping.repository.ShippingPolicyRepository;
+import shop.nuribooks.books.order.shipping.repository.ShippingRepository;
 import shop.nuribooks.books.order.shipping.service.ShippingService;
+import shop.nuribooks.books.payment.payment.dto.PaymentInfoDto;
 import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
+import shop.nuribooks.books.payment.payment.repository.PaymentRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -77,10 +90,13 @@ public class OrderServiceImpl implements OrderService {
 	private final ShippingPolicyRepository shippingPolicyRepository;
 	private final PointPolicyRepository pointPolicyRepository;
 	private final RedisCartRepository redisCartRepository;
+	private final ShippingRepository shippingRepository;
+	private final OrderDetailRepository orderDetailRepository;
 
 	private final OrderDetailService orderDetailService;
 	private final ShippingService shippingService;
 	private final PointHistoryService pointHistoryService;
+	private final PaymentRepository paymentRepository;
 
 	/**
 	 * 주문 폼 정보 가져오기 - 바로 주문(회원)
@@ -310,6 +326,15 @@ public class OrderServiceImpl implements OrderService {
 			.build();
 	}
 
+	/**
+	 * 주문 목록 가져오기
+	 *
+	 * @param includeOrdersInPendingStatus 대기 미포함 여부
+	 * @param pageable 페이지
+	 * @param orderListPeriodRequest 적용 날짜
+	 * @param userId 사용자 아이디
+	 * @return 주문 목록
+	 */
 	@Override
 	public Page<OrderListResponse> getOrderList(
 		boolean includeOrdersInPendingStatus,
@@ -327,6 +352,60 @@ public class OrderServiceImpl implements OrderService {
 			new PageImpl(result.orders(), pageable, result.totalCount());
 
 		return response;
+	}
+
+	/**
+	 * 주문 상세 가져오기
+	 * @param userId
+	 * @param orderId
+	 * @param pageable
+	 * @return
+	 */
+	@Override
+	public OrderDetailResponse getOrderDetail(Optional<Long> userId, Long orderId, Pageable pageable) {
+
+		Order order = orderRepository.findById(orderId).orElseThrow(
+			() -> new OrderNotFoundException("해당 주문 정보가 존재하지 않습니다.")
+		);
+
+		if (!Objects.equals(order.getCustomer().getId(), userId.get())) {
+			log.error("주문 상세 조회 - {} 가 소유한 주문이 아님", userId.get());
+			throw new OrderNotBelongsToUserException("해당 주문 정보의 소유자가 아닙니다.");
+		}
+
+		// 주문 요약 정보
+		OrderSummaryDto orderSummaryDto = OrderSummaryDto.builder()
+			.title(order.getTitle())
+			.orderedAt(order.getOrderedAt())
+			.build();
+
+		// 배송 정보
+		Shipping shipping = shippingRepository.findByOrder(order);
+
+		ShippingInfoDto shippingInfoDto = ShippingInfoDto.builder()
+			.recipientName(shipping.getRecipientName())
+			.recipientPhoneNumber(shipping.getRecipientPhoneNumber())
+			.recipientAddress(shipping.getRecipientAddress())
+			.recipientAddressDetail(shipping.getRecipientAddressDetail())
+			.recipientZipcode(shipping.getRecipientZipcode())
+			.build();
+
+		// 주문 항목
+		pageable = PageRequest.of(0, 5);
+		OrderDetailItemPageDto orderDetailItem = orderDetailRepository.findOrderDetail(orderId, pageable);
+
+		Page<OrderDetailItemDto> orderListResponses =
+			new PageImpl(orderDetailItem.orderDetailItem(), pageable, orderDetailItem.totalCount());
+
+		// TODO : 결제 정보는 주문이 다 되면 추가한다.
+		PaymentInfoDto paymentInfoDto = null;
+		// PaymentInfoDto paymentInfo = paymentRepository.findPaymentInfo(orderId);
+
+		return OrderDetailResponse.builder()
+			.order(orderSummaryDto)
+			.orderItems(orderListResponses)
+			.shipping(shippingInfoDto)
+			.payment(paymentInfoDto).build();
 	}
 
 	// -------------- private

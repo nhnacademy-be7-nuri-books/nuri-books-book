@@ -7,11 +7,12 @@ import org.springframework.data.domain.Pageable;
 
 import jakarta.validation.Valid;
 import shop.nuribooks.books.common.message.ResponseMessage;
-import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
-import shop.nuribooks.books.order.order.dto.OrderListPeriodRequest;
-import shop.nuribooks.books.order.order.dto.OrderListResponse;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
+import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
+import shop.nuribooks.books.order.order.dto.request.OrderTempRegisterRequest;
+import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderListResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderTempRegisterResponse;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailResponse;
 import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
 
 /**
@@ -83,4 +84,6 @@ public interface OrderService {
 		Pageable pageable,
 		OrderListPeriodRequest orderListPeriodRequest,
 		Optional<Long> userId);
+
+	OrderDetailResponse getOrderDetail(Optional<Long> userId, Long orderId, Pageable pageable);
 }
