@@ -17,6 +17,8 @@ import shop.nuribooks.books.book.booklike.repository.BookLikeRepository;
 import shop.nuribooks.books.book.booklike.service.BookLikeService;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
+import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @RequiredArgsConstructor
 @Service
@@ -25,6 +27,7 @@ public class BookLikeServiceImpl implements BookLikeService {
 
 	private final BookLikeRepository bookLikeRepository;
 	private final BookContributorRepository bookContributorRepository;
+	private final MemberRepository memberRepository;
 
 	@Override
 	public void addLike(Long memberId, Long bookId) {
@@ -41,6 +44,9 @@ public class BookLikeServiceImpl implements BookLikeService {
 		if (pageable.getPageNumber() < 0) {
 			throw new InvalidPageRequestException();
 		}
+
+		memberRepository.findById(memberId)
+			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
 		Page<BookLikeResponse> bookLikePage = bookLikeRepository.findLikedBooks(memberId, pageable);
 
