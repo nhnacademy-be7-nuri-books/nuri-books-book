@@ -18,7 +18,7 @@ import shop.nuribooks.books.book.booklike.repository.BookLikeCustomRepository;
 import shop.nuribooks.books.book.publisher.entity.QPublisher;
 
 @RequiredArgsConstructor
-public class BookLikeCustomRepositoryIml implements BookLikeCustomRepository {
+public class BookLikeCustomRepositoryImpl implements BookLikeCustomRepository {
 	private final JPAQueryFactory queryFactory;
 
 	@Override

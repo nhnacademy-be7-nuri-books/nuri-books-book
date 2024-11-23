@@ -14,7 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.booklike.dto.BookLikeResponse;
 import shop.nuribooks.books.book.booklike.service.BookLikeService;
+import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.PagedResponse;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
 
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
@@ -31,6 +33,7 @@ public class BookLikeController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 		@ApiResponse(responseCode = "404", description = "회원 정보가 존재하지 않음")
 	})
+	@HasRole(role = AuthorityType.MEMBER)
 	@GetMapping("/{member-id}/book-likes")
 	public ResponseEntity<PagedResponse<BookLikeResponse>> getBookLikes(@PathVariable("member-id") long memberId,
 		Pageable pageable) {
