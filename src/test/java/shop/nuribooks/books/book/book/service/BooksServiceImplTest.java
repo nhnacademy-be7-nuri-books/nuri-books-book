@@ -47,7 +47,6 @@ import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
 import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
-import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.book.contributor.repository.role.ContributorRoleRepository;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
@@ -75,9 +74,6 @@ public class BooksServiceImplTest {
 
 	@Mock
 	private CategoryRepository categoryRepository;
-
-	@Mock
-	private ContributorRepository contributorRepository;
 
 	@Mock
 	private ContributorRoleRepository contributorRoleRepository;
@@ -557,7 +553,68 @@ public class BooksServiceImplTest {
 			);
 			when(bookMapper.toBookResponse(book)).thenReturn(bookResponse);
 
-			BookResponse result = bookService.getBookById(1L);
+			BookResponse result = bookService.getBookById(1L, false);
+
+			assertNotNull(result, "존재하지 않는 도서입니다.");
+			assertEquals(bookResponse, result);
+		}
+	}
+
+	@Test
+	@DisplayName("유효한 책 ID로 책 조회")
+	public void getBookByIdCompleteAndUpdateCount() {
+		when(bookRepository.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.of(book));
+
+		List<BookContributorInfoResponse> contributorResponses = List.of(
+			new BookContributorInfoResponse(1L, "이정규", 1L, "지은이"),
+			new BookContributorInfoResponse(1L, "임건우", 2L, "엮은이")
+		);
+		lenient().when(bookContributorRepository.findContributorsAndRolesByBookId(book.getId()))
+			.thenReturn(contributorResponses);
+
+		try (MockedStatic<BookUtils> mockedStatic = mockStatic(BookUtils.class)) {
+			Map<String, List<String>> contributorsByRole = Map.of(
+				"지은이", List.of("이정규"),
+				"엮은이", List.of("임건우")
+			);
+			mockedStatic.when(() -> BookUtils.groupContributorsByRole(contributorResponses))
+				.thenReturn(contributorsByRole);
+
+			List<String> tagNames = List.of("wow", "amazing");
+			lenient().when(bookTagRepository.findTagNamesByBookId(book.getId())).thenReturn(tagNames);
+
+			List<List<SimpleCategoryResponse>> categories = List.of(
+				List.of(new SimpleCategoryResponse(1L, "국내도서"),
+					new SimpleCategoryResponse(2L, "문학"))
+			);
+			lenient().when(bookCategoryRepository.findCategoriesByBookId(book.getId())).thenReturn(categories);
+
+			BigDecimal salePrice = BookUtils.calculateSalePrice(book.getPrice(), book.getDiscountRate());
+			BookResponse bookResponse = new BookResponse(
+				book.getId(),
+				book.getPublisherId().getName(),
+				book.getState().getKorName(),
+				book.getTitle(),
+				book.getThumbnailImageUrl(),
+				book.getDetailImageUrl(),
+				book.getPublicationDate(),
+				book.getPrice(),
+				book.getDiscountRate(),
+				salePrice,
+				book.getDescription(),
+				book.getContents(),
+				book.getIsbn(),
+				book.isPackageable(),
+				book.getLikeCount(),
+				book.getStock(),
+				book.getViewCount(),
+				tagNames,
+				contributorsByRole,
+				categories
+			);
+			when(bookMapper.toBookResponse(book)).thenReturn(bookResponse);
+
+			BookResponse result = bookService.getBookById(1L, true);
 
 			assertNotNull(result, "존재하지 않는 도서입니다.");
 			assertEquals(bookResponse, result);
