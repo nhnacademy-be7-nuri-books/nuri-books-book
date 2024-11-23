@@ -43,12 +43,14 @@ public record ReviewRequest(
 			.orderDetail(orderDetail)
 			.build();
 
-		for (String image : reviewImages) {
-			ReviewImage reviewImage = ReviewImage.builder()
-				.imageUrl(image)
-				.review(review)
-				.build();
-			review.getReviewImages().add(reviewImage);
+		if (reviewImages != null) {
+			for (String image : reviewImages) {
+				ReviewImage reviewImage = ReviewImage.builder()
+					.imageUrl(image)
+					.review(review)
+					.build();
+				review.getReviewImages().add(reviewImage);
+			}
 		}
 
 		return review;

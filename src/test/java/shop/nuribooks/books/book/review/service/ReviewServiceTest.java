@@ -123,7 +123,8 @@ public class ReviewServiceTest {
 	public void registerOrderDetailNotFound() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNull(anyLong(), anyLong())).thenReturn(
+		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(anyLong(), anyLong(),
+			anyList())).thenReturn(
 			List.of());
 		MemberIdContext.setMemberId(member.getId());
 		assertThrows(NoOrderDetailForReviewException.class,
@@ -138,7 +139,8 @@ public class ReviewServiceTest {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(reviewRepository.save(any())).thenReturn(newReview);
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNull(anyLong(), anyLong())).thenReturn(
+		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(anyLong(), anyLong(),
+			anyList())).thenReturn(
 			List.of(orderDetail));
 		when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
 		MemberIdContext.setMemberId(member.getId());
@@ -153,7 +155,8 @@ public class ReviewServiceTest {
 		TestUtils.setIdForEntity(review1, 1l);
 		when(reviewRepository.save(any())).thenReturn(review1);
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNull(anyLong(), anyLong())).thenReturn(
+		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(anyLong(), anyLong(),
+			anyList())).thenReturn(
 			List.of(orderDetail));
 		when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
 		MemberIdContext.setMemberId(member.getId());
