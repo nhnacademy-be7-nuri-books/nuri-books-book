@@ -34,7 +34,7 @@ public class BookControllerTest extends ControllerTestSupport {
 				.param("page", "10")
 				.param("size", "10"))
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.message").value("조회 가능한 페이지 범위를 초과했습니다."));
+			.andExpect(jsonPath("$.message").value("조회 가능한 페이지 범위를 벗어났습니다."));
 	}
 
 	/*@Test
