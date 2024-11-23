@@ -22,6 +22,7 @@ import shop.nuribooks.books.book.booklike.service.BookLikeService;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.booklike.BookLikeIdNotFoundException;
 import shop.nuribooks.books.exception.booklike.ResourceAlreadyExistBookLikeIdException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -54,9 +55,19 @@ public class BookLikeServiceImpl implements BookLikeService {
 		bookLikeRepository.save(new BookLike(new BookLikeId(memberId, bookId), book));
 	}
 
+	@Transactional
 	@Override
 	public void removeLike(Long memberId, Long bookId) {
+		BookLikeId bookLikeId = new BookLikeId(memberId, bookId);
 
+		if (!bookLikeRepository.existsById(bookLikeId)) {
+			throw new BookLikeIdNotFoundException();
+		}
+
+		Book book = bookRepository.findByIdAndDeletedAtIsNull(bookId)
+			.orElseThrow(() -> new BookNotFoundException(bookId));
+		book.decrementLikeCount();
+		bookLikeRepository.deleteById(bookLikeId);
 	}
 
 	@Override
