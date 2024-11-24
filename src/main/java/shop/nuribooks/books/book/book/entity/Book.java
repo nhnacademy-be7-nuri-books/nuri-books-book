@@ -149,9 +149,16 @@ public class Book {
 		this.deletedAt = LocalDateTime.now();
 	}
 
-	public void updateStock(int count){
+	public void updateStock(int count) {
 		this.stock -= count;
 	}
 
+	public void incrementLikeCount() {
+		this.likeCount++;
+	}
+
+	public void decrementLikeCount() {
+		this.likeCount--;
+	}
 }
 

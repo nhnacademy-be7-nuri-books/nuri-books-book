@@ -375,7 +375,7 @@ public class BooksServiceImplTest {
 
 		InvalidPageRequestException exception = assertThrows(InvalidPageRequestException.class,
 			() -> bookService.getBooks(pageable));
-		assertEquals("페이지 번호는 0 이상이어야 합니다.", exception.getMessage());
+		assertEquals("조회 가능한 페이지 범위를 벗어났습니다.", exception.getMessage());
 		verify(bookRepository, never()).findAllWithPublisher(any(Pageable.class));
 	}
 
