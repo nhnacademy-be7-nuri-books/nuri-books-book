@@ -10,11 +10,8 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -22,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.BookListResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.QBook;
+import shop.nuribooks.books.book.book.enums.SortType;
 import shop.nuribooks.books.book.publisher.entity.QPublisher;
 
 @Repository
@@ -42,11 +40,10 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
 					publisher.name,
 					book.state,
 					book.title,
+					book.publicationDate,
 					book.price,
 					book.discountRate,
-					book.thumbnailImageUrl,
-					review.id.count().as("reviewCount"),
-					review.score.avg().as("scoreAvg")
+					book.thumbnailImageUrl
 				)
 			)
 			.from(book)
@@ -58,8 +55,8 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
 			.groupBy(book.id);
 
 		pageable.getSort().forEach(order -> {
-			Path<Book> path = Expressions.path(Book.class, book, order.getProperty());
-			OrderSpecifier orderSpecifier = new OrderSpecifier(order.isAscending() ? Order.ASC : Order.DESC, path);
+			SortType type = SortType.convert(order.getProperty());
+			OrderSpecifier orderSpecifier = new OrderSpecifier(type.getOrder(), type.getExpression());
 			query.orderBy(orderSpecifier);
 		});
 

@@ -1,6 +1,7 @@
 package shop.nuribooks.books.book.book.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
@@ -10,11 +11,10 @@ public record BookListResponse(
 	String publisherName,
 	BookStateEnum state,
 	String title,
+	LocalDate publicationDate,
 	BigDecimal price,
 	Integer discountRate,
-	String thumbnailImageUrl,
-	Long reviewCount,
-	Double scoreAvg
+	String thumbnailImageUrl
 ) {
 	public static BookListResponse of(Book book) {
 		return new BookListResponse(
@@ -22,11 +22,10 @@ public record BookListResponse(
 			book.getPublisherId().getName(),
 			book.getState(),
 			book.getTitle(),
+			book.getPublicationDate(),
 			book.getPrice(),
 			book.getDiscountRate(),
-			book.getThumbnailImageUrl(),
-			0l,
-			0d
+			book.getThumbnailImageUrl()
 		);
 	}
 }
