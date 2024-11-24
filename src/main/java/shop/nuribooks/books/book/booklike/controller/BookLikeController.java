@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.booklike.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,6 @@ import shop.nuribooks.books.book.booklike.dto.BookLikeResponse;
 import shop.nuribooks.books.book.booklike.dto.LikeStatusResponse;
 import shop.nuribooks.books.book.booklike.service.BookLikeService;
 import shop.nuribooks.books.common.annotation.HasRole;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 
@@ -72,9 +72,9 @@ public class BookLikeController {
 	})
 	@HasRole(role = AuthorityType.MEMBER)
 	@GetMapping("/me")
-	public ResponseEntity<PagedResponse<BookLikeResponse>> getBookLikes(Pageable pageable) {
+	public ResponseEntity<Page<BookLikeResponse>> getBookLikes(Pageable pageable) {
 		Long memberId = MemberIdContext.getMemberId();
-		PagedResponse<BookLikeResponse> bookLikes = bookLikeService.getLikedBooks(memberId, pageable);
+		Page<BookLikeResponse> bookLikes = bookLikeService.getLikedBooks(memberId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(bookLikes);
 	}
 
