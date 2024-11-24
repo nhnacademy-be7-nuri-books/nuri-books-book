@@ -8,16 +8,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.QBook;
 import shop.nuribooks.books.book.publisher.entity.QPublisher;
 
 @Repository
 @RequiredArgsConstructor
-public class BookRepositoryCustomImpl implements BookRepositoryCustom{
+public class BookCustomRepositoryImpl implements BookCustomRepository {
 
 	private final JPAQueryFactory queryFactory;
 
@@ -34,10 +36,10 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom{
 			.fetch();
 
 		long total = Optional.ofNullable(queryFactory.select(book.count())
-			.from(book)
-			.join(book.publisherId, publisher)
+				.from(book)
+				.join(book.publisherId, publisher)
 				.where(book.deletedAt.isNull())
-			.fetchOne())
+				.fetchOne())
 			.orElse(0L);
 
 		return new PageImpl<>(books, pageable, total);
@@ -53,5 +55,21 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom{
 			.fetchOne();
 
 		return Optional.ofNullable(result);
+	}
+
+	@Override
+	public List<TopBookLikeResponse> findTopBooksByLikes() {
+		QBook book = QBook.book;
+
+		return queryFactory.select(Projections.constructor(
+				TopBookLikeResponse.class,
+				book.id,
+				book.thumbnailImageUrl,
+				book.title
+			))
+			.from(book)
+			.orderBy(book.likeCount.desc())
+			.limit(10)
+			.fetch();
 	}
 }
