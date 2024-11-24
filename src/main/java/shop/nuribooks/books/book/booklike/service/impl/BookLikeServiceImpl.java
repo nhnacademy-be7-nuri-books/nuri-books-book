@@ -50,7 +50,7 @@ public class BookLikeServiceImpl implements BookLikeService {
 			throw new ResourceAlreadyExistBookLikeIdException();
 		}
 
-		book.incrementViewCount();
+		book.incrementLikeCount();
 
 		bookLikeRepository.save(new BookLike(new BookLikeId(memberId, bookId), book));
 	}
@@ -100,4 +100,10 @@ public class BookLikeServiceImpl implements BookLikeService {
 			(int)bookLikePage.getTotalElements()
 		);
 	}
+
+	@Override
+	public boolean isBookLikedByMember(Long memberId, Long bookId) {
+		return bookLikeRepository.existsByMemberIdAndBookId(memberId, bookId);
+	}
+
 }

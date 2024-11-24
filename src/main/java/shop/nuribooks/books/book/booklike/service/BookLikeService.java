@@ -11,4 +11,6 @@ public interface BookLikeService {
 	void removeLike(Long memberId, Long bookId);
 
 	PagedResponse<BookLikeResponse> getLikedBooks(Long memberId, Pageable pageable);
+
+	boolean isBookLikedByMember(Long memberId, Long bookId);
 }
