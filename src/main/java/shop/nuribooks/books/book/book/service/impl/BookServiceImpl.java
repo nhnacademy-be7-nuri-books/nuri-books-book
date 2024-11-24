@@ -190,7 +190,7 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public List<TopBookLikeResponse> getTopBookLikes() {
-		return List.of();
+		return bookRepository.findTopBooksByLikes();
 	}
 
 	//Contributor 저장 메서드

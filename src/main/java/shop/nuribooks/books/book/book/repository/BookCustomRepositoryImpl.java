@@ -68,6 +68,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 				book.title
 			))
 			.from(book)
+			.where(book.deletedAt.isNull())
 			.orderBy(book.likeCount.desc())
 			.limit(10)
 			.fetch();

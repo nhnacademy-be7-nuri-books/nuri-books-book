@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.book.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
 import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.PagedResponse;
@@ -40,7 +43,8 @@ public class BookController {
 		@ApiResponse(responseCode = "400", description = "Invalid input data")
 	})
 	@PostMapping("/register/aladin")
-	public ResponseEntity<ResponseMessage> registerAladinBook(@Valid @RequestBody AladinBookRegisterRequest aladinBookSaveReq) {
+	public ResponseEntity<ResponseMessage> registerAladinBook(
+		@Valid @RequestBody AladinBookRegisterRequest aladinBookSaveReq) {
 		bookService.registerBook(aladinBookSaveReq);
 		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서 등록 성공");
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
@@ -52,7 +56,8 @@ public class BookController {
 		@ApiResponse(responseCode = "400", description = "Invalid input data")
 	})
 	@PostMapping("/register/personal")
-	public ResponseEntity<ResponseMessage> registerPersonallyBook(@Valid @RequestBody PersonallyBookRegisterRequest personallyBookSaveReq) {
+	public ResponseEntity<ResponseMessage> registerPersonallyBook(
+		@Valid @RequestBody PersonallyBookRegisterRequest personallyBookSaveReq) {
 		bookService.registerBook(personallyBookSaveReq);
 		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서 등록 성공");
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
@@ -105,5 +110,11 @@ public class BookController {
 	public ResponseEntity<Void> deleteBook(@PathVariable(name = "book-id") Long bookId) {
 		bookService.deleteBook(bookId);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/top/book-like")
+	public ResponseEntity<List<TopBookLikeResponse>> getTopBookLike() {
+		List<TopBookLikeResponse> response = bookService.getTopBookLikes();
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 }
