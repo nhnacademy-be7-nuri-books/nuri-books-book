@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.book.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,6 @@ import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
 import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.common.annotation.HasRole;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 
@@ -40,7 +40,8 @@ public class BookController {
 		@ApiResponse(responseCode = "400", description = "Invalid input data")
 	})
 	@PostMapping("/register/aladin")
-	public ResponseEntity<ResponseMessage> registerAladinBook(@Valid @RequestBody AladinBookRegisterRequest aladinBookSaveReq) {
+	public ResponseEntity<ResponseMessage> registerAladinBook(
+		@Valid @RequestBody AladinBookRegisterRequest aladinBookSaveReq) {
 		bookService.registerBook(aladinBookSaveReq);
 		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서 등록 성공");
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
@@ -52,7 +53,8 @@ public class BookController {
 		@ApiResponse(responseCode = "400", description = "Invalid input data")
 	})
 	@PostMapping("/register/personal")
-	public ResponseEntity<ResponseMessage> registerPersonallyBook(@Valid @RequestBody PersonallyBookRegisterRequest personallyBookSaveReq) {
+	public ResponseEntity<ResponseMessage> registerPersonallyBook(
+		@Valid @RequestBody PersonallyBookRegisterRequest personallyBookSaveReq) {
 		bookService.registerBook(personallyBookSaveReq);
 		ResponseMessage responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), "도서 등록 성공");
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
@@ -64,8 +66,8 @@ public class BookController {
 		@ApiResponse(responseCode = "400", description = "잘못된 페이징 요청")
 	})
 	@GetMapping
-	public ResponseEntity<PagedResponse<BookContributorsResponse>> getBooks(Pageable pageable) {
-		PagedResponse<BookContributorsResponse> pagedResponse = bookService.getBooks(pageable);
+	public ResponseEntity<Page<BookContributorsResponse>> getBooks(Pageable pageable) {
+		Page<BookContributorsResponse> pagedResponse = bookService.getBooks(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
 	}
 
