@@ -47,6 +47,7 @@ import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
 import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
+import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.book.contributor.repository.role.ContributorRoleRepository;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
@@ -74,6 +75,9 @@ public class BooksServiceImplTest {
 
 	@Mock
 	private CategoryRepository categoryRepository;
+
+	@Mock
+	private ContributorRepository contributorRepository;
 
 	@Mock
 	private ContributorRoleRepository contributorRoleRepository;
