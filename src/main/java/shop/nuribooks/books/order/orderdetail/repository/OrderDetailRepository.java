@@ -9,4 +9,6 @@ import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long>, OrderDetailCustomRepository {
 	List<OrderDetail> findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(long bookId, long customerId,
 		List<Integer> orderStates);
+
+	List<OrderDetail> findByOrderId(Long orderId);
 }

@@ -18,7 +18,6 @@ import shop.nuribooks.books.order.order.entity.Order;
 @DiscriminatorValue("order_using_point")
 @Table(name = "order_using_point")
 public class OrderUsingPoint extends PointHistory {
-	// TODO:: 주문 id 추가
 	@OneToOne
 	@JoinColumn(name = "order_id")
 	private Order order;

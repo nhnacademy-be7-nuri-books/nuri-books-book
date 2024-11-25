@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.booklike.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +16,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.booklike.dto.BookLikeResponse;
+import shop.nuribooks.books.book.booklike.dto.LikeStatusResponse;
 import shop.nuribooks.books.book.booklike.service.BookLikeService;
 import shop.nuribooks.books.common.annotation.HasRole;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 
-@RequestMapping("/api/books")
+@RequestMapping("/api/books/book-likes")
 @RequiredArgsConstructor
 @RestController
 public class BookLikeController {
@@ -37,10 +38,10 @@ public class BookLikeController {
 		@ApiResponse(responseCode = "409", description = "이미 좋아요가 존재함")
 	})
 	@HasRole(role = AuthorityType.MEMBER)
-	@PostMapping("/book-likes/{book-id}")
+	@PostMapping("/{book-id}")
 	public ResponseEntity<Void> addLike(@PathVariable(name = "book-id") Long bookId) {
 		Long memberId = MemberIdContext.getMemberId();
-		bookLikeService.addLike(bookId, memberId);
+		bookLikeService.addLike(memberId, bookId);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
@@ -53,10 +54,10 @@ public class BookLikeController {
 		@ApiResponse(responseCode = "404", description = "좋아요 또는 도서 정보가 존재하지 않음")
 	})
 	@HasRole(role = AuthorityType.MEMBER)
-	@DeleteMapping("/book-likes/{book-id}")
+	@DeleteMapping("/{book-id}")
 	public ResponseEntity<Void> removeLike(@PathVariable(name = "book-id") Long bookId) {
 		Long memberId = MemberIdContext.getMemberId();
-		bookLikeService.removeLike(bookId, memberId);
+		bookLikeService.removeLike(memberId, bookId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
@@ -70,10 +71,25 @@ public class BookLikeController {
 		@ApiResponse(responseCode = "404", description = "회원 정보가 존재하지 않음")
 	})
 	@HasRole(role = AuthorityType.MEMBER)
-	@GetMapping("/book-likes/me")
-	public ResponseEntity<PagedResponse<BookLikeResponse>> getBookLikes(Pageable pageable) {
+	@GetMapping("/me")
+	public ResponseEntity<Page<BookLikeResponse>> getBookLikes(Pageable pageable) {
 		Long memberId = MemberIdContext.getMemberId();
-		PagedResponse<BookLikeResponse> bookLikes = bookLikeService.getLikedBooks(memberId, pageable);
+		Page<BookLikeResponse> bookLikes = bookLikeService.getLikedBooks(memberId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(bookLikes);
+	}
+
+	@Operation(
+		summary = "도서 좋아요 상태 조회",
+		description = "회원이 특정 도서에 좋아요를 눌렀는지 여부를 조회합니다."
+	)
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "좋아요 상태 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "도서 또는 회원 정보가 존재하지 않음")
+	})
+	@GetMapping("/status/{book-id}")
+	public ResponseEntity<LikeStatusResponse> getLikeStatus(@PathVariable(name = "book-id") Long bookId) {
+		Long memberId = MemberIdContext.getMemberId();
+		boolean isLiked = bookLikeService.isBookLikedByMember(memberId, bookId);
+		return ResponseEntity.ok(new LikeStatusResponse(isLiked));
 	}
 }
