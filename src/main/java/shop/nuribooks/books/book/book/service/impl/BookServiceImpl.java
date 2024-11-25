@@ -1,25 +1,27 @@
 package shop.nuribooks.books.book.book.service.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.dto.AladinBookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
+import shop.nuribooks.books.book.book.dto.BookListResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
@@ -42,7 +44,6 @@ import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
 import shop.nuribooks.books.book.contributor.repository.role.ContributorRoleRepository;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
@@ -104,53 +105,43 @@ public class BookServiceImpl implements BookService {
 	//도서 상세 조회 시 조회수 증가 추가
 	@Transactional
 	@Override
-	public BookResponse getBookById(Long bookId) {
+	public BookResponse getBookById(Long bookId, boolean updateRecentView) {
 		Book book = bookRepository.findByIdAndDeletedAtIsNull(bookId)
 			.orElseThrow(BookIdNotFoundException::new);
 
-		book.incrementViewCount();
-		bookRepository.save(book);
+		if (updateRecentView)
+			book.incrementViewCount();
 
 		return bookMapper.toBookResponse(book);
 	}
 
 	@Override
-	public PagedResponse<BookContributorsResponse> getBooks(Pageable pageable) {
+	public Page<BookContributorsResponse> getBooks(Pageable pageable) {
 		if (pageable.getPageNumber() < 0) {
 			throw new InvalidPageRequestException();
 		}
 
-		Page<Book> bookPage = bookRepository.findAllWithPublisher(pageable);
+		List<BookListResponse> books = bookRepository.findAllWithPublisher(pageable);
 
-		if (pageable.getPageNumber() > bookPage.getTotalPages() - 1) {
-			return new PagedResponse<>(
-				Collections.emptyList(),
-				pageable.getPageNumber(),
-				pageable.getPageSize(),
-				bookPage.getTotalPages(),
-				bookPage.getTotalElements()
-			);
-		}
-
-		List<BookContributorsResponse> bookListResponses = bookPage.stream()
+		List<BookContributorsResponse> bookListResponses = books.stream()
 			.map(book -> {
-				AdminBookListResponse bookDetails = AdminBookListResponse.of(book);
-				log.info("Fetching contributors for bookId: {}", book.getId());
+				// BookListResponse bookDetails = BookListResponse.of(book);
+				// log.info("Fetching contributors for bookId: {}", book.getId());
 				List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(
-					book.getId());
+					book.id());
 				Map<String, List<String>> contributorsByRole = BookUtils.groupContributorsByRole(contributors);
 				log.info("Contributors fetched: {}", contributors);
 
-				return new BookContributorsResponse(bookDetails, contributorsByRole);
+				return new BookContributorsResponse(book, contributorsByRole);
 			})
 			.toList();
 
-		return new PagedResponse<>(
+		long count = this.bookRepository.countBook();
+
+		return new PageImpl<>(
 			bookListResponses,
-			bookPage.getNumber(),
-			bookPage.getSize(),
-			bookPage.getTotalPages(),
-			bookPage.getTotalElements()
+			pageable,
+			count
 		);
 	}
 
@@ -185,6 +176,11 @@ public class BookServiceImpl implements BookService {
 		book.delete();
 
 		log.info("Delete Complete - bookId: {}", book.getId());
+	}
+
+	@Override
+	public List<TopBookLikeResponse> getTopBookLikes() {
+		return bookRepository.findTopBooksByLikes();
 	}
 
 	//Contributor 저장 메서드
@@ -317,4 +313,14 @@ public class BookServiceImpl implements BookService {
 			return role;
 		}
 	}
+
+	@Override
+	public List<BookResponse> getAllBooks() {
+		List<Book> books = bookRepository.findAllAndDeletedAtIsNull();
+
+		return books.stream()
+			.map(bookMapper::toBookResponse)
+			.collect(Collectors.toList());
+	}
 }
+
