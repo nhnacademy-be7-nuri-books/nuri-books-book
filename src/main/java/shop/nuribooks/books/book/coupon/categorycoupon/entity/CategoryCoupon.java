@@ -17,11 +17,11 @@ import shop.nuribooks.books.book.coupon.entity.Coupon;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Table(name = "book_categories")
+@Table(name = "category_coupons")
 @Entity
 public class CategoryCoupon {
 	@Id
-	private Long couponId;
+	private Long id;
 
 	@MapsId
 	@OneToOne

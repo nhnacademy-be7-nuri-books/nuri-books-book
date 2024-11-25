@@ -34,6 +34,7 @@ public class CategoryCouponServiceImpl implements CategoryCouponService {
 			.maximumDiscountPrice(categoryCouponRequest.maximumDiscountPrice())
 			.createdAt(categoryCouponRequest.createdAt())
 			.expirationType(categoryCouponRequest.expirationType())
+			.expiredAt(categoryCouponRequest.expiredAt())
 			.period(categoryCouponRequest.period() != null ? categoryCouponRequest.period() : 0)
 			.expiredDate(categoryCouponRequest.expiredDate())
 			.couponType(categoryCouponRequest.couponType())
