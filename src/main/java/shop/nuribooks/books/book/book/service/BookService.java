@@ -14,7 +14,7 @@ import shop.nuribooks.books.common.message.PagedResponse;
 public interface BookService {
 	void registerBook(BaseBookRegisterRequest reqDto);
 
-	BookResponse getBookById(Long bookId);
+	BookResponse getBookById(Long bookId, boolean updateRecentView);
 
 	PagedResponse<BookContributorsResponse> getBooks(Pageable pageable);
 

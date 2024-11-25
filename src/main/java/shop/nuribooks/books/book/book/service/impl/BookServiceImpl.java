@@ -105,12 +105,12 @@ public class BookServiceImpl implements BookService {
 	//도서 상세 조회 시 조회수 증가 추가
 	@Transactional
 	@Override
-	public BookResponse getBookById(Long bookId) {
+	public BookResponse getBookById(Long bookId, boolean updateRecentView) {
 		Book book = bookRepository.findByIdAndDeletedAtIsNull(bookId)
 			.orElseThrow(BookIdNotFoundException::new);
 
-		book.incrementViewCount();
-		bookRepository.save(book);
+		if (updateRecentView)
+			book.incrementViewCount();
 
 		return bookMapper.toBookResponse(book);
 	}
