@@ -16,8 +16,8 @@ import org.springframework.stereotype.Repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
+import shop.nuribooks.books.book.book.dto.BookListResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.utility.BookUtils;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
@@ -58,7 +58,7 @@ public class BookCategoryCustomImpl implements BookCategoryCustom {
 	}
 
 	@Override
-	public List<AdminBookListResponse> findBooksByCategoryId(List<Long> categoryIds, Pageable pageable) {
+	public List<BookListResponse> findBooksByCategoryId(List<Long> categoryIds, Pageable pageable) {
 		List<Book> books = queryFactory
 			.select(book)
 			.from(bookCategory)
@@ -68,7 +68,7 @@ public class BookCategoryCustomImpl implements BookCategoryCustom {
 			.limit(pageable.getPageSize())
 			.fetch();
 		return books.stream()
-			.map(AdminBookListResponse::of)
+			.map(BookListResponse::of)
 			.toList();
 	}
 
@@ -98,7 +98,7 @@ public class BookCategoryCustomImpl implements BookCategoryCustom {
 		// BookContributorsResponse 목록을 생성합니다.
 		List<BookContributorsResponse> bookContributorsResponseList = books.stream()
 			.map(book -> {
-				AdminBookListResponse bookDetails = AdminBookListResponse.of(book);
+				BookListResponse bookDetails = BookListResponse.of(book);
 
 				// 기여자 정보를 조회하여 역할별로 그룹화합니다.
 				List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(
