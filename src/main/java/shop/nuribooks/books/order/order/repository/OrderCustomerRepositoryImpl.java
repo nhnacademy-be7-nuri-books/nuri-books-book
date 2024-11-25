@@ -11,9 +11,9 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.order.order.dto.OrderListPeriodRequest;
-import shop.nuribooks.books.order.order.dto.OrderListResponse;
-import shop.nuribooks.books.order.order.dto.OrderPageResponse;
+import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
+import shop.nuribooks.books.order.order.dto.response.OrderListResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderPageResponse;
 import shop.nuribooks.books.order.order.entity.QOrder;
 import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 import shop.nuribooks.books.order.orderdetail.entity.QOrderDetail;
@@ -35,10 +35,19 @@ public class OrderCustomerRepositoryImpl implements OrderCustomerRepository {
 		NumberPath<Long> customerId = order.customer.id;
 
 		BooleanBuilder whereClause = new BooleanBuilder();
+
+		// 특정 사용자만
 		whereClause.and(customerId.eq(userId));
+
+		// 환불 취소는 제외
+		whereClause.and(orderDetail.orderState.ne(OrderState.RETURNED));
+		whereClause.and(orderDetail.orderState.ne(OrderState.CANCELED));
+
+		// 기간 지정
 		whereClause.and(order.orderedAt.between(
 			orderListPeriodRequest.getStart().atStartOfDay(),
 			orderListPeriodRequest.getEnd().atTime(LocalTime.MAX)));
+		
 		if (!includeOrdersInPendingStatus) {
 			whereClause.and(orderDetail.orderState.ne(OrderState.PENDING));
 		}

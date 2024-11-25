@@ -28,7 +28,6 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 	public List<ReviewMemberResponse> findReviewsByBookId(long bookId, Pageable pageable) {
 		return queryFactory.selectFrom(review)
 			.where(review.book.id.eq(bookId))
-			.where(review.updateAt.isNull())
 			.join(review.member, member)
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -60,7 +59,6 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 			.select(review.score.avg())
 			.from(review)
 			.where(review.book.id.eq(bookId))
-			.where(review.updateAt.isNull())
 			.fetchOne();
 		return Math.round(avgScore * 100.0) / 100.0;
 	}
@@ -70,7 +68,6 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 		return queryFactory.from(review)
 			.join(review.book, book)
 			.where(review.member.id.eq(memberId))
-			.where(review.updateAt.isNull())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.transform(
@@ -100,7 +97,6 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 		return queryFactory.select(review.count())
 			.from(review)
 			.where(review.book.id.eq(bookId))
-			.where(review.updateAt.isNull())
 			.fetchOne();
 	}
 
@@ -109,7 +105,6 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 		return queryFactory.select(review.count())
 			.from(review)
 			.where(review.member.id.eq(memberId))
-			.where(review.updateAt.isNull())
 			.fetchOne();
 	}
 }

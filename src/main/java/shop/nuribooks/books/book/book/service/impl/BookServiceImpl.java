@@ -117,7 +117,7 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public PagedResponse<BookContributorsResponse> getBooks(Pageable pageable) {
 		if (pageable.getPageNumber() < 0) {
-			throw new InvalidPageRequestException("페이지 번호는 0 이상이어야 합니다.");
+			throw new InvalidPageRequestException();
 		}
 
 		Page<Book> bookPage = bookRepository.findAllWithPublisher(pageable);
