@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.book.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
@@ -14,4 +16,5 @@ public interface BookService {
 	PagedResponse<BookContributorsResponse> getBooks(Pageable pageable);
 	void updateBook(Long bookId, BookUpdateRequest bookUpdateReq);
 	void deleteBook(Long bookId);
+	List<BookResponse> getAllBooks();
 }

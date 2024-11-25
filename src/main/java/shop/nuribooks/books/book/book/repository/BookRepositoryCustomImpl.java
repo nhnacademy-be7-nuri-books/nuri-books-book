@@ -54,4 +54,12 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom{
 
 		return Optional.ofNullable(result);
 	}
+
+	@Override
+	public List<Book> findAllAndDeletedAtIsNull() {
+		QBook book = QBook.book;
+		return queryFactory.selectFrom(book)
+			.where(book.deletedAt.isNull())
+			.fetch();
+	}
 }

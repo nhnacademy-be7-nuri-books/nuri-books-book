@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -317,4 +318,14 @@ public class BookServiceImpl implements BookService {
 			return role;
 		}
 	}
+
+	@Override
+	public List<BookResponse> getAllBooks() {
+		List<Book> books = bookRepository.findAllAndDeletedAtIsNull();
+
+		return books.stream()
+			.map(bookMapper::toBookResponse)
+			.collect(Collectors.toList());
+	}
 }
+
