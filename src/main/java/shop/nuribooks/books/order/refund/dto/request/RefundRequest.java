@@ -5,8 +5,7 @@ import java.math.BigDecimal;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.refund.entity.Refund;
 
-public record RefundRequest(Long orderId,
-							BigDecimal refundAmount,
+public record RefundRequest(BigDecimal refundAmount,
 							String reason) {
 
 	public Refund toEntity(Order order) {

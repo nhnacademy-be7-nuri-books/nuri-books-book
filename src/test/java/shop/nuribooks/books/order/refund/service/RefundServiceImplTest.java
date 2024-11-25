@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
@@ -26,10 +27,10 @@ import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.order.repository.OrderRepository;
-import shop.nuribooks.books.order.orderDetail.entity.OrderDetail;
-import shop.nuribooks.books.order.orderDetail.entity.OrderState;
-import shop.nuribooks.books.order.orderDetail.repository.OrderDetailRepository;
-import shop.nuribooks.books.order.orderDetail.service.OrderDetailService;
+import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.entity.OrderState;
+import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
+import shop.nuribooks.books.order.orderdetail.service.OrderDetailService;
 import shop.nuribooks.books.order.refund.dto.request.RefundRequest;
 import shop.nuribooks.books.order.refund.dto.response.RefundInfoResponse;
 import shop.nuribooks.books.order.refund.entity.Refund;
@@ -67,8 +68,8 @@ class RefundServiceImplTest {
 		BigDecimal paymentPrice = order.getPaymentPrice();
 		when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 		// when
-
-		RefundInfoResponse refundResponseInfo = refundService.getRefundResponseInfo(order.getId());
+		PageRequest pageRequest = PageRequest.of(0, 5);
+		RefundInfoResponse refundResponseInfo = refundService.getRefundResponseInfo(order.getId(), pageRequest);
 		// then
 		assertThat(refundResponseInfo.totalRefundAmount())
 			.isEqualTo(paymentPrice.subtract(BigDecimal.valueOf(2500L)));
