@@ -42,8 +42,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	@Override
 	public void registerMemberCoupon(MemberCouponRegisterRequest memberCouponRegisterRequest) {
 		Coupon coupon = couponRepository.findById(memberCouponRegisterRequest.couponId())
-			.orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
-
+			.orElseThrow(CouponNotFoundException::new);
 		Member member = memberRepository.findById(memberCouponRegisterRequest.memberId())
 			.orElseThrow(() -> new MemberNotFoundException("멤버를 못찾아요."));
 
@@ -74,7 +73,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	@Override
 	public void updateIsUsed(Long memberCouponId) {
 		MemberCoupon coupon = memberCouponRepository.findById(memberCouponId)
-			.orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
+			.orElseThrow(CouponNotFoundException::new);
 		coupon.setUsed();
 	}
 
@@ -87,7 +86,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	@Override
 	public void deleteMemberCoupon(Long memberCouponId) {
 		MemberCoupon memberCoupon = memberCouponRepository.findById(memberCouponId)
-			.orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
+			.orElseThrow(CouponNotFoundException::new);
 		memberCouponRepository.delete(memberCoupon);
 	}
 

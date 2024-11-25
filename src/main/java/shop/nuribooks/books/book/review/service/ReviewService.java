@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.common.message.PagedResponse;
@@ -33,5 +34,5 @@ public interface ReviewService {
 	 */
 	PagedResponse<ReviewBookResponse> getReviewsByMemberId(long memberId, Pageable pageable);
 
-	ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId);
+	ReviewMemberResponse updateReview(ReviewUpdateRequest reviewUpdateRequest, long reviewId);
 }

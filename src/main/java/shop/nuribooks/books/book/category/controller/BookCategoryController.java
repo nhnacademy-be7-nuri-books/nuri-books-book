@@ -16,14 +16,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.dto.AdminBookListResponse;
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
 import shop.nuribooks.books.common.message.PagedResponse;
 
 @RequiredArgsConstructor
-//@RequestMapping("/api/book-category")
 @RequestMapping("/api/books")
 @RestController
 public class BookCategoryController {

@@ -375,7 +375,7 @@ public class BooksServiceImplTest {
 
 		InvalidPageRequestException exception = assertThrows(InvalidPageRequestException.class,
 			() -> bookService.getBooks(pageable));
-		assertEquals("페이지 번호는 0 이상이어야 합니다.", exception.getMessage());
+		assertEquals("조회 가능한 페이지 범위를 벗어났습니다.", exception.getMessage());
 		verify(bookRepository, never()).findAllWithPublisher(any(Pageable.class));
 	}
 
@@ -617,8 +617,20 @@ public class BooksServiceImplTest {
 	}
 
 	@Test
-	@DisplayName("parseContributors - 작가-역할 파싱 예외처리")
-	public void parseContributorsException() {
+	@DisplayName("parseContributors - 작가-역할 파싱 입력 시 괄호 안닫힘 예외처리")
+	public void parseContributorsNotClosedParenthesisIndex() {
+		String authorRole = "카트가이 (지은이) , 포장지가이 (옮긴이";
+
+		InvalidContributorRoleException exception = assertThrows(InvalidContributorRoleException.class, () -> {
+			ReflectionTestUtils.invokeMethod(bookService, "parseContributors", authorRole);
+		});
+
+		assertEquals("역할 이름이 괄호로 닫히지 않아 작가-역할 저장에 실패했습니다.", exception.getMessage());
+	}
+
+	@Test
+	@DisplayName("parseContributors - 작가-역할 파싱 역할 없음 예외처리")
+	public void parseContributorsExceptionWithoutRole() {
 		String authorRole = "카트가이 (지은이), 포장지가이";
 
 		InvalidContributorRoleException exception = assertThrows(InvalidContributorRoleException.class, () -> {

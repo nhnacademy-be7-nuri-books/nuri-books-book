@@ -1,11 +1,14 @@
 package shop.nuribooks.books.book.coupon.entity;
 
+import static jakarta.persistence.EnumType.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,6 +19,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
+import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 import shop.nuribooks.books.book.point.enums.PolicyType;
 
@@ -56,12 +60,15 @@ public class Coupon {
 	@NotNull
 	private ExpirationType expirationType;
 
-	private LocalDateTime expireDate;
+	private LocalDateTime expiredDate;
+
+	@Enumerated(STRING)
+	private CouponType couponType;
 
 	@Builder
 	public Coupon(String name, PolicyType policyType, int discount, BigDecimal minimumOrderPrice,
 		BigDecimal maximumDiscountPrice, LocalDate createdAt, LocalDate expiredAt,
-		int period, ExpirationType expirationType, LocalDateTime expireDate) {
+		int period, ExpirationType expirationType, LocalDateTime expiredDate, CouponType couponType) {
 		this.name = name;
 		this.policyType = policyType;
 		this.discount = discount;
@@ -71,7 +78,8 @@ public class Coupon {
 		this.expiredAt = expiredAt;
 		this.period = period;
 		this.expirationType = expirationType;
-		this.expireDate = expireDate;
+		this.expiredDate = expiredDate;
+		this.couponType = couponType;
 	}
 
 	public void update(CouponRequest request) {
@@ -84,9 +92,10 @@ public class Coupon {
 		this.expiredAt = request.expiredAt();
 		this.period = request.period();
 		this.expirationType = request.expirationType();
+		this.couponType = request.couponType();
 	}
 
 	public void expire() {
-		this.expireDate = LocalDateTime.now();
+		this.expiredDate = LocalDateTime.now();
 	}
 }

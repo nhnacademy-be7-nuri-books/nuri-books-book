@@ -1,7 +1,6 @@
 package shop.nuribooks.books.book.book.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.validation.constraints.DecimalMin;
@@ -46,4 +45,5 @@ public record BookUpdateRequest(
 
 	@Size(min = 1, max = 10, message = "카테고리는 최대 10개까지 선택 가능합니다.")
 	List<Long> categoryIds
-) {}
+) {
+}

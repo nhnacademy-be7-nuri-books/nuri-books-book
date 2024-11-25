@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
@@ -80,10 +81,10 @@ public class ReviewController {
 	})
 	@PutMapping("/api/reviews/{reviewId}")
 	public ResponseEntity<ReviewMemberResponse> updateReview(
-		@Valid @RequestBody ReviewRequest reviewRequest,
+		@Valid @RequestBody ReviewUpdateRequest reviewUpdateRequest,
 		@PathVariable long reviewId
 	) {
-		ReviewMemberResponse response = this.reviewService.updateReview(reviewRequest, reviewId);
+		ReviewMemberResponse response = this.reviewService.updateReview(reviewUpdateRequest, reviewId);
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,24 +36,19 @@ import shop.nuribooks.books.common.config.QuerydslConfiguration;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class BookCategoryRepositoryTest {
 
+	private final List<BookCategory> bookCategories = new ArrayList<>();
 	@Autowired
 	private BookRepository bookRepository;
-
 	@Autowired
 	private CategoryRepository categoryRepository;
-
 	@Autowired
 	private BookCategoryRepository bookCategoryRepository;
-
 	@Autowired
 	private PublisherRepository publisherRepository;
-
 	private Book book;
 	private Book book2;
 	private Category category;
 	private Category parentCategory; // 여기 추가
-
-	private List<BookCategory> bookCategories = new ArrayList<>();
 
 	@BeforeEach
 	void setUp() {
@@ -114,7 +110,7 @@ class BookCategoryRepositoryTest {
 
 		// Then
 		assertThat(categories).isNotNull();
-		assertThat(categories.get(0).get(1).name()).isEqualTo(category.getName());
+		assertThat(categories.getFirst().get(1).name()).isEqualTo(category.getName());
 
 	}
 
@@ -122,9 +118,6 @@ class BookCategoryRepositoryTest {
 	@Test
 	@Order(6)
 	void findCategoriesByBookId_NoCategory() {
-		// Given
-		Long nonExistentBookId = 999L;
-
 		// When
 		List<List<SimpleCategoryResponse>> categories = bookCategoryRepository.findCategoriesByBookId(book.getId());
 
@@ -139,17 +132,21 @@ class BookCategoryRepositoryTest {
 	@Order(7)
 	void findBooksByCategoryId_Success() {
 		// Given
-		List<Long> categoryIds = Arrays.asList(category.getId());
+		List<Long> categoryIds = Collections.singletonList(category.getId());
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// When
 		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
 
 		// Then
-		assertThat(books).isNotNull();
-		assertThat(books.size()).isEqualTo(1);
-		assertThat(books.get(0).id()).isEqualTo(book.getId());
-		assertThat(books.get(0).title()).isEqualTo(book.getTitle());
+		assertThat(books)
+			.isNotNull()
+			.hasSize(1)
+			.first()
+			.satisfies(bookResponse -> {
+				assertThat(bookResponse.id()).isEqualTo(book.getId());
+				assertThat(bookResponse.title()).isEqualTo(book.getTitle());
+			});
 	}
 
 	@DisplayName("카테고리 ID 목록으로 책 개수 조회 성공")
@@ -157,7 +154,7 @@ class BookCategoryRepositoryTest {
 	@Order(8)
 	void countBookByCategoryIds_Success() {
 		// Given
-		List<Long> categoryIds = Arrays.asList(category.getId());
+		List<Long> categoryIds = Collections.singletonList(category.getId());
 
 		// When
 		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
@@ -178,8 +175,9 @@ class BookCategoryRepositoryTest {
 		List<AdminBookListResponse> books = bookCategoryRepository.findBooksByCategoryId(categoryIds, pageable);
 
 		// Then
-		assertThat(books).isNotNull();
-		assertThat(books.size()).isEqualTo(2);
+		assertThat(books)
+			.isNotNull()
+			.hasSize(2);
 	}
 
 	@DisplayName("복수의 카테고리 ID로 책 개수 조회 성공")
@@ -201,7 +199,7 @@ class BookCategoryRepositoryTest {
 	@Order(11)
 	void findBooksByInvalidCategoryId_ReturnsEmpty() {
 		// Given
-		List<Long> categoryIds = Arrays.asList(999L);
+		List<Long> categoryIds = List.of(999L);
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// When
@@ -216,13 +214,13 @@ class BookCategoryRepositoryTest {
 	@Order(12)
 	void countBookByInvalidCategoryIds_ReturnsZero() {
 		// Given
-		List<Long> categoryIds = Arrays.asList(999L);
+		List<Long> categoryIds = List.of(999L);
 
 		// When
 		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
 
 		// Then
-		assertThat(count).isEqualTo(0);
+		assertThat(count).isZero();
 	}
 
 	@DisplayName("카테고리 ID 목록이 비어있을 때 책 조회 시 빈 결과 반환")
@@ -251,6 +249,6 @@ class BookCategoryRepositoryTest {
 		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
 
 		// Then
-		assertThat(count).isEqualTo(0);
+		assertThat(count).isZero();
 	}
 }

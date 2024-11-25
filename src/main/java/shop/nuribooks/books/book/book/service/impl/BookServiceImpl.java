@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -119,7 +117,7 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public PagedResponse<BookContributorsResponse> getBooks(Pageable pageable) {
 		if (pageable.getPageNumber() < 0) {
-			throw new InvalidPageRequestException("페이지 번호는 0 이상이어야 합니다.");
+			throw new InvalidPageRequestException();
 		}
 
 		Page<Book> bookPage = bookRepository.findAllWithPublisher(pageable);
@@ -263,37 +261,38 @@ public class BookServiceImpl implements BookService {
 
 	/**
 	 * 알라딘 api 조회를 통해 author응답을 작가이름과 작가역할로 분리하기위한 메서드
-	 * (?:,\s*[^,(]+)*: 쉼표로 구분된 여러 단어를 하나의 이름으로 처리
-	 * \s*\(([^)]+)\): 괄호로 묶인 역할 부분을 선택적으로 매칭
-	 * \\s*: 역할 앞에 공백이 있을 수 있으므로 제거.
 	 * @param author - ex) 모구랭 (지은이), 이르 (원작)  또는 정승례, 최보름, 양지은, 윤희 (지은이)
 	 * @return 기여자, 기여자역할 리스트
 	 */
 	private List<ParsedContributor> parseContributors(String author) {
-		List<ParsedContributor> contributors = new ArrayList<>();
+		List<ParsedContributor> parsedContributors = new ArrayList<>();
+		int start = 0;
+		int startParenthesisIndex;
 
-		Matcher matcher = Pattern.compile("([^,(]+(?:,\\s*[^,(]+)*)\\s*\\(([^)]+)\\)").matcher(author);
-		int lastMatchEnd = 0;
+		while ((startParenthesisIndex = author.indexOf('(', start)) != -1) {
+			int closeParenthesisIndex = author.indexOf(')', startParenthesisIndex);
+			if (closeParenthesisIndex == -1) {
+				throw new InvalidContributorRoleException("역할 이름이 괄호로 닫히지 않아 작가-역할 저장에 실패했습니다.");
+			}
 
-		while (matcher.find()) {
-			String names = matcher.group(1).trim();
-			String role = matcher.group(2).trim();
+			String names = author.substring(start, startParenthesisIndex).trim();
+			String role = author.substring(startParenthesisIndex + 1, closeParenthesisIndex).trim();
 
 			for (String name : names.split(",")) {
-				contributors.add(new ParsedContributor(name.trim(), role));
+				String trimmedName = name.trim();
+				if (!trimmedName.isEmpty()) {
+					parsedContributors.add(new ParsedContributor(trimmedName, role));
+				}
 			}
-
-			lastMatchEnd = matcher.end();
+			start = closeParenthesisIndex + 1;
 		}
 
-		if (lastMatchEnd < author.length()) {
-			String remainingNames = author.substring(lastMatchEnd).trim();
-			if (!remainingNames.isBlank()) {
-				throw new InvalidContributorRoleException("입력 마지막에 괄호로 역할이 지정되지 않아 작가-역할 저장에 실패합니다.");
-			}
+		String remainingNames = author.substring(start).trim();
+		if (!remainingNames.isBlank()) {
+			throw new InvalidContributorRoleException("입력 마지막에 괄호로 역할이 지정되지 않아 작가-역할 저장에 실패합니다.");
 		}
 
-		return contributors;
+		return parsedContributors;
 	}
 
 	/**

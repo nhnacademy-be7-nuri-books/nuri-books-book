@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,8 +21,11 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
+import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.service.CouponService;
+import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,7 +38,7 @@ public class CouponController {
 		@ApiResponse(responseCode = "201", description = "생성 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
-	// @HasRole(role = AuthorityType.ADMIN)
+	@HasRole(role = AuthorityType.ADMIN)
 	@PostMapping
 	public ResponseEntity<ResponseMessage> registerCoupon(
 		@Valid @RequestBody CouponRequest couponRequest) {
@@ -48,10 +52,12 @@ public class CouponController {
 		@ApiResponse(responseCode = "200", description = "조회 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
-	// @HasRole(role = AuthorityType.ADMIN)
+	@HasRole(role = AuthorityType.ADMIN)
 	@GetMapping
-	public ResponseEntity<Page<CouponResponse>> getCoupons(Pageable pageable) {
-		Page<CouponResponse> couponPolicyResponses = couponService.getCoupons(pageable);
+	public ResponseEntity<Page<CouponResponse>> getCoupons(
+		@RequestParam(value = "type", defaultValue = "ALL") CouponType type,
+		Pageable pageable) {
+		Page<CouponResponse> couponPolicyResponses = couponService.getCoupons(type, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(couponPolicyResponses);
 	}
 
@@ -60,9 +66,9 @@ public class CouponController {
 		@ApiResponse(responseCode = "200", description = "조회 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
-	// @HasRole(role = AuthorityType.ADMIN)
+	@HasRole(role = AuthorityType.ADMIN)
 	@GetMapping("/{coupon-id}")
-	public ResponseEntity<Coupon> getCouponPolicies(@PathVariable(name = "coupon-id") Long id) {
+	public ResponseEntity<Coupon> getCoupons(@PathVariable(name = "coupon-id") Long id) {
 		Coupon coupon = couponService.getCouponById(id);
 		return ResponseEntity.status(HttpStatus.OK).body(coupon);
 	}
@@ -72,7 +78,7 @@ public class CouponController {
 		@ApiResponse(responseCode = "200", description = "업데이트 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
-	// @HasRole(role = AuthorityType.ADMIN)
+	@HasRole(role = AuthorityType.ADMIN)
 	@PutMapping("/{coupon-id}")
 	public ResponseEntity<ResponseMessage> updateCoupon(@PathVariable("coupon-id") Long id,
 		@Valid @RequestBody CouponRequest couponRequest) {
@@ -86,7 +92,7 @@ public class CouponController {
 		@ApiResponse(responseCode = "204", description = "삭제 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
-	// @HasRole(role = AuthorityType.ADMIN)
+	@HasRole(role = AuthorityType.ADMIN)
 	@PutMapping("/{coupon-id}/expire")
 	public ResponseEntity<ResponseMessage> expireCoupon(@PathVariable("coupon-id") Long id) {
 		couponService.expireCoupon(id);
