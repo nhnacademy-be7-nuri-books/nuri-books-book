@@ -21,10 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
 
-import shop.nuribooks.books.book.coupon.service.CouponService;
-import shop.nuribooks.books.book.point.entity.PointHistory;
-import shop.nuribooks.books.book.point.service.PointHistoryService;
-import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
@@ -63,15 +59,6 @@ class MemberServiceImplTest {
 	@Mock
 	private MemberRepository memberRepository;
 
-	@Mock
-	private PointHistoryService pointHistoryService;
-
-	@Mock
-	private CartRepository cartRepository;
-
-	@Mock
-	private CouponService couponService;
-
 	@BeforeEach
 	void setUp() {
 		MemberIdContext.setMemberId(1L);
@@ -98,9 +85,7 @@ class MemberServiceImplTest {
 		when(gradeRepository.findByName("STANDARD")).thenReturn(Optional.of(standard));
 		when(memberRepository.save(any(Member.class)))
 			.thenReturn(savedMember);
-		when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
 
-		doNothing().when(couponService).issueWelcomeCoupon(any(Member.class));
 		// when
 		MemberRegisterResponse response = memberServiceImpl.registerMember(request);
 
@@ -113,8 +98,6 @@ class MemberServiceImplTest {
 		// verify
 		verify(customerRepository, times(1)).save(any(Customer.class));
 		verify(memberRepository, times(1)).save(any(Member.class));
-		verify(couponService, times(1)).issueWelcomeCoupon(any(Member.class));  // couponService 호출 확인
-
 	}
 
 	@DisplayName("회원 등록 실패 - 중복된 이메일")
