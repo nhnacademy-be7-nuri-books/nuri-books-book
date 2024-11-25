@@ -5,6 +5,7 @@ import static shop.nuribooks.books.member.member.entity.AuthorityType.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.coupon.service.CouponService;
 import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
 import shop.nuribooks.books.book.point.enums.PolicyName;
+import shop.nuribooks.books.book.point.event.PointHistoryEvent;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.entity.Cart;
 import shop.nuribooks.books.cart.repository.CartRepository;
@@ -59,6 +61,7 @@ public class MemberServiceImpl implements MemberService {
 	private final PointHistoryService pointHistoryService;
 	private final CartRepository cartRepository;
 	private final CouponService couponService;
+	private final ApplicationEventPublisher publisher;
 
 	/**
 	 * 회원등록 <br>
@@ -104,7 +107,8 @@ public class MemberServiceImpl implements MemberService {
 		Member savedMember = memberRepository.save(newMember);
 		createCart(savedMember);
 
-		pointHistoryService.registerPointHistory(new PointHistoryRequest(savedMember), PolicyName.WELCOME);
+		publisher.publishEvent(new PointHistoryEvent(new PointHistoryRequest(savedMember), PolicyName.WELCOME));
+		// pointHistoryService.registerPointHistory(new PointHistoryRequest(savedMember), PolicyName.WELCOME);
 		couponService.issueWelcomeCoupon(savedMember);
 		return DtoMapper.toRegisterDto(savedCustomer, savedMember);
 	}
