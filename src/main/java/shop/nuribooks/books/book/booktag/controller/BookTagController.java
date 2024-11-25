@@ -1,8 +1,16 @@
 package shop.nuribooks.books.book.booktag.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,11 +19,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
-import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
+import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.service.BookTagService;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/book-tags")
@@ -48,8 +54,8 @@ public class BookTagController {
 	 */
 	@Operation(summary = "도서 태그 조회", description = "특정 도서에 등록된 태그 목록을 조회합니다.")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "태그 조회 성공"),
-			@ApiResponse(responseCode = "404", description = "도서를 찾을 수 없음")
+		@ApiResponse(responseCode = "200", description = "태그 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "도서를 찾을 수 없음")
 	})
 	@GetMapping("/book/{bookId}")
 	public ResponseEntity<BookTagGetResponse> getBookTag(@Valid @PathVariable Long bookId) {
@@ -65,8 +71,8 @@ public class BookTagController {
 	 */
 	@Operation(summary = "태그에 해당하는 도서 조회", description = "특정 태그에 속한 모든 도서 목록을 조회합니다.")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "도서 조회 성공"),
-			@ApiResponse(responseCode = "404", description = "태그를 찾을 수 없음")
+		@ApiResponse(responseCode = "200", description = "도서 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "태그를 찾을 수 없음")
 	})
 	@GetMapping("/tag/{tagId}")
 	public ResponseEntity<List<BookResponse>> getBooksByTagId(@Valid @PathVariable Long tagId) {
@@ -81,8 +87,8 @@ public class BookTagController {
 	 */
 	@Operation(summary = "도서 태그 삭제", description = "특정 도서 태그를 삭제합니다.")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "204", description = "도서 태그 삭제에 성공하였습니다."),
-			@ApiResponse(responseCode = "404", description = "해당 도서 태그를 찾을 수 없습니다.")
+		@ApiResponse(responseCode = "204", description = "도서 태그 삭제에 성공하였습니다."),
+		@ApiResponse(responseCode = "404", description = "해당 도서 태그를 찾을 수 없습니다.")
 	})
 	@DeleteMapping("/{bookTagId}")
 	public ResponseEntity<HttpStatus> deleteBookTag(@Valid @PathVariable Long bookTagId) {

@@ -9,8 +9,6 @@ import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,10 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
-import shop.nuribooks.books.book.review.service.ReviewService;
 import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
@@ -109,12 +107,11 @@ public class ReviewControllerTest extends ControllerTestSupport {
 
 	@Test
 	void updateTest() throws Exception {
-		ReviewRequest reviewRequest = new ReviewRequest(
+		ReviewUpdateRequest reviewUpdateRequest = new ReviewUpdateRequest(
 			"title",
 			"contentnew",
 			4,
-			1L,
-			List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
+			1L
 		);
 
 		ReviewMemberResponse response = new ReviewMemberResponse(
@@ -127,14 +124,14 @@ public class ReviewControllerTest extends ControllerTestSupport {
 				new ReviewImageResponse(2, "http://example.com/image2.jpg"))
 		);
 
-		when(reviewService.updateReview(any(ReviewRequest.class), anyLong())).thenReturn(response);
+		when(reviewService.updateReview(any(), anyLong())).thenReturn(response);
 
 		// header 추가 대신 set
 		MemberIdContext.setMemberId(1l);
 		// Act & Assert
 		mockMvc.perform(put("/api/reviews/1")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(reviewRequest)))
+				.content(objectMapper.writeValueAsString(reviewUpdateRequest)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.title").value("title"))
 			.andExpect(jsonPath("$.content").value("contentnew"));

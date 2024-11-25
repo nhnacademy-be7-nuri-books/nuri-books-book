@@ -40,7 +40,7 @@ public class BookContributor {
 	private ContributorRole contributorRole;
 
 	@Builder
-	public BookContributor (Book book, Contributor contributor, ContributorRole contributorRole) {
+	public BookContributor(Book book, Contributor contributor, ContributorRole contributorRole) {
 		this.book = book;
 		this.contributor = contributor;
 		this.contributorRole = contributorRole;

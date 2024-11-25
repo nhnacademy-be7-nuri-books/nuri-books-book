@@ -16,11 +16,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.order.order.entity.Order;
 
 /**
@@ -29,10 +28,12 @@ import shop.nuribooks.books.order.order.entity.Order;
  * @author nuri
  */
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "shippings")
 @Comment("배송 정보")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Shipping {
 
 	@Id
@@ -95,36 +96,5 @@ public class Shipping {
 
 	@Comment("배송 완료 일시")
 	private LocalDateTime shippingCompletedAt;
-
-	/**
-	 * 배송지 생성자 (builder)
-	 *
-	 * @param order 주문 정보
-	 * @param shippingPolicy 배송 정책 (배송비)
-	 * @param recipientName 받는 사람 이름
-	 * @param recipientAddress 받는 사람 주소
-	 * @param recipientAddressDetail 받는 사람 상세 주소
-	 * @param recipientZipcode 받는 사람 우편번호
-	 * @param recipientPhoneNumber 받는 사람 연락처
-	 * @param senderName 보내는 사람 이름
-	 * @param senderPhoneNumber 보내는 사람 연락처
-	 * @param shippingAt 출고일
-	 * @param orderInvoiceNumber 주문 송장 번호
-	 * @param shippingCompletedAt 배송 완료 일시
-	 */
-	@Builder
-	public Shipping(Order order, ShippingPolicy shippingPolicy, String recipientName, String recipientAddress,
-		String recipientAddressDetail, String recipientZipcode, String recipientPhoneNumber, String senderName,
-		String senderPhoneNumber, LocalDateTime shippingAt, String orderInvoiceNumber,
-		LocalDateTime shippingCompletedAt) {
-		this.order = order;
-		this.shippingPolicy = shippingPolicy;
-		this.recipientName = recipientName;
-		this.recipientAddress = recipientAddress;
-		this.recipientAddressDetail = recipientAddressDetail;
-		this.recipientZipcode = recipientZipcode;
-		this.recipientPhoneNumber = recipientPhoneNumber;
-		this.senderName = senderName;
-		this.senderPhoneNumber = senderPhoneNumber;
-	}
+	
 }

@@ -14,8 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+import shop.nuribooks.books.book.point.dto.request.register.ReviewSavingPointRequest;
+import shop.nuribooks.books.book.point.enums.PolicyName;
+import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
@@ -27,9 +31,13 @@ import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.review.NoOrderDetailForReviewException;
 import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
+import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.entity.OrderState;
+import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +46,8 @@ public class ReviewServiceImpl implements ReviewService {
 	private final BookRepository bookRepository;
 	private final ReviewRepository reviewRepository;
 	private final ReviewImageRepository reviewImageRepository;
+	private final OrderDetailRepository orderDetailRepository;
+	private final PointHistoryService pointHistoryService;
 
 	/**
 	 * 리뷰 등록. 리뷰 이미지도 함께 등록합니다.
@@ -47,16 +57,28 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public ReviewMemberResponse registerReview(ReviewRequest reviewRequest) {
 		Long ownerId = Optional.ofNullable(MemberIdContext.getMemberId())
-			.orElseThrow(() -> new RequiredHeaderIsNullException());
+			.orElseThrow(RequiredHeaderIsNullException::new);
 
 		Member member = this.memberRepository.findById(ownerId)
 			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 유저입니다."));
-		Book book = this.bookRepository.findById(reviewRequest.bookId())
-			.orElseThrow(() -> new BookIdNotFoundException());
 
-		Review review = reviewRequest.toEntity(member, book);
+		Book book = this.bookRepository.findById(reviewRequest.bookId())
+			.orElseThrow(BookIdNotFoundException::new);
+
+		List<OrderDetail> orderDetails = this.orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(
+			reviewRequest.bookId(), ownerId,
+			List.of(OrderState.PAID.getCode(), OrderState.DELIVERING.getCode(), OrderState.COMPLETED.getCode()));
+		if (orderDetails.size() == 0) {
+			throw new NoOrderDetailForReviewException();
+		}
+
+		Review review = reviewRequest.toEntity(member, book, orderDetails.getFirst());
 		Review result = this.reviewRepository.save(review);
 
+		ReviewSavingPointRequest reviewSavingPointRequest = new ReviewSavingPointRequest(member, result);
+		PolicyName policyName = result.getReviewImages().size() > 0 ? PolicyName.IMAGE_REVIEW : PolicyName.REVIEW;
+
+		this.pointHistoryService.registerPointHistory(reviewSavingPointRequest, policyName);
 		return ReviewMemberResponse.of(result);
 	}
 
@@ -148,18 +170,16 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Transactional
-	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId) {
+	public ReviewMemberResponse updateReview(ReviewUpdateRequest reviewUpdateRequest, long reviewId) {
 		Long ownerId = Optional.ofNullable(MemberIdContext.getMemberId())
-			.orElseThrow(() -> new RequiredHeaderIsNullException());
+			.orElseThrow(RequiredHeaderIsNullException::new);
 		// 기존 review update 처리
-		Review prevReview = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException());
-		if (prevReview.getMember().getId() != ownerId) {
+		Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+		if (review.getMember().getId() != ownerId) {
 			throw new ReviewNotFoundException();
 		}
-		prevReview.updated();
+		review.update(reviewUpdateRequest);
 
-		Review newReview = reviewRequest.toEntity(prevReview.getMember(), prevReview.getBook());
-		Review result = reviewRepository.save(newReview);
-		return ReviewMemberResponse.of(result);
+		return ReviewMemberResponse.of(review);
 	}
 }

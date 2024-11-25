@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 import lombok.Builder;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
+import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 import shop.nuribooks.books.book.point.enums.PolicyType;
 
@@ -21,7 +22,8 @@ public record CouponResponse(
 	LocalDate expiredAt,
 	int period,
 	ExpirationType expirationType,
-	LocalDateTime expireDate
+	LocalDateTime expiredDate,
+	CouponType couponType
 ) {
 	public static CouponResponse of(Coupon coupon) {
 		return CouponResponse.builder()
@@ -35,7 +37,8 @@ public record CouponResponse(
 			.expiredAt(coupon.getExpiredAt())
 			.expirationType(coupon.getExpirationType())
 			.period(coupon.getPeriod())
-			.expireDate(coupon.getExpireDate())
+			.expiredDate(coupon.getExpiredDate())
+			.couponType(coupon.getCouponType())
 			.build();
 	}
 }

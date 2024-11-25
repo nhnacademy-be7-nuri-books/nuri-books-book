@@ -24,6 +24,20 @@ public class TagServiceImpl implements TagService {
 	private final TagRepository tagRepository;
 
 	/**
+	 * getTagEditor : 태그 편집 빌더
+	 *
+	 * @param request 요청된 태그 정보 담긴 객체
+	 * @param tag 기존 태그 정보를 담은 객체
+	 * @return 수정된 정보를 포함한 객체
+	 */
+	private static TagEditor getTagEditor(TagRequest request, Tag tag) {
+		TagEditor.TagEditorBuilder builder = tag.toEditor();
+		return builder
+			.name(request.name())
+			.build();
+	}
+
+	/**
 	 * registerTag : 태그 등록
 	 *
 	 * @param request 태그 이름 등록
@@ -33,7 +47,7 @@ public class TagServiceImpl implements TagService {
 	@Override
 	public TagResponse registerTag(TagRequest request) {
 		if (tagRepository.existsByName(request.name())) {
-			throw new TagAlreadyExistsException("태그가 이미 등록되어 있습니다.");
+			throw new TagAlreadyExistsException();
 		}
 		Tag tag = request.toEntity();
 		Tag savedTag = tagRepository.save(tag);
@@ -72,7 +86,7 @@ public class TagServiceImpl implements TagService {
 	@Override
 	public TagResponse getTag(Long id) {
 		Tag tag = tagRepository.findById(id)
-			.orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
+			.orElseThrow(() -> new TagNotFoundException());
 
 		return TagResponse.of(tag);
 	}
@@ -88,10 +102,10 @@ public class TagServiceImpl implements TagService {
 	@Override
 	public TagResponse updateTag(Long id, TagRequest request) {
 		Tag tag = tagRepository.findById(id)
-			.orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
+			.orElseThrow(() -> new TagNotFoundException());
 
 		if (tagRepository.existsByName(request.name())) {
-			throw new TagAlreadyExistsException("태그가 이미 등록되어 있습니다.");
+			throw new TagAlreadyExistsException();
 		}
 
 		TagEditor tagEditor = getTagEditor(request, tag);
@@ -108,23 +122,9 @@ public class TagServiceImpl implements TagService {
 	@Override
 	public void deleteTag(Long id) {
 		Tag tag = tagRepository.findById(id)
-			.orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
+			.orElseThrow(() -> new TagNotFoundException());
 
 		tagRepository.delete(tag);
-	}
-
-	/**
-	 * getTagEditor : 태그 편집 빌더
-	 *
-	 * @param request 요청된 태그 정보 담긴 객체
-	 * @param tag 기존 태그 정보를 담은 객체
-	 * @return 수정된 정보를 포함한 객체
-	 */
-	private static TagEditor getTagEditor(TagRequest request, Tag tag) {
-		TagEditor.TagEditorBuilder builder = tag.toEditor();
-		return builder
-			.name(request.name())
-			.build();
 	}
 
 }

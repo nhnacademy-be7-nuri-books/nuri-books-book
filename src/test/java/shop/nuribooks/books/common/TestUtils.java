@@ -19,6 +19,9 @@ import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusType;
+import shop.nuribooks.books.order.order.entity.Order;
+import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 
 public class TestUtils {
 	public static void setIdForEntity(Object entity, Long id) {
@@ -31,13 +34,14 @@ public class TestUtils {
 		}
 	}
 
-	public static Review createReview(Member member, Book book) {
+	public static Review createReview(Member member, Book book, OrderDetail orderDetail) {
 		Review review = Review.builder()
 			.title("제목")
 			.content("내용")
 			.score(5)
 			.member(member)
 			.book(book)
+			.orderDetail(orderDetail)
 			.build();
 		review.getReviewImages().add(createReviewImage("image1", review));
 		review.getReviewImages().add(createReviewImage("image2", review));
@@ -138,6 +142,27 @@ public class TestUtils {
 		return BookCategory.builder()
 			.book(book)
 			.category(category)
+			.build();
+	}
+
+	public static Order createOrder(Customer customer) {
+		return Order.builder()
+			.customer(customer)
+			.expectedDeliveryAt(LocalDate.of(2024, 07, 01))
+			.orderedAt(LocalDateTime.of(2024, 06, 01, 12, 0))
+			.paymentPrice(BigDecimal.valueOf(50000))
+			.wrappingPrice(BigDecimal.valueOf(3000))
+			.build();
+	}
+
+	public static OrderDetail createOrderDetail(Order order, Book book) {
+		return OrderDetail.builder()
+			.book(book)
+			.count(5)
+			.isWrapped(false)
+			.order(order)
+			.orderState(OrderState.PENDING)
+			.unitPrice(BigDecimal.valueOf(10000))
 			.build();
 	}
 }

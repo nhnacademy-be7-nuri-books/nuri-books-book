@@ -29,7 +29,6 @@ public class AddressEditor {
 		private String zipcode;
 		private String address;
 		private String detailAddress;
-		private boolean isDefault;
 
 		AddressEditorBuilder() {
 		}

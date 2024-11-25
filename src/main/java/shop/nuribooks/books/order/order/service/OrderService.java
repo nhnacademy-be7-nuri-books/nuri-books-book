@@ -1,12 +1,19 @@
 package shop.nuribooks.books.order.order.service;
 
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import jakarta.validation.Valid;
 import shop.nuribooks.books.common.message.ResponseMessage;
-import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
+import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
+import shop.nuribooks.books.order.order.dto.request.OrderTempRegisterRequest;
+import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderListResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderTempRegisterResponse;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailResponse;
 import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
-import shop.nuribooks.books.payment.payment.dto.PaymentSuccessRequest;
 
 /**
  * 주문 서비스 인터페이스
@@ -45,7 +52,8 @@ public interface OrderService {
 	 * @param orderTempRegisterRequest 주문 임시 등록 request
 	 * @return 주문 임시 등록 response
 	 */
-	OrderTempRegisterResponse registerTempOrderForMember(Long id, @Valid OrderTempRegisterRequest orderTempRegisterRequest);
+	OrderTempRegisterResponse registerTempOrderForMember(Long id,
+		@Valid OrderTempRegisterRequest orderTempRegisterRequest);
 
 	/**
 	 * 비회원 주문 임시 등록
@@ -63,4 +71,19 @@ public interface OrderService {
 	 */
 	ResponseMessage verifyOrderInformation(PaymentRequest paymentRequest);
 
+	/**
+	 * 주문 목록 조회
+	 *
+	 * @param includeOrdersInPendingStatus 대기 미포함 여부
+	 * @param pageable 페이지
+	 * @param userId 사용자 아이디
+	 * @return 주문 목록
+	 */
+	Page<OrderListResponse> getOrderList(
+		boolean includeOrdersInPendingStatus,
+		Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest,
+		Optional<Long> userId);
+
+	OrderDetailResponse getOrderDetail(Optional<Long> userId, Long orderId, Pageable pageable);
 }

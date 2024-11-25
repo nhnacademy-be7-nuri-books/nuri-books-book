@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
 import shop.nuribooks.books.cart.dto.response.CartBookResponse;
-import shop.nuribooks.books.cart.entity.RedisCartKey;
 import shop.nuribooks.books.cart.service.CartService;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 
@@ -29,7 +28,7 @@ public class CartController {
 	private final CartService cartService;
 
 	@PostMapping("/api/cart")
-	public ResponseEntity addToCart(@RequestBody @Valid CartAddRequest cartAddRequest) {
+	public ResponseEntity<Void> addToCart(@RequestBody @Valid CartAddRequest cartAddRequest) {
 		String cartId;
 		Long memberId = MemberIdContext.getMemberId();
 		// 비회원인 경우
@@ -63,7 +62,7 @@ public class CartController {
 	}
 
 	@DeleteMapping("/api/cart/{cart-id}/book/{book-id}")
-	public ResponseEntity removeCartItem(@PathVariable("cart-id") String requestCartId,
+	public ResponseEntity<Void> removeCartItem(@PathVariable("cart-id") String requestCartId,
 		@PathVariable("book-id") Long bookId) {
 		Long memberId = MemberIdContext.getMemberId();
 		String cartId;

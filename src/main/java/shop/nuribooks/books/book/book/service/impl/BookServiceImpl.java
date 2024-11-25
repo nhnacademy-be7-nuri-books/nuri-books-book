@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,9 +45,9 @@ import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
-import shop.nuribooks.books.exception.book.InvalidBookStateException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
+import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -77,71 +75,30 @@ public class BookServiceImpl implements BookService {
 			throw new ResourceAlreadyExistIsbnException(reqDto.getIsbn());
 		}
 
-		try {
-			Publisher publisher;
-			try {
-				publisher = publisherRepository.findByName(reqDto.getPublisherName())
-					.orElseGet(() -> publisherRepository.save(Publisher.builder()
-						.name(reqDto.getPublisherName())
-						.build()
-					));
-			} catch (Exception ex) {
-				log.error("Error saving book entity: {}", ex.getMessage(), ex);
-				throw ex;
-			}
+		Publisher publisher = publisherRepository.findByName(reqDto.getPublisherName())
+			.orElseGet(() -> publisherRepository.save(Publisher.builder()
+				.name(reqDto.getPublisherName())
+				.build()));
 
-			BookStateEnum bookStateEnum;
-			try {
-				bookStateEnum = BookStateEnum.fromStringKor(String.valueOf(reqDto.getState()));
-			} catch (InvalidBookStateException ex) {
-				log.error("Error parsing book state from request: {}", ex.getMessage(), ex);
-				throw ex;
-			}
+		BookStateEnum bookStateEnum = BookStateEnum.fromStringKor(reqDto.getState());
 
-			Book book;
-			try {
-				book = reqDto.toEntity(publisher, bookStateEnum);
-				log.info("Saving book entity: {}", book);
-				bookRepository.save(book);
-			} catch (Exception ex) {
-				log.error("Error saving book entity: {}", ex.getMessage(), ex);
-				throw ex;
-			}
+		Book book = bookRepository.save(reqDto.toEntity(publisher, bookStateEnum));
+		log.info("Book entity saved: {}", book);
 
-			List<ParsedContributor> parsedContributors = List.of();
-			try {
-				parsedContributors = parseContributors(reqDto.getAuthor());
-				saveContributors(parsedContributors, book);
-			} catch (Exception ex) {
-				log.error("Error parsing or saving contributors: {}", ex.getMessage(), ex);
-			}
+		List<ParsedContributor> parsedContributors = parseContributors(reqDto.getAuthor());
+		saveContributors(parsedContributors, book);
 
-			try {
-				if (reqDto instanceof AladinBookRegisterRequest aladinReq) {
-					registerAladinCategories(aladinReq.getCategoryName(), book);
-				} else if (reqDto instanceof PersonallyBookRegisterRequest personallyReq) {
-					registerPersonallyCategories(personallyReq.getCategoryIds(), book);
-				}
-			} catch (Exception ex) {
-				log.error("Error registering categories: {}", ex.getMessage(), ex);
-				throw ex;
-			}
-
-			try {
-				if (reqDto.getTagIds() != null && !reqDto.getTagIds().isEmpty()) {
-					List<Long> tagIdList = reqDto.getTagIds();
-					bookTagService.registerTagToBook(book.getId(), tagIdList);
-				}
-			} catch (Exception ex) {
-				log.error("Error registering tags: {}", ex.getMessage(), ex);
-				throw ex;
-			}
-			log.info("Book with ISBN {} successfully saved.", reqDto.getIsbn());
-
-		} catch (Exception ex) {
-			log.error("Error saving book with ISBN {}: {}", reqDto.getIsbn(), ex.getMessage(), ex);
-			throw ex;
+		if (reqDto instanceof AladinBookRegisterRequest aladinReq) {
+			registerAladinCategories(aladinReq.getCategoryName(), book);
+		} else if (reqDto instanceof PersonallyBookRegisterRequest personallyReq) {
+			registerPersonallyCategories(personallyReq.getCategoryIds(), book);
 		}
+
+		if (reqDto.getTagIds() != null && !reqDto.getTagIds().isEmpty()) {
+			bookTagService.registerTagToBook(book.getId(), reqDto.getTagIds());
+		}
+
+		log.info("Book with ISBN {} saved successfully", reqDto.getIsbn());
 	}
 
 	//도서 상세 조회 시 조회수 증가 추가
@@ -160,7 +117,7 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public PagedResponse<BookContributorsResponse> getBooks(Pageable pageable) {
 		if (pageable.getPageNumber() < 0) {
-			throw new InvalidPageRequestException("페이지 번호는 0 이상이어야 합니다.");
+			throw new InvalidPageRequestException();
 		}
 
 		Page<Book> bookPage = bookRepository.findAllWithPublisher(pageable);
@@ -304,26 +261,38 @@ public class BookServiceImpl implements BookService {
 
 	/**
 	 * 알라딘 api 조회를 통해 author응답을 작가이름과 작가역할로 분리하기위한 메서드
-	 * ((?:[^,(]+(?:,\\s)?)+): 쉼표로 구분된 여러 단어를 하나의 이름으로 처리
-	 * (?:\\s*\\(([^)]+)\\))?: 괄호로 묶인 역할 부분을 선택적으로 매칭
-	 * \\s*: 역할 앞에 공백이 있을 수 있으므로 제거.
 	 * @param author - ex) 모구랭 (지은이), 이르 (원작)  또는 정승례, 최보름, 양지은, 윤희 (지은이)
 	 * @return 기여자, 기여자역할 리스트
 	 */
 	private List<ParsedContributor> parseContributors(String author) {
-		List<ParsedContributor> contributors = new ArrayList<>();
-		Matcher matcher = Pattern.compile("((?:[^,(]+(?:,\\s)?)+)(?:\\s*\\(([^)]+)\\))?").matcher(author);
+		List<ParsedContributor> parsedContributors = new ArrayList<>();
+		int start = 0;
+		int startParenthesisIndex;
 
-		while (matcher.find()) {
-			String names = matcher.group(1).trim();
-			String role = matcher.group(2) != null ? matcher.group(2).trim() : "";
-
-			for (String name : names.split("\\s*,\\s*")) {
-
-				contributors.add(new ParsedContributor(name.trim(), role));
+		while ((startParenthesisIndex = author.indexOf('(', start)) != -1) {
+			int closeParenthesisIndex = author.indexOf(')', startParenthesisIndex);
+			if (closeParenthesisIndex == -1) {
+				throw new InvalidContributorRoleException("역할 이름이 괄호로 닫히지 않아 작가-역할 저장에 실패했습니다.");
 			}
+
+			String names = author.substring(start, startParenthesisIndex).trim();
+			String role = author.substring(startParenthesisIndex + 1, closeParenthesisIndex).trim();
+
+			for (String name : names.split(",")) {
+				String trimmedName = name.trim();
+				if (!trimmedName.isEmpty()) {
+					parsedContributors.add(new ParsedContributor(trimmedName, role));
+				}
+			}
+			start = closeParenthesisIndex + 1;
 		}
-		return contributors;
+
+		String remainingNames = author.substring(start).trim();
+		if (!remainingNames.isBlank()) {
+			throw new InvalidContributorRoleException("입력 마지막에 괄호로 역할이 지정되지 않아 작가-역할 저장에 실패합니다.");
+		}
+
+		return parsedContributors;
 	}
 
 	/**
