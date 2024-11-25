@@ -6,7 +6,6 @@ import org.hibernate.annotations.Comment;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +20,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.nuribooks.books.order.order.entity.Order;
+import shop.nuribooks.books.order.shipping.dto.ShippingResponse;
 
 /**
  * 배송지 entity
@@ -47,7 +47,7 @@ public class Shipping {
 	@Comment("연관된 주문 정보")
 	private Order order;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "shipping_policy_id", nullable = false,
 		foreignKey = @ForeignKey(name = "FK_shippings_to_shipping_policies_1"))
 	@Comment("배송 정책 정보")
@@ -96,5 +96,22 @@ public class Shipping {
 
 	@Comment("배송 완료 일시")
 	private LocalDateTime shippingCompletedAt;
-	
+
+	public ShippingResponse toResponseDto() {
+		return ShippingResponse.builder()
+			.id(id)
+			.orderId(order.getId())
+			.orderInvoiceNumber(orderInvoiceNumber)
+			.recipientName(recipientName)
+			.recipientPhoneNumber(recipientPhoneNumber)
+			.recipientAddress(recipientAddress)
+			.recipientAddressDetail(recipientAddressDetail)
+			.recipientZipcode(recipientZipcode)
+			.senderName(senderName)
+			.senderPhoneNumber(senderPhoneNumber)
+			.shippingPolicy(shippingPolicy)
+			.shippingCompletedAt(shippingCompletedAt)
+			.shippingAt(shippingAt)
+			.build();
+	}
 }
