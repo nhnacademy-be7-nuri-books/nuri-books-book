@@ -36,6 +36,7 @@ import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @Service
@@ -64,8 +65,9 @@ public class ReviewServiceImpl implements ReviewService {
 		Book book = this.bookRepository.findById(reviewRequest.bookId())
 			.orElseThrow(BookIdNotFoundException::new);
 
-		List<OrderDetail> orderDetails = this.orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNull(
-			reviewRequest.bookId(), ownerId);
+		List<OrderDetail> orderDetails = this.orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(
+			reviewRequest.bookId(), ownerId,
+			List.of(OrderState.PAID.getCode(), OrderState.DELIVERING.getCode(), OrderState.COMPLETED.getCode()));
 		if (orderDetails.size() == 0) {
 			throw new NoOrderDetailForReviewException();
 		}

@@ -3,9 +3,11 @@ package shop.nuribooks.books.book.book.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
@@ -31,6 +34,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
+import shop.nuribooks.books.book.review.entity.Review;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -106,6 +110,9 @@ public class Book {
 
 	private LocalDateTime deletedAt;
 
+	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+	private List<Review> review;
+
 	@Builder
 	@Jacksonized
 	private Book(Publisher publisherId, BookStateEnum state, String title, String thumbnailImageUrl,
@@ -149,9 +156,16 @@ public class Book {
 		this.deletedAt = LocalDateTime.now();
 	}
 
-	public void updateStock(int count){
+	public void updateStock(int count) {
 		this.stock -= count;
 	}
 
+	public void incrementLikeCount() {
+		this.likeCount++;
+	}
+
+	public void decrementLikeCount() {
+		this.likeCount--;
+	}
 }
 
