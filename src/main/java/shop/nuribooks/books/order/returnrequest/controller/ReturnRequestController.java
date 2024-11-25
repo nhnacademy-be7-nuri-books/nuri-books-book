@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -20,7 +19,6 @@ import shop.nuribooks.books.order.returnrequest.service.ReturnRequestService;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/return-requests")
 public class ReturnRequestController {
 	private final ReturnRequestService returnRequestService;
 
@@ -31,13 +29,13 @@ public class ReturnRequestController {
 		return ResponseEntity.status(HttpStatus.OK).body(returnRequestResponse);
 	}
 
-	@PostMapping("/{order-id}")
+	@PostMapping("/api/orders/return-requests/{order-id}")
 	public ResponseEntity<ResponseMessage> registerWrappingPaper(@PathVariable(name = "order-id") Long orderId,
 		@Valid @RequestBody ReturnRequestRegisterRequest returnRequestRegisterRequest
 	) {
 		returnRequestService.registerReturnRequest(orderId, returnRequestRegisterRequest);
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(new ResponseMessage(HttpStatus.CREATED.value(), "반품 요청 등록 성"));
+			.body(new ResponseMessage(HttpStatus.CREATED.value(), "반품 요청 등록 성공"));
 	}
 
 }
