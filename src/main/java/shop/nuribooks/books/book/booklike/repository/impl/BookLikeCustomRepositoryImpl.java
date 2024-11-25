@@ -1,6 +1,8 @@
 package shop.nuribooks.books.book.booklike.repository.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -8,6 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -32,11 +35,11 @@ public class BookLikeCustomRepositoryImpl implements BookLikeCustomRepository {
 				BookLikeResponse.class,
 				book.id,
 				book.title,
-				null,
+				Expressions.constant(Map.of()),
 				book.publisherId.name,
 				book.price,
 				book.discountRate,
-				null,
+				Expressions.constant(BigDecimal.ZERO),
 				book.thumbnailImageUrl
 			))
 			.from(bookLike)

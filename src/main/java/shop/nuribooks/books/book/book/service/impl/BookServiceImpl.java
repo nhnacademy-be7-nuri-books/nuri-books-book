@@ -20,6 +20,7 @@ import shop.nuribooks.books.book.book.dto.BookListResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
@@ -174,6 +175,11 @@ public class BookServiceImpl implements BookService {
 		book.delete();
 
 		log.info("Delete Complete - bookId: {}", book.getId());
+	}
+
+	@Override
+	public List<TopBookLikeResponse> getTopBookLikes() {
+		return bookRepository.findTopBooksByLikes();
 	}
 
 	//Contributor 저장 메서드

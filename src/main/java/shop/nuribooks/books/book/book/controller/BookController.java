@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.book.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,7 @@ import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
 import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
@@ -109,5 +112,11 @@ public class BookController {
 	public ResponseEntity<Void> deleteBook(@PathVariable(name = "book-id") Long bookId) {
 		bookService.deleteBook(bookId);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/top/book-like")
+	public ResponseEntity<List<TopBookLikeResponse>> getTopBookLike() {
+		List<TopBookLikeResponse> response = bookService.getTopBookLikes();
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 }
