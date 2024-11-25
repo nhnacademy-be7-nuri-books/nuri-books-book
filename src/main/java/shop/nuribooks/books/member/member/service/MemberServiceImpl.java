@@ -15,9 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.coupon.service.CouponService;
-import shop.nuribooks.books.book.point.dto.request.register.PointHistoryRequest;
-import shop.nuribooks.books.book.point.enums.PolicyName;
-import shop.nuribooks.books.book.point.event.PointHistoryEvent;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.entity.Cart;
 import shop.nuribooks.books.cart.repository.CartRepository;
@@ -44,6 +41,7 @@ import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.entity.StatusType;
+import shop.nuribooks.books.member.member.event.RegisteredEvent;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 /**
@@ -107,9 +105,10 @@ public class MemberServiceImpl implements MemberService {
 		Member savedMember = memberRepository.save(newMember);
 		createCart(savedMember);
 
-		publisher.publishEvent(new PointHistoryEvent(new PointHistoryRequest(savedMember), PolicyName.WELCOME));
-		// pointHistoryService.registerPointHistory(new PointHistoryRequest(savedMember), PolicyName.WELCOME);
-		couponService.issueWelcomeCoupon(savedMember);
+		// 멤버 등록되었다고 이벤트 생성. 이제 event listener들이 event 잡아서 로직 실행해줌.
+		RegisteredEvent registeredEvent = new RegisteredEvent(savedMember);
+		publisher.publishEvent(registeredEvent);
+		
 		return DtoMapper.toRegisterDto(savedCustomer, savedMember);
 	}
 
