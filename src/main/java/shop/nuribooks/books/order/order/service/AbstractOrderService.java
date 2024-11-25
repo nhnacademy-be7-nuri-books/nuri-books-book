@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import lombok.AllArgsConstructor;
@@ -12,19 +13,28 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
+import shop.nuribooks.books.book.coupon.service.MemberCouponService;
+import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.address.repository.AddressRepository;
+import shop.nuribooks.books.member.customer.dto.CustomerDto;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.dto.MemberPointDTO;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
+import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailRequest;
+import shop.nuribooks.books.order.shipping.dto.ShippingPolicyResponse;
 import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
 import shop.nuribooks.books.order.shipping.repository.ShippingPolicyRepository;
 import shop.nuribooks.books.order.shipping.service.ShippingService;
+import shop.nuribooks.books.order.wrapping.entity.WrappingPaper;
+import shop.nuribooks.books.order.wrapping.service.WrappingPaperService;
 
 @AllArgsConstructor
 public abstract class AbstractOrderService {
@@ -38,6 +48,78 @@ public abstract class AbstractOrderService {
 	protected final MemberRepository memberRepository;
 
 	protected final ShippingService shippingService;
+	protected final WrappingPaperService wrappingPaperService;
+	protected final MemberCouponService memberCouponService;
+
+	/**
+	 * 주문 가격 검증
+	 * @param orderTempRegisterRequest 클라이언트에서 받은 주문 정보
+	 * @return 검증 여부
+	 */
+	public boolean validateOrderPrice(OrderRegisterRequest orderTempRegisterRequest) {
+
+		// 클라이언트에서 받은 총 결제 금액
+		BigDecimal orderTotalPrice = orderTempRegisterRequest.paymentPrice();
+
+		// 도서 총 가격
+		List<OrderDetailRequest> orderDetails = orderTempRegisterRequest.orderDetails();
+		BigDecimal bookTotalPrice = orderDetails.stream()
+			.map(orderDetail -> orderDetail.unitPrice().multiply(BigDecimal.valueOf(orderDetail.count())))
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		// 배송비 (배송 정책에 따른 계산)
+		ShippingPolicyResponse shippingPolicy = getShippingPolicy(bookTotalPrice.intValue());
+		BigDecimal shippingCost = BigDecimal.valueOf(shippingPolicy.shippingFee());
+
+		// 사용 포인트
+		BigDecimal usedPoint = orderTempRegisterRequest.usingPoint();
+
+		WrappingPaper wrappingPaper = null;
+		// 포장비
+		if (Objects.nonNull(orderTempRegisterRequest.wrapping())) {
+			wrappingPaper = wrappingPaperService.getWrappingPaper(
+				orderTempRegisterRequest.wrapping());
+		}
+
+		BigDecimal wrappingCost = wrappingPaper == null ? BigDecimal.ZERO : wrappingPaper.getWrappingPrice();
+
+		MemberCouponOrderDto memberCouponAllType = null;
+		if (Objects.nonNull(orderTempRegisterRequest.allAppliedCoupon())) {
+			memberCouponAllType = memberCouponService.getMemberCoupon(
+				orderTempRegisterRequest.allAppliedCoupon());
+		}
+
+		// 쿠폰 할인 적용된 금액 (쿠폰 적용 후 금액)
+		BigDecimal couponDiscount = memberCouponAllType == null ? BigDecimal.ZERO :
+			BigDecimal.valueOf(memberCouponAllType.discount());  // 쿠폰 할인액
+
+		BigDecimal calculatedTotalPrice;
+
+		if (Objects.isNull(memberCouponAllType) || memberCouponAllType.policyType().compareTo(PolicyType.FIXED) == 0) {
+			calculatedTotalPrice = bookTotalPrice
+				.subtract(couponDiscount) // 쿠폰 값 제외
+				.subtract(usedPoint) // 사용된 포인트 제외
+				.add(wrappingCost) // 포장비 추가
+				.add(shippingCost); // 배송비 추가
+		} else {
+			BigDecimal discountPrice = bookTotalPrice.multiply(couponDiscount.divide(BigDecimal.valueOf(100)));
+			if (discountPrice.compareTo(memberCouponAllType.maximumDiscountPrice()) >= 0) {
+				calculatedTotalPrice = bookTotalPrice
+					.subtract(memberCouponAllType.maximumDiscountPrice()) // 쿠폰 값 제외
+					.subtract(usedPoint) // 사용된 포인트 제외
+					.add(wrappingCost) // 포장비 추가
+					.add(shippingCost); // 배송비 추가
+			} else {
+				calculatedTotalPrice = bookTotalPrice
+					.subtract(discountPrice) // 쿠폰 값 제외
+					.subtract(usedPoint) // 사용된 포인트 제외
+					.add(wrappingCost) // 포장비 추가
+					.add(shippingCost); // 배송비 추가
+			}
+		}
+
+		return calculatedTotalPrice.compareTo(orderTotalPrice) == 0;
+	}
 
 	/**
 	 * 사용자 확인
@@ -59,6 +141,26 @@ public abstract class AbstractOrderService {
 	protected List<AddressResponse> getAddressesByMember(Customer customer) {
 		List<Address> addressesByMemberId = addressRepository.findAllByMemberId(customer.getId());
 		return addressesByMemberId.stream().map(AddressResponse::of).toList();
+	}
+
+	/**
+	 * 사용자 정보 DTO 생성
+	 *
+	 * @param customer 사용자
+	 * @param addressResponseList 사용자 주소
+	 * @param point 사용자 포인트
+	 * @return CustomerDto
+	 */
+	protected CustomerDto createCustomerDto(Customer customer, List<AddressResponse> addressResponseList,
+		Optional<MemberPointDTO> point) {
+		return new CustomerDto(
+			customer.getId(),
+			customer.getName(),
+			customer.getPhoneNumber(),
+			customer.getEmail(),
+			point.get().point(),
+			addressResponseList
+		);
 	}
 
 	/**
@@ -95,10 +197,17 @@ public abstract class AbstractOrderService {
 	}
 
 	/**
-	 * 	배송비 정책 조회
+	 * 	주문 가격에 알맞는 배송비 가져오기
 	 */
-	protected ShippingPolicy getShippingPolicy(int orderTotalPrice) {
-		return shippingPolicyRepository.findClosedShippingPolicy(orderTotalPrice);
+	protected ShippingPolicyResponse getShippingPolicy(int orderTotalPrice) {
+		ShippingPolicy shippingPolicy = shippingPolicyRepository.findClosedShippingPolicy(orderTotalPrice);
+
+		return new ShippingPolicyResponse(
+			shippingPolicy.getId(),
+			shippingPolicy.getShippingFee(),
+			shippingPolicy.getExpiration(),
+			shippingPolicy.getMinimumOrderPrice()
+		);
 	}
 
 	/**

@@ -31,10 +31,11 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		Book book = bookRepository.findById(orderDetailRequest.bookId())
 			.orElseThrow(() -> new BookNotFoundException(orderDetailRequest.bookId()));
 
-		// 재고 확인 (동시성 고려) - RabbitMQ
+		// 재고 확인 (동시성 고려)
 		if (orderDetailRequest.count() > book.getStock()) {
+			log.error("{} - 재고 없음", book.getTitle());
 			// 예외 처리
-			throw new NoStockAvailableException();
+			throw new NoStockAvailableException(book.getTitle());
 		}
 
 		// 주문 상세 추가
