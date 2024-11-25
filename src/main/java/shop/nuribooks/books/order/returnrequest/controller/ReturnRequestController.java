@@ -23,7 +23,7 @@ public class ReturnRequestController {
 	private final ReturnRequestService returnRequestService;
 
 	// 관리자가 반품요청들을 확인
-	@GetMapping
+	@GetMapping("/api/orders/return-requests")
 	public ResponseEntity<Page<ReturnRequestResponse>> getWrappingPapers(Pageable pageable) {
 		Page<ReturnRequestResponse> returnRequestResponse = returnRequestService.getReturnRequest(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(returnRequestResponse);
