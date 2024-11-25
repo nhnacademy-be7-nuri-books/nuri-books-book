@@ -19,8 +19,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 
+import shop.nuribooks.books.book.coupon.service.CouponService;
+import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
@@ -61,7 +64,16 @@ class MemberServiceImplTest {
 	private MemberRepository memberRepository;
 
 	@Mock
+	private PointHistoryService pointHistoryService;
+
+	@Mock
 	private CartRepository cartRepository;
+
+	@Mock
+	private CouponService couponService;
+
+	@Mock
+	private ApplicationEventPublisher publisher;
 
 	@BeforeEach
 	void setUp() {
@@ -102,6 +114,7 @@ class MemberServiceImplTest {
 		// verify
 		verify(customerRepository, times(1)).save(any(Customer.class));
 		verify(memberRepository, times(1)).save(any(Member.class));
+
 	}
 
 	@DisplayName("회원 등록 실패 - 중복된 이메일")
