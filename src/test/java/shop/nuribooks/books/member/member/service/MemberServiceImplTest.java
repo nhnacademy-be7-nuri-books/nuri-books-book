@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
 
+import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
@@ -58,6 +59,9 @@ class MemberServiceImplTest {
 
 	@Mock
 	private MemberRepository memberRepository;
+
+	@Mock
+	private CartRepository cartRepository;
 
 	@BeforeEach
 	void setUp() {
