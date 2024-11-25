@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
@@ -31,5 +32,11 @@ public class BookCoupon {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
+
+	@Builder
+	public BookCoupon(Coupon coupon, Book book) {
+		this.coupon = coupon;
+		this.book = book;
+	}
 
 }

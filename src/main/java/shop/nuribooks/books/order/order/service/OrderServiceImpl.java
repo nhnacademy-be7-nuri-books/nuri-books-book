@@ -3,46 +3,52 @@ package shop.nuribooks.books.order.order.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.dto.BookOrderResponse;
-import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
+import shop.nuribooks.books.book.coupon.entity.AllAppliedCoupon;
+import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
+import shop.nuribooks.books.book.coupon.repository.AllAppliedCouponRepository;
+import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
+import shop.nuribooks.books.book.coupon.service.MemberCouponService;
 import shop.nuribooks.books.book.point.dto.request.register.OrderUsingPointRequest;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
 import shop.nuribooks.books.book.point.enums.PolicyName;
+import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
 import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.entity.RedisCartKey;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 import shop.nuribooks.books.common.message.ResponseMessage;
-import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
-import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.member.MemberCartNotFoundException;
 import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
 import shop.nuribooks.books.exception.order.NoStockAvailableException;
 import shop.nuribooks.books.exception.order.OrderNotFoundException;
+import shop.nuribooks.books.exception.order.OrderPriceValidationFailException;
 import shop.nuribooks.books.exception.order.PriceMismatchException;
 import shop.nuribooks.books.exception.order.detail.OrderNotBelongsToUserException;
 import shop.nuribooks.books.exception.point.PointNotFoundException;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
-import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.address.repository.AddressRepository;
+import shop.nuribooks.books.member.customer.dto.CustomerDto;
 import shop.nuribooks.books.member.customer.dto.EntityMapper;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
 import shop.nuribooks.books.member.customer.entity.Customer;
@@ -52,11 +58,11 @@ import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.dto.OrderSummaryDto;
 import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
-import shop.nuribooks.books.order.order.dto.request.OrderTempRegisterRequest;
+import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
 import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
 import shop.nuribooks.books.order.order.dto.response.OrderListResponse;
 import shop.nuribooks.books.order.order.dto.response.OrderPageResponse;
-import shop.nuribooks.books.order.order.dto.response.OrderTempRegisterResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderRegisterResponse;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailItemDto;
@@ -66,54 +72,91 @@ import shop.nuribooks.books.order.orderdetail.dto.OrderDetailResponse;
 import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 import shop.nuribooks.books.order.orderdetail.service.OrderDetailService;
 import shop.nuribooks.books.order.shipping.dto.ShippingInfoDto;
+import shop.nuribooks.books.order.shipping.dto.ShippingPolicyResponse;
 import shop.nuribooks.books.order.shipping.entity.Shipping;
-import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
 import shop.nuribooks.books.order.shipping.repository.ShippingPolicyRepository;
 import shop.nuribooks.books.order.shipping.repository.ShippingRepository;
 import shop.nuribooks.books.order.shipping.service.ShippingService;
+import shop.nuribooks.books.order.wrapping.dto.WrappingPaperResponse;
+import shop.nuribooks.books.order.wrapping.entity.WrappingPaper;
+import shop.nuribooks.books.order.wrapping.service.WrappingPaperService;
 import shop.nuribooks.books.payment.payment.dto.PaymentInfoDto;
 import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
 import shop.nuribooks.books.payment.payment.repository.PaymentRepository;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
-public class OrderServiceImpl implements OrderService {
+public class OrderServiceImpl extends AbstractOrderService implements OrderService {
 
-	private final CustomerRepository customerRepository;
-	private final MemberRepository memberRepository;
 	private final OrderRepository orderRepository;
-	private final BookRepository bookRepository;
-	private final AddressRepository addressRepository;
-	private final BookContributorRepository bookContributorRepository;
-	private final ShippingPolicyRepository shippingPolicyRepository;
-	private final PointPolicyRepository pointPolicyRepository;
-	private final RedisCartRepository redisCartRepository;
-	private final ShippingRepository shippingRepository;
 	private final OrderDetailRepository orderDetailRepository;
+	private final ShippingRepository shippingRepository;
+	private final PointPolicyRepository pointPolicyRepository;
+	private final MemberCouponRepository memberCouponRepository;
+	private final AllAppliedCouponRepository allAppliedCouponRepository;
+	private final PaymentRepository paymentRepository;
 
 	private final OrderDetailService orderDetailService;
-	private final ShippingService shippingService;
 	private final PointHistoryService pointHistoryService;
-	private final PaymentRepository paymentRepository;
+
+	public OrderServiceImpl(CustomerRepository customerRepository,
+		BookRepository bookRepository,
+		AddressRepository addressRepository,
+		BookContributorRepository bookContributorRepository,
+		RedisCartRepository redisCartRepository,
+		ShippingPolicyRepository shippingPolicyRepository,
+		MemberRepository memberRepository,
+		OrderRepository orderRepository,
+		OrderDetailRepository orderDetailRepository,
+		ShippingRepository shippingRepository,
+		PointPolicyRepository pointPolicyRepository,
+		PaymentRepository paymentRepository,
+		ShippingService shippingService,
+		MemberCouponRepository memberCouponRepository,
+		OrderDetailService orderDetailService,
+		PointHistoryService pointHistoryService,
+		WrappingPaperService wrappingPaperService,
+		MemberCouponService memberCouponService,
+		AllAppliedCouponRepository allAppliedCouponRepository) {
+		super(customerRepository,
+			bookRepository,
+			addressRepository,
+			bookContributorRepository,
+			redisCartRepository,
+			shippingPolicyRepository,
+			memberRepository,
+			shippingService,
+			wrappingPaperService,
+			memberCouponService);
+		this.orderRepository = orderRepository;
+		this.orderDetailRepository = orderDetailRepository;
+		this.shippingRepository = shippingRepository;
+		this.pointPolicyRepository = pointPolicyRepository;
+		this.paymentRepository = paymentRepository;
+		this.memberCouponRepository = memberCouponRepository;
+		this.orderDetailService = orderDetailService;
+		this.pointHistoryService = pointHistoryService;
+		this.allAppliedCouponRepository = allAppliedCouponRepository;
+	}
 
 	/**
 	 * 주문 폼 정보 가져오기 - 바로 주문(회원)
 	 *
-	 * @param id 사용자 아이디
+	 * @param memberId 사용자 아이디
 	 * @param bookId 상품 아이디
 	 * @param quantity 상품 갯수
 	 * @return OrderInformationResponse
 	 */
 	@Override
-	public OrderInformationResponse getMemberOrderInformation(Long id, Long bookId, int quantity) {
+	public OrderInformationResponse getMemberOrderInformation(Long memberId, Long bookId, int quantity
+	) {
 
-		// 사용자 확인
-		Customer customer = getCustomerById(id);
-
-		// 주소 정보 가져오기
+		// 사용자 정보
+		Customer customer = getCustomerById(memberId);
 		List<AddressResponse> addressResponseList = getAddressesByMember(customer);
+		Optional<MemberPointDTO> point = getMemberPoints(memberId);
+		CustomerDto customerDto = createCustomerDto(customer, addressResponseList, point);
 
 		// 도서 정보 가져오기
 		BookOrderResponse bookOrderResponse = getBookOrderResponses(bookId,
@@ -124,30 +167,30 @@ public class OrderServiceImpl implements OrderService {
 		BigDecimal orderTotalPrice = calculateTotalPrice(bookOrderResponses);
 
 		// 배송비 정보 가져오기
-		ShippingPolicy shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
+		ShippingPolicyResponse shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
 
-		// 포인트 가져오기
-		Optional<MemberPointDTO> point = memberRepository.findPointById(id);
+		// 포장지 목록 가져오기
+		List<WrappingPaperResponse> paperResponse = wrappingPaperService.getAllWrappingPaper();
 
-		// todo: 포장
-
-		// todo : 쿠폰
+		// 쿠폰 목록 가져오기 (ALL 타입)
+		List<MemberCouponOrderDto> allTypeCoupon = memberCouponService.getAllTypeAvailableCouponsByMemberId(memberId,
+			orderTotalPrice);
 
 		if (point.isPresent()) {
-			return OrderInformationResponse.of(
-				customer,
-				addressResponseList,
-				bookOrderResponses,
-				shippingPolicy,
-				point.get().point()
-			);
+			return OrderInformationResponse.builder()
+				.customer(customerDto)
+				.bookOrderResponse(bookOrderResponses)
+				.shippingPolicyResponse(shippingPolicy)
+				.paperResponse(paperResponse)
+				.allTypeCoupon(allTypeCoupon)
+				.build();
 		} else {
 			throw new PointNotFoundException();
 		}
 	}
 
 	/**
-	 * 주문 폼 정보 가져오기 - 바로 주문(회원)
+	 * 주문 폼 정보 가져오기 - 바로 주문(비회원)
 	 *
 	 * @param bookId 상품 아이디
 	 * @param quantity 상품 갯수
@@ -164,20 +207,34 @@ public class OrderServiceImpl implements OrderService {
 		BigDecimal orderTotalPrice = calculateTotalPrice(bookOrderResponses);
 
 		// 배송비 정보 가져오기
-		ShippingPolicy shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
+		ShippingPolicyResponse shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
 
-		return OrderInformationResponse.of(bookOrderResponses, shippingPolicy);
+		// 포장지 목록 가져오기
+		List<WrappingPaperResponse> paperResponse = wrappingPaperService.getAllWrappingPaper();
+
+		return OrderInformationResponse.builder()
+			.bookOrderResponse(bookOrderResponses)
+			.shippingPolicyResponse(shippingPolicy)
+			.paperResponse(paperResponse)
+			.build();
 	}
 
-	//회원 장바구니 도서 정보 가져오기
+	/**
+	 * 회원 장바구니 도서 정보 가져오기
+	 *
+	 * @param memberId 회원 아이디
+	 * @return 주문 폼 정보
+	 */
 	@Override
 	public OrderInformationResponse getMemberCartOrderInformation(Long memberId) {
 
-		Customer customer = getCustomerById(memberId);
 		String cartId = RedisCartKey.MEMBER_CART.withSuffix(memberId.toString());
 
-		// 주소 정보 가져오기
+		// 사용자 정보
+		Customer customer = getCustomerById(memberId);
 		List<AddressResponse> addressResponseList = getAddressesByMember(customer);
+		Optional<MemberPointDTO> point = getMemberPoints(memberId);
+		CustomerDto customerDto = createCustomerDto(customer, addressResponseList, point);
 
 		// 도서 정보 가져오기
 		Map<Long, Integer> cart = redisCartRepository.getCart(cartId);
@@ -187,21 +244,23 @@ public class OrderServiceImpl implements OrderService {
 		BigDecimal orderTotalPrice = calculateTotalPrice(bookOrderResponses);
 
 		// 배송비 정보 가져오기
-		ShippingPolicy shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
+		ShippingPolicyResponse shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
 
-		// 포인트 가져오기
-		Optional<MemberPointDTO> point = memberRepository.findPointById(memberId);
+		// 포장지 목록 가져오기
+		List<WrappingPaperResponse> paperResponse = wrappingPaperService.getAllWrappingPaper();
 
-		// todo : 쿠폰
+		// 쿠폰 목록 가져오기 (ALL 타입)
+		List<MemberCouponOrderDto> allTypeCoupon = memberCouponService.getAllTypeAvailableCouponsByMemberId(memberId,
+			orderTotalPrice);
 
 		if (point.isPresent()) {
-			return OrderInformationResponse.of(
-				customer,
-				addressResponseList,
-				bookOrderResponses,
-				shippingPolicy,
-				point.get().point()
-			);
+			return OrderInformationResponse.builder()
+				.customer(customerDto)
+				.bookOrderResponse(bookOrderResponses)
+				.shippingPolicyResponse(shippingPolicy)
+				.paperResponse(paperResponse)
+				.allTypeCoupon(allTypeCoupon)
+				.build();
 		} else {
 			throw new PointNotFoundException();
 		}
@@ -220,9 +279,16 @@ public class OrderServiceImpl implements OrderService {
 		BigDecimal orderTotalPrice = calculateTotalPrice(bookOrderResponses);
 
 		// 배송비 정보 가져오기
-		ShippingPolicy shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
+		ShippingPolicyResponse shippingPolicy = getShippingPolicy(orderTotalPrice.intValue());
 
-		return OrderInformationResponse.of(bookOrderResponses, shippingPolicy);
+		// 포장지 목록 가져오기
+		List<WrappingPaperResponse> paperResponse = wrappingPaperService.getAllWrappingPaper();
+
+		return OrderInformationResponse.builder()
+			.bookOrderResponse(bookOrderResponses)
+			.shippingPolicyResponse(shippingPolicy)
+			.paperResponse(paperResponse)
+			.build();
 	}
 
 	/**
@@ -234,14 +300,12 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	@Override
 	@Transactional
-	public OrderTempRegisterResponse registerTempOrderForMember(Long id,
-		OrderTempRegisterRequest orderTempRegisterRequest) {
+	public OrderRegisterResponse registerTempOrderForMember(Long id,
+		OrderRegisterRequest orderTempRegisterRequest) {
 
 		// 사용자 확인
 		Customer customer = getCustomerById(id);
 		BigDecimal usedPoint = orderTempRegisterRequest.usingPoint();
-
-		// todo : 회원 쿠폰 처리
 
 		// 임시 주문 등록
 		Order order = createOrder(customer, orderTempRegisterRequest);
@@ -252,17 +316,49 @@ public class OrderServiceImpl implements OrderService {
 			handlePointUsage(id, savedOrder, orderTempRegisterRequest.usingPoint());
 		}
 
-		// 주문 상세 등록
-		List<String> bookTitles = registerOrderDetails(savedOrder, orderTempRegisterRequest.orderDetails());
+		List<String> bookTitles;
+
+		// 포장 처리
+		if (Objects.nonNull(orderTempRegisterRequest.wrapping())) {
+			List<OrderDetailRequest> updatedOrderDetails;
+			WrappingPaper wrappingPaper = wrappingPaperService.getWrappingPaper(
+				orderTempRegisterRequest.wrapping());
+			savedOrder.setWrappingPaper(wrappingPaper);
+
+			updatedOrderDetails = processWrapping(orderTempRegisterRequest.orderDetails(),
+				orderTempRegisterRequest.wrappingList());
+
+			// 주문 상세 등록
+			bookTitles = registerOrderDetails(savedOrder, updatedOrderDetails);
+		} else {
+			// 주문 상세 등록
+			bookTitles = registerOrderDetails(savedOrder, orderTempRegisterRequest.orderDetails());
+		}
 
 		// 배송지 등록
 		shippingService.registerShipping(savedOrder, orderTempRegisterRequest.shippingRegister());
 
+		// todo : 회원 쿠폰 처리
+
+		// 주문 전체 적용 쿠폰
+		if (Objects.nonNull(orderTempRegisterRequest.allAppliedCoupon())) {
+			processCoupon(orderTempRegisterRequest, savedOrder);
+		}
+
+		// 주문 update
 		savedOrder.setTitle(makeOrderName(bookTitles));
 		orderRepository.save(savedOrder);
 
+		// 가격 검증 처리
+		if (!validateOrderPrice(orderTempRegisterRequest)) {
+			log.error("클라이언트에서 넘겨받은 결제 금액과 실제 결제 금액이 다릅니다.");
+			throw new OrderPriceValidationFailException();
+		}
+
+		log.debug("주문 저장 성공");
+
 		// 응답 반환
-		return OrderTempRegisterResponse.of(savedOrder, makeOrderName(bookTitles));
+		return OrderRegisterResponse.of(savedOrder, makeOrderName(bookTitles));
 	}
 
 	/**
@@ -273,7 +369,7 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	@Override
 	@Transactional
-	public OrderTempRegisterResponse registerTempOrderForCustomer(OrderTempRegisterRequest orderTempRegisterRequest) {
+	public OrderRegisterResponse registerTempOrderForCustomer(OrderRegisterRequest orderTempRegisterRequest) {
 
 		// 사용자 생성
 		Customer customer = registerCustomer(orderTempRegisterRequest.customerRegister());
@@ -292,7 +388,7 @@ public class OrderServiceImpl implements OrderService {
 		orderRepository.save(savedOrder);
 
 		// 응답 반환
-		return OrderTempRegisterResponse.of(savedOrder, makeOrderName(bookTitles));
+		return OrderRegisterResponse.of(savedOrder, makeOrderName(bookTitles));
 	}
 
 	/**
@@ -305,15 +401,19 @@ public class OrderServiceImpl implements OrderService {
 	public ResponseMessage verifyOrderInformation(PaymentRequest paymentRequest) {
 
 		String frontOrderId = paymentRequest.orderId();
-		Long orderId = Long.parseLong(frontOrderId.substring(frontOrderId.length() - 2));
+		Long orderId = Long.parseLong(frontOrderId.substring(frontOrderId.length() - 4));
 
 		Optional<Order> order = orderRepository.findById(orderId);
 
 		if (order.isPresent()) {
 			if (!orderDetailService.checkStock(order.get())) {
-				throw new NoStockAvailableException();
+				log.error("결제 중 재고 없음");
+				throw new NoStockAvailableException("결제 중");
 			}
-			if (order.get().getPaymentPrice().intValue() != paymentRequest.amount()) {
+
+			BigDecimal paymentPrice = new BigDecimal(paymentRequest.amount());
+			if (order.get().getPaymentPrice().compareTo(paymentPrice) != 0) {
+				log.error("클라이언트에서 결제하려는 금액이 서버의 금액과 일치하지 않음");
 				throw new PriceMismatchException();
 			}
 		}
@@ -391,7 +491,6 @@ public class OrderServiceImpl implements OrderService {
 			.build();
 
 		// 주문 항목
-		pageable = PageRequest.of(0, 5);
 		OrderDetailItemPageDto orderDetailItem = orderDetailRepository.findOrderDetail(orderId, pageable);
 
 		Page<OrderDetailItemDto> orderListResponses =
@@ -453,80 +552,6 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	/**
-	 * 사용자 확인
-	 *
-	 * @param id 사용자 아이디
-	 * @return Customer
-	 */
-	private Customer getCustomerById(Long id) {
-		return customerRepository.findById(id)
-			.orElseThrow(() -> new MemberNotFoundException("등록되지 않은 사용자입니다."));
-	}
-
-	/**
-	 * 사용자로 부터 주소 목록 가져오기
-	 *
-	 * @param customer 사용자
-	 * @return 주소 목록
-	 */
-	private List<AddressResponse> getAddressesByMember(Customer customer) {
-		List<Address> addressesByMemberId = addressRepository.findAllByMemberId(customer.getId());
-		return addressesByMemberId.stream().map(AddressResponse::of).toList();
-	}
-
-	/**
-	 * 장바구니를 통한 책 정보 가져오기
-	 *
-	 * @param cart 장바구니
-	 * @return 책 목록
-	 */
-	private List<BookOrderResponse> getBookOrderResponsesFromCart(Map<Long, Integer> cart) {
-		return new ArrayList<>(cart.entrySet().stream()
-			.map(entry -> getBookOrderResponses(entry.getKey(), entry.getValue()))
-			.toList());
-	}
-
-	/**
-	 * 도서 정보 가져오기
-	 *
-	 * @param bookId 책 아이디
-	 * @param quantity 수량
-	 * @return BookOrderResponse
-	 */
-	private BookOrderResponse getBookOrderResponses(Long bookId, int quantity) {
-		// 도서 정보 가져오기
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(bookId));
-
-		// 도서 기여자 정보 가져오기
-		List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(
-			bookId);
-
-		// 만족하는 객체 생성
-		return BookOrderResponse.of(book, contributors, quantity);
-	}
-
-	/**
-	 * 도서 리스트의 총 가격 계산
-	 *
-	 * @param bookOrderResponses List<BookOrderResponse>
-	 * @return BigDecimal
-	 */
-	private BigDecimal calculateTotalPrice(List<BookOrderResponse> bookOrderResponses) {
-		BigDecimal totalPrice = BigDecimal.ZERO;
-		for (BookOrderResponse bookOrder : bookOrderResponses) {
-			totalPrice = totalPrice.add(bookOrder.bookTotalPrice());
-		}
-		return totalPrice;
-	}
-
-	/**
-	 * 	배송비 정책 조회
-	 */
-	private ShippingPolicy getShippingPolicy(int orderTotalPrice) {
-		return shippingPolicyRepository.findClosedShippingPolicy(orderTotalPrice);
-	}
-
-	/**
 	 * 비회원 저장 <br>
 	 * 고객 생성 후 customerRepository에 저장
 	 * @throws EmailAlreadyExistsException 이미 존재하는 이메일입니다.
@@ -555,13 +580,24 @@ public class OrderServiceImpl implements OrderService {
 	 * @param orderTempRegisterRequest 주문 등록 정보
 	 * @return 주문
 	 */
-	private Order createOrder(Customer customer, OrderTempRegisterRequest orderTempRegisterRequest) {
+	private Order createOrder(Customer customer, OrderRegisterRequest orderTempRegisterRequest) {
+
+		BigDecimal wrappingCost = BigDecimal.ZERO;
+		WrappingPaper wrappingPaper = null;
+		if (Objects.nonNull(orderTempRegisterRequest.wrapping())) {
+			wrappingPaper = wrappingPaperService.getWrappingPaper(
+				orderTempRegisterRequest.wrapping());
+			wrappingCost = wrappingPaper.getWrappingPrice();
+		}
+
 		return Order.builder()
 			.customer(customer)
 			.paymentPrice(orderTempRegisterRequest.paymentPrice())
 			.orderedAt(LocalDateTime.now())
-			.wrappingPrice(orderTempRegisterRequest.wrappingPrice())
+			.wrappingPrice(wrappingCost)
 			.expectedDeliveryAt(orderTempRegisterRequest.expectedDeliveryAt())
+			.wrappingPaper(wrappingPaper)
+			.booksPrice(orderTempRegisterRequest.paymentBooks())
 			.build();
 	}
 
@@ -588,4 +624,59 @@ public class OrderServiceImpl implements OrderService {
 			this.pointHistoryService.registerPointHistory(orderUsingPointRequest, PolicyName.USING);
 		});
 	}
+
+	private void processCoupon(OrderRegisterRequest orderTempRegisterRequest, Order savedOrder) {
+		MemberCoupon memberCoupon = memberCouponRepository.findById(orderTempRegisterRequest.allAppliedCoupon())
+			.orElseThrow(MemberCartNotFoundException::new);
+
+		BigDecimal discountPrice = BigDecimal.valueOf(memberCoupon.getCoupon().getDiscount());
+
+		// 쿠폰 정책에 따라 할인가 적용
+		if (memberCoupon.getCoupon().getPolicyType().compareTo(PolicyType.RATED) == 0) {
+			BigDecimal tempPrice = orderTempRegisterRequest.paymentBooks()
+				.multiply(discountPrice.divide(BigDecimal.valueOf(100)));
+
+			if (tempPrice.compareTo(memberCoupon.getCoupon().getMaximumDiscountPrice()) >= 0) {
+				discountPrice = memberCoupon.getCoupon().getMaximumDiscountPrice();
+			}
+		}
+
+		// AllAppliedCoupon 생성 및 저장
+		AllAppliedCoupon allAppliedCoupon = AllAppliedCoupon.builder()
+			.memberCoupon(memberCoupon)
+			.order(savedOrder)
+			.discount_price(discountPrice)
+			.build();
+
+		allAppliedCouponRepository.save(allAppliedCoupon);
+
+		// 쿠폰 사용 처리
+		memberCoupon.setUsed();
+		memberCouponRepository.save(memberCoupon);
+	}
+
+	private List<OrderDetailRequest> processWrapping(List<OrderDetailRequest> orderDetails, String wrappingList) {
+		// 포장할 책 ID 목록을 가져와서 Set으로 변환
+		String[] bookIds = wrappingList.split(",");
+		Set<Long> wrappingBookIds = Arrays.stream(bookIds)
+			.map(Long::parseLong)
+			.collect(Collectors.toSet());
+
+		// orderDetails를 순회하며 wrapping을 적용
+		List<OrderDetailRequest> updatedOrderDetails = new ArrayList<>();
+		for (OrderDetailRequest orderDetailRequest : orderDetails) {
+			Long bookId = orderDetailRequest.bookId();
+
+			// 책 ID가 wrappingBookIds에 포함되어 있으면 wrapping을 true로 설정
+			if (wrappingBookIds.contains(bookId)) {
+				OrderDetailRequest updatedOrderDetail = new OrderDetailRequest(
+					bookId, orderDetailRequest.count(), orderDetailRequest.unitPrice(), true, null);
+				updatedOrderDetails.add(updatedOrderDetail);
+			} else {
+				updatedOrderDetails.add(orderDetailRequest);
+			}
+		}
+		return updatedOrderDetails;
+	}
+
 }
