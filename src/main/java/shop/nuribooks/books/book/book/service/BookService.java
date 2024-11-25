@@ -11,9 +11,9 @@ import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 public interface BookService {
 	void registerBook(BaseBookRegisterRequest reqDto);
 
-	BookResponse getBookById(Long bookId);
-
 	Page<BookContributorsResponse> getBooks(Pageable pageable);
+  
+	BookResponse getBookById(Long bookId, boolean updateRecentView);
 
 	void updateBook(Long bookId, BookUpdateRequest bookUpdateReq);
 
