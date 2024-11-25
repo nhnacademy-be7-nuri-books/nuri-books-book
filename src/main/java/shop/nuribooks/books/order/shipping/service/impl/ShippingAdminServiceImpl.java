@@ -29,4 +29,13 @@ public class ShippingAdminServiceImpl implements ShippingAdminService {
 	public ShippingResponse getShippingResponse(Long id) {
 		return shippingRepository.findById(id).orElseThrow(ShippingNotFoundException::new).toResponseDto();
 	}
+
+	@Override
+	@Transactional
+	public void updateDeliveryStatus(Long id) {
+		Shipping shipping = shippingRepository.findById(id).orElseThrow(ShippingNotFoundException::new);
+		log.info("before : {}", shipping.getOrderInvoiceNumber());
+		shipping.startDelivery();
+		log.info("after : {}", shipping.getOrderInvoiceNumber());
+	}
 }

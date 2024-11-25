@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.shipping.dto.ShippingResponse;
+import shop.nuribooks.books.order.shipping.util.InvoiceNumberGenerator;
 
 /**
  * 배송지 entity
@@ -113,5 +114,10 @@ public class Shipping {
 			.shippingCompletedAt(shippingCompletedAt)
 			.shippingAt(shippingAt)
 			.build();
+	}
+
+	public void startDelivery() {
+		shippingAt = LocalDateTime.now();
+		orderInvoiceNumber = InvoiceNumberGenerator.generateInvoiceNumber();
 	}
 }

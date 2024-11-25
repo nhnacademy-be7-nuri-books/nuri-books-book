@@ -9,4 +9,6 @@ public interface ShippingAdminService {
 	Page<ShippingResponse> getShippingResponses(Pageable pageable);
 
 	ShippingResponse getShippingResponse(Long id);
+
+	void updateDeliveryStatus(Long id);
 }
