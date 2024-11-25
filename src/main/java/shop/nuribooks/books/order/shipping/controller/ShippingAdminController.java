@@ -43,4 +43,13 @@ public class ShippingAdminController {
 		shippingAdminService.updateDeliveryStatus(id);
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(HttpStatus.OK.value(), "배송이 시작되었습니다."));
 	}
+
+	@HasRole(role = AuthorityType.ADMIN)
+	@PutMapping("/delivery-complete/{id}")
+	public ResponseEntity<ResponseMessage> completeDelivery(@PathVariable Long id) {
+		shippingAdminService.completeDelivery(id);
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(new ResponseMessage(HttpStatus.OK.value(), "배송 완료 처리!"));
+	}
+
 }

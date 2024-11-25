@@ -11,4 +11,6 @@ public interface ShippingAdminService {
 	ShippingResponse getShippingResponse(Long id);
 
 	void updateDeliveryStatus(Long id);
+
+	void completeDelivery(Long id);
 }

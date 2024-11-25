@@ -120,4 +120,8 @@ public class Shipping {
 		shippingAt = LocalDateTime.now();
 		orderInvoiceNumber = InvoiceNumberGenerator.generateInvoiceNumber();
 	}
+
+	public void completeDelivery() {
+		shippingCompletedAt = LocalDateTime.now();
+	}
 }
