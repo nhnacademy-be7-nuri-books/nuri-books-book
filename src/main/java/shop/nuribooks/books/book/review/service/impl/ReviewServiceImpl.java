@@ -19,6 +19,7 @@ import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
+import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
@@ -35,6 +36,7 @@ import shop.nuribooks.books.exception.review.ReviewNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @Service
@@ -63,8 +65,9 @@ public class ReviewServiceImpl implements ReviewService {
 		Book book = this.bookRepository.findById(reviewRequest.bookId())
 			.orElseThrow(BookIdNotFoundException::new);
 
-		List<OrderDetail> orderDetails = this.orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNull(
-			reviewRequest.bookId(), ownerId);
+		List<OrderDetail> orderDetails = this.orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(
+			reviewRequest.bookId(), ownerId,
+			List.of(OrderState.PAID.getCode(), OrderState.DELIVERING.getCode(), OrderState.COMPLETED.getCode()));
 		if (orderDetails.size() == 0) {
 			throw new NoOrderDetailForReviewException();
 		}
@@ -167,7 +170,7 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Transactional
-	public ReviewMemberResponse updateReview(ReviewRequest reviewRequest, long reviewId) {
+	public ReviewMemberResponse updateReview(ReviewUpdateRequest reviewUpdateRequest, long reviewId) {
 		Long ownerId = Optional.ofNullable(MemberIdContext.getMemberId())
 			.orElseThrow(RequiredHeaderIsNullException::new);
 		// 기존 review update 처리
@@ -175,7 +178,7 @@ public class ReviewServiceImpl implements ReviewService {
 		if (review.getMember().getId() != ownerId) {
 			throw new ReviewNotFoundException();
 		}
-		review.update(reviewRequest, reviewImageRepository);
+		review.update(reviewUpdateRequest);
 
 		return ReviewMemberResponse.of(review);
 	}

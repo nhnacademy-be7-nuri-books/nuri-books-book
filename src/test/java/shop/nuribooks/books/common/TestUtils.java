@@ -151,6 +151,7 @@ public class TestUtils {
 			.expectedDeliveryAt(LocalDate.of(2024, 07, 01))
 			.orderedAt(LocalDateTime.of(2024, 06, 01, 12, 0))
 			.paymentPrice(BigDecimal.valueOf(50000))
+			.booksPrice(BigDecimal.valueOf(50000))
 			.wrappingPrice(BigDecimal.valueOf(3000))
 			.build();
 	}

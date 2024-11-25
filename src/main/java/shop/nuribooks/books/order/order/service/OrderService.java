@@ -7,11 +7,12 @@ import org.springframework.data.domain.Pageable;
 
 import jakarta.validation.Valid;
 import shop.nuribooks.books.common.message.ResponseMessage;
-import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
-import shop.nuribooks.books.order.order.dto.OrderListPeriodRequest;
-import shop.nuribooks.books.order.order.dto.OrderListResponse;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
+import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
+import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
+import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderListResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderRegisterResponse;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailResponse;
 import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
 
 /**
@@ -24,12 +25,12 @@ public interface OrderService {
 	/**
 	 * 주문 폼 정보 가져오기 - 바로 주문(회원)
 	 *
-	 * @param id 사용자 아이디
+	 * @param memberId 사용자 아이디
 	 * @param bookId 상품 아이디
 	 * @param quantity 상품 갯수
 	 * @return OrderInformationResponse
 	 */
-	OrderInformationResponse getMemberOrderInformation(Long id, Long bookId, int quantity);
+	OrderInformationResponse getMemberOrderInformation(Long memberId, Long bookId, int quantity);
 
 	/**
 	 * 주문 폼 정보 가져오기 - 바로 주문(비회원)
@@ -47,12 +48,12 @@ public interface OrderService {
 	/**
 	 * 회원 주문 임시 등록
 	 *
-	 * @param id UserId pk
+	 * @param memberId UserId pk
 	 * @param orderTempRegisterRequest 주문 임시 등록 request
 	 * @return 주문 임시 등록 response
 	 */
-	OrderTempRegisterResponse registerTempOrderForMember(Long id,
-		@Valid OrderTempRegisterRequest orderTempRegisterRequest);
+	OrderRegisterResponse registerTempOrderForMember(Long memberId,
+		@Valid OrderRegisterRequest orderTempRegisterRequest);
 
 	/**
 	 * 비회원 주문 임시 등록
@@ -60,7 +61,7 @@ public interface OrderService {
 	 * @param orderTempRegisterRequest 주문 임시 등록 request
 	 * @return 주문 임시 등록 response
 	 */
-	OrderTempRegisterResponse registerTempOrderForCustomer(@Valid OrderTempRegisterRequest orderTempRegisterRequest);
+	OrderRegisterResponse registerTempOrderForCustomer(@Valid OrderRegisterRequest orderTempRegisterRequest);
 
 	/**
 	 * 주문 금액 검증
@@ -83,4 +84,6 @@ public interface OrderService {
 		Pageable pageable,
 		OrderListPeriodRequest orderListPeriodRequest,
 		Optional<Long> userId);
+
+	OrderDetailResponse getOrderDetail(Optional<Long> userId, Long orderId, Pageable pageable);
 }

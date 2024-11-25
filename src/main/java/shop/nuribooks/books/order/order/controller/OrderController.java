@@ -26,12 +26,13 @@ import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
-import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
-import shop.nuribooks.books.order.order.dto.OrderListPeriodRequest;
-import shop.nuribooks.books.order.order.dto.OrderListResponse;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
+import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
+import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
+import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderListResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderRegisterResponse;
 import shop.nuribooks.books.order.order.service.OrderService;
+import shop.nuribooks.books.order.orderdetail.dto.OrderDetailResponse;
 import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
 
 /**
@@ -61,9 +62,9 @@ public class OrderController {
 	public ResponseEntity<OrderInformationResponse> getOrderInformation(
 		@PathVariable("book-id") Long bookId, @RequestParam Integer quantity) {
 
-		Optional<Long> userId = Optional.ofNullable(MemberIdContext.getMemberId());
+		Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
 
-		OrderInformationResponse result = userId
+		OrderInformationResponse result = memberId
 			// 회원 주문에 필요한 정보 가져오기
 			.map(id -> orderService.getMemberOrderInformation(id, bookId, quantity))
 			// 비회원 주문에 필요한 정보 가져오기
@@ -109,12 +110,12 @@ public class OrderController {
 	@ApiResponse(responseCode = "400", description = "잘못된 요청")
 	@ApiResponse(responseCode = "404", description = "사용자 또는 상품을 찾을 수 없음")
 	@PostMapping
-	public ResponseEntity<OrderTempRegisterResponse> registerTempOrder(
-		@Valid @RequestBody OrderTempRegisterRequest orderTempRegisterRequest) {
+	public ResponseEntity<OrderRegisterResponse> registerTempOrder(
+		@Valid @RequestBody OrderRegisterRequest orderTempRegisterRequest) {
 
-		Optional<Long> userId = Optional.ofNullable(MemberIdContext.getMemberId());
+		Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
 
-		OrderTempRegisterResponse result = userId
+		OrderRegisterResponse result = memberId
 			// 회원 주문
 			.map(id -> orderService.registerTempOrderForMember(id, orderTempRegisterRequest))
 			// 비회원 주문
@@ -133,7 +134,7 @@ public class OrderController {
 	@ApiResponse(responseCode = "200", description = "검증 성공")
 	@ApiResponse(responseCode = "400", description = "잘못된 요청")
 	@PostMapping("/verify")
-	public ResponseEntity<ResponseMessage> verifyOrderInformation(PaymentRequest paymentRequest) {
+	public ResponseEntity<ResponseMessage> verifyOrderInformation(@RequestBody PaymentRequest paymentRequest) {
 
 		ResponseMessage responseMessage = orderService.verifyOrderInformation(paymentRequest);
 
@@ -152,11 +153,33 @@ public class OrderController {
 		boolean includeOrdersInPendingStatus,
 		Pageable pageable) {
 
-		Optional<Long> userId = Optional.ofNullable(MemberIdContext.getMemberId());
+		Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
 
 		Page<OrderListResponse> result = orderService.getOrderList(includeOrdersInPendingStatus, pageable,
-			orderListPeriodRequest, userId);
+			orderListPeriodRequest, memberId);
 
+		log.debug("주문 목록 조회 성공");
+
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
+	/**
+	 * 주문 상세 조회
+	 *
+	 * @param orderId 주문 아이디
+	 * @param pageable 페이징
+	 * @return 주문 상세 정보
+	 */
+	@GetMapping("/details/{order-id}")
+	public ResponseEntity<OrderDetailResponse> getOrderDetail(
+		@PathVariable("order-id") Long orderId,
+		Pageable pageable
+	) {
+		Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
+
+		log.debug("주문 상세 조회 성공");
+
+		OrderDetailResponse result = orderService.getOrderDetail(memberId, orderId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 

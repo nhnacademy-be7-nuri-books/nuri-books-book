@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.coupon.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
@@ -16,6 +18,7 @@ import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
+import shop.nuribooks.books.exception.member.MemberCartNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -42,8 +45,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	@Override
 	public void registerMemberCoupon(MemberCouponRegisterRequest memberCouponRegisterRequest) {
 		Coupon coupon = couponRepository.findById(memberCouponRegisterRequest.couponId())
-			.orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
-
+			.orElseThrow(CouponNotFoundException::new);
 		Member member = memberRepository.findById(memberCouponRegisterRequest.memberId())
 			.orElseThrow(() -> new MemberNotFoundException("멤버를 못찾아요."));
 
@@ -74,7 +76,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	@Override
 	public void updateIsUsed(Long memberCouponId) {
 		MemberCoupon coupon = memberCouponRepository.findById(memberCouponId)
-			.orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
+			.orElseThrow(CouponNotFoundException::new);
 		coupon.setUsed();
 	}
 
@@ -87,7 +89,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	@Override
 	public void deleteMemberCoupon(Long memberCouponId) {
 		MemberCoupon memberCoupon = memberCouponRepository.findById(memberCouponId)
-			.orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
+			.orElseThrow(CouponNotFoundException::new);
 		memberCouponRepository.delete(memberCoupon);
 	}
 
@@ -99,6 +101,29 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	@Override
 	public Page<MemberCouponResponse> getExpiredOrUsedCouponsByMemberId(Long memberId, Pageable pageable) {
 		return memberCouponRepository.findExpiredOrUsedCouponsByMemberId(memberId, pageable);
+	}
+
+	@Override
+	public List<MemberCouponOrderDto> getAllTypeAvailableCouponsByMemberId(Long memberId, BigDecimal orderTotalPrice) {
+		return memberCouponRepository.findAllTypeAvailableCouponsByMemberId(memberId, orderTotalPrice);
+	}
+
+	@Override
+	public MemberCouponOrderDto getMemberCoupon(Long memberCouponId) {
+		MemberCoupon memberCoupon = memberCouponRepository.findById(memberCouponId)
+			.orElseThrow(MemberCartNotFoundException::new);
+
+		return MemberCouponOrderDto.builder()
+			.couponId(memberCoupon.getId())
+			.couponName(memberCoupon.getCoupon().getName())
+			.policyType(memberCoupon.getCoupon().getPolicyType())
+			.discount(memberCoupon.getCoupon().getDiscount())
+			.minimumOrderPrice(memberCoupon.getCoupon().getMinimumOrderPrice())
+			.maximumDiscountPrice(memberCoupon.getCoupon().getMaximumDiscountPrice())
+			.isUsed(memberCoupon.isUsed())
+			.createdAt(memberCoupon.getCreatedAt())
+			.expiredAt(memberCoupon.getExpiredAt())
+			.build();
 	}
 
 }

@@ -4,7 +4,6 @@ import org.hibernate.validator.constraints.Length;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
-
 import shop.nuribooks.books.book.contributor.entity.Contributor;
 
 @Builder

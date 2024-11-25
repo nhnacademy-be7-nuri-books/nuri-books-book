@@ -1,7 +1,9 @@
 package shop.nuribooks.books.book.coupon.repository.querydsl.impl;
 
 import static shop.nuribooks.books.book.coupon.entity.QMemberCoupon.*;
+import static shop.nuribooks.books.book.coupon.enums.CouponType.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
 import shop.nuribooks.books.book.coupon.entity.QMemberCoupon;
 import shop.nuribooks.books.book.coupon.repository.querydsl.MemberCouponRepositoryCustom;
@@ -113,5 +116,34 @@ public class MemberCouponRepositoryCustomImpl implements MemberCouponRepositoryC
 			.fetchOne();
 
 		return new PageImpl<>(expiredCoupons, pageable, total);
+	}
+
+	@Override
+	public List<MemberCouponOrderDto> findAllTypeAvailableCouponsByMemberId(Long memberId, BigDecimal orderTotalPrice) {
+		return queryFactory
+			.select(
+				Projections.constructor(
+					MemberCouponOrderDto.class,
+					memberCoupon.coupon.id,
+					memberCoupon.id,
+					memberCoupon.coupon.name,
+					memberCoupon.coupon.policyType,
+					memberCoupon.coupon.discount,
+					memberCoupon.coupon.minimumOrderPrice,
+					memberCoupon.coupon.maximumDiscountPrice,
+					memberCoupon.isUsed,
+					memberCoupon.createdAt,
+					memberCoupon.expiredAt
+				)
+			)
+			.from(memberCoupon)
+			.where(memberCoupon.member.id.eq(memberId)
+				.and(memberCoupon.isUsed.eq(false))
+				.and(memberCoupon.expiredAt.after(LocalDate.now()))
+				.and(memberCoupon.coupon.couponType.eq(ALL))
+				.and(memberCoupon.coupon.minimumOrderPrice.lt(orderTotalPrice)))
+			.orderBy(memberCoupon.createdAt.desc())
+			.fetch();
+
 	}
 }

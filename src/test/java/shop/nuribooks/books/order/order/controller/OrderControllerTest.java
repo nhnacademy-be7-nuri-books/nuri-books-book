@@ -27,9 +27,10 @@ import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse
 import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
-import shop.nuribooks.books.order.order.dto.OrderInformationResponse;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterRequest;
-import shop.nuribooks.books.order.order.dto.OrderTempRegisterResponse;
+import shop.nuribooks.books.member.customer.dto.CustomerDto;
+import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
+import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
+import shop.nuribooks.books.order.order.dto.response.OrderRegisterResponse;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailRequest;
 import shop.nuribooks.books.order.shipping.dto.ShippingRegisterRequest;
 
@@ -41,8 +42,8 @@ class OrderControllerTest extends ControllerTestSupport {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	private OrderTempRegisterRequest orderTempRegisterRequest;
-	private OrderTempRegisterResponse orderTempRegisterResponse;
+	private OrderRegisterRequest orderTempRegisterRequest;
+	private OrderRegisterResponse orderTempRegisterResponse;
 	private OrderInformationResponse memberOrderResponse;
 	private OrderInformationResponse customerOrderResponse;
 
@@ -71,7 +72,16 @@ class OrderControllerTest extends ControllerTestSupport {
 		List<OrderDetailRequest> orderDetailRequestList = new ArrayList<>();
 		orderDetailRequestList.add(orderDetailRequest);
 
-		orderTempRegisterRequest = new OrderTempRegisterRequest(
+		CustomerDto customerDto = new CustomerDto(
+			1L,
+			"홍길동",
+			"01012345678",
+			"abd@test.com",
+			BigDecimal.valueOf(5000),
+			List.of(new AddressResponse(1L, "집", "11111", "대전 00로 222-11", "", false))
+		);
+
+		orderTempRegisterRequest = new OrderRegisterRequest(
 			BigDecimal.valueOf(1000),
 			BigDecimal.ZERO,
 			LocalDate.now(),
@@ -80,10 +90,11 @@ class OrderControllerTest extends ControllerTestSupport {
 			null,
 			BigDecimal.ZERO,
 			null,
+			null,
 			null
 		);
 
-		orderTempRegisterResponse = new OrderTempRegisterResponse(
+		orderTempRegisterResponse = new OrderRegisterResponse(
 			1L,
 			"주문",
 			BigDecimal.valueOf(1000),
@@ -112,28 +123,20 @@ class OrderControllerTest extends ControllerTestSupport {
 		);
 
 		memberOrderResponse = new OrderInformationResponse(
+			customerDto,
 			null,
 			null,
 			null,
 			null,
-			BigDecimal.valueOf(1000),
-			List.of(new AddressResponse(1L, "집", "11111", "대전 00로 222-11", "", false)),
-			List.of(bookOrderResponse),
-			1L,
-			3000,
 			null
 		);
 
 		customerOrderResponse = new OrderInformationResponse(
-			1L,
-			"감자",
-			"010-4943-3703",
-			"test@test.com",
-			BigDecimal.ZERO,
 			null,
-			List.of(bookOrderResponse),
-			1L,
-			3000,
+			null,
+			null,
+			null,
+			null,
 			null
 		);
 	}
@@ -155,8 +158,7 @@ class OrderControllerTest extends ControllerTestSupport {
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/{book-id}", 1L)
 				.param("quantity", "2"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.name").doesNotExist())
-			.andExpect(jsonPath("$.shippingFee").value(3000));
+			.andExpect(jsonPath("$.customer.name").isNotEmpty());
 
 	}
 
@@ -170,8 +172,7 @@ class OrderControllerTest extends ControllerTestSupport {
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/{book-id}", 1L)
 				.param("quantity", "2"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.name").exists())
-			.andExpect(jsonPath("$.shippingFee").value(3000));
+			.andExpect(jsonPath("$.customer").isEmpty());
 
 	}
 
@@ -181,7 +182,7 @@ class OrderControllerTest extends ControllerTestSupport {
 
 		MemberIdContext.setMemberId(1L);
 
-		when(orderService.registerTempOrderForMember(any(Long.class), any(OrderTempRegisterRequest.class)))
+		when(orderService.registerTempOrderForMember(any(Long.class), any(OrderRegisterRequest.class)))
 			.thenReturn(orderTempRegisterResponse);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/orders")
@@ -194,7 +195,7 @@ class OrderControllerTest extends ControllerTestSupport {
 	@Test
 	@DisplayName("비회원 주문 테스트")
 	void registerTempOrderForCustomer() throws Exception {
-		when(orderService.registerTempOrderForCustomer(any(OrderTempRegisterRequest.class)))
+		when(orderService.registerTempOrderForCustomer(any(OrderRegisterRequest.class)))
 			.thenReturn(orderTempRegisterResponse);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/orders")
