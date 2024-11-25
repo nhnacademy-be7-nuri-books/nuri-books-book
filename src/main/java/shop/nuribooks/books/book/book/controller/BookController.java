@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.book.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,6 @@ import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
 import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.common.annotation.HasRole;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 
@@ -70,8 +70,8 @@ public class BookController {
 		@ApiResponse(responseCode = "400", description = "잘못된 페이징 요청")
 	})
 	@GetMapping
-	public ResponseEntity<PagedResponse<BookContributorsResponse>> getBooks(Pageable pageable) {
-		PagedResponse<BookContributorsResponse> pagedResponse = bookService.getBooks(pageable);
+	public ResponseEntity<Page<BookContributorsResponse>> getBooks(Pageable pageable) {
+		Page<BookContributorsResponse> pagedResponse = bookService.getBooks(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
 	}
 
