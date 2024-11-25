@@ -11,12 +11,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.BookListResponse;
+import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.QBook;
 import shop.nuribooks.books.book.book.enums.SortType;
@@ -24,7 +25,7 @@ import shop.nuribooks.books.book.publisher.entity.QPublisher;
 
 @Repository
 @RequiredArgsConstructor
-public class BookRepositoryCustomImpl implements BookRepositoryCustom {
+public class BookCustomRepositoryImpl implements BookCustomRepository{
 
 	private final JPAQueryFactory queryFactory;
 
@@ -78,13 +79,30 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
 	}
 
 	@Override
+	public List<TopBookLikeResponse> findTopBooksByLikes() {
+		QBook book = QBook.book;
+
+		return queryFactory.select(Projections.constructor(
+				TopBookLikeResponse.class,
+				book.id,
+				book.thumbnailImageUrl,
+				book.title
+			))
+			.from(book)
+			.where(book.deletedAt.isNull())
+			.orderBy(book.likeCount.desc())
+			.limit(10)
+			.fetch();
+	}
+
+	@Override
 	public List<Book> findAllAndDeletedAtIsNull() {
 		QBook book = QBook.book;
 		return queryFactory.selectFrom(book)
 			.where(book.deletedAt.isNull())
 			.fetch();
   }
-  
+
   @Override
 	public long countBook() {
 		return Optional.ofNullable(
