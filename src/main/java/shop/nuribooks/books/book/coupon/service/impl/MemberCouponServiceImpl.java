@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
-import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
@@ -39,14 +39,15 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	/**
 	 * 회원에게 쿠폰을 등록합니다.
 	 *
-	 * @param memberCouponRegisterRequest 쿠폰 등록을 위한 정보를 포함한 요청
+	 * @param memberCouponIssueRequest 쿠폰 등록을 위한 정보를 포함한 요청
 	 * @throws CouponNotFoundException 존재하지 않는 쿠폰일 경우 예외 발생
 	 */
+	@Transactional
 	@Override
-	public void registerMemberCoupon(MemberCouponRegisterRequest memberCouponRegisterRequest) {
-		Coupon coupon = couponRepository.findById(memberCouponRegisterRequest.couponId())
+	public void registerMemberCoupon(MemberCouponIssueRequest memberCouponIssueRequest) {
+		Coupon coupon = couponRepository.findById(memberCouponIssueRequest.couponId())
 			.orElseThrow(CouponNotFoundException::new);
-		Member member = memberRepository.findById(memberCouponRegisterRequest.memberId())
+		Member member = memberRepository.findById(memberCouponIssueRequest.memberId())
 			.orElseThrow(() -> new MemberNotFoundException("멤버를 못찾아요."));
 
 		MemberCoupon memberCoupon = MemberCoupon.builder()
@@ -74,6 +75,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	 * @throws CouponNotFoundException 존재하지 않는 쿠폰일 경우 예외 발생
 	 */
 	@Override
+	@Transactional
 	public void updateIsUsed(Long memberCouponId) {
 		MemberCoupon coupon = memberCouponRepository.findById(memberCouponId)
 			.orElseThrow(CouponNotFoundException::new);
@@ -86,6 +88,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	 * @param memberCouponId 삭제할 회원 쿠폰 ID
 	 * @throws CouponNotFoundException 존재하지 않는 쿠폰일 경우 예외 발생
 	 */
+	@Transactional
 	@Override
 	public void deleteMemberCoupon(Long memberCouponId) {
 		MemberCoupon memberCoupon = memberCouponRepository.findById(memberCouponId)

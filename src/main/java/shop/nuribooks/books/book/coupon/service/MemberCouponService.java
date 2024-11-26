@@ -6,13 +6,13 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
-import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
 
 public interface MemberCouponService {
 
-	void registerMemberCoupon(MemberCouponRegisterRequest memberCouponRegisterRequest);
+	void registerMemberCoupon(MemberCouponIssueRequest memberCouponIssueRequest);
 
 	List<MemberCouponResponse> getAllCouponByMemberId(Long memberId);
 
