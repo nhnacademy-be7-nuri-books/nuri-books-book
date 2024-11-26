@@ -2,9 +2,8 @@ package shop.nuribooks.books.payment.payment.event.handler;
 
 import java.math.BigDecimal;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.point.dto.request.register.OrderSavingPointRequest;
@@ -20,7 +19,7 @@ public class PointSavedEventHandler {
 	private final PointHistoryService pointHistoryService;
 
 	// point event listener 추가.
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@EventListener
 	public void createPointHistory(PointSavedEvent event) {
 		Member member = event.getMember();
 		Order order = event.getOrder();
