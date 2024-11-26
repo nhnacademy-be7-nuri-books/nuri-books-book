@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
@@ -52,6 +53,16 @@ public class MemberCouponController {
 	public ResponseEntity<Void> registerMemberCoupon(
 		@RequestBody MemberCouponIssueRequest memberCouponIssueRequest) {
 		memberCouponService.registerMemberCoupon(memberCouponIssueRequest);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	@HasRole(role = AuthorityType.MEMBER)
+	@PostMapping("/{coupon-id}")
+	public ResponseEntity<Void> issueMemberToBookCoupon(@Valid @PathVariable(name = "coupon-id") Long couponId) {
+		Long memberId = MemberIdContext.getMemberId();
+
+		MemberCouponIssueRequest request = new MemberCouponIssueRequest(memberId, couponId);
+		memberCouponService.registerMemberCoupon(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
