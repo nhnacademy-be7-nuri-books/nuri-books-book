@@ -100,6 +100,13 @@ public class PaymentServiceImpl implements PaymentService {
 
 		orderDetailRepository.saveAll(orderDetailList);
 
+		// 회원 사용 총금액 반영
+		Optional<Member> member = memberRepository.findById(order.getCustomer().getId());
+		member.ifPresent(value -> {
+			member.get().setTotalPaymentAmount(BigDecimal.valueOf(paymentSuccessRequest.totalAmount()));
+			memberRepository.save(member.get());
+		});
+
 		// 포인트 적립
 		handlePointSaving(order);
 

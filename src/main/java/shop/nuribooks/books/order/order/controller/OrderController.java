@@ -26,6 +26,7 @@ import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
+import shop.nuribooks.books.order.order.dto.OrderCancelDto;
 import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
 import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
 import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
@@ -148,6 +149,9 @@ public class OrderController {
 	 */
 	@HasRole(role = AuthorityType.MEMBER)
 	@GetMapping
+	@Operation(summary = "주문 목록 조회", description = "회원의 주문 목록을 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
 	public ResponseEntity<Page<OrderListResponse>> getOrderList(
 		OrderListPeriodRequest orderListPeriodRequest,
 		boolean includeOrdersInPendingStatus,
@@ -164,12 +168,41 @@ public class OrderController {
 	}
 
 	/**
+	 * 주문 환불/취소 목록 조회
+	 *
+	 * @return 주문 목록
+	 */
+	@Operation(summary = "주문 취소/환불 목록 조회", description = "회원의 취소된 주문 목록을 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	@ApiResponse(responseCode = "500", description = "서버 오류")
+	@HasRole(role = AuthorityType.MEMBER)
+	@GetMapping("/cancel")
+	public ResponseEntity<Page<OrderListResponse>> getCancelledOrderList(
+		OrderListPeriodRequest orderListPeriodRequest,
+		Pageable pageable) {
+
+		Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
+
+		Page<OrderListResponse> result = orderService.getCancelledOrderList(pageable,
+			orderListPeriodRequest, memberId);
+
+		log.debug("주문 취소/환불 조회 성공");
+
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
+	/**
 	 * 주문 상세 조회
 	 *
 	 * @param orderId 주문 아이디
 	 * @param pageable 페이징
 	 * @return 주문 상세 정보
 	 */
+	@Operation(summary = "주문 상세 조회", description = "특정 주문의 상세 정보를 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	@ApiResponse(responseCode = "500", description = "서버 오류")
 	@GetMapping("/details/{order-id}")
 	public ResponseEntity<OrderDetailResponse> getOrderDetail(
 		@PathVariable("order-id") Long orderId,
@@ -181,6 +214,38 @@ public class OrderController {
 
 		OrderDetailResponse result = orderService.getOrderDetail(memberId, orderId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
+	/**
+	 * 주문 취소 폼
+	 *
+	 * @param orderId 주문 아이디
+	 * @return 주문 상세 정보
+	 */
+	@GetMapping("/cancel/{order-id}")
+	public ResponseEntity<OrderCancelDto> getOrderCancel(
+		@PathVariable("order-id") Long orderId
+	) {
+		Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
+		OrderCancelDto result = orderService.getOrderCancel(memberId, orderId);
+
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
+	/**
+	 * 주문 취소
+	 *
+	 * @param orderId 주문 아이디
+	 * @return 주문 상세 정보
+	 */
+	@PostMapping("/cancel/{order-id}")
+	public ResponseEntity<ResponseMessage> doOrderCancel(
+		@PathVariable("order-id") Long orderId
+	) {
+		Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
+
+		//ResponseMessage result = paymentService.doOrderCancel(memberId, orderId);
+		return null;//ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
 }
