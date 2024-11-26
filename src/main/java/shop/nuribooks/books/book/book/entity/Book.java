@@ -35,6 +35,7 @@ import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.review.entity.Review;
+import shop.nuribooks.books.exception.book.InvalidStockException;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -92,20 +93,15 @@ public class Book {
 
 	@ColumnDefault("false")
 	@Column(nullable = false)
-	//@Column(nullable = false, columnDefinition = "tinyint(1) default 0")
 	private boolean isPackageable;
 
-	@NotNull
-	//@ColumnDefault("0")
+	@ColumnDefault("0")
 	private int likeCount;
 
-	@NotNull
-	@Min(0)
-	//@ColumnDefault("0")
+	@ColumnDefault("0")
 	private int stock;
 
-	@NotNull
-	//@ColumnDefault("0")
+	@ColumnDefault("0")
 	private Long viewCount;
 
 	private LocalDateTime deletedAt;
@@ -113,12 +109,15 @@ public class Book {
 	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
 	private List<Review> review;
 
+	@ColumnDefault("0")
+	private int salesCount;
+
 	@Builder
 	@Jacksonized
 	private Book(Publisher publisherId, BookStateEnum state, String title, String thumbnailImageUrl,
 		String detailImageUrl, LocalDate publicationDate, BigDecimal price, int discountRate,
 		String description, String contents, String isbn, boolean isPackageable, int stock,
-		int likeCount, Long viewCount) {
+		int likeCount, Long viewCount, int salesCount) {
 		this.state = state;
 		this.publisherId = publisherId;
 		this.title = title;
@@ -134,6 +133,7 @@ public class Book {
 		this.stock = stock;
 		this.likeCount = likeCount;
 		this.viewCount = viewCount;
+		this.salesCount = salesCount;
 	}
 
 	public void updateBookDetails(BookUpdateRequest request) {
@@ -157,7 +157,13 @@ public class Book {
 	}
 
 	public void updateStock(int count) {
+		if (this.stock - count < 0) {
+			throw new InvalidStockException();
+		}
 		this.stock -= count;
+		if (this.stock == 0) {
+			this.state = BookStateEnum.SOLD_OUT;
+		}
 	}
 
 	public void incrementLikeCount() {

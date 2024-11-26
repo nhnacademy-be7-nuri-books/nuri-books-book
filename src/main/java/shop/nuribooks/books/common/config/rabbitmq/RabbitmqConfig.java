@@ -3,7 +3,9 @@ package shop.nuribooks.books.common.config.rabbitmq;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -24,18 +26,15 @@ import shop.nuribooks.books.common.config.keymanager.KeyManagerConfig;
 @RequiredArgsConstructor
 public class RabbitmqConfig {
 
+	public static final String INVENTORY_UPDATE_KEY = "nuribooks.inventory.update.queue";
+	public static final String INVENTORY_EXCHANGE = "nuribooks.inventory.exchange";
+	public static final String INVENTORY_ROUTING_KEY = "nuribooks.inventory.update";
+	public static final String INVENTORY_DLQ = "nuribooks.inventory.update.dlq";
+	public static final String DEAD_LETTER_EXCHANGE = "nuribooks.deadletter.exchange";
+	public static final String INVENTORY_DEAD_LETTER_ROUTING_KEY = "nuribooks.inventory.update.dlq";
 	private final KeyManagerConfig keyManagerConfig;
-
 	@Value("${cloud.nhn.rabbitmq.secret-id}")
 	String rabbitmqSecretId;
-
-	public static final String BOOK_COUPON_QUEUE = "book.coupon.queue";
-	public static final String CATEGORY_COUPON_QUEUE = "category.coupon.queue";
-
-	public static final String COUPON_EXCHANGE = "coupon.exchange";
-
-	public static final String BOOK_COUPON_ROUTING_KEY = "book.coupon";
-	public static final String CATEGORY_COUPON_ROUTING_KEY = "category.coupon";
 
 	@Bean
 	public ConnectionFactory connectionFactory() {
@@ -61,32 +60,54 @@ public class RabbitmqConfig {
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(messageConverter());
 		rabbitTemplate.setReplyTimeout(20000L);
+		rabbitTemplate.setChannelTransacted(true);
+
+		// 모든 메시지 Persistent 설정
+		rabbitTemplate.setBeforePublishPostProcessors(message -> {
+			message.getMessageProperties().setDeliveryMode(MessageProperties.DEFAULT_DELIVERY_MODE);
+			return message;
+		});
+
 		return rabbitTemplate;
 	}
 
+	//Dead Letter Queue 설정 포함한 큐 정의
 	@Bean
-	public Queue bookCouponQueue() {
-		return new Queue(BOOK_COUPON_QUEUE, true);
+	public Queue inventoryUpdateQueue() {
+		return QueueBuilder.durable(INVENTORY_UPDATE_KEY)
+			.withArgument("x-dead-letter-exchange", DEAD_LETTER_EXCHANGE)
+			.withArgument("x-dead-letter-routing-key", INVENTORY_DEAD_LETTER_ROUTING_KEY)
+			.build();
+	}
+
+	//DLQ용 큐 생성
+	@Bean
+	public Queue inventoryUpdateDLQ() {
+		return new Queue(INVENTORY_DLQ, true);
 	}
 
 	@Bean
-	public Queue categoryCouponQueue() {
-		return new Queue(CATEGORY_COUPON_QUEUE, true);
+	public DirectExchange inventoryExchange() {
+		return new DirectExchange(INVENTORY_EXCHANGE);
 	}
 
 	@Bean
-	public DirectExchange couponExchange() {
-		return new DirectExchange(COUPON_EXCHANGE);
+	public DirectExchange deadLetterExchange() {
+		return new DirectExchange(DEAD_LETTER_EXCHANGE);
 	}
 
 	@Bean
-	public Binding bookCouponBinding(Queue bookCouponQueue, DirectExchange couponExchange) {
-		return BindingBuilder.bind(bookCouponQueue).to(couponExchange).with(BOOK_COUPON_ROUTING_KEY);
+	public Binding inventoryUpdateBinding() {
+		return BindingBuilder.bind(inventoryUpdateQueue())
+			.to(inventoryExchange())
+			.with(INVENTORY_ROUTING_KEY);
 	}
 
 	@Bean
-	public Binding categoryCouponBinding(Queue categoryCouponQueue, DirectExchange couponExchange) {
-		return BindingBuilder.bind(categoryCouponQueue).to(couponExchange).with(CATEGORY_COUPON_ROUTING_KEY);
+	public Binding inventoryDLQBinding() {
+		return BindingBuilder.bind(inventoryUpdateDLQ())
+			.to(deadLetterExchange())
+			.with(INVENTORY_DEAD_LETTER_ROUTING_KEY);
 	}
 
 	private RabbitmqConfigResponse parseRabbitmqConfig(String rabbitmqConfig) {

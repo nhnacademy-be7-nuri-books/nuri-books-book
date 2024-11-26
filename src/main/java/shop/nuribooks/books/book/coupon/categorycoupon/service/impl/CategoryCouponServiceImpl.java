@@ -7,12 +7,14 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.coupon.categorycoupon.dto.CategoryCouponRequest;
+import shop.nuribooks.books.book.coupon.categorycoupon.dto.CategoryCouponResponse;
 import shop.nuribooks.books.book.coupon.categorycoupon.entity.CategoryCoupon;
 import shop.nuribooks.books.book.coupon.categorycoupon.repository.CategoryCouponRepository;
 import shop.nuribooks.books.book.coupon.categorycoupon.service.CategoryCouponService;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
+import shop.nuribooks.books.exception.coupon.BookCouponNotFoundException;
 
 @Service
 @Transactional(readOnly = true)
@@ -48,5 +50,13 @@ public class CategoryCouponServiceImpl implements CategoryCouponService {
 			.coupon(coupon)
 			.category(category)
 			.build());
+	}
+
+	@Override
+	public CategoryCouponResponse getCategoryCoupon(Long categoryId) {
+		CategoryCoupon categoryCoupon = categoryCouponRepository.findByCategoryId(categoryId)
+			.orElseThrow(() -> new BookCouponNotFoundException());
+
+		return new CategoryCouponResponse(categoryCoupon);
 	}
 }

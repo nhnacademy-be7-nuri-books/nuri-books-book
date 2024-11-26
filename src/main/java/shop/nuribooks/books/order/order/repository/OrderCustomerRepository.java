@@ -1,5 +1,7 @@
 package shop.nuribooks.books.order.order.repository;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
@@ -14,5 +16,7 @@ public interface OrderCustomerRepository {
 
 	OrderPageResponse findCancelledOrders(Long memberId, Pageable pageable,
 		OrderListPeriodRequest orderListPeriodRequest);
+  
+	BigDecimal findOrderSavingPoint(Long orderId);
 
 }
