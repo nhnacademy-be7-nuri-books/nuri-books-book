@@ -36,10 +36,7 @@ public class BookSearchServiceImpl implements BookSearchService {
 		Pageable pageable) throws IOException {
 		SearchRequest request = SearchRequest.of(s -> s
 			.index(indexNameProvider.resolveIndexName())
-			.query(q -> q
-				.bool(b -> searchType.apply(b, keyword)
-				)
-			)
+			.query(q -> q.bool(b -> searchType.apply(b, keyword)))
 			.sort(
 				sortType.getSortOptions(),
 				SortType.POPULAR.getSortOptions()

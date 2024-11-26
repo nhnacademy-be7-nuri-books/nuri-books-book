@@ -7,12 +7,15 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import co.elastic.clients.util.DateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @Document(indexName = "#{indexNameProperty.resolveIndexName()}")
 public class BookDocument {
@@ -35,6 +38,14 @@ public class BookDocument {
 	private int discount_rate;
 
 	private String thumbnail_image_url;
+
+	private long view_count;
+
+	private int review_count;
+
+	private BigDecimal total_score;
+
+	private DateTime deleted_at;
 
 	// localdatetime -> date로 타입 변경.
 	// jackson이 Localdatetime 변환 지원 x
