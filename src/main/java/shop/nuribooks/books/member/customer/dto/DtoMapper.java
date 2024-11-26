@@ -1,5 +1,6 @@
 package shop.nuribooks.books.member.customer.dto;
 
+import shop.nuribooks.books.member.customer.dto.response.CustomerAuthInfoResponse;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
 
@@ -18,5 +19,12 @@ public class DtoMapper {
 			.email(customer.getEmail())
 			.build();
 	}
-}
 
+	public static CustomerAuthInfoResponse toAuthInfoDto(Customer customer) {
+		return CustomerAuthInfoResponse.builder()
+			.customerId(customer.getId())
+			.password(customer.getPassword())
+			.email(customer.getEmail())
+			.build();
+	}
+}

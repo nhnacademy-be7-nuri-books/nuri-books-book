@@ -3,12 +3,13 @@ package shop.nuribooks.books.book.coupon.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
-import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
@@ -46,8 +47,7 @@ public class CouponServiceImpl implements CouponService {
 	 */
 	@Override
 	public Page<CouponResponse> getCoupons(CouponType type, Pageable pageable) {
-		Page<CouponResponse> coupons = couponRepository.findCouponsByCouponId(pageable, type);
-		return coupons;
+		return couponRepository.findCouponsByCouponId(pageable, type);
 	}
 
 	/**
@@ -57,11 +57,11 @@ public class CouponServiceImpl implements CouponService {
 	 * @return
 	 */
 	@Override
-	public Coupon getCouponById(Long id) {
+	public CouponResponse getCouponById(Long id) {
 		Coupon coupon = couponRepository.findById(id)
-			.orElseThrow(() -> new CouponNotFoundException());
+			.orElseThrow(CouponNotFoundException::new);
 
-		return coupon;
+		return CouponResponse.of(coupon);
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class CouponServiceImpl implements CouponService {
 	@Transactional
 	public Coupon updateCoupon(Long id, CouponRequest request) {
 		Coupon coupon = couponRepository.findById(id)
-			.orElseThrow(() -> new CouponNotFoundException());
+			.orElseThrow(CouponNotFoundException::new);
 
 		coupon.update(request);
 		return coupon;
@@ -87,10 +87,11 @@ public class CouponServiceImpl implements CouponService {
 	 * @param member
 	 */
 	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void issueWelcomeCoupon(Member member) {
 		Coupon welcomeCoupon = couponRepository.findCouponsByNameLike("%WELCOME%");
 
-		MemberCouponRegisterRequest request = new MemberCouponRegisterRequest(member.getId(), welcomeCoupon.getId());
+		MemberCouponIssueRequest request = new MemberCouponIssueRequest(member.getId(), welcomeCoupon.getId());
 		memberCouponService.registerMemberCoupon(request);
 	}
 
@@ -103,7 +104,7 @@ public class CouponServiceImpl implements CouponService {
 	@Transactional
 	public void expireCoupon(Long id) {
 		Coupon coupon = couponRepository.findById(id)
-			.orElseThrow(() -> new CouponNotFoundException());
+			.orElseThrow(CouponNotFoundException::new);
 
 		coupon.expire();
 	}

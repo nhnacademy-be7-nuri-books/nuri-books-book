@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.coupon.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -8,7 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
@@ -17,6 +19,7 @@ import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
 import shop.nuribooks.books.exception.coupon.CouponAlreadyIssuedException;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
+import shop.nuribooks.books.exception.member.MemberCartNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -37,15 +40,15 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	/**
 	 * 회원에게 쿠폰을 등록합니다.
 	 *
-	 * @param memberCouponRegisterRequest 쿠폰 등록을 위한 정보를 포함한 요청
+	 * @param memberCouponIssueRequest 쿠폰 등록을 위한 정보를 포함한 요청
 	 * @throws CouponNotFoundException 존재하지 않는 쿠폰일 경우 예외 발생
 	 */
-	@Override
 	@Transactional
-	public void registerMemberCoupon(MemberCouponRegisterRequest memberCouponRegisterRequest) {
-		Coupon coupon = couponRepository.findById(memberCouponRegisterRequest.couponId())
+	@Override
+	public void registerMemberCoupon(MemberCouponIssueRequest memberCouponIssueRequest) {
+		Coupon coupon = couponRepository.findById(memberCouponIssueRequest.couponId())
 			.orElseThrow(CouponNotFoundException::new);
-		Member member = memberRepository.findById(memberCouponRegisterRequest.memberId())
+		Member member = memberRepository.findById(memberCouponIssueRequest.memberId())
 			.orElseThrow(() -> new MemberNotFoundException("멤버를 못찾아요."));
 
 		boolean alreadyIssued = memberCouponRepository.existsByMemberAndCoupon(member, coupon);
@@ -78,6 +81,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	 * @throws CouponNotFoundException 존재하지 않는 쿠폰일 경우 예외 발생
 	 */
 	@Override
+	@Transactional
 	public void updateIsUsed(Long memberCouponId) {
 		MemberCoupon coupon = memberCouponRepository.findById(memberCouponId)
 			.orElseThrow(CouponNotFoundException::new);
@@ -90,6 +94,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	 * @param memberCouponId 삭제할 회원 쿠폰 ID
 	 * @throws CouponNotFoundException 존재하지 않는 쿠폰일 경우 예외 발생
 	 */
+	@Transactional
 	@Override
 	public void deleteMemberCoupon(Long memberCouponId) {
 		MemberCoupon memberCoupon = memberCouponRepository.findById(memberCouponId)
@@ -105,6 +110,29 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	@Override
 	public Page<MemberCouponResponse> getExpiredOrUsedCouponsByMemberId(Long memberId, Pageable pageable) {
 		return memberCouponRepository.findExpiredOrUsedCouponsByMemberId(memberId, pageable);
+	}
+
+	@Override
+	public List<MemberCouponOrderDto> getAllTypeAvailableCouponsByMemberId(Long memberId, BigDecimal orderTotalPrice) {
+		return memberCouponRepository.findAllTypeAvailableCouponsByMemberId(memberId, orderTotalPrice);
+	}
+
+	@Override
+	public MemberCouponOrderDto getMemberCoupon(Long memberCouponId) {
+		MemberCoupon memberCoupon = memberCouponRepository.findById(memberCouponId)
+			.orElseThrow(MemberCartNotFoundException::new);
+
+		return MemberCouponOrderDto.builder()
+			.couponId(memberCoupon.getId())
+			.couponName(memberCoupon.getCoupon().getName())
+			.policyType(memberCoupon.getCoupon().getPolicyType())
+			.discount(memberCoupon.getCoupon().getDiscount())
+			.minimumOrderPrice(memberCoupon.getCoupon().getMinimumOrderPrice())
+			.maximumDiscountPrice(memberCoupon.getCoupon().getMaximumDiscountPrice())
+			.isUsed(memberCoupon.isUsed())
+			.createdAt(memberCoupon.getCreatedAt())
+			.expiredAt(memberCoupon.getExpiredAt())
+			.build();
 	}
 
 }

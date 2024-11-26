@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
 import shop.nuribooks.books.common.annotation.HasRole;
@@ -39,7 +39,7 @@ public class MemberCouponController {
 	/**
 	 * 회원에게 쿠폰을 등록합니다.
 	 *
-	 * @param memberCouponRegisterRequest 쿠폰 등록을 위한 정보를 포함한 요청
+	 * @param memberCouponIssueRequest 쿠폰 등록을 위한 정보를 포함한 요청
 	 * @return 성공 시 상태 코드 201 반환
 	 */
 	@Operation(summary = "회원 쿠폰 등록", description = "회원에게 쿠폰을 등록합니다.")
@@ -51,8 +51,8 @@ public class MemberCouponController {
 	})
 	@PostMapping
 	public ResponseEntity<Void> registerMemberCoupon(
-		@RequestBody MemberCouponRegisterRequest memberCouponRegisterRequest) {
-		memberCouponService.registerMemberCoupon(memberCouponRegisterRequest);
+		@RequestBody MemberCouponIssueRequest memberCouponIssueRequest) {
+		memberCouponService.registerMemberCoupon(memberCouponIssueRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
@@ -61,8 +61,8 @@ public class MemberCouponController {
 	public ResponseEntity<Void> issueMemberToBookCoupon(@Valid @PathVariable(name = "coupon-id") Long couponId) {
 		Long memberId = MemberIdContext.getMemberId();
 
-		MemberCouponRegisterRequest memberCouponRegisterRequest = new MemberCouponRegisterRequest(memberId, couponId);
-		memberCouponService.registerMemberCoupon(memberCouponRegisterRequest);
+		MemberCouponIssueRequest request = new MemberCouponIssueRequest(memberId, couponId);
+		memberCouponService.registerMemberCoupon(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
