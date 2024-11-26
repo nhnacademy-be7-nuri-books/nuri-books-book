@@ -59,7 +59,7 @@ public class MemberCoupon {
 
 	private void setExpiredAt(Coupon coupon) {
 		if (coupon.getExpirationType().equals(ExpirationType.DATE)) {
-			this.expiredAt = coupon.getCreatedAt();
+			this.expiredAt = coupon.getExpiredAt();
 		} else {
 			this.expiredAt = createdAt.plusDays(coupon.getPeriod());
 		}

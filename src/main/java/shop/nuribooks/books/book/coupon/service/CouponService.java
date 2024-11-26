@@ -14,7 +14,7 @@ public interface CouponService {
 
 	Page<CouponResponse> getCoupons(CouponType type, Pageable pageable);
 
-	Coupon getCouponById(Long id);
+	CouponResponse getCouponById(Long id);
 
 	void expireCoupon(Long id);
 
