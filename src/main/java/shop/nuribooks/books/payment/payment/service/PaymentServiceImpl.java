@@ -3,17 +3,28 @@ package shop.nuribooks.books.payment.payment.service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+
+import shop.nuribooks.books.book.point.dto.request.register.OrderSavingPointRequest;
+import shop.nuribooks.books.book.point.entity.PointPolicy;
+import shop.nuribooks.books.book.point.enums.PolicyName;
+import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
+import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
+import shop.nuribooks.books.book.point.service.PointHistoryService;
+import shop.nuribooks.books.common.config.rabbitmq.RabbitmqConfig;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.exception.order.OrderNotFoundException;
+import shop.nuribooks.books.inventory.message.InventoryUpdateMessage;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.entity.Order;
@@ -38,6 +49,10 @@ public class PaymentServiceImpl implements PaymentService {
 	private final PaymentRepository paymentRepository;
 	private final OrderDetailRepository orderDetailRepository;
 	private final BookRepository bookRepository;
+	private final PointPolicyRepository pointPolicyRepository;
+
+	private final PointHistoryService pointHistoryService;
+	private final RabbitTemplate rabbitTemplate;
 	private final ApplicationEventPublisher publisher;
 
 	/**
@@ -74,13 +89,14 @@ public class PaymentServiceImpl implements PaymentService {
 
 		for (OrderDetail orderDetail : orderDetailList) {
 			orderDetail.setOrderState(OrderState.PAID);
-			Book book = orderDetail.getBook();
-			book.updateStock(orderDetail.getCount());
 		}
 
-		bookRepository.saveAll(orderDetailList.stream()
-			.map(OrderDetail::getBook)  // Book 객체만 추출
-			.toList());  // 일괄 저장
+		//재고 업데이트 메시지 발행
+		try {
+			publishInventoryUpdateMessages(orderDetailList);
+		} catch (AmqpRejectAndDontRequeueException e) {
+			log.error("Invalid Message Format : {}", e.getMessage());
+		}
 
 		orderDetailRepository.saveAll(orderDetailList);
 
@@ -102,5 +118,23 @@ public class PaymentServiceImpl implements PaymentService {
 		member.ifPresent(value -> {
 			publisher.publishEvent(new PointSavedEvent(value, order, order.getBooksPrice()));
 		});
+	}
+
+	//재고 업데이트 메시지 발행
+	private void publishInventoryUpdateMessages(List<OrderDetail> orderDetailList) {
+		for (OrderDetail orderDetail : orderDetailList) {
+			InventoryUpdateMessage message = InventoryUpdateMessage
+				.builder()
+				.bookId(orderDetail.getBook().getId())
+				.count(orderDetail.getCount())
+				.messageId("inventory-" + UUID.randomUUID())
+				.build();
+
+			rabbitTemplate.convertAndSend(
+				RabbitmqConfig.INVENTORY_EXCHANGE,
+				RabbitmqConfig.INVENTORY_ROUTING_KEY,
+				message
+			);
+		}
 	}
 }
