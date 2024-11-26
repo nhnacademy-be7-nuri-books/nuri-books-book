@@ -82,7 +82,6 @@ import shop.nuribooks.books.order.wrapping.entity.WrappingPaper;
 import shop.nuribooks.books.order.wrapping.service.WrappingPaperService;
 import shop.nuribooks.books.payment.payment.dto.PaymentInfoDto;
 import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
-import shop.nuribooks.books.payment.payment.repository.PaymentRepository;
 
 @Service
 @Transactional(readOnly = true)
@@ -95,7 +94,6 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 	private final PointPolicyRepository pointPolicyRepository;
 	private final MemberCouponRepository memberCouponRepository;
 	private final AllAppliedCouponRepository allAppliedCouponRepository;
-	private final PaymentRepository paymentRepository;
 
 	private final OrderDetailService orderDetailService;
 	private final PointHistoryService pointHistoryService;
@@ -111,7 +109,6 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		OrderDetailRepository orderDetailRepository,
 		ShippingRepository shippingRepository,
 		PointPolicyRepository pointPolicyRepository,
-		PaymentRepository paymentRepository,
 		ShippingService shippingService,
 		MemberCouponRepository memberCouponRepository,
 		OrderDetailService orderDetailService,
@@ -133,7 +130,6 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		this.orderDetailRepository = orderDetailRepository;
 		this.shippingRepository = shippingRepository;
 		this.pointPolicyRepository = pointPolicyRepository;
-		this.paymentRepository = paymentRepository;
 		this.memberCouponRepository = memberCouponRepository;
 		this.orderDetailService = orderDetailService;
 		this.pointHistoryService = pointHistoryService;
@@ -448,18 +444,15 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 				pageable, orderListPeriodRequest);
 		}
 
-		Page<OrderListResponse> response =
-			new PageImpl(result.orders(), pageable, result.totalCount());
-
-		return response;
+		return new PageImpl(result.orders(), pageable, result.totalCount());
 	}
 
 	/**
 	 * 주문 상세 가져오기
-	 * @param userId
-	 * @param orderId
-	 * @param pageable
-	 * @return
+	 * @param userId 사용자 아이디
+	 * @param orderId 주문 아이디
+	 * @param pageable 페이징
+	 * @return 주문 상세 정보
 	 */
 	@Override
 	public OrderDetailResponse getOrderDetail(Optional<Long> userId, Long orderId, Pageable pageable) {
@@ -496,9 +489,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		Page<OrderDetailItemDto> orderListResponses =
 			new PageImpl(orderDetailItem.orderDetailItem(), pageable, orderDetailItem.totalCount());
 
-		// TODO : 결제 정보는 주문이 다 되면 추가한다.
-		PaymentInfoDto paymentInfoDto = null;
-		// PaymentInfoDto paymentInfo = paymentRepository.findPaymentInfo(orderId);
+		PaymentInfoDto paymentInfoDto = orderRepository.findPaymentInfo(orderId);
 
 		return OrderDetailResponse.builder()
 			.order(orderSummaryDto)
