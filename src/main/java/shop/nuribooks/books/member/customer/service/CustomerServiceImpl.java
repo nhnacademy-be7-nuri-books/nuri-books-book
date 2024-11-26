@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.exception.member.AlreadyMemberException;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
@@ -14,6 +15,7 @@ import shop.nuribooks.books.member.customer.dto.response.CustomerAuthInfoRespons
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
+import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 /**
  * @author Jprotection
@@ -24,6 +26,7 @@ import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 public class CustomerServiceImpl implements CustomerService {
 
 	private final CustomerRepository customerRepository;
+	private final MemberRepository memberRepository;
 
 	/**
 	 * 비회원 저장 <br>
@@ -55,6 +58,10 @@ public class CustomerServiceImpl implements CustomerService {
 	public CustomerAuthInfoResponse getCustomerAuthInfoByEmail(String email) {
 		Customer foundCustomer = customerRepository.findByEmail(email)
 			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
+
+		if (memberRepository.existsById(foundCustomer.getId())) {
+			throw new AlreadyMemberException("비회원이 아닌 회원입니다.");
+		}
 
 		return DtoMapper.toAuthInfoDto(foundCustomer);
 	}
