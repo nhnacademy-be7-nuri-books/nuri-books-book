@@ -157,6 +157,10 @@ public class Book {
 
 	public void updateStock(int count) {
 		this.stock -= count;
+		if (this.stock <= 0) {
+			this.state = BookStateEnum.SOLD_OUT;
+			this.stock = 0;
+		}
 	}
 
 	public void incrementLikeCount() {
