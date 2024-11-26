@@ -88,6 +88,7 @@ public class PaymentServiceImpl implements PaymentService {
 		Optional<Member> member = memberRepository.findById(order.getCustomer().getId());
 		member.ifPresent(value -> {
 			member.get().setTotalPaymentAmount(BigDecimal.valueOf(paymentSuccessRequest.totalAmount()));
+			memberRepository.save(member.get());
 		});
 
 		// 포인트 적립

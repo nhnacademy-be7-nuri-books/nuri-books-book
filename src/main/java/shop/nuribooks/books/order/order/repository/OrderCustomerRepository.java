@@ -14,4 +14,5 @@ public interface OrderCustomerRepository {
 
 	OrderPageResponse findCancelledOrders(Long memberId, Pageable pageable,
 		OrderListPeriodRequest orderListPeriodRequest);
+
 }
