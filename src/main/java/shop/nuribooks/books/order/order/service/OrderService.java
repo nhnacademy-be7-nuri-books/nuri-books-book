@@ -86,4 +86,7 @@ public interface OrderService {
 		Optional<Long> userId);
 
 	OrderDetailResponse getOrderDetail(Optional<Long> userId, Long orderId, Pageable pageable);
+
+	Page<OrderListResponse> getCancelledOrderList(Pageable pageable, OrderListPeriodRequest orderListPeriodRequest,
+		Optional<Long> memberId);
 }

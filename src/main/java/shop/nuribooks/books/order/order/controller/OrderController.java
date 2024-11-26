@@ -164,6 +164,27 @@ public class OrderController {
 	}
 
 	/**
+	 * 주문 환불/취소 목록 조회
+	 *
+	 * @return 주문 목록
+	 */
+	@HasRole(role = AuthorityType.MEMBER)
+	@GetMapping("/cancel")
+	public ResponseEntity<Page<OrderListResponse>> getCancelledOrderList(
+		OrderListPeriodRequest orderListPeriodRequest,
+		Pageable pageable) {
+
+		Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
+
+		Page<OrderListResponse> result = orderService.getCancelledOrderList(pageable,
+			orderListPeriodRequest, memberId);
+
+		log.debug("주문 취소/환불 조회 성공");
+
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
+	/**
 	 * 주문 상세 조회
 	 *
 	 * @param orderId 주문 아이디

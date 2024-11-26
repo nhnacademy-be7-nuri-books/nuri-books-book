@@ -421,7 +421,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 	 * @param includeOrdersInPendingStatus 대기 미포함 여부
 	 * @param pageable 페이지
 	 * @param orderListPeriodRequest 적용 날짜
-	 * @param userId 사용자 아이디
+	 * @param memberId 사용자 아이디
 	 * @return 주문 목록
 	 */
 	@Override
@@ -429,11 +429,31 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		boolean includeOrdersInPendingStatus,
 		Pageable pageable,
 		OrderListPeriodRequest orderListPeriodRequest,
-		Optional<Long> userId) {
+		Optional<Long> memberId) {
 
 		OrderPageResponse result = null;
-		if (userId.isPresent()) {
-			result = orderRepository.findOrders(includeOrdersInPendingStatus, userId.get(),
+		if (memberId.isPresent()) {
+			result = orderRepository.findOrders(includeOrdersInPendingStatus, memberId.get(),
+				pageable, orderListPeriodRequest);
+		}
+
+		return new PageImpl(result.orders(), pageable, result.totalCount());
+	}
+
+	/**
+	 * 주문 취소/환불 목록 가져오기
+	 *
+	 * @param pageable 페이지
+	 * @param orderListPeriodRequest 적용 날짜
+	 * @param memberId 사용자 아이디
+	 * @return 주문 취소/환불 목록
+	 */
+	@Override
+	public Page<OrderListResponse> getCancelledOrderList(Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest, Optional<Long> memberId) {
+		OrderPageResponse result = null;
+		if (memberId.isPresent()) {
+			result = orderRepository.findCancelledOrders(memberId.get(),
 				pageable, orderListPeriodRequest);
 		}
 
