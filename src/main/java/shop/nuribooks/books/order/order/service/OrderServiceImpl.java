@@ -29,8 +29,6 @@ import shop.nuribooks.books.book.coupon.repository.AllAppliedCouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
 import shop.nuribooks.books.book.point.enums.PolicyType;
-import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
-import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.entity.RedisCartKey;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 import shop.nuribooks.books.common.message.ResponseMessage;
@@ -89,12 +87,10 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 	private final OrderRepository orderRepository;
 	private final OrderDetailRepository orderDetailRepository;
 	private final ShippingRepository shippingRepository;
-	private final PointPolicyRepository pointPolicyRepository;
 	private final MemberCouponRepository memberCouponRepository;
 	private final AllAppliedCouponRepository allAppliedCouponRepository;
 
 	private final OrderDetailService orderDetailService;
-	private final PointHistoryService pointHistoryService;
 	private final ApplicationEventPublisher publisher;
 
 	public OrderServiceImpl(CustomerRepository customerRepository,
@@ -107,11 +103,9 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		OrderRepository orderRepository,
 		OrderDetailRepository orderDetailRepository,
 		ShippingRepository shippingRepository,
-		PointPolicyRepository pointPolicyRepository,
 		ShippingService shippingService,
 		MemberCouponRepository memberCouponRepository,
 		OrderDetailService orderDetailService,
-		PointHistoryService pointHistoryService,
 		WrappingPaperService wrappingPaperService,
 		MemberCouponService memberCouponService,
 		AllAppliedCouponRepository allAppliedCouponRepository,
@@ -129,10 +123,8 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		this.orderRepository = orderRepository;
 		this.orderDetailRepository = orderDetailRepository;
 		this.shippingRepository = shippingRepository;
-		this.pointPolicyRepository = pointPolicyRepository;
 		this.memberCouponRepository = memberCouponRepository;
 		this.orderDetailService = orderDetailService;
-		this.pointHistoryService = pointHistoryService;
 		this.allAppliedCouponRepository = allAppliedCouponRepository;
 		this.publisher = publisher;
 	}
