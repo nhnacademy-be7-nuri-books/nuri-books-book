@@ -24,18 +24,20 @@ import shop.nuribooks.books.common.config.keymanager.KeyManagerConfig;
 @RequiredArgsConstructor
 public class RabbitmqConfig {
 
-	private final KeyManagerConfig keyManagerConfig;
-
-	@Value("${cloud.nhn.rabbitmq.secret-id}")
-	String rabbitmqSecretId;
-
 	public static final String BOOK_COUPON_QUEUE = "book.coupon.queue";
 	public static final String CATEGORY_COUPON_QUEUE = "category.coupon.queue";
+	public static final String INVENTORY_UPDATE_KEY = "inventory.update.queue";
 
 	public static final String COUPON_EXCHANGE = "coupon.exchange";
+	public static final String INVENTORY_EXCHANGE = "inventory.exchange";
 
 	public static final String BOOK_COUPON_ROUTING_KEY = "book.coupon";
 	public static final String CATEGORY_COUPON_ROUTING_KEY = "category.coupon";
+	public static final String INVENTORY_ROUTING_KEY = "inventory.update";
+
+	private final KeyManagerConfig keyManagerConfig;
+	@Value("${cloud.nhn.rabbitmq.secret-id}")
+	String rabbitmqSecretId;
 
 	@Bean
 	public ConnectionFactory connectionFactory() {
@@ -75,8 +77,18 @@ public class RabbitmqConfig {
 	}
 
 	@Bean
+	public Queue inventoryUpdateQueue() {
+		return new Queue(INVENTORY_UPDATE_KEY, true);
+	}
+
+	@Bean
 	public DirectExchange couponExchange() {
 		return new DirectExchange(COUPON_EXCHANGE);
+	}
+
+	@Bean
+	public DirectExchange inventoryExchange() {
+		return new DirectExchange(INVENTORY_EXCHANGE);
 	}
 
 	@Bean
@@ -87,6 +99,11 @@ public class RabbitmqConfig {
 	@Bean
 	public Binding categoryCouponBinding(Queue categoryCouponQueue, DirectExchange couponExchange) {
 		return BindingBuilder.bind(categoryCouponQueue).to(couponExchange).with(CATEGORY_COUPON_ROUTING_KEY);
+	}
+
+	@Bean
+	public Binding inventoryUpdate(Queue inventoryUpdateQueue, DirectExchange inventoryExchange) {
+		return BindingBuilder.bind(inventoryUpdateQueue).to(inventoryExchange).with(INVENTORY_ROUTING_KEY);
 	}
 
 	private RabbitmqConfigResponse parseRabbitmqConfig(String rabbitmqConfig) {
