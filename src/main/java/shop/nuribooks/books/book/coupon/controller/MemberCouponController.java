@@ -66,6 +66,16 @@ public class MemberCouponController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
+	@HasRole(role = AuthorityType.MEMBER)
+	@PostMapping("/category/{coupon-id}")
+	public ResponseEntity<Void> issueMemberToCategoryCoupon(@Valid @PathVariable(name = "coupon-id") Long couponId) {
+		Long memberId = MemberIdContext.getMemberId();
+
+		MemberCouponIssueRequest request = new MemberCouponIssueRequest(memberId, couponId);
+		memberCouponService.registerMemberCoupon(request);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
 	/**
 	 * 회원 ID로 사용 가능한 쿠폰을 조회합니다.
 	 *
