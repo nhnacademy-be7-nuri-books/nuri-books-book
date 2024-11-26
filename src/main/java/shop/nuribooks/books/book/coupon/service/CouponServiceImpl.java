@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
-import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
@@ -89,7 +89,7 @@ public class CouponServiceImpl implements CouponService {
 	public void issueWelcomeCoupon(Member member) {
 		Coupon welcomeCoupon = couponRepository.findCouponsByNameLike("%WELCOME%");
 
-		MemberCouponRegisterRequest request = new MemberCouponRegisterRequest(member.getId(), welcomeCoupon.getId());
+		MemberCouponIssueRequest request = new MemberCouponIssueRequest(member.getId(), welcomeCoupon.getId());
 		memberCouponService.registerMemberCoupon(request);
 	}
 
