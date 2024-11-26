@@ -8,14 +8,11 @@ import java.time.LocalDateTime;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.nuribooks.books.book.coupon.service.CouponService;
-import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.entity.Cart;
 import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.exception.BadRequestException;
@@ -56,22 +53,20 @@ public class MemberServiceImpl implements MemberService {
 	private final CustomerRepository customerRepository;
 	private final MemberRepository memberRepository;
 	private final GradeRepository gradeRepository;
-	private final PointHistoryService pointHistoryService;
 	private final CartRepository cartRepository;
-	private final CouponService couponService;
 	private final ApplicationEventPublisher publisher;
 
 	/**
 	 * 회원등록 <br>
 	 * 고객(customer) 생성 후 customerRepository에 저장 <br>
 	 * 그 후, 회원(member) 생성 후 memberRepository에 저장
-	 * @throws EmailAlreadyExistsException 이미 존재하는 이메일입니다.
-	 * @throws UsernameAlreadyExistsException 이미 존재하는 아이디입니다.
-	 * @param request
-	 * MemberRegisterRequest로 name, username, password, phoneNumber, email, birthday를 받는다. <br>
-	 * 생성일자(createdAt)는 현재 시간, point와 totalPaymentAmount는 0으로 초기화 <br>
-	 * 권한은 MEMBER, 등급은 STANDARD, 상태는 ACTIVE로 초기화 <br>
+	 *
+	 * @param request MemberRegisterRequest로 name, username, password, phoneNumber, email, birthday를 받는다. <br>
+	 *                생성일자(createdAt)는 현재 시간, point와 totalPaymentAmount는 0으로 초기화 <br>
+	 *                권한은 MEMBER, 등급은 STANDARD, 상태는 ACTIVE로 초기화 <br>
 	 * @return MemberRegisterResponse에 이름, 성별, 유저 아이디, 전화번호, 이메일, 생일을 담아서 반환
+	 * @throws EmailAlreadyExistsException    이미 존재하는 이메일입니다.
+	 * @throws UsernameAlreadyExistsException 이미 존재하는 아이디입니다.
 	 */
 	@Override
 	@Transactional
@@ -108,17 +103,18 @@ public class MemberServiceImpl implements MemberService {
 		// 멤버 등록되었다고 이벤트 생성. 이제 event listener들이 event 잡아서 로직 실행해줌.
 		RegisteredEvent registeredEvent = new RegisteredEvent(savedMember);
 		publisher.publishEvent(registeredEvent);
-		
+
 		return DtoMapper.toRegisterDto(savedCustomer, savedMember);
 	}
 
 	/**
 	 * 회원탈퇴 <br>
 	 * 아이디와 비밀번호로 회원 검증 후 회원을 휴면 상태로 전환 <br>
-	 * @throws MemberNotFoundException 존재하지 않는 회원입니다.
-	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
+	 *
 	 * @param memberId 요청 회원의 PK id
-	 * member의 status를 WITHDRAWN으로, 탈퇴 일시인 withdrawnAt을 현재 시간으로 변경
+	 *                 member의 status를 WITHDRAWN으로, 탈퇴 일시인 withdrawnAt을 현재 시간으로 변경
+	 * @throws MemberNotFoundException   존재하지 않는 회원입니다.
+	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
 	 */
 	@Override
 	@Transactional
@@ -136,9 +132,10 @@ public class MemberServiceImpl implements MemberService {
 	/**
 	 * 회원 정보 수정 <br>
 	 * 변경 가능한 정보는 name, password
-	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
+	 *
 	 * @param memberId 회원 PK id
-	 * @param request MemberUpdateRequest로 수정하고 싶은 이름과 비밀번호를 받음
+	 * @param request  MemberUpdateRequest로 수정하고 싶은 이름과 비밀번호를 받음
+	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
 	 */
 	@Override
 	@Transactional
@@ -156,6 +153,7 @@ public class MemberServiceImpl implements MemberService {
 
 	/**
 	 * 입력받은 username으로 회원의 PK id, 비밀번호, 권한을 조회
+	 *
 	 * @param username "abc123" 형식의 유저 아이디
 	 * @return 회원이 존재하면 PK id, username, 비밀번호, 권한을 MemberAuthInfoResponse에 담아서 반환 <br>
 	 * 회원이 존재하지 않는다면 PK id, username, 비밀번호, 권한이 모두 null인 MemberAuthInfoResponse를 반환
@@ -172,6 +170,7 @@ public class MemberServiceImpl implements MemberService {
 
 	/**
 	 * 입력받은 이메일로 회원의 PK id, username, 비밀번호, 권한을 조회
+	 *
 	 * @param email 유저 이메일
 	 * @return 회원이 존재하면 PK id, username, 비밀번호, 권한을 MemberAuthInfoResponse에 담아서 반환 <br>
 	 * 회원이 존재하지 않는다면 PK id, username, 비밀번호, 권한이 모두 null인 MemberAuthInfoResponse를 반환
@@ -188,10 +187,11 @@ public class MemberServiceImpl implements MemberService {
 
 	/**
 	 * 회원 PK id로 상세 정보 조회
-	 * @throws MemberNotFoundException 존재하지 않는 회원입니다.
-	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
+	 *
 	 * @param memberId 요청 회원의 PK id
 	 * @return MemberDetailsResponse에 회원의 정보를 담아서 반환
+	 * @throws MemberNotFoundException   존재하지 않는 회원입니다.
+	 * @throws CustomerNotFoundException 존재하지 않는 고객입니다.
 	 */
 	@Override
 	public MemberDetailsResponse getMemberDetails(Long memberId) {
@@ -240,47 +240,6 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	/**
-	 * 매일 04:00시 정각에 마지막 로그인 날짜가 90일이 지난 회원들을 찾아, <br>
-	 * 그 중에서 상태가 ACTIVE인 회원들을 INACTIVE로 변경
-	 */
-	@Transactional
-	@Scheduled(cron = "0 0 4 * * ?")
-	public void checkInactiveMembers() {
-		LocalDateTime thresholdDate = LocalDateTime.now().minusDays(90);
-
-		memberRepository.findAllByLatestLoginAtBefore(thresholdDate)
-			.stream()
-			.filter(foundMember -> foundMember.getStatus() == StatusType.ACTIVE)
-			.forEach(foundMember -> {
-				log.info("신규 휴면 회원이 발생하였습니다. - 회원 아이디: {}", foundMember.getUsername());
-
-				foundMember.changeToInactive();
-			});
-	}
-
-	/**
-	 * 매일 04:30분에 탈퇴 날짜가 1년이 지난 회원들을 찾아, <br>
-	 * userId와, status, withdrawnAt을 제외한 모든 필드들을 NULL 또는 공백 처리
-	 */
-	@Scheduled(cron = "0 30 4 * * ?")
-	@Transactional
-	public void removeWithdrawnMembers() {
-		LocalDateTime thresholdDate = LocalDateTime.now().minusYears(1);
-
-		memberRepository.findAllByWithdrawnAtBefore(thresholdDate)
-			.forEach(foundMember -> {
-				log.info("탈퇴 후 1년이 지나 SOFT DELETE의 대상이 되는 회원을 발견했습니다. - 회원 아이디: {}",
-					foundMember.getUsername());
-
-				Customer foundCustomer = customerRepository.findById(foundMember.getId())
-					.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
-
-				foundCustomer.changeToSoftDeleted();
-				foundMember.changeToSoftDeleted();
-			});
-	}
-
-	/**
 	 * STANDARD 등급을 가져오는 메서드
 	 */
 	private Grade standard() {
@@ -293,4 +252,3 @@ public class MemberServiceImpl implements MemberService {
 		cartRepository.save(cart);
 	}
 }
-

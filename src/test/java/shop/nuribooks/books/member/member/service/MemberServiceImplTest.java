@@ -7,8 +7,6 @@ import static org.mockito.Mockito.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
@@ -393,47 +391,6 @@ class MemberServiceImplTest {
 			.hasMessage("존재하지 않는 고객입니다.");
 	}
 
-	@DisplayName("마지막 로그인 날짜로부터 90일이 지난 회원을 휴면 처리")
-	@Test
-	void checkInactiveMembers() {
-		//given
-		Customer savedCustomer = getSavedCustomer();
-		Member inactiveMember = getInactiveMember(savedCustomer);
-		Member scheduledInactiveMember = spy(getScheduledInactiveMember(savedCustomer));
-		List<Member> members = Arrays.asList(inactiveMember, scheduledInactiveMember);
-
-		when(memberRepository.findAllByLatestLoginAtBefore(any(LocalDateTime.class)))
-			.thenReturn(members);
-
-		//when
-		memberServiceImpl.checkInactiveMembers();
-
-		//then
-		assertThat(scheduledInactiveMember.getStatus()).isEqualTo(StatusType.INACTIVE);
-		verify(scheduledInactiveMember, times(1)).changeToInactive();
-	}
-
-	@DisplayName("탈퇴 후 1년이 지난 회원을 soft delete")
-	@Test
-	void removeWithdrawnMembers() {
-		//given
-		Customer savedCustomer = spy(getSavedCustomer());
-		Member savedMember = spy(getSavedMember(savedCustomer));
-		savedMember.changeToWithdrawn();
-
-		when(memberRepository.findAllByWithdrawnAtBefore(any(LocalDateTime.class)))
-			.thenReturn(List.of(savedMember));
-		when(customerRepository.findById(savedMember.getId())).thenReturn(Optional.of(savedCustomer));
-
-		//when
-		memberServiceImpl.removeWithdrawnMembers();
-
-		//then
-		verify(savedCustomer, times(1)).changeToSoftDeleted();
-		verify(savedMember, times(1)).changeToSoftDeleted();
-		assertThat(savedMember.getAuthority()).isNull();
-	}
-
 	/**
 	 * 테스트를 위한 MemberRegisterRequest 생성
 	 */
@@ -498,44 +455,6 @@ class MemberServiceImplTest {
 			.createdAt(LocalDateTime.now())
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
-			.build();
-	}
-
-	/**
-	 * 테스트를 위한 휴면 회원 생성
-	 */
-	private Member getInactiveMember(Customer savedCustomer) {
-		return Member.builder()
-			.customer(savedCustomer)
-			.authority(AuthorityType.MEMBER)
-			.grade(getGrade())
-			.status(StatusType.INACTIVE)
-			.gender(GenderType.MALE)
-			.username("nuribooks95")
-			.birthday(LocalDate.of(1988, 8, 12))
-			.createdAt(LocalDateTime.now())
-			.point(BigDecimal.ZERO)
-			.totalPaymentAmount(BigDecimal.ZERO)
-			.latestLoginAt(LocalDateTime.of(2024, 2, 22, 22, 22, 22))
-			.build();
-	}
-
-	/**
-	 * 테스트를 위한 휴면 예정 회원 생성
-	 */
-	private Member getScheduledInactiveMember(Customer savedCustomer) {
-		return Member.builder()
-			.customer(savedCustomer)
-			.authority(AuthorityType.MEMBER)
-			.grade(getGrade())
-			.status(StatusType.ACTIVE)
-			.gender(GenderType.MALE)
-			.username("nuribooks95")
-			.birthday(LocalDate.of(1988, 8, 12))
-			.createdAt(LocalDateTime.now())
-			.point(BigDecimal.ZERO)
-			.totalPaymentAmount(BigDecimal.ZERO)
-			.latestLoginAt(LocalDateTime.of(2024, 3, 3, 3, 3, 3))
 			.build();
 	}
 }
