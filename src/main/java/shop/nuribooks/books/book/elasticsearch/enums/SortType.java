@@ -4,9 +4,9 @@ import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 
 public enum SortType {
-	ACCURACY(SortOptions.of(so -> so.field(f -> f.field("view_count").order(SortOrder.Desc)))),
+	ACCURACY(SortOptions.of(so -> so.score(ss -> ss.order(SortOrder.Desc)))),
 	// 구현 예정
-	POPULAR(SortOptions.of(so -> so.score(ss -> ss.order(SortOrder.Desc)))),
+	POPULAR(SortOptions.of(so -> so.field(f -> f.field("view_count").order(SortOrder.Desc)))),
 
 	NEW(SortOptions.of(so -> so.field(f -> f.field("publication_date").order(SortOrder.Desc)))),
 	CHEAP(SortOptions.of(so -> so.field(f -> f.field("price").order(SortOrder.Asc)))),
