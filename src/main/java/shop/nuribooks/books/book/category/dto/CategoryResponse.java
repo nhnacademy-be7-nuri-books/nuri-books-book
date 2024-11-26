@@ -2,7 +2,6 @@ package shop.nuribooks.books.book.category.dto;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import shop.nuribooks.books.book.category.entity.Category;
 
@@ -25,7 +24,7 @@ public record CategoryResponse(Long id,
 		if (category.getSubCategory() != null && !category.getSubCategory().isEmpty()) {
 			subCategoryResponses = category.getSubCategory().stream()
 				.map(CategoryResponse::from)
-				.collect(Collectors.toList());
+				.toList();
 		}
 
 		return new CategoryResponse(
