@@ -15,6 +15,7 @@ import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
+import shop.nuribooks.books.exception.coupon.CouponAlreadyIssuedException;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
@@ -40,11 +41,17 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	 * @throws CouponNotFoundException 존재하지 않는 쿠폰일 경우 예외 발생
 	 */
 	@Override
+	@Transactional
 	public void registerMemberCoupon(MemberCouponRegisterRequest memberCouponRegisterRequest) {
 		Coupon coupon = couponRepository.findById(memberCouponRegisterRequest.couponId())
 			.orElseThrow(CouponNotFoundException::new);
 		Member member = memberRepository.findById(memberCouponRegisterRequest.memberId())
 			.orElseThrow(() -> new MemberNotFoundException("멤버를 못찾아요."));
+
+		boolean alreadyIssued = memberCouponRepository.existsByMemberAndCoupon(member, coupon);
+		if (alreadyIssued) {
+			throw new CouponAlreadyIssuedException();
+		}
 
 		MemberCoupon memberCoupon = MemberCoupon.builder()
 			.coupon(coupon)

@@ -7,11 +7,13 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.coupon.bookcoupon.dto.BookCouponRequest;
+import shop.nuribooks.books.book.coupon.bookcoupon.dto.BookCouponResponse;
 import shop.nuribooks.books.book.coupon.bookcoupon.entity.BookCoupon;
 import shop.nuribooks.books.book.coupon.bookcoupon.repository.BookCouponRepository;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
+import shop.nuribooks.books.exception.coupon.BookCouponNotFoundException;
 
 @RequiredArgsConstructor
 @Service
@@ -43,6 +45,14 @@ public class BookCouponServiceImpl implements BookCouponService {
 
 		BookCoupon bookCoupon = request.toEntity(coupon, book);
 		return bookCouponRepository.save(bookCoupon);
+	}
+
+	@Override
+	public BookCouponResponse getBookCoupon(Long id) {
+		BookCoupon bookCoupon = bookCouponRepository.findByBookId(id)
+			.orElseThrow(() -> new BookCouponNotFoundException());
+
+		return new BookCouponResponse(bookCoupon);
 	}
 
 }
