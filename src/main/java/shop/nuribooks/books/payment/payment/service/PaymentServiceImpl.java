@@ -7,12 +7,14 @@ import java.util.UUID;
 
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.repository.BookRepository;
+
 import shop.nuribooks.books.book.point.dto.request.register.OrderSavingPointRequest;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
 import shop.nuribooks.books.book.point.enums.PolicyName;
@@ -34,6 +36,7 @@ import shop.nuribooks.books.payment.payment.dto.PaymentSuccessRequest;
 import shop.nuribooks.books.payment.payment.entity.Payment;
 import shop.nuribooks.books.payment.payment.entity.PaymentMethod;
 import shop.nuribooks.books.payment.payment.entity.PaymentState;
+import shop.nuribooks.books.payment.payment.event.PointSavedEvent;
 import shop.nuribooks.books.payment.payment.repository.PaymentRepository;
 
 @Service
@@ -50,6 +53,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 	private final PointHistoryService pointHistoryService;
 	private final RabbitTemplate rabbitTemplate;
+	private final ApplicationEventPublisher publisher;
 
 	/**
 	 * 결제 완료 처리
@@ -112,17 +116,7 @@ public class PaymentServiceImpl implements PaymentService {
 		Optional<Member> member = memberRepository.findById(order.getCustomer().getId());
 
 		member.ifPresent(value -> {
-			Optional<PointPolicy> pointPolicy = pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(
-				PolicyName.SAVE.toString());
-
-			if (pointPolicy.isEmpty()) {
-				throw new PointPolicyNotFoundException();
-			}
-
-			OrderSavingPointRequest orderSavingPointRequest = new OrderSavingPointRequest(
-				member.get(), order, order.getPaymentPrice());
-
-			this.pointHistoryService.registerPointHistory(orderSavingPointRequest, PolicyName.SAVE);
+			publisher.publishEvent(new PointSavedEvent(value, order, order.getBooksPrice()));
 		});
 	}
 

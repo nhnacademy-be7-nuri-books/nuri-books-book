@@ -3,6 +3,8 @@ package shop.nuribooks.books.member.customer.controller;
 import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
+import shop.nuribooks.books.member.customer.dto.response.CustomerAuthInfoResponse;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.service.CustomerService;
 
@@ -47,5 +50,20 @@ public class CustomerController {
 
 		return ResponseEntity.status(CREATED).body(response);
 	}
-}
 
+	/**
+	 * 이메일로 비회원의 customerId, password, email을 조회
+	 */
+	@Operation(summary = "이메일로 비회원 인증 조회", description = "이메일로 비회원의 customerId, 비밀번호, 이메일을 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "비회원 인증 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "비회원이 존재하지 않음")
+	})
+	@GetMapping("/{email}")
+	public ResponseEntity<CustomerAuthInfoResponse> getCustomerAuthInfoByEmail(@PathVariable String email) {
+
+		CustomerAuthInfoResponse response = customerService.getCustomerAuthInfoByEmail(email);
+
+		return ResponseEntity.status(OK).body(response);
+	}
+}
