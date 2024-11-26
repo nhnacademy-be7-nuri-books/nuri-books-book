@@ -46,8 +46,7 @@ public class CouponServiceImpl implements CouponService {
 	 */
 	@Override
 	public Page<CouponResponse> getCoupons(CouponType type, Pageable pageable) {
-		Page<CouponResponse> coupons = couponRepository.findCouponsByCouponId(pageable, type);
-		return coupons;
+		return couponRepository.findCouponsByCouponId(pageable, type);
 	}
 
 	/**
@@ -57,11 +56,11 @@ public class CouponServiceImpl implements CouponService {
 	 * @return
 	 */
 	@Override
-	public Coupon getCouponById(Long id) {
+	public CouponResponse getCouponById(Long id) {
 		Coupon coupon = couponRepository.findById(id)
-			.orElseThrow(() -> new CouponNotFoundException());
+			.orElseThrow(CouponNotFoundException::new);
 
-		return coupon;
+		return CouponResponse.of(coupon);
 	}
 
 	/**
@@ -75,7 +74,7 @@ public class CouponServiceImpl implements CouponService {
 	@Transactional
 	public Coupon updateCoupon(Long id, CouponRequest request) {
 		Coupon coupon = couponRepository.findById(id)
-			.orElseThrow(() -> new CouponNotFoundException());
+			.orElseThrow(CouponNotFoundException::new);
 
 		coupon.update(request);
 		return coupon;
@@ -103,7 +102,7 @@ public class CouponServiceImpl implements CouponService {
 	@Transactional
 	public void expireCoupon(Long id) {
 		Coupon coupon = couponRepository.findById(id)
-			.orElseThrow(() -> new CouponNotFoundException());
+			.orElseThrow(CouponNotFoundException::new);
 
 		coupon.expire();
 	}
