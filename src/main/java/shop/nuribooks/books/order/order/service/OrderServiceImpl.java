@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -27,11 +28,7 @@ import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
 import shop.nuribooks.books.book.coupon.repository.AllAppliedCouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
-import shop.nuribooks.books.book.point.dto.request.register.OrderUsingPointRequest;
-import shop.nuribooks.books.book.point.entity.PointPolicy;
-import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.enums.PolicyType;
-import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
 import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.entity.RedisCartKey;
@@ -64,6 +61,7 @@ import shop.nuribooks.books.order.order.dto.response.OrderListResponse;
 import shop.nuribooks.books.order.order.dto.response.OrderPageResponse;
 import shop.nuribooks.books.order.order.dto.response.OrderRegisterResponse;
 import shop.nuribooks.books.order.order.entity.Order;
+import shop.nuribooks.books.order.order.event.PointUsedEvent;
 import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailItemDto;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailItemPageDto;
@@ -97,6 +95,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 
 	private final OrderDetailService orderDetailService;
 	private final PointHistoryService pointHistoryService;
+	private final ApplicationEventPublisher publisher;
 
 	public OrderServiceImpl(CustomerRepository customerRepository,
 		BookRepository bookRepository,
@@ -115,7 +114,8 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		PointHistoryService pointHistoryService,
 		WrappingPaperService wrappingPaperService,
 		MemberCouponService memberCouponService,
-		AllAppliedCouponRepository allAppliedCouponRepository) {
+		AllAppliedCouponRepository allAppliedCouponRepository,
+		ApplicationEventPublisher publisher) {
 		super(customerRepository,
 			bookRepository,
 			addressRepository,
@@ -134,6 +134,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		this.orderDetailService = orderDetailService;
 		this.pointHistoryService = pointHistoryService;
 		this.allAppliedCouponRepository = allAppliedCouponRepository;
+		this.publisher = publisher;
 	}
 
 	/**
@@ -602,17 +603,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		Optional<Member> member = memberRepository.findById(id);
 
 		member.ifPresent(value -> {
-			Optional<PointPolicy> pointPolicy = pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(
-				PolicyName.USING.toString());
-
-			if (pointPolicy.isEmpty()) {
-				throw new PointPolicyNotFoundException();
-			}
-
-			OrderUsingPointRequest orderUsingPointRequest = new OrderUsingPointRequest(
-				member.get(), savedOrder, usedPoint);
-
-			this.pointHistoryService.registerPointHistory(orderUsingPointRequest, PolicyName.USING);
+			publisher.publishEvent(new PointUsedEvent(value, savedOrder, usedPoint));
 		});
 	}
 
