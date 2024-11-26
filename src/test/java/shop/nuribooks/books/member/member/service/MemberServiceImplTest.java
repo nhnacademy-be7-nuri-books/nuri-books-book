@@ -8,9 +8,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import shop.nuribooks.books.book.coupon.service.CouponService;
-import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
@@ -69,7 +69,10 @@ class MemberServiceImplTest {
 
     @Mock
     private CouponService couponService;
-
+  
+  	@Mock
+	  private ApplicationEventPublisher publisher;
+  
     @BeforeEach
     void setUp() {
         MemberIdContext.setMemberId(1L);
@@ -96,9 +99,7 @@ class MemberServiceImplTest {
         when(gradeRepository.findByName("STANDARD")).thenReturn(Optional.of(standard));
         when(memberRepository.save(any(Member.class)))
                 .thenReturn(savedMember);
-        when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
-
-        doNothing().when(couponService).issueWelcomeCoupon(any(Member.class));
+        
         // when
         MemberRegisterResponse response = memberServiceImpl.registerMember(request);
 

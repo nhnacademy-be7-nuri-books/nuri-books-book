@@ -14,13 +14,15 @@ import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
 public interface BookService {
 	void registerBook(BaseBookRegisterRequest reqDto);
 
-	BookResponse getBookById(Long bookId, boolean updateRecentView);
-
 	Page<BookContributorsResponse> getBooks(Pageable pageable);
+  
+	BookResponse getBookById(Long bookId, boolean updateRecentView);
 
 	void updateBook(Long bookId, BookUpdateRequest bookUpdateReq);
 
 	void deleteBook(Long bookId);
 
 	List<TopBookLikeResponse> getTopBookLikes();
+
+	List<BookResponse> getAllBooks();
 }

@@ -14,6 +14,8 @@ public interface BookCustomRepository {
 
 	Optional<Book> findBookByIdAndDeletedAtIsNull(Long bookId);
 
+	List<Book> findAllAndDeletedAtIsNull();
+
 	long countBook();
 
 	List<TopBookLikeResponse> findTopBooksByLikes();

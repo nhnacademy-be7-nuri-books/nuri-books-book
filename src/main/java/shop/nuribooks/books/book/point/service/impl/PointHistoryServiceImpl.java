@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	 * @return
 	 */
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW) // 전파 방식 설정.
 	public PointHistory registerPointHistory(PointHistoryRequest pointHistoryRequest, PolicyName policyName) {
 
 		PointPolicy pointPolicy = pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(

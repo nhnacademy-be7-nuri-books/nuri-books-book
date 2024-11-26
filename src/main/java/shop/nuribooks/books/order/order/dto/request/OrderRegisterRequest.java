@@ -13,14 +13,12 @@ import jakarta.validation.constraints.PositiveOrZero;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailRequest;
 import shop.nuribooks.books.order.shipping.dto.ShippingRegisterRequest;
-import shop.nuribooks.books.order.stub.coupon.AllAppliedCouponRequestStub;
-import shop.nuribooks.books.order.wrapping.dto.WrappingRegisterRequest;
 
-public record OrderTempRegisterRequest(
+public record OrderRegisterRequest(
 	@PositiveOrZero(message = "결제 금액은 0 이상이어야 합니다.")
-	BigDecimal paymentPrice, // 총 결제 금액 = 상품 금액 + 포장 금액 + 배송금액 - 포인트 - 쿠폰 할인가
-	@PositiveOrZero(message = "포장 금액은 0 이상이어야 합니다.")
-	BigDecimal wrappingPrice, // 포장 비용
+	BigDecimal paymentPrice, // 결제 금액
+	@PositiveOrZero(message = "결제 금액은 0 이상이어야 합니다.")
+	BigDecimal paymentBooks, // 순수 도서 가격
 	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	LocalDate expectedDeliveryAt, // 주문 예상 날짜
 	@NotNull(message = "주문 상세는 1개 이상이어야 합니다.")
@@ -32,8 +30,9 @@ public record OrderTempRegisterRequest(
 	CustomerRegisterRequest customerRegister,
 	@PositiveOrZero(message = "사용 포인트는 0 이상이어야 합니다.")
 	BigDecimal usingPoint, // 사용 포인트
-	AllAppliedCouponRequestStub allAppliedCoupon, // 주문 전용 쿠폰 (stub 객체 사용 이후 변경 예정)
-	WrappingRegisterRequest wrapping // 포장지 정보
+	Long allAppliedCoupon, // 주문 전용 쿠폰 (stub 객체 사용 이후 변경 예정)
+	Long wrapping, // 포장지 정보
+	String wrappingList // 포장지 적용 도서
 ) {
 
 }

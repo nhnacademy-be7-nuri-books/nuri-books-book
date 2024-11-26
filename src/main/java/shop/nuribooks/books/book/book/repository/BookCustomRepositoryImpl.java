@@ -6,12 +6,15 @@ import static shop.nuribooks.books.book.review.entity.QReview.*;
 
 import java.util.List;
 import java.util.Optional;
-import com.querydsl.jpa.impl.JPAQuery;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
+
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.BookListResponse;
 import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
@@ -93,6 +96,14 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 	}
 
 	@Override
+	public List<Book> findAllAndDeletedAtIsNull() {
+		QBook book = QBook.book;
+		return queryFactory.selectFrom(book)
+			.where(book.deletedAt.isNull())
+			.fetch();
+  }
+
+  @Override
 	public long countBook() {
 		return Optional.ofNullable(
 				queryFactory.select(book.count())

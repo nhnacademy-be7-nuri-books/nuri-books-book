@@ -1,7 +1,6 @@
 package shop.nuribooks.books.book.book.controller;
 
 import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -118,5 +117,11 @@ public class BookController {
 	public ResponseEntity<List<TopBookLikeResponse>> getTopBookLike() {
 		List<TopBookLikeResponse> response = bookService.getTopBookLikes();
 		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	@GetMapping("/all")
+	public ResponseEntity<List<BookResponse>> getAllBooks() {
+		List<BookResponse> bookTitles = bookService.getAllBooks();
+		return ResponseEntity.ok(bookTitles);
 	}
 }
