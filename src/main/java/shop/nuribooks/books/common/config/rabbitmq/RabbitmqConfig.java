@@ -26,15 +26,12 @@ public class RabbitmqConfig {
 
 	public static final String BOOK_COUPON_QUEUE = "book.coupon.queue";
 	public static final String CATEGORY_COUPON_QUEUE = "category.coupon.queue";
-	public static final String INVENTORY_UPDATE_KEY = "inventory.update.queue";
-
+	public static final String INVENTORY_UPDATE_KEY = "nuribooks.inventory.update.queue";
 	public static final String COUPON_EXCHANGE = "coupon.exchange";
-	public static final String INVENTORY_EXCHANGE = "inventory.exchange";
-
+	public static final String INVENTORY_EXCHANGE = "nuribooks.inventory.exchange";
 	public static final String BOOK_COUPON_ROUTING_KEY = "book.coupon";
 	public static final String CATEGORY_COUPON_ROUTING_KEY = "category.coupon";
-	public static final String INVENTORY_ROUTING_KEY = "inventory.update";
-
+	public static final String INVENTORY_ROUTING_KEY = "nuribooks.inventory.update";
 	private final KeyManagerConfig keyManagerConfig;
 	@Value("${cloud.nhn.rabbitmq.secret-id}")
 	String rabbitmqSecretId;
