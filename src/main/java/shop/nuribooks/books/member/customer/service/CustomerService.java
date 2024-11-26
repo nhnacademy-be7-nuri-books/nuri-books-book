@@ -1,6 +1,7 @@
 package shop.nuribooks.books.member.customer.service;
 
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
+import shop.nuribooks.books.member.customer.dto.response.CustomerAuthInfoResponse;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 
 /**
@@ -9,4 +10,6 @@ import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterRespons
 public interface CustomerService {
 
 	CustomerRegisterResponse registerCustomer(CustomerRegisterRequest request);
+
+	CustomerAuthInfoResponse getCustomerAuthInfoByEmail(String email);
 }

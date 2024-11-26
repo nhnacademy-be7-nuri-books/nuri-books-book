@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.order.refund.dto.request.RefundRequest;
 import shop.nuribooks.books.order.refund.dto.response.RefundInfoResponse;
@@ -33,7 +32,7 @@ public class RefundController {
 
 	@PostMapping("/api/orders/refunds/{order-id}")
 	public ResponseEntity<Void> registerRefund(@PathVariable(name = "order-id") Long orderId,
-		@RequestBody @Valid RefundRequest refundRequest) {
+		@RequestBody RefundRequest refundRequest) {
 		RefundResponse response = refundService.refund(orderId, refundRequest);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
