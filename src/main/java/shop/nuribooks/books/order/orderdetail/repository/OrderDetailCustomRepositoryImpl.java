@@ -53,8 +53,8 @@ public class OrderDetailCustomRepositoryImpl implements OrderDetailCustomReposit
 					orderDetail.orderState
 				)
 			).from(orderDetail)
-			.leftJoin(order).on(order.eq(orderDetail.order))
-			.leftJoin(book).on(book.eq(orderDetail.book))
+			.leftJoin(order).on(order.id.eq(orderDetail.order.id))
+			.leftJoin(book).on(book.id.eq(orderDetail.book.id))
 			.where(order.id.eq(orderId))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
