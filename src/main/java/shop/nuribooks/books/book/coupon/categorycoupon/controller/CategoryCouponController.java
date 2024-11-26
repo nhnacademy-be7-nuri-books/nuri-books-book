@@ -23,7 +23,7 @@ public class CategoryCouponController {
 
 	@HasRole(role = AuthorityType.ADMIN)
 	@PostMapping
-	public ResponseEntity<ResponseMessage> registerBookCoupon(
+	public ResponseEntity<ResponseMessage> registerCategoryCoupon(
 		@Valid @RequestBody CategoryCouponRequest categoryCouponRequest) {
 
 		categoryCouponService.registerCategoryCoupon(categoryCouponRequest);
