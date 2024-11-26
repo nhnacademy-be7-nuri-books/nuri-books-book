@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.point.dto.request.register.ReviewSavingPointRequest;
-import shop.nuribooks.books.book.point.enums.PolicyName;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
@@ -23,6 +22,7 @@ import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.entity.Review;
+import shop.nuribooks.books.book.review.event.ReviewRegisteredEvent;
 import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.ReviewService;
@@ -48,6 +48,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ReviewImageRepository reviewImageRepository;
 	private final OrderDetailRepository orderDetailRepository;
 	private final PointHistoryService pointHistoryService;
+	private final ApplicationEventPublisher publisher;
 
 	/**
 	 * 리뷰 등록. 리뷰 이미지도 함께 등록합니다.
@@ -68,17 +69,14 @@ public class ReviewServiceImpl implements ReviewService {
 		List<OrderDetail> orderDetails = this.orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(
 			reviewRequest.bookId(), ownerId,
 			List.of(OrderState.PAID.getCode(), OrderState.DELIVERING.getCode(), OrderState.COMPLETED.getCode()));
-		if (orderDetails.size() == 0) {
+		if (orderDetails.isEmpty()) {
 			throw new NoOrderDetailForReviewException();
 		}
 
 		Review review = reviewRequest.toEntity(member, book, orderDetails.getFirst());
 		Review result = this.reviewRepository.save(review);
 
-		ReviewSavingPointRequest reviewSavingPointRequest = new ReviewSavingPointRequest(member, result);
-		PolicyName policyName = result.getReviewImages().size() > 0 ? PolicyName.IMAGE_REVIEW : PolicyName.REVIEW;
-
-		this.pointHistoryService.registerPointHistory(reviewSavingPointRequest, policyName);
+		publisher.publishEvent(new ReviewRegisteredEvent(member, result));
 		return ReviewMemberResponse.of(result);
 	}
 

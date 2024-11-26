@@ -31,4 +31,5 @@ public class BookUtils {
 	public static BigDecimal calculateTotalPrice(BigDecimal price, int quantity) {
 		return price.multiply(BigDecimal.valueOf(quantity)).setScale(0, RoundingMode.DOWN);
 	}
+
 }
