@@ -3,6 +3,7 @@ package shop.nuribooks.books.common.config.rabbitmq;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -60,6 +61,13 @@ public class RabbitmqConfig {
 		rabbitTemplate.setMessageConverter(messageConverter());
 		rabbitTemplate.setReplyTimeout(20000L);
 		rabbitTemplate.setChannelTransacted(true);
+
+		// 모든 메시지 Persistent 설정
+		rabbitTemplate.setBeforePublishPostProcessors(message -> {
+			message.getMessageProperties().setDeliveryMode(MessageProperties.DEFAULT_DELIVERY_MODE);
+			return message;
+		});
+
 		return rabbitTemplate;
 	}
 
