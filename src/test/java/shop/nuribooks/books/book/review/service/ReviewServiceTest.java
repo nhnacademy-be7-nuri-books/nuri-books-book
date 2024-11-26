@@ -13,13 +13,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
@@ -47,6 +47,8 @@ import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class ReviewServiceTest {
+	@Mock
+	private ApplicationEventPublisher publisher;
 	@InjectMocks
 	private ReviewServiceImpl reviewService;
 	@Mock
@@ -61,7 +63,6 @@ public class ReviewServiceTest {
 	private OrderDetailRepository orderDetailRepository;
 	@Mock
 	private PointHistoryService pointHistoryService;
-
 	private Book book;
 	private Member member;
 	private Review review;
@@ -142,7 +143,7 @@ public class ReviewServiceTest {
 		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(anyLong(), anyLong(),
 			anyList())).thenReturn(
 			List.of(orderDetail));
-		when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
+		// when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
 		MemberIdContext.setMemberId(member.getId());
 		assertEquals(ReviewMemberResponse.of(newReview),
 			reviewService.registerReview(newReviewRequest));
@@ -158,7 +159,7 @@ public class ReviewServiceTest {
 		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(anyLong(), anyLong(),
 			anyList())).thenReturn(
 			List.of(orderDetail));
-		when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
+		// when(pointHistoryService.registerPointHistory(any(), any())).thenReturn(new PointHistory());
 		MemberIdContext.setMemberId(member.getId());
 		assertEquals(ReviewMemberResponse.of(review1),
 			reviewService.registerReview(reviewRequest));

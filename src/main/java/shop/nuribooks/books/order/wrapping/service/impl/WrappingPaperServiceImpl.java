@@ -1,5 +1,8 @@
 package shop.nuribooks.books.order.wrapping.service.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,21 @@ public class WrappingPaperServiceImpl implements WrappingPaperService {
 	@Override
 	public Page<WrappingPaperResponse> getWrappingPaperResponse(Pageable pageable) {
 		return wrappingPaperRepository.findAll(pageable).map(WrappingPaper::toResponseDto);
+	}
+
+	@Override
+	public List<WrappingPaperResponse> getAllWrappingPaper() {
+		List<WrappingPaper> wrappingPapers = wrappingPaperRepository.findAll();
+
+		return wrappingPapers.stream()
+			.map(wp -> new WrappingPaperResponse(wp.getId(), wp.getTitle(), wp.getImageUrl(), wp.getWrappingPrice()))
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public WrappingPaper getWrappingPaper(Long wrappingId) {
+		return wrappingPaperRepository.findById(wrappingId)
+			.orElseThrow(WrappingPaperNotFoundException::new);
 	}
 
 	@Transactional

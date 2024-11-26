@@ -3,7 +3,6 @@ package shop.nuribooks.books.order.order.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import org.hibernate.annotations.Comment;
 
@@ -22,8 +21,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.order.wrapping.entity.WrappingPaper;
 
 /**
  * 주문 Entity
@@ -49,8 +48,12 @@ public class Order {
 	private Customer customer;
 
 	@Column(precision = 9, nullable = false)
-	@Comment("결제 금액")
+	@Comment("총 결제 금액")
 	private BigDecimal paymentPrice;
+
+	@Column(precision = 9, nullable = false)
+	@Comment("순수 금액")
+	private BigDecimal booksPrice;
 
 	@Column(nullable = false)
 	@Comment("주문 일시")
@@ -67,6 +70,12 @@ public class Order {
 	@Setter
 	private String title;
 
+	@Setter
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "wrapping_paper_id", nullable = true,
+		foreignKey = @ForeignKey(name = "FK_orders_to_wrapping_papers_1"))
+	private WrappingPaper wrappingPaper;
+
 	/**
 	 * 주문 생성자 (builder)
 	 *
@@ -75,18 +84,24 @@ public class Order {
 	 * @param orderedAt 주문 일시
 	 * @param wrappingPrice 포장 비용
 	 * @param expectedDeliveryAt 예상 배송 날짜
+	 * @param wrappingPaper 포장지
+	 * @param booksPrice 도서 총 가격
 	 */
 	@Builder
 	public Order(Customer customer,
 		BigDecimal paymentPrice,
 		LocalDateTime orderedAt,
 		BigDecimal wrappingPrice,
-		LocalDate expectedDeliveryAt) {
+		LocalDate expectedDeliveryAt,
+		WrappingPaper wrappingPaper,
+		BigDecimal booksPrice) {
 		this.customer = customer;
 		this.paymentPrice = paymentPrice;
 		this.orderedAt = orderedAt;
 		this.wrappingPrice = wrappingPrice != null ? wrappingPrice : BigDecimal.ZERO;
 		this.expectedDeliveryAt = expectedDeliveryAt;
+		this.wrappingPaper = wrappingPaper;
+		this.booksPrice = booksPrice;
 	}
 
 }

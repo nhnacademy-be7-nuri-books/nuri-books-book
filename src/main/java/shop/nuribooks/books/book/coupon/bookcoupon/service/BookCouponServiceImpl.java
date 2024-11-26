@@ -34,6 +34,7 @@ public class BookCouponServiceImpl implements BookCouponService {
 			.maximumDiscountPrice(request.maximumDiscountPrice())
 			.createdAt(request.createdAt())
 			.expirationType(request.expirationType())
+			.expiredAt(request.expiredAt())
 			.period(request.period() != null ? request.period() : 0)
 			.expiredDate(request.expiredDate())
 			.couponType(request.couponType())
