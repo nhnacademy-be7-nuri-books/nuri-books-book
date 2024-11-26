@@ -3,9 +3,6 @@ package shop.nuribooks.books.order.refund.service;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +17,6 @@ import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.order.repository.OrderRepository;
-import shop.nuribooks.books.order.orderdetail.dto.OrderDetailItemDto;
-import shop.nuribooks.books.order.orderdetail.dto.OrderDetailItemPageDto;
 import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
@@ -32,7 +27,6 @@ import shop.nuribooks.books.order.refund.dto.response.RefundInfoResponse;
 import shop.nuribooks.books.order.refund.dto.response.RefundResponse;
 import shop.nuribooks.books.order.refund.entity.Refund;
 import shop.nuribooks.books.order.refund.repository.RefundRepository;
-import shop.nuribooks.books.payment.payment.dto.PaymentInfoDto;
 
 @RequiredArgsConstructor
 @Service
@@ -53,25 +47,19 @@ public class RefundServiceImpl implements RefundService {
 		BigDecimal paymentPrice = order.getPaymentPrice();
 
 		// 일단은 반품 배송비 2500원으로 생각
-		BigDecimal deductedAmount = BigDecimal.valueOf(2500L);
+		BigDecimal shippingPrice = BigDecimal.valueOf(2500L);
+		BigDecimal savingPointAmount = orderRepository.findOrderSavingPoint(orderId);
+
+		BigDecimal deductedAmount = shippingPrice.add(savingPointAmount);
 
 		BigDecimal totalRefundAmount =
 			paymentPrice.subtract(deductedAmount).compareTo(BigDecimal.ZERO) > 0 ?
 				paymentPrice.subtract(deductedAmount) : BigDecimal.ZERO;
 
-		pageable = PageRequest.of(0, 5);
-		OrderDetailItemPageDto orderDetailItem = orderDetailRepository.findOrderDetail(orderId, pageable);
+		RefundInfo refundInfo = new RefundInfo(paymentPrice, shippingPrice, savingPointAmount, deductedAmount,
+			totalRefundAmount);
 
-		Page<OrderDetailItemDto> orderListResponses =
-			new PageImpl(orderDetailItem.orderDetailItem(), pageable, orderDetailItem.totalCount());
-
-		// TODO : 결제 정보는 주문이 다 되면 추가한다.
-		PaymentInfoDto paymentInfoDto = null;
-		// PaymentInfoDto paymentInfo = paymentRepository.findPaymentInfo(orderId);
-
-		RefundInfo refundInfo = new RefundInfo(paymentPrice, deductedAmount, totalRefundAmount);
-
-		return new RefundInfoResponse(orderListResponses, paymentInfoDto, refundInfo);
+		return new RefundInfoResponse(refundInfo);
 	}
 
 	// 단순 변심에 의한 반품
@@ -93,16 +81,12 @@ public class RefundServiceImpl implements RefundService {
 		Member member = getMember(order);
 
 		Refund refund = refundRequest.toEntity(order);
+		Refund saved = refundRepository.save(refund);
 
 		RefundReturningPointRequest refundReturningPointRequest = new RefundReturningPointRequest(member,
-			refund, refund.getRefundAmount());
+			saved, saved.getRefundAmount());
 		//환불 포인트에 저장
 		pointHistoryService.registerPointHistory(refundReturningPointRequest, PolicyName.REFUND);
-		// 회원 포인트로 변환 (현재는 구매한 금액에 대해서만 포인트로 반환한다.)
-
-		// TODO: 주문으로 인해 적립된 포인트 기록을 삭제 및 누적 구매금액도 다시 감소시켜야 한다.
-
-		Refund saved = refundRepository.save(refund);
 		return RefundResponse.of(saved);
 	}
 
