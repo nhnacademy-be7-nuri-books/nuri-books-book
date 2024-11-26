@@ -11,6 +11,9 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.coupon.entity.QAllAppliedCoupon;
+import shop.nuribooks.books.book.point.entity.child.QOrderSavingPoint;
+import shop.nuribooks.books.book.point.entity.child.QOrderUsingPoint;
 import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
 import shop.nuribooks.books.order.order.dto.response.OrderListResponse;
 import shop.nuribooks.books.order.order.dto.response.OrderPageResponse;
@@ -18,6 +21,8 @@ import shop.nuribooks.books.order.order.entity.QOrder;
 import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 import shop.nuribooks.books.order.orderdetail.entity.QOrderDetail;
 import shop.nuribooks.books.order.shipping.entity.QShipping;
+import shop.nuribooks.books.order.shipping.entity.QShippingPolicy;
+import shop.nuribooks.books.payment.payment.dto.PaymentInfoDto;
 
 @RequiredArgsConstructor
 public class OrderCustomerRepositoryImpl implements OrderCustomerRepository {
@@ -47,7 +52,7 @@ public class OrderCustomerRepositoryImpl implements OrderCustomerRepository {
 		whereClause.and(order.orderedAt.between(
 			orderListPeriodRequest.getStart().atStartOfDay(),
 			orderListPeriodRequest.getEnd().atTime(LocalTime.MAX)));
-		
+
 		if (!includeOrdersInPendingStatus) {
 			whereClause.and(orderDetail.orderState.ne(OrderState.PENDING));
 		}
@@ -82,5 +87,38 @@ public class OrderCustomerRepositoryImpl implements OrderCustomerRepository {
 			.fetchOne();
 
 		return new OrderPageResponse(orders, totalCount);
+	}
+
+	@Override
+	public PaymentInfoDto findPaymentInfo(Long orderId) {
+
+		QOrder order = QOrder.order;
+		QShipping shipping = QShipping.shipping;
+		QAllAppliedCoupon allAppliedCoupon = QAllAppliedCoupon.allAppliedCoupon;
+		QOrderUsingPoint orderUsingPoint = QOrderUsingPoint.orderUsingPoint;
+		QOrderSavingPoint orderSavingPoint = QOrderSavingPoint.orderSavingPoint;
+		QShippingPolicy shippingPolicy = QShippingPolicy.shippingPolicy;
+
+		return queryFactory.select(
+				Projections.constructor(
+					PaymentInfoDto.class,
+					order.paymentPrice,
+					order.booksPrice,
+					shippingPolicy.shippingFee,
+					allAppliedCoupon.discount_price,
+					allAppliedCoupon.discount_price, // 도서 쿠폰
+					order.wrappingPrice,
+					orderUsingPoint.amount,
+					orderSavingPoint.amount
+				))
+			.from(order)
+			.leftJoin(shipping).on(shipping.order.id.eq(orderId))
+			.leftJoin(allAppliedCoupon).on(allAppliedCoupon.order.id.eq(orderId))
+			.leftJoin(orderUsingPoint).on(orderUsingPoint.order.id.eq(orderId))
+			.leftJoin(orderSavingPoint).on(orderSavingPoint.order.id.eq(orderId))
+			.leftJoin(shippingPolicy).on(shipping.shippingPolicy.id.eq(shippingPolicy.id))
+			.where(order.id.eq(orderId))
+			.fetchOne();
+
 	}
 }

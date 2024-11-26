@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.coupon.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -87,6 +88,7 @@ public class CouponServiceImpl implements CouponService {
 	 * @param member
 	 */
 	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void issueWelcomeCoupon(Member member) {
 		Coupon welcomeCoupon = couponRepository.findCouponsByNameLike("%WELCOME%");
 
