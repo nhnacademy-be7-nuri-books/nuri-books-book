@@ -35,6 +35,7 @@ import lombok.extern.jackson.Jacksonized;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.review.entity.Review;
+import shop.nuribooks.books.exception.book.InvalidStockException;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -156,10 +157,12 @@ public class Book {
 	}
 
 	public void updateStock(int count) {
+		if (this.stock - count < 0) {
+			throw new InvalidStockException();
+		}
 		this.stock -= count;
-		if (this.stock <= 0) {
+		if (this.stock == 0) {
 			this.state = BookStateEnum.SOLD_OUT;
-			this.stock = 0;
 		}
 	}
 

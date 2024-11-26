@@ -24,13 +24,8 @@ import shop.nuribooks.books.common.config.keymanager.KeyManagerConfig;
 @RequiredArgsConstructor
 public class RabbitmqConfig {
 
-	public static final String BOOK_COUPON_QUEUE = "book.coupon.queue";
-	public static final String CATEGORY_COUPON_QUEUE = "category.coupon.queue";
 	public static final String INVENTORY_UPDATE_KEY = "nuribooks.inventory.update.queue";
-	public static final String COUPON_EXCHANGE = "coupon.exchange";
 	public static final String INVENTORY_EXCHANGE = "nuribooks.inventory.exchange";
-	public static final String BOOK_COUPON_ROUTING_KEY = "book.coupon";
-	public static final String CATEGORY_COUPON_ROUTING_KEY = "category.coupon";
 	public static final String INVENTORY_ROUTING_KEY = "nuribooks.inventory.update";
 	private final KeyManagerConfig keyManagerConfig;
 	@Value("${cloud.nhn.rabbitmq.secret-id}")
@@ -60,17 +55,8 @@ public class RabbitmqConfig {
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(messageConverter());
 		rabbitTemplate.setReplyTimeout(20000L);
+		rabbitTemplate.setChannelTransacted(true);
 		return rabbitTemplate;
-	}
-
-	@Bean
-	public Queue bookCouponQueue() {
-		return new Queue(BOOK_COUPON_QUEUE, true);
-	}
-
-	@Bean
-	public Queue categoryCouponQueue() {
-		return new Queue(CATEGORY_COUPON_QUEUE, true);
 	}
 
 	@Bean
@@ -79,23 +65,8 @@ public class RabbitmqConfig {
 	}
 
 	@Bean
-	public DirectExchange couponExchange() {
-		return new DirectExchange(COUPON_EXCHANGE);
-	}
-
-	@Bean
 	public DirectExchange inventoryExchange() {
 		return new DirectExchange(INVENTORY_EXCHANGE);
-	}
-
-	@Bean
-	public Binding bookCouponBinding(Queue bookCouponQueue, DirectExchange couponExchange) {
-		return BindingBuilder.bind(bookCouponQueue).to(couponExchange).with(BOOK_COUPON_ROUTING_KEY);
-	}
-
-	@Bean
-	public Binding categoryCouponBinding(Queue categoryCouponQueue, DirectExchange couponExchange) {
-		return BindingBuilder.bind(categoryCouponQueue).to(couponExchange).with(CATEGORY_COUPON_ROUTING_KEY);
 	}
 
 	@Bean
