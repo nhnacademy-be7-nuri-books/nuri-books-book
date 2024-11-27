@@ -32,22 +32,40 @@ public class BookSearchServiceImpl implements BookSearchService {
 	/**
 	 * 책 검색 (검색 쿼리 DSL)
 	 */
-	public Page<BookDocument> searchBooks(String keyword, SearchType searchType, SortType sortType,
+	@Override
+	public Page<BookDocument> searchBooks(String keyword, Long categoryId, SearchType searchType, SortType sortType,
 		Pageable pageable) throws IOException {
 		SearchRequest request = SearchRequest.of(s -> s
 			.index(indexNameProvider.resolveIndexName())
-			.query(q -> q.bool(b -> searchType.apply(b, keyword)))
+			.query(q -> q.bool(b -> {
+				b = searchType.apply(b, keyword);
+
+				// deleted_at이 null인 도서만 필터링
+				b = b.mustNot(mn -> mn.exists(e -> e.field("deleted_at")));
+
+				// categoryId가 제공된 경우 필터링 추가
+				if (categoryId != null) {
+					b = b.filter(fq -> fq.term(t -> t
+						.field("categories")
+						.value(categoryId)
+					));
+				}
+				return b;
+			}))
 			.sort(
 				sortType.getSortOptions(),
 				SortType.POPULAR.getSortOptions()
 			)
 			.from((int)pageable.getOffset())
 			.size(pageable.getPageSize())
+			.source(src -> src
+				.filter(f -> f
+					.excludes("categories")
+				)
+			)
 		);
 
-		SearchResponse<BookDocument> response = null;
-
-		response = elasticsearchClient.search(request, BookDocument.class);
+		SearchResponse<BookDocument> response = elasticsearchClient.search(request, BookDocument.class);
 
 		List<BookDocument> books = response.hits().hits().stream()
 			.map(Hit::source)
