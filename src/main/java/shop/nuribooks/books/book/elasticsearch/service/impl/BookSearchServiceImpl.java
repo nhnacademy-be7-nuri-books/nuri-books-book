@@ -61,6 +61,7 @@ public class BookSearchServiceImpl implements BookSearchService {
 			.source(src -> src
 				.filter(f -> f
 					.excludes("categories")
+					.excludes("deleted_at")
 				)
 			)
 		);

@@ -10,11 +10,9 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @Document(indexName = "#{indexNameProperty.resolveIndexName()}")
 public class BookDocument {
@@ -43,8 +41,6 @@ public class BookDocument {
 	private int review_count;
 
 	private BigDecimal total_score;
-
-	private Date deleted_at;
 
 	// localdatetime -> date로 타입 변경.
 	// jackson이 Localdatetime 변환 지원 x
