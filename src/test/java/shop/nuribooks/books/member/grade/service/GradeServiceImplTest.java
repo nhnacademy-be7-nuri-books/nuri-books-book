@@ -27,7 +27,7 @@ import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class GradeServiceImplTest {
+class GradeServiceImplTest {
 
 	@InjectMocks
 	private GradeServiceImpl gradeServiceImpl;
@@ -41,13 +41,13 @@ public class GradeServiceImplTest {
 	@DisplayName("등급 등록 성공")
 	@Test
 	void registerGrade() {
-	    //given
+		//given
 		GradeRegisterRequest request = getGradeRegisterRequest();
 		Grade savedGrade = getSavedGrade();
 		when(gradeRepository.existsByName(request.name())).thenReturn(false);
 		when(gradeRepository.save(any(Grade.class))).thenReturn(savedGrade);
 
-	    //when
+		//when
 		gradeServiceImpl.registerGrade(request);
 
 		//then
@@ -58,11 +58,11 @@ public class GradeServiceImplTest {
 	@DisplayName("등급 등록 실패 - 이미 존재하는 등급")
 	@Test
 	void registerGrade_gradeAlreadyExists() {
-	    //given
+		//given
 		GradeRegisterRequest request = getGradeRegisterRequest();
 		when(gradeRepository.existsByName(request.name())).thenReturn(true);
 
-	    //when / then
+		//when / then
 		assertThatThrownBy(() -> gradeServiceImpl.registerGrade(request))
 			.isInstanceOf(GradeAlreadyExistsException.class)
 			.hasMessage("이미 존재하는 등급입니다.");
@@ -71,13 +71,13 @@ public class GradeServiceImplTest {
 	@DisplayName("등급명으로 등급 상세 조회 성공")
 	@Test
 	void getGradeDetails() {
-	    //given
+		//given
 		Grade savedGrade = getSavedGrade();
 		String requiredName = "STANDARD";
 
 		when(gradeRepository.findByName(requiredName)).thenReturn(Optional.of(savedGrade));
 
-	    //when
+		//when
 		GradeDetailsResponse response = gradeServiceImpl.getGradeDetails(requiredName);
 
 		//then
@@ -101,18 +101,17 @@ public class GradeServiceImplTest {
 			.hasMessage("해당 이름의 등급이 존재하지 않습니다.");
 	}
 
-
 	@DisplayName("등급명으로 등급 수정 성공")
 	@Test
 	void updateGrade() {
-	    //given
+		//given
 		Grade savedGrade = spy(getSavedGrade());
 		GradeUpdateRequest request = getGradeUpdateRequest();
 		String requiredName = "STANDARD";
 
 		when(gradeRepository.findByName(requiredName)).thenReturn(Optional.of(savedGrade));
 
-	    //when
+		//when
 		gradeServiceImpl.updateGrade(requiredName, request);
 
 		//then
@@ -144,12 +143,12 @@ public class GradeServiceImplTest {
 
 		when(gradeRepository.findByName(requiredName)).thenReturn(Optional.of(savedGrade));
 		when(memberRepository.existsByGradeId(savedGrade.getId())).thenReturn(false);
-	    doNothing().when(gradeRepository).delete(savedGrade);
+		doNothing().when(gradeRepository).delete(savedGrade);
 
-	    //when
+		//when
 		gradeServiceImpl.deleteGrade(requiredName);
 
-	    //then
+		//then
 		verify(gradeRepository, times(1)).findByName(requiredName);
 		verify(gradeRepository, times(1)).delete(savedGrade);
 	}

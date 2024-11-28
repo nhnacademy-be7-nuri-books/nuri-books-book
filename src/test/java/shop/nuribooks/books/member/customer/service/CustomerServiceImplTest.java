@@ -18,7 +18,7 @@ import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class CustomerServiceImplTest {
+class CustomerServiceImplTest {
 
 	@InjectMocks
 	private CustomerServiceImpl customerServiceImpl;
@@ -29,7 +29,7 @@ public class CustomerServiceImplTest {
 	@DisplayName("비회원 등록 성공")
 	@Test
 	void registerCustomer() {
-	    //given
+		//given
 		CustomerRegisterRequest request = getCustomerRegisterRequest();
 		Customer savedCustomer = getSavedCustomer();
 
@@ -73,7 +73,6 @@ public class CustomerServiceImplTest {
 			.isInstanceOf(PhoneNumberAlreadyExistsException.class)
 			.hasMessage("이미 존재하는 전화번호입니다.");
 	}
-
 
 	/**
 	 * 테스트를 위한 CustomerRegisterRequest 생성

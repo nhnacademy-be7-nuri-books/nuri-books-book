@@ -22,7 +22,7 @@ import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterRespons
 import shop.nuribooks.books.member.customer.service.CustomerService;
 
 @WebMvcTest(CustomerController.class)
-public class CustomerControllerTest {
+class CustomerControllerTest {
 
 	@MockBean
 	protected CustomerService customerService;

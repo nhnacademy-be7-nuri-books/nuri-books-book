@@ -5,7 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class GenderTypeTest {
+class GenderTypeTest {
 
 	@DisplayName("성별 enum을 String으로 변환")
 	@Test

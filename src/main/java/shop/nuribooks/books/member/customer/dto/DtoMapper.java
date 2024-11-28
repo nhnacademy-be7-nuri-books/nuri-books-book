@@ -9,6 +9,11 @@ import shop.nuribooks.books.member.customer.entity.Customer;
  */
 public class DtoMapper {
 
+	// 기본 생성자를 private으로 선언하여 외부에서 객체를 생성할 수 없게 함
+	private DtoMapper() {
+		throw new UnsupportedOperationException("This is a utility class and cannot be instantiated.");
+	}
+
 	/**
 	 * Customer를 CustomerRegisterResponse로 변환
 	 */
