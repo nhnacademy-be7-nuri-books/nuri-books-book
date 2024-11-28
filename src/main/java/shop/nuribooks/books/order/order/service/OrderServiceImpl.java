@@ -527,10 +527,23 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 			throw new OrderNotBelongsToUserException("해당 주문 정보의 소유자가 아닙니다.");
 		}
 
+		WrappingPaper wrappingPaper = order.getWrappingPaper();
+		WrappingPaperResponse wrappingPaperResponse = null;
+
+		if (Objects.nonNull(wrappingPaper)) {
+			wrappingPaperResponse = WrappingPaperResponse.builder()
+				.id(wrappingPaper.getId())
+				.title(wrappingPaper.getTitle())
+				.imageUrl(wrappingPaper.getImageUrl())
+				.wrappingPrice(wrappingPaper.getWrappingPrice())
+				.build();
+		}
+
 		// 주문 요약 정보
 		OrderSummaryDto orderSummaryDto = OrderSummaryDto.builder()
 			.title(order.getTitle())
 			.orderedAt(order.getOrderedAt())
+			.wrappingInfo(wrappingPaperResponse)
 			.build();
 
 		// 배송 정보
