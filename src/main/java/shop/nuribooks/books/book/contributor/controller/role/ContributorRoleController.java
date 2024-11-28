@@ -31,7 +31,7 @@ public class ContributorRoleController {
 	private final ContributorRoleService contributorRoleService;
 
 	@Operation(summary = "Register a new contributor role", description = "Register a new role for a contributor.")
-	@ApiResponses({
+	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "registered successfully"),
 		@ApiResponse(responseCode = "400", description = "Invalid request data")
 	})
@@ -43,7 +43,7 @@ public class ContributorRoleController {
 	}
 
 	@Operation(summary = "Get all contributor roles", description = "Retrieve all available contributor roles.")
-	@ApiResponses({
+	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "got successfully")
 	})
 	@GetMapping
@@ -53,7 +53,7 @@ public class ContributorRoleController {
 	}
 
 	@Operation(summary = "Update a contributor role", description = "Update the name of a specific contributor role.")
-	@ApiResponses({
+	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "updated successfully"),
 		@ApiResponse(responseCode = "400", description = "Invalid request data"),
 		@ApiResponse(responseCode = "404", description = "Contributor role not found")
@@ -66,7 +66,7 @@ public class ContributorRoleController {
 	}
 
 	@Operation(summary = "Delete a contributor role", description = "Remove a specific contributor role.")
-	@ApiResponses({
+	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "deleted successfully"),
 		@ApiResponse(responseCode = "404", description = "Contributor role not found")
 	})

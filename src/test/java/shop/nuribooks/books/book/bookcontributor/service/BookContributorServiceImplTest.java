@@ -192,12 +192,12 @@ class BookContributorServiceImplTest {
 	@Test
 	void getAllBooksByContributorId_ShouldThrowContributorNotFoundException_WhenContributorDoesNotExist() {
 		// Arrange
-		when(contributorRepository.findById(contributor.getId())).thenReturn(Optional.empty());
+		when(contributorRepository.existsById(contributor.getId())).thenReturn(false);
 
 		// Act & Assert
 		assertThrows(ContributorNotFoundException.class,
 			() -> bookContributorService.getAllBooksByContributorId(contributor.getId()));
-		verify(contributorRepository).findById(contributor.getId());
+		verify(contributorRepository).existsById(contributor.getId());
 	}
 
 	@DisplayName("도서 기여자 삭제 성공")

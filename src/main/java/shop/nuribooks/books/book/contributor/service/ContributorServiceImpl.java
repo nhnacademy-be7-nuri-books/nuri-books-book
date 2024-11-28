@@ -49,7 +49,7 @@ public class ContributorServiceImpl implements ContributorService {
 	public ContributorResponse updateContributor(Long contributorId, ContributorRequest request) {
 		Contributor contributor = contributorRepository.findById(contributorId)
 			.orElseThrow(
-				() -> new ContributorNotFoundException());
+				ContributorNotFoundException::new);
 
 		ContributorEditor contributorEditor = getContributorEditor(request, contributor);
 		contributor.edit(contributorEditor);
@@ -67,7 +67,7 @@ public class ContributorServiceImpl implements ContributorService {
 	@Override
 	public ContributorResponse getContributor(Long contributorId) {
 		Contributor contributor = contributorRepository.findById(contributorId)
-			.orElseThrow(() -> new ContributorNotFoundException());
+			.orElseThrow(ContributorNotFoundException::new);
 		return ContributorResponse.of(contributor);
 	}
 
@@ -91,7 +91,7 @@ public class ContributorServiceImpl implements ContributorService {
 	@Override
 	public void deleteContributor(Long contributorId) {
 		Contributor contributor = contributorRepository.findById(contributorId)
-			.orElseThrow(() -> new ContributorNotFoundException());
+			.orElseThrow(ContributorNotFoundException::new);
 		contributorRepository.delete(contributor);
 	}
 

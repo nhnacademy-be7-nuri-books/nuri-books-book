@@ -24,6 +24,7 @@ public class OrderUsingPointRequest extends PointHistoryRequest {
 			throw new PointUsingMuchMoreException();
 	}
 
+	@Override
 	public OrderUsingPoint toEntity(PointPolicy pointPolicy) {
 		return OrderUsingPoint.builder()
 			.amount(amount.negate())

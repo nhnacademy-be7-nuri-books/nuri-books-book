@@ -55,7 +55,7 @@ public class CategoryCouponServiceImpl implements CategoryCouponService {
 	@Override
 	public CategoryCouponResponse getCategoryCoupon(Long categoryId) {
 		CategoryCoupon categoryCoupon = categoryCouponRepository.findByCategoryId(categoryId)
-			.orElseThrow(() -> new BookCouponNotFoundException());
+			.orElseThrow(BookCouponNotFoundException::new);
 
 		return new CategoryCouponResponse(categoryCoupon);
 	}

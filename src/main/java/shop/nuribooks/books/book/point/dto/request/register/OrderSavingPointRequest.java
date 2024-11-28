@@ -23,6 +23,7 @@ public class OrderSavingPointRequest extends PointHistoryRequest {
 		this.orderPrice = orderPrice;
 	}
 
+	@Override
 	public OrderSavingPoint toEntity(PointPolicy pointPolicy) {
 		Grade grade = member.getGrade();
 		return OrderSavingPoint.builder()
