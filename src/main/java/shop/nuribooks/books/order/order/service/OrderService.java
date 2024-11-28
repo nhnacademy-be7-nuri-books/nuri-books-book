@@ -101,6 +101,8 @@ public interface OrderService {
 	 */
 	OrderDetailResponse getOrderDetail(Optional<Long> memberId, Long orderId, Pageable pageable);
 
+	OrderDetailResponse getNonMemberOrderDetail(Optional<Long> customerId, Long orderId, Pageable pageable);
+
 	/**
 	 * 주문 취소/환불 목록 가져오기
 	 *

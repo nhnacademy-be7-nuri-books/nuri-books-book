@@ -233,6 +233,16 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
+	@GetMapping("/{order-id}/non-member/{customer-id}")
+	public ResponseEntity<OrderDetailResponse> getNonMemberOrderDetail(
+		@PathVariable("order-id") Long orderId,
+		@PathVariable("customer-id") Long customerId,
+		Pageable pageable
+	) {
+		OrderDetailResponse result = orderService.getNonMemberOrderDetail(Optional.of(customerId), orderId, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
 	/**
 	 * 주문 취소 폼
 	 *
