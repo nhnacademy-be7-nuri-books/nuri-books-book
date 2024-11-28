@@ -1,6 +1,12 @@
 package shop.nuribooks.books.book.coupon.service;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -40,7 +46,7 @@ public class CouponServiceImpl implements CouponService {
 	}
 
 	/**
-	 * 모든 쿠폰 조회하는 메서드
+	 * 쿠폰 타입별로 조회하는 메서드
 	 *
 	 * @param pageable
 	 * @return
@@ -48,6 +54,23 @@ public class CouponServiceImpl implements CouponService {
 	@Override
 	public Page<CouponResponse> getCoupons(CouponType type, Pageable pageable) {
 		return couponRepository.findCouponsByCouponId(pageable, type);
+	}
+
+	/**
+	 * 모든 쿠폰 조회하는 메서드
+	 * @param pageable
+	 * @return
+	 */
+	@Override
+	public Page<CouponResponse> getAllCoupons(Pageable pageable) {
+		List<CouponResponse> combinedCoupons = Stream.of(CouponType.ALL, CouponType.BOOK, CouponType.CATEGORY)
+			.flatMap(type -> getCoupons(type, pageable).getContent().stream())
+			.sorted(Comparator.comparingLong(CouponResponse::id))
+			.collect(Collectors.toList());
+
+		int start = Math.min((int)pageable.getOffset(), combinedCoupons.size());
+		int end = Math.min(start + pageable.getPageSize(), combinedCoupons.size());
+		return new PageImpl<>(combinedCoupons.subList(start, end), pageable, combinedCoupons.size());
 	}
 
 	/**
