@@ -11,9 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.BookListResponse;
@@ -25,7 +25,7 @@ import shop.nuribooks.books.book.publisher.entity.QPublisher;
 
 @Repository
 @RequiredArgsConstructor
-public class BookCustomRepositoryImpl implements BookCustomRepository{
+public class BookCustomRepositoryImpl implements BookCustomRepository {
 
 	private final JPAQueryFactory queryFactory;
 
@@ -61,9 +61,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 			query.orderBy(orderSpecifier);
 		});
 
-		List<BookListResponse> books = query.fetch();
-
-		return books;
+		return query.fetch();
 	}
 
 	@Override
@@ -101,9 +99,9 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 		return queryFactory.selectFrom(book)
 			.where(book.deletedAt.isNull())
 			.fetch();
-  }
+	}
 
-  @Override
+	@Override
 	public long countBook() {
 		return Optional.ofNullable(
 				queryFactory.select(book.count())

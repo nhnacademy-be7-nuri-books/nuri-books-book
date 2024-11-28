@@ -2,7 +2,6 @@ package shop.nuribooks.books.book.elasticsearch.service.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -70,7 +69,7 @@ public class BookSearchServiceImpl implements BookSearchService {
 
 		List<BookDocument> books = response.hits().hits().stream()
 			.map(Hit::source)
-			.collect(Collectors.toList());
+			.toList();
 
 		return new PageImpl<>(books, pageable, response.hits().total().value());
 	}

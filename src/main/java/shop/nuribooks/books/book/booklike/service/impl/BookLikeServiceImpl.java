@@ -40,8 +40,9 @@ public class BookLikeServiceImpl implements BookLikeService {
 	@Transactional
 	@Override
 	public void addLike(Long memberId, Long bookId) {
-		memberRepository.findById(memberId)
-			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+		if (!memberRepository.existsById(memberId)) {
+			throw new MemberNotFoundException("존재하지 않는 회원입니다.");
+		}
 
 		Book book = bookRepository.findByIdAndDeletedAtIsNull(bookId)
 			.orElseThrow(() -> new BookNotFoundException(bookId));
@@ -76,8 +77,9 @@ public class BookLikeServiceImpl implements BookLikeService {
 			throw new InvalidPageRequestException();
 		}
 
-		memberRepository.findById(memberId)
-			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+		if (!memberRepository.existsById(memberId)) {
+			throw new MemberNotFoundException("존재하지 않는 회원입니다.");
+		}
 
 		Page<BookLikeResponse> bookLikePage = bookLikeRepository.findLikedBooks(memberId, pageable);
 

@@ -51,7 +51,7 @@ public class BookCouponServiceImpl implements BookCouponService {
 	@Override
 	public BookCouponResponse getBookCoupon(Long id) {
 		BookCoupon bookCoupon = bookCouponRepository.findByBookId(id)
-			.orElseThrow(() -> new BookCouponNotFoundException());
+			.orElseThrow(BookCouponNotFoundException::new);
 
 		return new BookCouponResponse(bookCoupon);
 	}
