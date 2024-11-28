@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
+import shop.nuribooks.books.member.customer.dto.response.CustomerAuthInfoResponse;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.service.CustomerService;
 
@@ -75,6 +76,25 @@ class CustomerControllerTest {
 				.value(Matchers.containsString("유효한 이메일 형식으로 입력해야 합니다.")));
 	}
 
+	@DisplayName("이메일로 비회원 인증 정보 조회 성공")
+	@Test
+	void getCustomerAuthInfoByEmail() throws Exception {
+		//given
+		String email = "member50@naver.com";
+		CustomerAuthInfoResponse response = getCustomerAuthInfoResponse();
+
+		when(customerService.getCustomerAuthInfoByEmail(email)).thenReturn(response);
+
+		//when
+		ResultActions result = mockMvc.perform(get("/api/members/customers/{email}", email));
+
+		//then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("customerId").value(response.customerId()))
+			.andExpect(jsonPath("password").value(response.password()))
+			.andExpect(jsonPath("email").value(response.email()));
+	}
+
 	/**
 	 * 테스트를 위한 CustomerRegisterRequest 생성
 	 */
@@ -107,6 +127,17 @@ class CustomerControllerTest {
 			.password("   ")
 			.phoneNumber(null)
 			.email("nuri")
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 CustomerAuthInfoResponse 생성
+	 */
+	private CustomerAuthInfoResponse getCustomerAuthInfoResponse() {
+		return CustomerAuthInfoResponse.builder()
+			.customerId(50L)
+			.email("member50@naver.com")
+			.password("member50!")
 			.build();
 	}
 }
