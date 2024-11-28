@@ -20,7 +20,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
-import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.service.CouponService;
 import shop.nuribooks.books.common.annotation.HasRole;
@@ -68,8 +67,8 @@ public class CouponController {
 	})
 	@HasRole(role = AuthorityType.ADMIN)
 	@GetMapping("/{coupon-id}")
-	public ResponseEntity<Coupon> getCoupons(@PathVariable(name = "coupon-id") Long id) {
-		Coupon coupon = couponService.getCouponById(id);
+	public ResponseEntity<CouponResponse> getCoupon(@PathVariable(name = "coupon-id") Long id) {
+		CouponResponse coupon = couponService.getCouponById(id);
 		return ResponseEntity.status(HttpStatus.OK).body(coupon);
 	}
 

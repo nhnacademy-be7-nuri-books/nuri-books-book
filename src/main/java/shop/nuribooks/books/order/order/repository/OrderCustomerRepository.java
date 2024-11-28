@@ -9,10 +9,15 @@ import shop.nuribooks.books.order.order.dto.response.OrderPageResponse;
 import shop.nuribooks.books.payment.payment.dto.PaymentInfoDto;
 
 public interface OrderCustomerRepository {
-	OrderPageResponse findOrders(boolean includeOrdersInPendingStatus, Long userId, Pageable pageable,
+	OrderPageResponse findOrders(boolean includeOrdersInPendingStatus, Long memberId, Pageable pageable,
 		OrderListPeriodRequest orderListPeriodRequest);
 
 	PaymentInfoDto findPaymentInfo(Long orderId);
 
+
+	OrderPageResponse findCancelledOrders(Long memberId, Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest);
+  
 	BigDecimal findOrderSavingPoint(Long orderId);
+
 }

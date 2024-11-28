@@ -36,6 +36,12 @@ public class BookDocument {
 
 	private String thumbnail_image_url;
 
+	private long view_count;
+
+	private int review_count;
+
+	private BigDecimal total_score;
+
 	// localdatetime -> date로 타입 변경.
 	// jackson이 Localdatetime 변환 지원 x
 	// 추가 라이브러리가 elastic search의 object mapper에 적용안됨.

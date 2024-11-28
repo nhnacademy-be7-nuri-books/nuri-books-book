@@ -16,6 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.annotation.PostConstruct;
-import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.member.dto.request.MemberPasswordUpdateRequest;
@@ -39,12 +40,15 @@ import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.StatusType;
+import shop.nuribooks.books.member.member.service.MemberService;
 
-class MemberControllerTest extends ControllerTestSupport {
+@WebMvcTest(MemberController.class)
+class MemberControllerTest {
 
+	@MockBean
+	protected MemberService memberService;
 	@Autowired
 	private MockMvc mockMvc;
-
 	@Autowired
 	private ObjectMapper objectMapper;
 
