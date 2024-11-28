@@ -66,7 +66,7 @@ public class CouponController {
 	})
 	@HasRole(role = AuthorityType.ADMIN)
 	@GetMapping("/list")
-	public ResponseEntity<Page<CouponResponse>> getAllCoupons(Pageable pageable) {
+	public ResponseEntity<Page<CouponResponse>> getCoupons(Pageable pageable) {
 		Page<CouponResponse> couponPolicyResponses = couponService.getAllCoupons(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(couponPolicyResponses);
 	}
