@@ -10,6 +10,8 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -21,11 +23,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.book.tag.dto.TagRequest;
 import shop.nuribooks.books.book.tag.dto.TagResponse;
-import shop.nuribooks.books.common.ControllerTestSupport;
+import shop.nuribooks.books.book.tag.service.TagServiceImpl;
 
-class TagControllerTest extends ControllerTestSupport {
+@WebMvcTest(TagController.class)
+class TagControllerTest {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
+	@MockBean
+	protected TagServiceImpl tagService;
 	@Autowired
 	private MockMvc mockMvc;
 

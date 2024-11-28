@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -27,19 +28,19 @@ import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
+import shop.nuribooks.books.book.booktag.service.BookTagService;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
-import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.common.TestUtils;
 
 @WebMvcTest(BookTagController.class)
-class BookTagControllerTest extends ControllerTestSupport {
+class BookTagControllerTest {
 
+	@MockBean
+	protected BookTagService bookTagService;
 	@Autowired
 	private MockMvc mockMvc;
-
 	@Autowired
 	private ObjectMapper objectMapper;
-
 	@Mock
 	private BookRepository bookRepository;
 

@@ -1,6 +1,6 @@
 package shop.nuribooks.books.member.customer.controller;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -17,23 +17,24 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.service.CustomerService;
 
-public class CustomerControllerTest extends ControllerTestSupport {
+@WebMvcTest(CustomerController.class)
+public class CustomerControllerTest {
 
+	@MockBean
+	protected CustomerService customerService;
 	@Autowired
 	private MockMvc mockMvc;
-
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	@DisplayName("비회원 등록 성공")
 	@Test
 	void customerRegister() throws Exception {
-	    //given
+		//given
 		CustomerRegisterRequest request = getCustomerRegisterRequest();
 		CustomerRegisterResponse response = getCustomerRegisterResponse();
 
@@ -44,7 +45,7 @@ public class CustomerControllerTest extends ControllerTestSupport {
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
-	    //then
+		//then
 		result.andExpect(status().isCreated())
 			.andExpect(jsonPath("name").value(response.name()))
 			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
