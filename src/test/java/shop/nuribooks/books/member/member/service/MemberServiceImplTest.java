@@ -117,7 +117,7 @@ class MemberServiceImplTest {
 
 	@DisplayName("회원 등록 실패 - 중복된 이메일")
 	@Test
-	public void registerMember_EmailAlreadyExists() {
+	void registerMember_EmailAlreadyExists() {
 		//given
 		MemberRegisterRequest request = getMemberCreateRequest();
 		when(customerRepository.existsByEmail(request.email())).thenReturn(true);

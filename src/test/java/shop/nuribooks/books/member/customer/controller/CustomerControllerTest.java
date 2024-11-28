@@ -1,6 +1,6 @@
 package shop.nuribooks.books.member.customer.controller;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -17,23 +17,25 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.member.customer.dto.request.CustomerRegisterRequest;
+import shop.nuribooks.books.member.customer.dto.response.CustomerAuthInfoResponse;
 import shop.nuribooks.books.member.customer.dto.response.CustomerRegisterResponse;
 import shop.nuribooks.books.member.customer.service.CustomerService;
 
-public class CustomerControllerTest extends ControllerTestSupport {
+@WebMvcTest(CustomerController.class)
+class CustomerControllerTest {
 
+	@MockBean
+	protected CustomerService customerService;
 	@Autowired
 	private MockMvc mockMvc;
-
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	@DisplayName("비회원 등록 성공")
 	@Test
 	void customerRegister() throws Exception {
-	    //given
+		//given
 		CustomerRegisterRequest request = getCustomerRegisterRequest();
 		CustomerRegisterResponse response = getCustomerRegisterResponse();
 
@@ -44,7 +46,7 @@ public class CustomerControllerTest extends ControllerTestSupport {
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
-	    //then
+		//then
 		result.andExpect(status().isCreated())
 			.andExpect(jsonPath("name").value(response.name()))
 			.andExpect(jsonPath("phoneNumber").value(response.phoneNumber()))
@@ -72,6 +74,25 @@ public class CustomerControllerTest extends ControllerTestSupport {
 				.value(Matchers.containsString("전화번호는 반드시 입력해야 합니다.")))
 			.andExpect(jsonPath("$.message")
 				.value(Matchers.containsString("유효한 이메일 형식으로 입력해야 합니다.")));
+	}
+
+	@DisplayName("이메일로 비회원 인증 정보 조회 성공")
+	@Test
+	void getCustomerAuthInfoByEmail() throws Exception {
+		//given
+		String email = "member50@naver.com";
+		CustomerAuthInfoResponse response = getCustomerAuthInfoResponse();
+
+		when(customerService.getCustomerAuthInfoByEmail(email)).thenReturn(response);
+
+		//when
+		ResultActions result = mockMvc.perform(get("/api/members/customers/{email}", email));
+
+		//then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("customerId").value(response.customerId()))
+			.andExpect(jsonPath("password").value(response.password()))
+			.andExpect(jsonPath("email").value(response.email()));
 	}
 
 	/**
@@ -106,6 +127,17 @@ public class CustomerControllerTest extends ControllerTestSupport {
 			.password("   ")
 			.phoneNumber(null)
 			.email("nuri")
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 CustomerAuthInfoResponse 생성
+	 */
+	private CustomerAuthInfoResponse getCustomerAuthInfoResponse() {
+		return CustomerAuthInfoResponse.builder()
+			.customerId(50L)
+			.email("member50@naver.com")
+			.password("member50!")
 			.build();
 	}
 }

@@ -31,10 +31,6 @@ public enum SearchType {
 		return type;
 	}
 
-	public Builder apply(Builder b, String keyword) {
-		return this.func.apply(b, keyword);
-	}
-
 	private static ObjectBuilder<Query> titleBuilder(Query.Builder sq, String keyword, Float boost) {
 		return sq.match(m -> m
 			.field("title")
@@ -70,5 +66,10 @@ public enum SearchType {
 				)
 			)
 		);
+	}
+
+	public Builder apply(Builder b, String keyword) {
+		b.minimumShouldMatch("1");
+		return this.func.apply(b, keyword);
 	}
 }

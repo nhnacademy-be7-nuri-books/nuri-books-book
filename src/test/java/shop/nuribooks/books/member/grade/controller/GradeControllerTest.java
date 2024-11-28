@@ -22,26 +22,28 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.member.grade.dto.DtoMapper;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeListResponse;
 import shop.nuribooks.books.member.grade.entity.Grade;
+import shop.nuribooks.books.member.grade.service.GradeService;
 
-public class GradeControllerTest extends ControllerTestSupport {
+@WebMvcTest(GradeController.class)
+class GradeControllerTest {
 
+	@MockBean
+	protected GradeService gradeService;
 	@Autowired
 	private MockMvc mockMvc;
-
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	@DisplayName("등급 등록 성공")
 	@Test
 	void gradeRegister() throws Exception {
-	    //given
+		//given
 		GradeRegisterRequest request = getGradeRegisterRequest();
 
 		doNothing().when(gradeService).registerGrade(any(GradeRegisterRequest.class));
@@ -60,7 +62,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 	@DisplayName("등급 등록 실패 - validation 에러")
 	@Test
 	void gradeRegister_invalidRequest() throws Exception {
-	    //given
+		//given
 		GradeRegisterRequest badRequest = getBadGradeRegisterRequest();
 
 		//when
@@ -81,13 +83,13 @@ public class GradeControllerTest extends ControllerTestSupport {
 	@DisplayName("등급명으로 등급 상세 조회 성공")
 	@Test
 	void getGradeDetails() throws Exception {
-	    //given
-	    String requiredName = "STANDARD";
+		//given
+		String requiredName = "STANDARD";
 		GradeDetailsResponse response = getGradeDetailsResponse();
 
 		when(gradeService.getGradeDetails(requiredName)).thenReturn(response);
 
-	    //when
+		//when
 		ResultActions result = mockMvc.perform(get("/api/members/grades/{name}", requiredName));
 
 		//then
@@ -100,14 +102,14 @@ public class GradeControllerTest extends ControllerTestSupport {
 
 	@DisplayName("등급명으로 등급 수정 성공")
 	@Test
-	public void gradeUpdate() throws Exception{
-	    //given
+	void gradeUpdate() throws Exception {
+		//given
 		GradeUpdateRequest request = getGradeUpdateRequest();
 		String requestName = "MASTER";
 
 		doNothing().when(gradeService).updateGrade(eq(requestName), any(GradeUpdateRequest.class));
 
-	    //when
+		//when
 		ResultActions result = mockMvc.perform(put("/api/members/grades/{name}", requestName)
 			.contentType(APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
@@ -121,7 +123,7 @@ public class GradeControllerTest extends ControllerTestSupport {
 	@DisplayName("등급명으로 등급 수정 - validation 에러")
 	@Test
 	void gradeUpdate_invalidRequest() throws Exception {
-	    //given
+		//given
 		GradeUpdateRequest badRequest = getBadGradeUpdateRequest();
 		String requiredName = "STANDARD";
 
@@ -143,12 +145,12 @@ public class GradeControllerTest extends ControllerTestSupport {
 	@DisplayName("등급명으로 등급 삭제 성공")
 	@Test
 	void gradeDelete() throws Exception {
-	    //given
-	    String requiredName = "STANDARD";
+		//given
+		String requiredName = "STANDARD";
 
 		doNothing().when(gradeService).deleteGrade(requiredName);
 
-	    //when
+		//when
 		ResultActions result = mockMvc.perform(delete("/api/members/grades/{name}", requiredName));
 
 		//then
@@ -160,12 +162,12 @@ public class GradeControllerTest extends ControllerTestSupport {
 	@DisplayName("등급 목록 조회")
 	@Test
 	void getGradeList() throws Exception {
-	    //given
+		//given
 		List<GradeListResponse> response = getGradeListResponse();
 
 		when(gradeService.getGradeList()).thenReturn(response);
 
-	    //when
+		//when
 		ResultActions result = mockMvc.perform(get("/api/members/grades"));
 
 		//then
