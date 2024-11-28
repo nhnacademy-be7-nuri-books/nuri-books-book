@@ -14,6 +14,7 @@ public interface OrderCustomerRepository {
 
 	PaymentInfoDto findPaymentInfo(Long orderId);
 
+
 	OrderPageResponse findCancelledOrders(Long memberId, Pageable pageable,
 		OrderListPeriodRequest orderListPeriodRequest);
   
