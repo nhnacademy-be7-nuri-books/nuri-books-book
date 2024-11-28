@@ -31,7 +31,7 @@ import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.service.GradeService;
 
 @WebMvcTest(GradeController.class)
-public class GradeControllerTest {
+class GradeControllerTest {
 
 	@MockBean
 	protected GradeService gradeService;
@@ -102,7 +102,7 @@ public class GradeControllerTest {
 
 	@DisplayName("등급명으로 등급 수정 성공")
 	@Test
-	public void gradeUpdate() throws Exception {
+	void gradeUpdate() throws Exception {
 		//given
 		GradeUpdateRequest request = getGradeUpdateRequest();
 		String requestName = "MASTER";

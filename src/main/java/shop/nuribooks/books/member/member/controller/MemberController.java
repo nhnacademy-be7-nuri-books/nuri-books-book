@@ -148,7 +148,6 @@ public class MemberController {
 	@PutMapping("/api/members/me")
 	public ResponseEntity<ResponseMessage> memberUpdate(
 		@RequestBody @Valid MemberPasswordUpdateRequest request) {
-		// TODO: 동일한 password를 입력해도 항상 다른 암호화된 비밀번호가 넘어옴.
 
 		Long memberId = MemberIdContext.getMemberId();
 		memberService.updateMember(memberId, request);
