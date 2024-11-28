@@ -53,9 +53,7 @@ public class CouponController {
 	})
 	@HasRole(role = AuthorityType.ADMIN)
 	@GetMapping
-	public ResponseEntity<Page<CouponResponse>> getCoupons(
-		@RequestParam(value = "type", defaultValue = "MIXED") CouponType type,
-		Pageable pageable) {
+	public ResponseEntity<Page<CouponResponse>> getCoupons(@RequestParam CouponType type, Pageable pageable) {
 		Page<CouponResponse> couponPolicyResponses = couponService.getCoupons(type, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(couponPolicyResponses);
 	}
