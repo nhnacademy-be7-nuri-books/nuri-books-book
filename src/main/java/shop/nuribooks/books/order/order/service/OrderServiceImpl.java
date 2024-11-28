@@ -449,6 +449,18 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		return new PageImpl(result.orders(), pageable, result.totalCount());
 	}
 
+	@Override
+	public Page<OrderListResponse> getNonMemberOrderList(boolean includeOrdersInPendingStatus, Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest, Optional<Long> customerId) {
+		OrderPageResponse result = null;
+		if (customerId.isPresent()) {
+			result = orderRepository.findNonMemberOrders(includeOrdersInPendingStatus, customerId.get(),
+				pageable, orderListPeriodRequest);
+		}
+
+		return new PageImpl(result.orders(), pageable, result.totalCount());
+	}
+
 	/**
 	 * 주문 취소/환불 목록 가져오기
 	 *

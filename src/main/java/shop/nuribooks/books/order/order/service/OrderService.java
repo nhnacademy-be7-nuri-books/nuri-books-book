@@ -86,6 +86,12 @@ public interface OrderService {
 		OrderListPeriodRequest orderListPeriodRequest,
 		Optional<Long> userId);
 
+	Page<OrderListResponse> getNonMemberOrderList(
+		boolean includeOrdersInPendingStatus,
+		Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest,
+		Optional<Long> userId);
+
 	/**
 	 * 주문 상세 조회
 	 * @param memberId 사용자 아이디
