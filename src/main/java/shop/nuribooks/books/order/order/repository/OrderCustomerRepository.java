@@ -12,12 +12,15 @@ public interface OrderCustomerRepository {
 	OrderPageResponse findOrders(boolean includeOrdersInPendingStatus, Long memberId, Pageable pageable,
 		OrderListPeriodRequest orderListPeriodRequest);
 
+	OrderPageResponse findNonMemberOrders(boolean includeOrdersInPendingStatus, Long customerId, Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest);
+
 	PaymentInfoDto findPaymentInfo(Long orderId);
 
 
 	OrderPageResponse findCancelledOrders(Long memberId, Pageable pageable,
 		OrderListPeriodRequest orderListPeriodRequest);
-  
+
 	BigDecimal findOrderSavingPoint(Long orderId);
 
 }

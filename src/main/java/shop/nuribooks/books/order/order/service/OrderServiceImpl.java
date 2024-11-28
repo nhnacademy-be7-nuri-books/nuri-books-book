@@ -449,6 +449,18 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		return new PageImpl(result.orders(), pageable, result.totalCount());
 	}
 
+	@Override
+	public Page<OrderListResponse> getNonMemberOrderList(boolean includeOrdersInPendingStatus, Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest, Optional<Long> customerId) {
+		OrderPageResponse result = null;
+		if (customerId.isPresent()) {
+			result = orderRepository.findNonMemberOrders(includeOrdersInPendingStatus, customerId.get(),
+				pageable, orderListPeriodRequest);
+		}
+
+		return new PageImpl(result.orders(), pageable, result.totalCount());
+	}
+
 	/**
 	 * 주문 취소/환불 목록 가져오기
 	 *
@@ -544,6 +556,51 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 			.title(order.getTitle())
 			.orderedAt(order.getOrderedAt())
 			.wrappingInfo(wrappingPaperResponse)
+			.build();
+
+		// 배송 정보
+		Shipping shipping = shippingRepository.findByOrder(order);
+
+		ShippingInfoDto shippingInfoDto = ShippingInfoDto.builder()
+			.recipientName(shipping.getRecipientName())
+			.recipientPhoneNumber(shipping.getRecipientPhoneNumber())
+			.recipientAddress(shipping.getRecipientAddress())
+			.recipientAddressDetail(shipping.getRecipientAddressDetail())
+			.recipientZipcode(shipping.getRecipientZipcode())
+			.build();
+
+		// 주문 항목
+		OrderDetailItemPageDto orderDetailItem = orderDetailRepository.findOrderDetail(orderId, pageable);
+
+		Page<OrderDetailItemDto> orderListResponses =
+			new PageImpl(orderDetailItem.orderDetailItem(), pageable, orderDetailItem.totalCount());
+
+		// 결제 항목
+		PaymentInfoDto paymentInfoDto = orderRepository.findPaymentInfo(orderId);
+
+		return OrderDetailResponse.builder()
+			.order(orderSummaryDto)
+			.orderItems(orderListResponses)
+			.shipping(shippingInfoDto)
+			.payment(paymentInfoDto).build();
+	}
+
+	@Override
+	public OrderDetailResponse getNonMemberOrderDetail(Optional<Long> customerId, Long orderId,
+		Pageable pageable) {
+		Order order = orderRepository.findById(orderId).orElseThrow(
+			() -> new OrderNotFoundException("해당 주문 정보가 존재하지 않습니다.")
+		);
+
+		if (!Objects.equals(order.getCustomer().getId(), customerId.get())) {
+			log.error("주문 상세 조회 - {} 가 소유한 주문이 아님", customerId.get());
+			throw new OrderNotBelongsToUserException("해당 주문 정보의 소유자가 아닙니다.");
+		}
+
+		// 주문 요약 정보
+		OrderSummaryDto orderSummaryDto = OrderSummaryDto.builder()
+			.title(order.getTitle())
+			.orderedAt(order.getOrderedAt())
 			.build();
 
 		// 배송 정보
