@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
+import shop.nuribooks.books.book.coupon.enums.IssuanceType;
 import shop.nuribooks.books.book.point.enums.PolicyType;
 
 @Entity
@@ -38,6 +39,9 @@ public class Coupon {
 	@Size(min = 2, max = 50)
 	private String name;
 
+	@Enumerated(STRING)
+	private CouponType couponType;
+
 	@NotNull
 	private PolicyType policyType;
 
@@ -51,24 +55,26 @@ public class Coupon {
 	private BigDecimal maximumDiscountPrice;
 
 	@NotNull
-	private LocalDate createdAt;
+	private ExpirationType expirationType;
+
+	private Integer expirationDays;
 
 	private LocalDate expiredAt;
 
-	private Integer period;
+	@Enumerated(STRING)
+	private IssuanceType issuanceType;
+
+	private int quantity;
 
 	@NotNull
-	private ExpirationType expirationType;
+	private LocalDate createdAt;
 
-	private LocalDateTime expiredDate;
-
-	@Enumerated(STRING)
-	private CouponType couponType;
+	private LocalDateTime deletedAt;
 
 	@Builder
 	public Coupon(String name, PolicyType policyType, int discount, BigDecimal minimumOrderPrice,
 		BigDecimal maximumDiscountPrice, LocalDate createdAt, LocalDate expiredAt,
-		int period, ExpirationType expirationType, LocalDateTime expiredDate, CouponType couponType) {
+		int expirationDays, ExpirationType expirationType, LocalDateTime expiredDate, CouponType couponType) {
 		this.name = name;
 		this.policyType = policyType;
 		this.discount = discount;
@@ -76,10 +82,28 @@ public class Coupon {
 		this.maximumDiscountPrice = maximumDiscountPrice;
 		this.createdAt = createdAt;
 		this.expiredAt = expiredAt;
-		this.period = period;
+		this.expirationDays = expirationDays;
 		this.expirationType = expirationType;
-		this.expiredDate = expiredDate;
+		this.deletedAt = expiredDate;
 		this.couponType = couponType;
+	}
+
+	@Builder
+	public Coupon(String name, CouponType couponType, PolicyType policyType, int discount, BigDecimal minimumOrderPrice,
+		BigDecimal maximumDiscountPrice, ExpirationType expirationType, Integer expirationDays, LocalDate expiredAt,
+		IssuanceType issuanceType, int quantity) {
+		this.name = name;
+		this.couponType = couponType;
+		this.policyType = policyType;
+		this.discount = discount;
+		this.minimumOrderPrice = minimumOrderPrice;
+		this.maximumDiscountPrice = maximumDiscountPrice;
+		this.expirationType = expirationType;
+		this.expirationDays = expirationDays;
+		this.expiredAt = expiredAt;
+		this.issuanceType = issuanceType;
+		this.quantity = quantity;
+		this.createdAt = LocalDate.now();
 	}
 
 	public void update(CouponRequest request) {
@@ -90,12 +114,12 @@ public class Coupon {
 		this.maximumDiscountPrice = request.maximumDiscountPrice();
 		this.createdAt = request.createdAt();
 		this.expiredAt = request.expiredAt();
-		this.period = request.period();
+		this.expirationDays = request.period();
 		this.expirationType = request.expirationType();
 		this.couponType = request.couponType();
 	}
 
 	public void expire() {
-		this.expiredDate = LocalDateTime.now();
+		this.deletedAt = LocalDateTime.now();
 	}
 }

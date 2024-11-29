@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.coupon.service;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,8 +14,10 @@ import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
+import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.exception.coupon.CouponAlreadyExistsException;
+import shop.nuribooks.books.exception.coupon.CouponBadRequestException;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
 import shop.nuribooks.books.member.member.entity.Member;
 
@@ -107,6 +111,35 @@ public class CouponServiceImpl implements CouponService {
 			.orElseThrow(CouponNotFoundException::new);
 
 		coupon.expire();
+	}
+
+	private void validateExpiration(ExpirationType expirationType, Integer expirationDays, LocalDate expiredAt) {
+		switch (expirationType) {
+			case ExpirationType.DATE -> validateDateExpiration(expirationDays, expiredAt);
+			case ExpirationType.DAYS -> validateDaysExpiration(expirationDays, expiredAt);
+			default -> throw new CouponBadRequestException();
+		}
+	}
+
+	private void validateDateExpiration(Integer expirationDays, LocalDate expiredAt) {
+		if (expirationDays != null) {
+			throw new CouponBadRequestException();
+		}
+		if (expiredAt == null) {
+			throw new CouponBadRequestException();
+		}
+		if (expiredAt.isBefore(LocalDate.now())) {
+			throw new CouponBadRequestException();
+		}
+	}
+
+	private void validateDaysExpiration(Integer expirationDays, LocalDate expiredAt) {
+		if (expiredAt != null) {
+			throw new CouponBadRequestException();
+		}
+		if (expirationDays == null) {
+			throw new CouponBadRequestException();
+		}
 	}
 
 }
