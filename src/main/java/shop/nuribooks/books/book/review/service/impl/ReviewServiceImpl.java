@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
@@ -47,7 +46,6 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ReviewRepository reviewRepository;
 	private final ReviewImageRepository reviewImageRepository;
 	private final OrderDetailRepository orderDetailRepository;
-	private final PointHistoryService pointHistoryService;
 	private final ApplicationEventPublisher publisher;
 
 	/**
@@ -106,7 +104,7 @@ public class ReviewServiceImpl implements ReviewService {
 		// review만 가져오기
 		List<ReviewMemberResponse> reviews = this.reviewRepository.findReviewsByBookId(bookId, pageable);
 		// 리뷰가 있다면, 이미지 조합하기
-		if (reviews.size() > 0) {
+		if (!reviews.isEmpty()) {
 			// review id가 key인 map 생성 및 초기화
 			Map<Long, ReviewMemberResponse> reviewMap = new LinkedHashMap<>();
 			for (ReviewMemberResponse rmr : reviews) {
@@ -125,9 +123,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		long totalElement = this.reviewRepository.countByBookId(bookId);
 
-		Page<ReviewMemberResponse> page = new PageImpl(reviews, pageable, totalElement);
-
-		return page;
+		return new PageImpl<>(reviews, pageable, totalElement);
 	}
 
 	/**
@@ -144,7 +140,7 @@ public class ReviewServiceImpl implements ReviewService {
 		List<ReviewBookResponse> reviews = this.reviewRepository.findReviewsByMemberId(memberId, pageable);
 
 		// 리뷰가 있다면, 이미지 조합하기
-		if (reviews.size() > 0) {
+		if (!reviews.isEmpty()) {
 			// review id가 key인 map 생성 및 초기화
 			Map<Long, ReviewBookResponse> reviewMap = new LinkedHashMap<>();
 			for (ReviewBookResponse rbr : reviews) {
@@ -162,9 +158,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		int totalElement = (int)this.reviewRepository.countByMemberId(memberId);
 
-		PagedResponse pagedResponse = PagedResponse.of(reviews, pageable, totalElement);
-
-		return pagedResponse;
+		return PagedResponse.of(reviews, pageable, totalElement);
 	}
 
 	@Transactional

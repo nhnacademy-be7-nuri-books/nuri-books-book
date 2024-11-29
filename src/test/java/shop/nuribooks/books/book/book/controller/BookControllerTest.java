@@ -19,7 +19,7 @@ import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 
 @WebMvcTest(BookController.class)
-public class BookControllerTest {
+class BookControllerTest {
 
 	@MockBean
 	protected BookService bookService;
@@ -29,7 +29,7 @@ public class BookControllerTest {
 	private ObjectMapper objectMapper;
 
 	@Test
-	public void getBooks_ShouldReturnBadRequest_WhenPageIsOutOfRange() throws Exception {
+	void getBooks_ShouldReturnBadRequest_WhenPageIsOutOfRange() throws Exception {
 		Pageable pageable = PageRequest.of(10, 10);
 		when(bookService.getBooks(pageable)).thenThrow(new InvalidPageRequestException());
 
@@ -42,7 +42,7 @@ public class BookControllerTest {
 	}
 
 	/*@Test
-	public void updateBook_ShouldReturnOk_WhenRequestIsValid() throws Exception {
+	void updateBook_ShouldReturnOk_WhenRequestIsValid() throws Exception {
 		Long bookId = 1L;
 		BookUpdateRequest bookUpdateReq = new BookUpdateRequest(
 			1L,
@@ -70,7 +70,7 @@ public class BookControllerTest {
 	}*/
 
 	@Test
-	public void deleteBook_ShouldReturnNoContent_WhenBookExists() throws Exception {
+	void deleteBook_ShouldReturnNoContent_WhenBookExists() throws Exception {
 		Long bookId = 1L;
 
 		doNothing().when(bookService).deleteBook(bookId);
@@ -81,7 +81,7 @@ public class BookControllerTest {
 	}
 
 	/*@Test
-	public void deleteBook_ShouldReturnNotFound_WhenBookDoesNotExist() throws Exception {
+	void deleteBook_ShouldReturnNotFound_WhenBookDoesNotExist() throws Exception {
 		Long bookId = 9999L;
 
 		doThrow(new ResourceNotFoundException("도서를 찾을 수 없습니다.")).when(bookService).deleteBook(bookId);

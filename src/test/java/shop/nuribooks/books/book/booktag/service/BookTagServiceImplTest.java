@@ -220,6 +220,7 @@ class BookTagServiceImplTest {
 		verify(bookTagRepository, never()).findTagNamesByBookId(anyLong());
 	}
 
+
 	@DisplayName("도서에 등록된 태그 조회 실패 - bookTagId는 null")
 	@Test
 	void failed1_getBookTag() {
