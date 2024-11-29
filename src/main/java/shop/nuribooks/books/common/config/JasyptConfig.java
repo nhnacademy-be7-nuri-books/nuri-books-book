@@ -13,11 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @Slf4j
 public class JasyptConfig {
-	@Autowired
-	private Environment env;
 
 	@Bean("jasyptStringEncryptor")
-	public StringEncryptor stringEncryptor() {
+	public StringEncryptor stringEncryptor(@Autowired Environment env) {
 
 		PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
 		SimpleStringPBEConfig config = new SimpleStringPBEConfig();

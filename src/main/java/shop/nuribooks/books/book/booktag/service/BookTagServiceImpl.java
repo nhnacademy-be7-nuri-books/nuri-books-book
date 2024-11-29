@@ -2,7 +2,6 @@ package shop.nuribooks.books.book.booktag.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +52,7 @@ public class BookTagServiceImpl implements BookTagService {
 
 		for (Long tagId : request.tagId()) {
 			Tag tag = tagRepository.findById(tagId)
-				.orElseThrow(() -> new TagNotFoundException());
+				.orElseThrow(TagNotFoundException::new);
 
 			if (!bookTagRepository.existsByBookIdAndTagId(request.bookId(), tagId)) {
 				BookTag bookTag = BookTag.builder()
@@ -80,10 +79,6 @@ public class BookTagServiceImpl implements BookTagService {
 	 */
 	@Override
 	public BookTagGetResponse getBookTag(Long bookId) {
-
-		Book book = bookRepository.findById(bookId)
-			.orElseThrow(() -> new BookNotFoundException(bookId));
-
 		List<String> tagNames = bookTagRepository.findTagNamesByBookId(bookId);
 
 		List<BookTag> bookTags = bookTagRepository.findByBookId(bookId);
@@ -104,7 +99,7 @@ public class BookTagServiceImpl implements BookTagService {
 	@Override
 	public List<BookResponse> getBooksByTagId(Long tagId) {
 		tagRepository.findById(tagId)
-			.orElseThrow(() -> new TagNotFoundException());
+			.orElseThrow(TagNotFoundException::new);
 
 		List<Long> bookIds = bookTagRepository.findBookIdsByTagId(tagId);
 
@@ -112,7 +107,7 @@ public class BookTagServiceImpl implements BookTagService {
 
 		return books.stream()
 			.map(bookMapper::toBookResponse)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	/**
@@ -124,7 +119,7 @@ public class BookTagServiceImpl implements BookTagService {
 	@Override
 	public void deleteBookTag(Long bookTagId) {
 		BookTag bookTag = bookTagRepository.findById(bookTagId)
-			.orElseThrow(() -> new BookTagNotFountException());
+			.orElseThrow(BookTagNotFountException::new);
 		bookTagRepository.delete(bookTag);
 	}
 
@@ -142,7 +137,7 @@ public class BookTagServiceImpl implements BookTagService {
 
 		for (Long tagId : tagIds) {
 			Tag tag = tagRepository.findById(tagId)
-				.orElseThrow(() -> new TagNotFoundException());
+				.orElseThrow(TagNotFoundException::new);
 
 			if (!bookTagRepository.existsByBookIdAndTagId(bookId, tagId)) {
 				BookTag bookTag = BookTag.builder()

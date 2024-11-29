@@ -46,7 +46,7 @@ import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class ReviewServiceTest {
+class ReviewServiceTest {
 	@Mock
 	private ApplicationEventPublisher publisher;
 	@InjectMocks
@@ -72,7 +72,7 @@ public class ReviewServiceTest {
 	private OrderDetail orderDetail;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		member = TestUtils.createMember(TestUtils.createCustomer(), TestUtils.creategrade());
 		TestUtils.setIdForEntity(member, 1L);
 
@@ -113,7 +113,7 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void registerMemberNotFound() {
+	void registerMemberNotFound() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 		MemberIdContext.setMemberId(member.getId());
 		assertThrows(MemberNotFoundException.class,
@@ -121,7 +121,7 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void registerOrderDetailNotFound() {
+	void registerOrderDetailNotFound() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(anyLong(), anyLong(),
@@ -133,7 +133,7 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void registerSuccessWithPolicyName() {
+	void registerSuccessWithPolicyName() {
 		ReviewRequest newReviewRequest = new ReviewRequest("제에목", "내앵애애애애용", 1, book.getId(), List.of());
 		Review newReview = newReviewRequest.toEntity(member, book, orderDetail);
 		TestUtils.setIdForEntity(newReview, 1L);
@@ -150,7 +150,7 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void registerSuccess() {
+	void registerSuccess() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		Review review1 = reviewRequest.toEntity(member, book, orderDetail);
 		TestUtils.setIdForEntity(review1, 1l);
@@ -166,14 +166,14 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void registerByNullUser() {
+	void registerByNullUser() {
 		MemberIdContext.setMemberId(null);
 		assertThrows(RequiredHeaderIsNullException.class,
 			() -> reviewService.registerReview(reviewRequest));
 	}
 
 	@Test
-	public void updateFailed() {
+	void updateFailed() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.empty());
 		MemberIdContext.setMemberId(member.getId());
 		assertThrows(ReviewNotFoundException.class,
@@ -181,7 +181,7 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void updatedByOtherUser() {
+	void updatedByOtherUser() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
 		MemberIdContext.setMemberId(member.getId() + 10);
 		assertThrows(ReviewNotFoundException.class,
@@ -189,14 +189,14 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void updatedByNullUser() {
+	void updatedByNullUser() {
 		MemberIdContext.setMemberId(null);
 		assertThrows(RequiredHeaderIsNullException.class,
 			() -> reviewService.updateReview(reviewUpdateRequest, review.getId()));
 	}
 
 	@Test
-	public void updateSuccess() {
+	void updateSuccess() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
 		MemberIdContext.setMemberId(member.getId());
 		assertEquals(ReviewMemberResponse.of(review),
@@ -204,14 +204,14 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void getScoreFail() {
+	void getScoreFail() {
 		when(bookRepository.existsById(anyLong())).thenReturn(false);
 		assertThrows(BookIdNotFoundException.class,
 			() -> this.reviewService.getScoreByBookId(1));
 	}
 
 	@Test
-	public void getScoreSuccess() {
+	void getScoreSuccess() {
 		double score = 4.1;
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findScoreByBookId(1)).thenReturn(score);
@@ -219,14 +219,14 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void getReviewsAndMemFail() {
+	void getReviewsAndMemFail() {
 		when(bookRepository.existsById(anyLong())).thenReturn(false);
 		assertThrows(BookIdNotFoundException.class,
 			() -> this.reviewService.getReviewsByBookId(1, PageRequest.of(0, 1)));
 	}
 
 	@Test
-	public void getReviewsAndMemSuccess() {
+	void getReviewsAndMemSuccess() {
 		List<ReviewMemberResponse> res = new LinkedList<>();
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByBookId(anyLong(), any())).thenReturn(res);
@@ -237,7 +237,7 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void getReviewsAndMemFullSuccess() {
+	void getReviewsAndMemFullSuccess() {
 		List<ReviewMemberResponse> res = List.of(ReviewMemberResponse.of(review));
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByBookId(anyLong(), any())).thenReturn(res);
@@ -250,14 +250,14 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void getReviewsAndBookFail() {
+	void getReviewsAndBookFail() {
 		when(memberRepository.existsById(anyLong())).thenReturn(false);
 		assertThrows(MemberNotFoundException.class,
 			() -> this.reviewService.getReviewsByMemberId(1, PageRequest.of(0, 2)));
 	}
 
 	@Test
-	public void getReviewsAndBookSuccess() {
+	void getReviewsAndBookSuccess() {
 		List<ReviewBookResponse> res = new LinkedList<>();
 		when(memberRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByMemberId(anyLong(), any())).thenReturn(res);
@@ -268,7 +268,7 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void getReviewsAndBookFullSuccess() {
+	void getReviewsAndBookFullSuccess() {
 		List<ReviewBookResponse> res = List.of(ReviewBookResponse.of(review));
 		when(memberRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByMemberId(anyLong(), any())).thenReturn(res);

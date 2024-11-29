@@ -27,7 +27,7 @@ import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.book.point.service.PointPolicyService;
 
 @WebMvcTest(PointPolicyController.class)
-public class PointPolicyControllerTest {
+class PointPolicyControllerTest {
 	@MockBean
 	protected PointPolicyService pointPolicyService;
 	@Autowired

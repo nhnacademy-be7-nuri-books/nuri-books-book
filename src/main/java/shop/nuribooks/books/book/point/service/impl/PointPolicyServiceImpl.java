@@ -37,7 +37,9 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 	 */
 	@Override
 	public PointPolicy registerPointPolicy(PointPolicyRequest pointPolicyRequest) {
-		if (this.pointPolicyRepository.existsByNameIgnoreCaseAndDeletedAtIsNull(pointPolicyRequest.name())) {
+		Boolean isExist = this.pointPolicyRepository.existsByNameIgnoreCaseAndDeletedAtIsNull(
+			pointPolicyRequest.name());
+		if (isExist) {
 			throw new ResourceAlreadyExistException("같은 이름의 포인트 정책이 이미 존재합니다.");
 		}
 
@@ -55,7 +57,7 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 	@Override
 	public PointPolicy updatePointPolicy(long id, PointPolicyRequest pointPolicyRequest) {
 		PointPolicy pointPolicy = pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(id)
-			.orElseThrow(() -> new PointPolicyNotFoundException());
+			.orElseThrow(PointPolicyNotFoundException::new);
 
 		pointPolicy.update(pointPolicyRequest);
 		return pointPolicy;
@@ -70,7 +72,7 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 	@Override
 	public void deletePointPolicy(long id) {
 		PointPolicy pointPolicy = pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(id)
-			.orElseThrow(() -> new PointPolicyNotFoundException());
+			.orElseThrow(PointPolicyNotFoundException::new);
 
 		pointPolicy.delete();
 	}

@@ -17,15 +17,15 @@ public class ElasticSearchConfig extends ElasticsearchConfiguration {
 	private String username;
 
 	@Value("${spring.elasticsearch.password}")
-	private String encoded_password;
+	private String encodedPassword;
 
 	@Value("${spring.elasticsearch.uris}")
-	private String encoded_uri;
+	private String encodedUri;
 
 	@Override
 	public ClientConfiguration clientConfiguration() {
-		String password = keyManagerConfig.getSecretValue(encoded_password);
-		String uri = keyManagerConfig.getSecretValue(encoded_uri);
+		String password = keyManagerConfig.getSecretValue(encodedPassword);
+		String uri = keyManagerConfig.getSecretValue(encodedUri);
 
 		return ClientConfiguration.builder()
 			.connectedTo(uri)

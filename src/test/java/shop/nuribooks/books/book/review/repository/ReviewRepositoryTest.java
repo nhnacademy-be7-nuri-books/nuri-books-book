@@ -33,13 +33,12 @@ import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @DataJpaTest
 @Import({QuerydslConfiguration.class})
-public class ReviewRepositoryTest {
+class ReviewRepositoryTest {
+	private final List<Review> reviews = new LinkedList<>();
 	@Autowired
 	private MemberRepository memberRepository;
-
 	@Autowired
 	private BookRepository bookRepository;
-
 	@Autowired
 	private ReviewRepository reviewRepository;
 	@Autowired
@@ -50,10 +49,8 @@ public class ReviewRepositoryTest {
 	private OrderDetailRepository orderDetailRepository;
 	@Autowired
 	private OrderRepository orderRepository;
-
 	private Member member;
 	private Book book;
-	private final List<Review> reviews = new LinkedList<>();
 
 	@BeforeEach
 	void setUp() {

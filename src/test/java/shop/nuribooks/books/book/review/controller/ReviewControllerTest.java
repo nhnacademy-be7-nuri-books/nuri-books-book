@@ -27,7 +27,7 @@ import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 
 @WebMvcTest(ReviewController.class)
-public class ReviewControllerTest {
+class ReviewControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
