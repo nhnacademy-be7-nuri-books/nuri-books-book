@@ -28,7 +28,6 @@ public class BookTagRepositoryImpl implements BookTagCustomRepository {
 	@Override
 	public List<Long> findBookIdsByTagId(Long tagId) {
 		QBookTag bookTag = QBookTag.bookTag;
-		QTag tag = QTag.tag;
 
 		return queryFactory
 			.select(bookTag.book.id)

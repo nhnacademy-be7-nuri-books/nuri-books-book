@@ -16,6 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -24,24 +26,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.book.book.dto.BookOrderResponse;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
-import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 import shop.nuribooks.books.member.customer.dto.CustomerDto;
 import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
 import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
 import shop.nuribooks.books.order.order.dto.response.OrderRegisterResponse;
+import shop.nuribooks.books.order.order.service.OrderService;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailRequest;
 import shop.nuribooks.books.order.shipping.dto.ShippingRegisterRequest;
 
-class OrderControllerTest extends ControllerTestSupport {
+@WebMvcTest(OrderController.class)
+class OrderControllerTest {
 
+	@MockBean
+	protected OrderService orderService;
 	@Autowired
 	private MockMvc mockMvc;
-
 	@Autowired
 	private ObjectMapper objectMapper;
-
 	private OrderRegisterRequest orderTempRegisterRequest;
 	private OrderRegisterResponse orderTempRegisterResponse;
 	private OrderInformationResponse memberOrderResponse;

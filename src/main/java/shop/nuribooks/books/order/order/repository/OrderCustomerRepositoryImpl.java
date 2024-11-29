@@ -91,6 +91,64 @@ public class OrderCustomerRepositoryImpl implements OrderCustomerRepository {
 	}
 
 	@Override
+	public OrderPageResponse findNonMemberOrders(boolean includeOrdersInPendingStatus, Long customerId,
+		Pageable pageable, OrderListPeriodRequest orderListPeriodRequest) {
+		QOrder order = QOrder.order;
+		QShipping shipping = QShipping.shipping;
+		QOrderDetail orderDetail = QOrderDetail.orderDetail;
+		BooleanBuilder whereClause = new BooleanBuilder();
+
+		// 환불 취소는 제외
+		whereClause.and(orderDetail.orderState.ne(OrderState.RETURNED));
+		whereClause.and(orderDetail.orderState.ne(OrderState.CANCELED));
+
+		// 기간 지정
+		whereClause.and(order.orderedAt.between(
+			orderListPeriodRequest.getStart().atStartOfDay(),
+			orderListPeriodRequest.getEnd().atTime(LocalTime.MAX)));
+
+		// customerId로 주문 필터링
+		whereClause.and(order.customer.id.eq(customerId));
+
+		if (!includeOrdersInPendingStatus) {
+			whereClause.and(orderDetail.orderState.ne(OrderState.PENDING));
+		}
+
+		// 주문 목록 조회
+		List<OrderListResponse> orders = queryFactory.select(
+				Projections.constructor(
+					OrderListResponse.class,
+					order.id,
+					order.orderedAt,
+					order.title,
+					order.paymentPrice,
+					shipping.orderInvoiceNumber,
+					orderDetail.orderState
+				)
+			).from(order)
+			.distinct()
+			.leftJoin(shipping).on(shipping.order.eq(order))
+			.leftJoin(orderDetail).on(orderDetail.order.eq(order))
+			.where(whereClause)
+			.orderBy(order.orderedAt.desc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		// 전체 주문 수 조회
+		Long totalCount = queryFactory.select(
+				order.count()
+			)
+			.from(order)
+			.leftJoin(shipping).on(shipping.order.eq(order))
+			.leftJoin(orderDetail).on(orderDetail.order.eq(order))
+			.where(whereClause)
+			.fetchOne();
+
+		return new OrderPageResponse(orders, totalCount);
+	}
+
+	@Override
 	public OrderPageResponse findCancelledOrders(Long memberId, Pageable pageable,
 		OrderListPeriodRequest orderListPeriodRequest) {
 

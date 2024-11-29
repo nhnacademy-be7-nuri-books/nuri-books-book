@@ -5,7 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class AuthorityTypeTest {
+class AuthorityTypeTest {
 
 	@DisplayName("권한 enum을 String으로 변환")
 	@Test

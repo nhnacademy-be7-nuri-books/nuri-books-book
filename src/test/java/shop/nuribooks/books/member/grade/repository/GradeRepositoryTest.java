@@ -9,21 +9,21 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
 import org.springframework.context.annotation.Import;
+
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.grade.entity.Grade;
 
 @DataJpaTest
 @Import(QuerydslConfiguration.class)
-public class GradeRepositoryTest {
+class GradeRepositoryTest {
 
 	@Autowired
 	private GradeRepository gradeRepository;
 
 	@DisplayName("입력된 등급명으로 등급 존재 여부 확인")
 	@Test
-	public void existsByName() {
+	void existsByName() {
 		//given
 		Grade savedGrade = getSavedGrade();
 
@@ -36,8 +36,8 @@ public class GradeRepositoryTest {
 
 	@DisplayName("입력된 등급명으로 등급 조회")
 	@Test
-	public void findByName() {
-	    //given
+	void findByName() {
+		//given
 		Grade savedGrade = getSavedGrade();
 
 		//when

@@ -2,7 +2,6 @@ package shop.nuribooks.books.book.bookcontributor.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -53,7 +52,7 @@ public class BookContributorServiceImpl implements BookContributorService {
 			.orElseThrow(() -> new BookNotFoundException(registerRequest.bookId()));
 
 		Contributor contributor = contributorRepository.findById(registerRequest.contributorId())
-			.orElseThrow(() -> new ContributorNotFoundException());
+			.orElseThrow(ContributorNotFoundException::new);
 
 		List<ContributorRole> roles = new ArrayList<>();
 		for (Long roleId : registerRequest.contributorRoleId()) {
@@ -82,15 +81,16 @@ public class BookContributorServiceImpl implements BookContributorService {
 	 */
 	@Override
 	public List<BookResponse> getAllBooksByContributorId(Long contributorId) {
-		contributorRepository.findById(contributorId)
-			.orElseThrow(() -> new ContributorNotFoundException());
+		if (!contributorRepository.existsById(contributorId)) {
+			throw new ContributorNotFoundException();
+		}
 
 		List<Long> bookIds = bookContributorRepository.findBookIdsByContributorId(contributorId);
 		List<Book> books = bookRepository.findAllById(bookIds);
 
 		return books.stream()
 			.map(bookMapper::toBookResponse)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	/**

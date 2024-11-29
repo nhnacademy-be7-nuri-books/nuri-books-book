@@ -168,6 +168,23 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
+	@GetMapping("/non-member/{customer-id}")
+	@Operation(summary = "주문 목록 조회", description = "회원의 주문 목록을 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	public ResponseEntity<Page<OrderListResponse>> getNonMemberOrderList(
+		OrderListPeriodRequest orderListPeriodRequest,
+		boolean includeOrdersInPendingStatus,
+		Pageable pageable,
+		@PathVariable("customer-id") Long customerId) {
+		Page<OrderListResponse> result = orderService.getNonMemberOrderList(includeOrdersInPendingStatus, pageable,
+			orderListPeriodRequest, Optional.of(customerId));
+
+		log.debug("주문 목록 조회 성공");
+
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
 	/**
 	 * 주문 환불/취소 목록 조회
 	 *
@@ -214,6 +231,16 @@ public class OrderController {
 		log.debug("주문 상세 조회 성공");
 
 		OrderDetailResponse result = orderService.getOrderDetail(memberId, orderId, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
+	@GetMapping("/{order-id}/non-member/{customer-id}")
+	public ResponseEntity<OrderDetailResponse> getNonMemberOrderDetail(
+		@PathVariable("order-id") Long orderId,
+		@PathVariable("customer-id") Long customerId,
+		Pageable pageable
+	) {
+		OrderDetailResponse result = orderService.getNonMemberOrderDetail(Optional.of(customerId), orderId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 

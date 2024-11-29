@@ -24,7 +24,7 @@ import shop.nuribooks.books.book.elasticsearch.enums.SortType;
 import shop.nuribooks.books.book.elasticsearch.service.BookSearchService;
 
 @WebMvcTest(BookSearchController.class)
-public class BookSearchControllerTest {
+class BookSearchControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -38,7 +38,7 @@ public class BookSearchControllerTest {
 	}
 
 	@Test
-	public void testSearchBooks() throws Exception {
+	void testSearchBooks() throws Exception {
 		// Given
 		String keyword = "Java";
 		SearchType searchType = SearchType.ALL;
@@ -59,12 +59,14 @@ public class BookSearchControllerTest {
 
 		Page<BookDocument> bookPage = new PageImpl<>(List.of(book1, book2), pageable, 2);
 
-		when(bookSearchService.searchBooks(eq(keyword), eq(searchType), eq(sortType), eq(pageable))).thenReturn(
+		when(bookSearchService.searchBooks(eq(keyword), anyLong(), eq(searchType), eq(sortType),
+			eq(pageable))).thenReturn(
 			bookPage);
 
 		// When & Then
 		mockMvc.perform(get("/api/books/search")
 				.param("keyword", keyword)
+				.param("category_id", "1")
 				.param("search_type", searchType.name())
 				.param("sort_type", sortType.name())
 				.param("page", "0")
@@ -78,7 +80,7 @@ public class BookSearchControllerTest {
 	}
 
 	@Test
-	public void testSearchBooksWithWrongSearchType() throws Exception {
+	void testSearchBooksWithWrongSearchType() throws Exception {
 		// Given
 		String keyword = "Java";
 		String searchType = "ie";
@@ -99,12 +101,13 @@ public class BookSearchControllerTest {
 
 		Page<BookDocument> bookPage = new PageImpl<>(List.of(book1, book2), pageable, 2);
 
-		when(bookSearchService.searchBooks(eq(keyword), any(), eq(sortType), eq(pageable))).thenReturn(
+		when(bookSearchService.searchBooks(eq(keyword), anyLong(), any(), eq(sortType), eq(pageable))).thenReturn(
 			bookPage);
 
 		// When & Then
 		mockMvc.perform(get("/api/books/search")
 				.param("keyword", keyword)
+				.param("category_id", "1")
 				.param("search_type", searchType)
 				.param("sort_type", sortType.name())
 				.param("page", "0")
@@ -118,7 +121,7 @@ public class BookSearchControllerTest {
 	}
 
 	@Test
-	public void testSearchBooksWithWrongSortType() throws Exception {
+	void testSearchBooksWithWrongSortType() throws Exception {
 		// Given
 		String keyword = "Java";
 		SearchType searchType = SearchType.ALL;
@@ -139,12 +142,13 @@ public class BookSearchControllerTest {
 
 		Page<BookDocument> bookPage = new PageImpl<>(List.of(book1, book2), pageable, 2);
 
-		when(bookSearchService.searchBooks(eq(keyword), eq(searchType), any(), eq(pageable))).thenReturn(
+		when(bookSearchService.searchBooks(eq(keyword), anyLong(), eq(searchType), any(), eq(pageable))).thenReturn(
 			bookPage);
 
 		// When & Then
 		mockMvc.perform(get("/api/books/search")
 				.param("keyword", keyword)
+				.param("category_id", "1")
 				.param("search_type", searchType.name())
 				.param("sort_type", sortType)
 				.param("page", "0")

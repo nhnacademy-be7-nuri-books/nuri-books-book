@@ -50,7 +50,8 @@ public class OrderDetailCustomRepositoryImpl implements OrderDetailCustomReposit
 					book.thumbnailImageUrl,
 					orderDetail.unitPrice,
 					orderDetail.count,
-					orderDetail.orderState
+					orderDetail.orderState,
+					orderDetail.isWrapped
 				)
 			).from(orderDetail)
 			.leftJoin(order).on(order.id.eq(orderDetail.order.id))

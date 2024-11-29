@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -36,7 +35,7 @@ public class CouponCustomRepositoryImpl implements CouponCustomRepository {
 	public Page<CouponResponse> findCouponsByCouponId(Pageable pageable, CouponType type) {
 		QCoupon coupon = QCoupon.coupon;
 
-		QueryResults<CouponResponse> results = queryFactory.select(Projections.constructor(CouponResponse.class,
+		List<CouponResponse> results = queryFactory.select(Projections.constructor(CouponResponse.class,
 				coupon.id,
 				coupon.policyType,
 				coupon.name,
@@ -54,12 +53,14 @@ public class CouponCustomRepositoryImpl implements CouponCustomRepository {
 			.where(coupon.couponType.eq(type))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
-			.fetchResults();
+			.fetch();
 
-		List<CouponResponse> coupons = results.getResults();
-		long total = results.getTotal();
+		long total = queryFactory.select(coupon.count())
+			.from(coupon)
+			.where(coupon.couponType.eq(type))
+			.fetchOne();
 
-		return new PageImpl<>(coupons, pageable, total);
+		return new PageImpl<>(results, pageable, total);
 	}
 
 }

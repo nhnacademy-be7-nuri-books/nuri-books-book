@@ -87,6 +87,12 @@ public interface OrderService {
 		OrderListPeriodRequest orderListPeriodRequest,
 		Optional<Long> userId);
 
+	Page<OrderListResponse> getNonMemberOrderList(
+		boolean includeOrdersInPendingStatus,
+		Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest,
+		Optional<Long> userId);
+
 	/**
 	 * 주문 상세 조회
 	 * @param memberId 사용자 아이디
@@ -95,6 +101,8 @@ public interface OrderService {
 	 * @return 주문 상세 내역
 	 */
 	OrderDetailResponse getOrderDetail(Optional<Long> memberId, Long orderId, Pageable pageable);
+
+	OrderDetailResponse getNonMemberOrderDetail(Optional<Long> customerId, Long orderId, Pageable pageable);
 
 	/**
 	 * 주문 취소/환불 목록 가져오기
