@@ -1,6 +1,5 @@
 package shop.nuribooks.books.order.shipping.service;
 
-import jakarta.validation.constraints.NotNull;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.shipping.dto.ShippingRegisterRequest;
 

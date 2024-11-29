@@ -79,6 +79,7 @@ public class BookTagServiceImpl implements BookTagService {
 	 */
 	@Override
 	public BookTagGetResponse getBookTag(Long bookId) {
+
 		List<String> tagNames = bookTagRepository.findTagNamesByBookId(bookId);
 
 		List<BookTag> bookTags = bookTagRepository.findByBookId(bookId);
@@ -98,8 +99,7 @@ public class BookTagServiceImpl implements BookTagService {
 	 */
 	@Override
 	public List<BookResponse> getBooksByTagId(Long tagId) {
-		tagRepository.findById(tagId)
-			.orElseThrow(TagNotFoundException::new);
+
 
 		List<Long> bookIds = bookTagRepository.findBookIdsByTagId(tagId);
 

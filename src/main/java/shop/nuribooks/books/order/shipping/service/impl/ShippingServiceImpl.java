@@ -32,7 +32,6 @@ public class ShippingServiceImpl implements ShippingService {
 		if (Objects.isNull(shippingPolicy)) {
 			throw new ShippingPolicyNotFoundException();
 		}
-		;
 
 		Shipping shipping = Shipping.builder()
 			.order(order)

@@ -35,8 +35,8 @@ public class BookCouponController {
 			.body(new ResponseMessage(HttpStatus.CREATED.value(), "도서와 쿠폰 연결 성공"));
 	}
 
-	@GetMapping("/{bookId}")
-	public ResponseEntity<BookCouponResponse> getBookCoupon(@Valid @PathVariable(name = "bookId") Long bookId) {
+	@GetMapping("/{book-id}")
+	public ResponseEntity<BookCouponResponse> getBookCoupon(@Valid @PathVariable(name = "book-id") Long bookId) {
 		BookCouponResponse bookCouponResponse = bookCouponService.getBookCoupon(bookId);
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(bookCouponResponse);
