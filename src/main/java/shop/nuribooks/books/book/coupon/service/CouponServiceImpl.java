@@ -40,7 +40,7 @@ public class CouponServiceImpl implements CouponService {
 	}
 
 	/**
-	 * 모든 쿠폰 조회하는 메서드
+	 * 쿠폰 타입별로 조회하는 메서드
 	 *
 	 * @param pageable
 	 * @return
@@ -48,6 +48,17 @@ public class CouponServiceImpl implements CouponService {
 	@Override
 	public Page<CouponResponse> getCoupons(CouponType type, Pageable pageable) {
 		return couponRepository.findCouponsByCouponId(pageable, type);
+	}
+
+	/**
+	 * 모든 쿠폰 조회하는 메서드
+	 * @param pageable
+	 * @return
+	 */
+	@Override
+	public Page<CouponResponse> getAllCoupons(Pageable pageable) {
+		Page<Coupon> coupons = couponRepository.findAll(pageable);
+		return coupons.map(CouponResponse::of);
 	}
 
 	/**
