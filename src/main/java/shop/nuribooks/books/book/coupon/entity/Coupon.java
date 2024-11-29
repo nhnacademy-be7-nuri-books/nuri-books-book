@@ -57,7 +57,7 @@ public class Coupon {
 	@NotNull
 	private ExpirationType expirationType;
 
-	private Integer expirationDays;
+	private Integer period;
 
 	private LocalDate expiredAt;
 
@@ -71,26 +71,26 @@ public class Coupon {
 
 	private LocalDateTime deletedAt;
 
-	@Builder
-	public Coupon(String name, PolicyType policyType, int discount, BigDecimal minimumOrderPrice,
-		BigDecimal maximumDiscountPrice, LocalDate createdAt, LocalDate expiredAt,
-		int expirationDays, ExpirationType expirationType, LocalDateTime expiredDate, CouponType couponType) {
-		this.name = name;
-		this.policyType = policyType;
-		this.discount = discount;
-		this.minimumOrderPrice = minimumOrderPrice;
-		this.maximumDiscountPrice = maximumDiscountPrice;
-		this.createdAt = createdAt;
-		this.expiredAt = expiredAt;
-		this.expirationDays = expirationDays;
-		this.expirationType = expirationType;
-		this.deletedAt = expiredDate;
-		this.couponType = couponType;
-	}
+	// @Builder
+	// public Coupon(String name, PolicyType policyType, int discount, BigDecimal minimumOrderPrice,
+	// 	BigDecimal maximumDiscountPrice, LocalDate createdAt, LocalDate expiredAt,
+	// 	int period, ExpirationType expirationType, LocalDateTime expiredDate, CouponType couponType) {
+	// 	this.name = name;
+	// 	this.policyType = policyType;
+	// 	this.discount = discount;
+	// 	this.minimumOrderPrice = minimumOrderPrice;
+	// 	this.maximumDiscountPrice = maximumDiscountPrice;
+	// 	this.createdAt = createdAt;
+	// 	this.expiredAt = expiredAt;
+	// 	this.period = period;
+	// 	this.expirationType = expirationType;
+	// 	this.deletedAt = expiredDate;
+	// 	this.couponType = couponType;
+	// }
 
 	@Builder
 	public Coupon(String name, CouponType couponType, PolicyType policyType, int discount, BigDecimal minimumOrderPrice,
-		BigDecimal maximumDiscountPrice, ExpirationType expirationType, Integer expirationDays, LocalDate expiredAt,
+		BigDecimal maximumDiscountPrice, ExpirationType expirationType, Integer period, LocalDate expiredAt,
 		IssuanceType issuanceType, int quantity) {
 		this.name = name;
 		this.couponType = couponType;
@@ -99,7 +99,7 @@ public class Coupon {
 		this.minimumOrderPrice = minimumOrderPrice;
 		this.maximumDiscountPrice = maximumDiscountPrice;
 		this.expirationType = expirationType;
-		this.expirationDays = expirationDays;
+		this.period = period;
 		this.expiredAt = expiredAt;
 		this.issuanceType = issuanceType;
 		this.quantity = quantity;
@@ -114,7 +114,7 @@ public class Coupon {
 		this.maximumDiscountPrice = request.maximumDiscountPrice();
 		this.createdAt = request.createdAt();
 		this.expiredAt = request.expiredAt();
-		this.expirationDays = request.period();
+		this.period = request.period();
 		this.expirationType = request.expirationType();
 		this.couponType = request.couponType();
 	}

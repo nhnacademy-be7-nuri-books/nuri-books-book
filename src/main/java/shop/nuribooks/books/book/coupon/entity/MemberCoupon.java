@@ -61,7 +61,7 @@ public class MemberCoupon {
 		if (coupon.getExpirationType().equals(ExpirationType.DATE)) {
 			this.expiredAt = coupon.getExpiredAt();
 		} else {
-			this.expiredAt = createdAt.plusDays(coupon.getExpirationDays());
+			this.expiredAt = createdAt.plusDays(coupon.getPeriod());
 		}
 		if (LocalDate.now().isAfter(expiredAt)) {
 			throw new MemberCouponExpiredException("쿠폰 기한이 만료되었습니다.");
