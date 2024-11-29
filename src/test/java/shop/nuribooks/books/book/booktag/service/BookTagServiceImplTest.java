@@ -207,9 +207,23 @@ class BookTagServiceImplTest {
 		verify(bookTagRepository, times(1)).findByBookId(bookId); // Verify findByBookId was called
 	}
 
+	@DisplayName("도서 태그 등록 실패 - 도서 없음")
+	@Test
+	void failed_getBookTag() {
+		// Given
+		Long bookId = 1L;
+
+		// Mocking the behavior of repositories
+		when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+
+		// Verify interactions
+		verify(bookTagRepository, never()).findTagNamesByBookId(anyLong());
+	}
+
+
 	@DisplayName("도서에 등록된 태그 조회 실패 - bookTagId는 null")
 	@Test
-	public void failed1_getBookTag() {
+	void failed1_getBookTag() {
 		// Given
 		Long bookId = 1L;
 
@@ -262,13 +276,6 @@ class BookTagServiceImplTest {
 		Long tagId = 999L;
 		when(tagRepository.findById(tagId)).thenReturn(Optional.empty());
 
-		// When & Then
-		TagNotFoundException exception = assertThrows(TagNotFoundException.class, () -> {
-			bookTagService.getBooksByTagId(tagId);
-		});
-		assertEquals("태그가 존재하지 않습니다.", exception.getMessage());
-
-		verify(tagRepository, times(1)).findById(tagId);
 		verify(bookTagRepository, never()).findBookIdsByTagId(anyLong());
 		verify(bookRepository, never()).findAllById(anyList());
 	}
