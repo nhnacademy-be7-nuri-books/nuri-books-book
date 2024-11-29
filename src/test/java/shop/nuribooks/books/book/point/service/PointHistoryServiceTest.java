@@ -41,7 +41,7 @@ import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class PointHistoryServiceTest {
+class PointHistoryServiceTest {
 	@InjectMocks
 	private PointHistoryServiceImpl pointHistoryService;
 
@@ -62,7 +62,7 @@ public class PointHistoryServiceTest {
 	private PointPolicy pointPolicy;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		member = Member.builder().point(BigDecimal.valueOf(500)).build();
 		TestUtils.setIdForEntity(member, 1l);
 		MemberIdContext.setMemberId(1l);
@@ -79,7 +79,7 @@ public class PointHistoryServiceTest {
 	}
 
 	@Test
-	public void registerPointHistory() {
+	void registerPointHistory() {
 		when(pointHistoryRepository.save(any())).thenReturn(pointHistory);
 		when(pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(anyString())).thenReturn(
 			Optional.of(pointPolicy));
@@ -88,7 +88,7 @@ public class PointHistoryServiceTest {
 	}
 
 	@Test
-	public void registerPointHistoryFail() {
+	void registerPointHistoryFail() {
 		when(pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(anyString())).thenReturn(
 			Optional.empty());
 		assertThrows(PointPolicyNotFoundException.class,
@@ -96,7 +96,7 @@ public class PointHistoryServiceTest {
 	}
 
 	@Test
-	public void registerReviewSavingPoint() {
+	void registerReviewSavingPoint() {
 		PointPolicyRequest pointPolicyRequest = new PointPolicyRequest(PolicyType.FIXED, "리뷰", BigDecimal.valueOf(500));
 		pointPolicy = pointPolicyRequest.toEntity();
 		ReviewSavingPointRequest reviewSavingPointRequest = new ReviewSavingPointRequest(member,
@@ -111,7 +111,7 @@ public class PointHistoryServiceTest {
 	}
 
 	@Test
-	public void registerReviewSavingPointFail() {
+	void registerReviewSavingPointFail() {
 		when(pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(anyString())).thenReturn(
 			Optional.empty());
 		assertThrows(PointPolicyNotFoundException.class,
@@ -119,7 +119,7 @@ public class PointHistoryServiceTest {
 	}
 
 	@Test
-	public void getPointHistories() {
+	void getPointHistories() {
 		when(pointHistoryRepository.findPointHistories(any(), any(), anyLong(), any())).thenReturn(
 			this.pointHistoryResponse);
 		assertEquals(1,
@@ -130,7 +130,7 @@ public class PointHistoryServiceTest {
 	}
 
 	@Test
-	public void getEarnedPointHistories() {
+	void getEarnedPointHistories() {
 		when(pointHistoryRepository.findPointHistories(any(), any(), anyLong(), any())).thenReturn(
 			this.pointHistoryResponse);
 		assertEquals(1,
@@ -140,7 +140,7 @@ public class PointHistoryServiceTest {
 	}
 
 	@Test
-	public void getUsedPointHistories() {
+	void getUsedPointHistories() {
 		when(pointHistoryRepository.findPointHistories(any(), any(), anyLong(), any())).thenReturn(
 			this.pointHistoryResponse);
 		assertEquals(1,
@@ -150,14 +150,14 @@ public class PointHistoryServiceTest {
 	}
 
 	@Test
-	public void deletePointHistorySuccess() {
+	void deletePointHistorySuccess() {
 		when(pointHistoryRepository.findById(anyLong())).thenReturn(Optional.of(pointHistory));
 		pointHistoryService.deletePointHistory(1);
 		assert (pointHistory.getDeletedAt() != null);
 	}
 
 	@Test
-	public void deletePointHistoryFail() {
+	void deletePointHistoryFail() {
 		when(pointHistoryRepository.findById(anyLong())).thenReturn(Optional.empty());
 		assertThrows(PointHistoryNotFoundException.class, () -> pointHistoryService.deletePointHistory(1));
 	}

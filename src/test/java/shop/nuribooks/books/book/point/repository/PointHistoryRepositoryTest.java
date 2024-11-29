@@ -27,7 +27,7 @@ import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @DataJpaTest
 @Import({QuerydslConfiguration.class})
-public class PointHistoryRepositoryTest {
+class PointHistoryRepositoryTest {
 	@Autowired
 	private MemberRepository memberRepository;
 

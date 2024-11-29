@@ -25,7 +25,7 @@ import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 
 @WebMvcTest(PointHistoryController.class)
-public class PointHistoryControllerTest {
+class PointHistoryControllerTest {
 	@Autowired
 	MockMvc mockMvc;
 

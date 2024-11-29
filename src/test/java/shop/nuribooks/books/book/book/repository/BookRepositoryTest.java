@@ -24,7 +24,7 @@ import shop.nuribooks.books.common.config.QuerydslConfiguration;
 @Slf4j
 @DataJpaTest
 @Import(QuerydslConfiguration.class)
-public class BookRepositoryTest {
+class BookRepositoryTest {
 
 	@Autowired
 	private BookRepository bookRepository;
@@ -37,7 +37,7 @@ public class BookRepositoryTest {
 	private Book book;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		publisher = publisherRepository.save(new Publisher("Publisher Name"));
 
 		book = Book.builder()
@@ -81,7 +81,7 @@ public class BookRepositoryTest {
 	}
 
 	@Test
-	public void testExistsByIsbn_ReturnsTrueWhenBookExists() {
+	void testExistsByIsbn_ReturnsTrueWhenBookExists() {
 		String isbn = "1234567890123";
 
 		boolean exists = bookRepository.existsByIsbn(isbn);
@@ -90,7 +90,7 @@ public class BookRepositoryTest {
 	}
 
 	@Test
-	public void testExistsByIsbn_ReturnsFalseWhenBookDoesNotExist() {
+	void testExistsByIsbn_ReturnsFalseWhenBookDoesNotExist() {
 		String isbn = "9999999999999";
 
 		boolean exists = bookRepository.existsByIsbn(isbn);
@@ -99,31 +99,31 @@ public class BookRepositoryTest {
 	}
 
 	@Test
-	public void testBookListAsc() {
+	void testBookListAsc() {
 		assertEquals(2,
 			this.bookRepository.findAllWithPublisher(PageRequest.of(0, 5, Sort.by(Sort.Order.asc("title")))).size());
 	}
 
 	@Test
-	public void testBookListDesc() {
+	void testBookListDesc() {
 		assertEquals(2,
 			this.bookRepository.findAllWithPublisher(PageRequest.of(0, 5, Sort.by(Sort.Order.desc("title")))).size());
 	}
 
 	// @Test
-	// public void testBookListDescReviewCount() {
+	// void testBookListDescReviewCount() {
 	// 	assertEquals(2,
 	// 		this.bookRepository.findAllWithPublisher(PageRequest.of(0, 5, Sort.by(Sort.Order.desc("reviewCount"))))
 	// 			.size());
 	// }
 
 	@Test
-	public void testCount() {
+	void testCount() {
 		assertEquals(2, this.bookRepository.countBook());
 	}
 
 	@Test
-	public void testFindBookById() {
+	void testFindBookById() {
 		assertEquals(book, this.bookRepository.findBookByIdAndDeletedAtIsNull(book.getId()).get());
 	}
 }
