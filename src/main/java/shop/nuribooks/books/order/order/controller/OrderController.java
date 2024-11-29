@@ -27,6 +27,7 @@ import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.order.order.dto.OrderCancelDto;
+import shop.nuribooks.books.order.order.dto.request.OrderCancelRequest;
 import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
 import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
 import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
@@ -249,7 +250,7 @@ public class OrderController {
 	 * @param orderId 주문 아이디
 	 * @return 주문 상세 정보
 	 */
-	@GetMapping("/cancel/{order-id}")
+	@GetMapping("/{order-id}/cancel")
 	public ResponseEntity<OrderCancelDto> getOrderCancel(
 		@PathVariable("order-id") Long orderId
 	) {
@@ -265,14 +266,24 @@ public class OrderController {
 	 * @param orderId 주문 아이디
 	 * @return 주문 상세 정보
 	 */
-	@PostMapping("/cancel/{order-id}")
+	@PostMapping("/{order-id}/cancel")
 	public ResponseEntity<ResponseMessage> doOrderCancel(
-		@PathVariable("order-id") Long orderId
-	) {
-		Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
+		@PathVariable("order-id") Long orderId,
+		@RequestBody OrderCancelRequest orderCancelRequest) {
 
-		//ResponseMessage result = paymentService.doOrderCancel(memberId, orderId);
-		return null;//ResponseEntity.status(HttpStatus.OK).body(result);
+		Long customerId = orderCancelRequest.customerId();
+		// 비회원 일 경우 -
+		if (customerId > -1) {
+			ResponseMessage result = orderService.doOrderCancel(customerId, orderId, orderCancelRequest);
+			return ResponseEntity.status(HttpStatus.OK).body(result);
+		} else {
+			// 회원일 경우
+			Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
+
+			ResponseMessage result = orderService.doOrderCancel(memberId.get(), orderId, orderCancelRequest);
+			return ResponseEntity.status(HttpStatus.OK).body(result);
+		}
+
 	}
 
 }

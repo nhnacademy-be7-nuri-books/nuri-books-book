@@ -1,6 +1,7 @@
 package shop.nuribooks.books.payment.payment.service;
 
 import shop.nuribooks.books.common.message.ResponseMessage;
+import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.payment.payment.dto.PaymentSuccessRequest;
 
 /**
@@ -17,4 +18,6 @@ public interface PaymentService {
 	 * @return 성공/실패 메시지
 	 */
 	ResponseMessage donePayment(PaymentSuccessRequest paymentSuccessRequest);
+
+	ResponseMessage cancelPayment(Order order, String reason);
 }

@@ -1,29 +1,37 @@
 package shop.nuribooks.books.payment.payment.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.time.OffsetDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.nuribooks.books.book.book.repository.BookRepository;
-
-import shop.nuribooks.books.book.point.dto.request.register.OrderSavingPointRequest;
-import shop.nuribooks.books.book.point.entity.PointPolicy;
-import shop.nuribooks.books.book.point.enums.PolicyName;
-import shop.nuribooks.books.book.point.exception.PointPolicyNotFoundException;
-import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
-import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.common.config.rabbitmq.RabbitmqConfig;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.exception.order.OrderNotFoundException;
+import shop.nuribooks.books.exception.payment.FailedPaymentCancelException;
+import shop.nuribooks.books.exception.payment.PaymentNotFoundException;
 import shop.nuribooks.books.inventory.message.InventoryUpdateMessage;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
@@ -34,13 +42,16 @@ import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 import shop.nuribooks.books.payment.payment.dto.PaymentSuccessRequest;
 import shop.nuribooks.books.payment.payment.entity.Payment;
+import shop.nuribooks.books.payment.payment.entity.PaymentCancel;
 import shop.nuribooks.books.payment.payment.entity.PaymentMethod;
 import shop.nuribooks.books.payment.payment.entity.PaymentState;
 import shop.nuribooks.books.payment.payment.event.PointSavedEvent;
+import shop.nuribooks.books.payment.payment.repository.PaymentCancelRepository;
 import shop.nuribooks.books.payment.payment.repository.PaymentRepository;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
@@ -48,10 +59,8 @@ public class PaymentServiceImpl implements PaymentService {
 	private final OrderRepository orderRepository;
 	private final PaymentRepository paymentRepository;
 	private final OrderDetailRepository orderDetailRepository;
-	private final BookRepository bookRepository;
-	private final PointPolicyRepository pointPolicyRepository;
+	private final PaymentCancelRepository paymentCancelRepository;
 
-	private final PointHistoryService pointHistoryService;
 	private final RabbitTemplate rabbitTemplate;
 	private final ApplicationEventPublisher publisher;
 
@@ -114,6 +123,83 @@ public class PaymentServiceImpl implements PaymentService {
 
 		return ResponseMessage.builder().message("성공").statusCode(201).build();
 	}
+
+	@Override
+	public ResponseMessage cancelPayment(Order order, String reason) {
+
+		JSONParser parser = new JSONParser();
+
+		// 결제 정보 가져오기
+		Payment payment = paymentRepository.findByOrder(order).orElseThrow(
+			() -> new PaymentNotFoundException("결제 정보가 없습니다.")
+		);
+
+		// 결제 취소
+		JSONObject paymentCancelInfo = new JSONObject();
+		paymentCancelInfo.put("cancelReason", reason);
+
+		String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+
+		Base64.Encoder encoder = Base64.getEncoder();
+		byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+		String authorizations = "Basic " + new String(encodedBytes);
+
+		String paymentKey = payment.getTossPaymentKey();
+		String cancelUrl = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
+		JSONObject tossResponse;
+
+		try {
+			// 결제 취소 API 호출
+			URL url = new URL(cancelUrl);
+
+			HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+			connection.setRequestProperty("Authorization", authorizations);
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestMethod("POST");
+			connection.setDoOutput(true);
+
+			OutputStream outputStream = connection.getOutputStream();
+			outputStream.write(paymentCancelInfo.toString().getBytes(StandardCharsets.UTF_8));
+
+			int code = connection.getResponseCode();
+
+			boolean isSuccess = code == 200;
+
+			InputStream responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
+
+			Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
+			tossResponse = (JSONObject)parser.parse(reader);
+			responseStream.close();
+
+			if (isSuccess) {
+				// 결제 상태 변경 & 취소 사유 작성
+				payment.setPaymentState(PaymentState.CANCELED);
+				paymentRepository.save(payment);
+
+				JSONArray cancelArray = (JSONArray)tossResponse.get("cancels");
+				JSONObject cancelObject = (JSONObject)cancelArray.get(0);
+
+				PaymentCancel paymentCancel = PaymentCancel.builder()
+					.payment(payment)
+					.transactionKey((String)cancelObject.get("transactionKey"))
+					.cancelReason((String)cancelObject.get("cancelReason"))
+					.canceledAt(OffsetDateTime.parse((String)cancelObject.get("canceledAt")).toLocalDateTime())
+					.build();
+
+				paymentCancelRepository.save(paymentCancel);
+
+				return ResponseMessage.builder().message("주문 취소 성공").statusCode(200).build();
+			}
+
+		} catch (IOException | ParseException e) {
+			throw new FailedPaymentCancelException("주문 취소 처리 중 IO 예외가 발생하였습니다.");
+		}
+
+		log.error("토스 페이먼츠를 통해 결제 취소를 진행 중 예외 발생");
+		throw new FailedPaymentCancelException((String)tossResponse.get("message"));
+	}
+
+	// ---------------------------------- private
 
 	/**
 	 * 적립금 처리
