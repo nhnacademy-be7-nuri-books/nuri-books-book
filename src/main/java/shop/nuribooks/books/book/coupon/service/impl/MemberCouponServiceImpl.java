@@ -85,7 +85,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	public void updateIsUsed(Long memberCouponId) {
 		MemberCoupon coupon = memberCouponRepository.findById(memberCouponId)
 			.orElseThrow(CouponNotFoundException::new);
-		coupon.setUsed();
+		coupon.setUsed(true);
 	}
 
 	/**

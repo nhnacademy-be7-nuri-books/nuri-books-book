@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import jakarta.validation.Valid;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.order.order.dto.OrderCancelDto;
+import shop.nuribooks.books.order.order.dto.request.OrderCancelRequest;
 import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
 import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
 import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
@@ -113,4 +114,13 @@ public interface OrderService {
 	 * @return 주문 취소 폼
 	 */
 	OrderCancelDto getOrderCancel(Optional<Long> memberId, Long orderId);
+
+	/**
+	 * 주문 취소 (결제 취소)
+	 *
+	 * @param customerId 사용자 아이디
+	 * @param orderId 주문 아이디
+	 * @return 응답 결과
+	 */
+	ResponseMessage doOrderCancel(Long customerId, Long orderId, OrderCancelRequest orderCancelRequest);
 }
