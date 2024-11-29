@@ -86,7 +86,7 @@ public class TagServiceImpl implements TagService {
 	@Override
 	public TagResponse getTag(Long id) {
 		Tag tag = tagRepository.findById(id)
-			.orElseThrow(() -> new TagNotFoundException());
+			.orElseThrow(TagNotFoundException::new);
 
 		return TagResponse.of(tag);
 	}
@@ -102,7 +102,7 @@ public class TagServiceImpl implements TagService {
 	@Override
 	public TagResponse updateTag(Long id, TagRequest request) {
 		Tag tag = tagRepository.findById(id)
-			.orElseThrow(() -> new TagNotFoundException());
+			.orElseThrow(TagNotFoundException::new);
 
 		if (tagRepository.existsByName(request.name())) {
 			throw new TagAlreadyExistsException();
@@ -122,7 +122,7 @@ public class TagServiceImpl implements TagService {
 	@Override
 	public void deleteTag(Long id) {
 		Tag tag = tagRepository.findById(id)
-			.orElseThrow(() -> new TagNotFoundException());
+			.orElseThrow(TagNotFoundException::new);
 
 		tagRepository.delete(tag);
 	}

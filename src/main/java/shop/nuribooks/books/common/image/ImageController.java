@@ -1,4 +1,4 @@
-package shop.nuribooks.books.common.Image;
+package shop.nuribooks.books.common.image;
 
 import java.util.List;
 
@@ -51,7 +51,8 @@ public class ImageController {
 	public ResponseEntity<List<String>> uploadImages(
 		@RequestPart(value = "files", required = false) List<MultipartFile> files) {
 		try {
-			List<String> imageUrls = imageManagerService.uploadImages(files);
+			String basePath = "/nuribooks/review";
+			List<String> imageUrls = imageManagerService.uploadImages(files, basePath);
 			return ResponseEntity.ok(imageUrls);
 		} catch (Exception ex) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
