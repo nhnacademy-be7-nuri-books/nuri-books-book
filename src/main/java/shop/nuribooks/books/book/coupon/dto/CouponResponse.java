@@ -37,7 +37,7 @@ public record CouponResponse(
 			.expiredAt(coupon.getExpiredAt())
 			.expirationType(coupon.getExpirationType())
 			.period(coupon.getPeriod())
-			.expiredDate(coupon.getExpiredDate())
+			.expiredDate(coupon.getDeletedAt())
 			.couponType(coupon.getCouponType())
 			.build();
 	}

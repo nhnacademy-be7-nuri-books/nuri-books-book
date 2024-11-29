@@ -47,7 +47,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	public PointHistory registerPointHistory(PointHistoryRequest pointHistoryRequest, PolicyName policyName) {
 
 		PointPolicy pointPolicy = pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(
-			policyName.toString()).orElseThrow(() -> new PointPolicyNotFoundException());
+			policyName.toString()).orElseThrow(PointPolicyNotFoundException::new);
 		// 멤버에 포인터 변화량 적용.
 		PointHistory pointHistory = pointHistoryRequest.toEntity(pointPolicy);
 		Member member = pointHistoryRequest.getMember();
@@ -69,8 +69,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 		List<PointHistoryResponse> result = this.pointHistoryRepository.findPointHistories(period, pageable, memberId,
 			type);
 		int count = (int)this.pointHistoryRepository.countPointHistories(memberId, period, type);
-		Page<PointHistoryResponse> response = new PageImpl(result, pageable, count);
-		return response;
+		return new PageImpl<>(result, pageable, count);
 	}
 
 	/**
@@ -82,7 +81,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 	@Override
 	public void deletePointHistory(long pointHistoryId) {
 		PointHistory pointHistory = this.pointHistoryRepository.findById(pointHistoryId)
-			.orElseThrow(() -> new PointHistoryNotFoundException());
+			.orElseThrow(PointHistoryNotFoundException::new);
 		pointHistory.setDeletedAt(LocalDateTime.now());
 	}
 }

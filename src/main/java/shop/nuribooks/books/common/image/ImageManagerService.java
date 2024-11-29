@@ -1,4 +1,4 @@
-package shop.nuribooks.books.common.Image;
+package shop.nuribooks.books.common.image;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -81,8 +80,7 @@ public class ImageManagerService {
 		}
 	}
 
-	public List<String> uploadImages(List<MultipartFile> files) throws IOException {
-		String basePath = "/nuribooks/review";
+	public List<String> uploadImages(List<MultipartFile> files, String basePath) throws IOException {
 		String uploadUrl = imageManagerUrl + "/" + imageAppKey + "/images";
 
 		HttpHeaders headers = createHeader();

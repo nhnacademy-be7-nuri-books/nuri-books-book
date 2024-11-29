@@ -23,7 +23,7 @@ import shop.nuribooks.books.exception.ResourceNotFoundException;
 import shop.nuribooks.books.exception.book.AladinApiException;
 
 @ExtendWith(MockitoExtension.class)
-public class AladinBookServiceImplTest {
+class AladinBookServiceImplTest {
 	@InjectMocks
 	private AladinBookServiceImpl aladinBookService;
 
@@ -31,13 +31,13 @@ public class AladinBookServiceImplTest {
 	private AladinFeignClient aladinFeignClient;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		ReflectionTestUtils.setField(aladinBookService, "ttbKey", "ttbljb06271100001");
 	}
 
 	@Test
 	@DisplayName("알라딘 api를 이용한 도서목록 조회")
-	public void getNewBooks() {
+	void getNewBooks() {
 		AladinBookListResponse response = mock(AladinBookListResponse.class);
 		List<AladinBookListItemResponse> itemResponses = List.of(
 			new AladinBookListItemResponse("제목", "작가 (지은이)", "2024-11-21", "설명", "0000000000000",
@@ -68,7 +68,7 @@ public class AladinBookServiceImplTest {
 
 	@Test
 	@DisplayName("알라딘 api 이용 도서목록 조회실패 예외")
-	public void getNewBooksException() {
+	void getNewBooksException() {
 		when(aladinFeignClient.getNewBooks(
 			anyString(), anyString(), anyInt(), anyInt(), anyString(), anyString(), anyString()
 		)).thenThrow(new RuntimeException("AladinFeignClient Exception"));
@@ -90,7 +90,7 @@ public class AladinBookServiceImplTest {
 
 	@Test
 	@DisplayName("알라딘 api를 이용해 isbn으로 특정 도서 조회")
-	public void getBookByIsbnWithAladin() {
+	void getBookByIsbnWithAladin() {
 		AladinBookListResponse response = mock(AladinBookListResponse.class);
 		AladinBookListItemResponse itemResponse = new AladinBookListItemResponse(
 			"제목",
@@ -140,7 +140,7 @@ public class AladinBookServiceImplTest {
 
 	@Test
 	@DisplayName("알라딘 api를 이용해 isbn으로 특정 도서 조회 실패")
-	public void getBookByIsbnWithAladinException() {
+	void getBookByIsbnWithAladinException() {
 		when(aladinFeignClient.getBookDetails(
 			anyString(),
 			anyString(),

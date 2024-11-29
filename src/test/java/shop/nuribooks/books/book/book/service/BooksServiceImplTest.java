@@ -58,7 +58,7 @@ import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
 import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
 
 @ExtendWith(MockitoExtension.class)
-public class BooksServiceImplTest {
+class BooksServiceImplTest {
 
 	@InjectMocks
 	private BookServiceImpl bookService;
@@ -104,7 +104,7 @@ public class BooksServiceImplTest {
 	private ContributorRole contributorRole;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		publisher = Publisher.builder()
 			.name("누리북스")
 			.build();
@@ -211,7 +211,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("registerBook - personallyBookRegisterRequest를 통한 도서 등록 테스트")
-	public void registerBookWithPersonally() {
+	void registerBookWithPersonally() {
 		BookStateEnum.fromStringKor(personallyRegisterRequest.getState());
 
 		when(bookRepository.existsByIsbn(personallyRegisterRequest.getIsbn())).thenReturn(false);
@@ -233,7 +233,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("registerBook - TagIds가 null일경우")
-	public void registerBookWithTagIdsIsNull() {
+	void registerBookWithTagIdsIsNull() {
 		personallyRegisterRequest = new PersonallyBookRegisterRequest(
 			"Sample Book Title",
 			"이정규 (지은이)",
@@ -307,7 +307,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("ISBN 중복 시 ResourceAlreadyExistIsbnException 예외 발생")
-	public void registerBookResourceAlreadyExistException() {
+	void registerBookResourceAlreadyExistException() {
 		when(bookRepository.existsByIsbn(aladinRegisterRequest.getIsbn())).thenReturn(true);
 
 		assertThrows(ResourceAlreadyExistIsbnException.class, () -> bookService.registerBook(aladinRegisterRequest));
@@ -317,7 +317,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("책 등록 시 출판사 저장실패 예외 발생")
-	public void registerBookPublisherException() {
+	void registerBookPublisherException() {
 		when(bookRepository.existsByIsbn(aladinRegisterRequest.getIsbn())).thenReturn(false);
 		when(publisherRepository.findByName(aladinRegisterRequest.getPublisherName())).thenReturn(Optional.empty());
 		when(publisherRepository.save(any(Publisher.class))).thenThrow(
@@ -328,7 +328,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("책 등록 시 도서상태 저장실패 예외 발생")
-	public void registerBookStateInvalidException() {
+	void registerBookStateInvalidException() {
 		when(bookRepository.existsByIsbn(aladinRegisterRequest.getIsbn())).thenReturn(false);
 		when(publisherRepository.findByName(aladinRegisterRequest.getPublisherName())).thenReturn(
 			Optional.of(publisher));
@@ -357,7 +357,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("책 등록 시 도서 저장 실패 예외")
-	public void registerBookException() {
+	void registerBookException() {
 		when(bookRepository.existsByIsbn(aladinRegisterRequest.getIsbn())).thenReturn(false);
 		when(publisherRepository.findByName(aladinRegisterRequest.getPublisherName())).thenReturn(
 			Optional.of(publisher));
@@ -368,7 +368,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("음수 페이지 번호로 책 조회 시 InvalidPageRequestException 예외 발생")
-	public void getBooksInvalidException() {
+	void getBooksInvalidException() {
 		Pageable pageable = mock(Pageable.class);
 		when(pageable.getPageNumber()).thenReturn(-1);
 
@@ -380,7 +380,7 @@ public class BooksServiceImplTest {
 
 	// @Test
 	// @DisplayName("getBooks - 유효한 페이지 요청 시 빈 리스트 반환")
-	// public void getBooksReturnEmptyPage() {
+	// void getBooksReturnEmptyPage() {
 	// 	Pageable pageable = mock(Pageable.class);
 	// 	when(pageable.getPageNumber()).thenReturn(1);
 	// 	when(pageable.getPageSize()).thenReturn(10);
@@ -400,7 +400,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("페이지 반환")
-	public void getBooks() {
+	void getBooks() {
 		Pageable pageable = mock(Pageable.class);
 
 		Book book1 = Book.builder()
@@ -473,7 +473,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("존재하지 않는 책 ID로 책 업데이트 시 BookIdNotFoundException 예외 발생")
-	public void updateBookNotFoundException() {
+	void updateBookNotFoundException() {
 		when(bookRepository.findById(1L)).thenReturn(Optional.empty());
 
 		assertThrows(BookIdNotFoundException.class, () -> bookService.updateBook(1L, updateRequest));
@@ -481,7 +481,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("유효한 책 ID로 책 업데이트 성공")
-	public void updateBookComplete() {
+	void updateBookComplete() {
 		when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 		when(categoryRepository.findById(any())).thenReturn(Optional.of(new Category()));
 
@@ -504,7 +504,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("유효한 책 ID로 책 조회")
-	public void getBookByIdComplete() {
+	void getBookByIdComplete() {
 		when(bookRepository.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.of(book));
 
 		List<BookContributorInfoResponse> contributorResponses = List.of(
@@ -565,7 +565,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("유효한 책 ID로 책 조회")
-	public void getBookByIdCompleteAndUpdateCount() {
+	void getBookByIdCompleteAndUpdateCount() {
 		when(bookRepository.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.of(book));
 
 		List<BookContributorInfoResponse> contributorResponses = List.of(
@@ -626,7 +626,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("유효한 책 ID로 책 삭제 성공")
-	public void deleteBookComplete() {
+	void deleteBookComplete() {
 		when(bookRepository.findBookByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.of(book));
 
 		bookService.deleteBook(1L);
@@ -636,7 +636,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("도서id가 null일 경우 삭제 시 예외발생")
-	public void deleteBookException() {
+	void deleteBookException() {
 		assertThrows(BookIdNotFoundException.class, () -> bookService.deleteBook(null));
 		verify(bookRepository, never()).findBookByIdAndDeletedAtIsNull(anyLong());
 	}
@@ -656,7 +656,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("parseContributors - 작가-역할 파싱")
-	public void parseContributors() {
+	void parseContributors() {
 		String authorRole = "카트가이, 포장지가이 (지은이), 멤버가이 (옮긴이)";
 
 		List<BookServiceImpl.ParsedContributor> parsedContributors = ReflectionTestUtils.invokeMethod(
@@ -678,7 +678,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("parseContributors - 작가-역할 파싱 입력 시 괄호 안닫힘 예외처리")
-	public void parseContributorsNotClosedParenthesisIndex() {
+	void parseContributorsNotClosedParenthesisIndex() {
 		String authorRole = "카트가이 (지은이) , 포장지가이 (옮긴이";
 
 		InvalidContributorRoleException exception = assertThrows(InvalidContributorRoleException.class, () -> {
@@ -690,7 +690,7 @@ public class BooksServiceImplTest {
 
 	@Test
 	@DisplayName("parseContributors - 작가-역할 파싱 역할 없음 예외처리")
-	public void parseContributorsExceptionWithoutRole() {
+	void parseContributorsExceptionWithoutRole() {
 		String authorRole = "카트가이 (지은이), 포장지가이";
 
 		InvalidContributorRoleException exception = assertThrows(InvalidContributorRoleException.class, () -> {

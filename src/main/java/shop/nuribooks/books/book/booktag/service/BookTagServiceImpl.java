@@ -2,7 +2,6 @@ package shop.nuribooks.books.book.booktag.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,7 +106,7 @@ public class BookTagServiceImpl implements BookTagService {
 
 		return books.stream()
 			.map(bookMapper::toBookResponse)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	/**
