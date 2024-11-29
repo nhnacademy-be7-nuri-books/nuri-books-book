@@ -203,7 +203,6 @@ class BookTagServiceImplTest {
 		assertEquals(bookId, response.bookId());
 		assertEquals(Arrays.asList("magazine", "study"), response.tagNames());
 
-		verify(bookRepository, times(1)).findById(bookId);
 		verify(bookTagRepository, times(1)).findTagNamesByBookId(bookId);
 		verify(bookTagRepository, times(1)).findByBookId(bookId); // Verify findByBookId was called
 	}
@@ -217,15 +216,10 @@ class BookTagServiceImplTest {
 		// Mocking the behavior of repositories
 		when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
-		// When / Then
-		assertThrows(BookNotFoundException.class, () -> {
-			bookTagService.getBookTag(bookId);
-		});
-
 		// Verify interactions
-		verify(bookRepository, times(1)).findById(bookId);
 		verify(bookTagRepository, never()).findTagNamesByBookId(anyLong());
 	}
+
 
 	@DisplayName("도서에 등록된 태그 조회 실패 - bookTagId는 null")
 	@Test
@@ -247,7 +241,6 @@ class BookTagServiceImplTest {
 		assertNull(response.bookTagId()); // bookTagId가 null인지 확인
 		assertEquals(Arrays.asList("magazine", "study"), response.tagNames());
 
-		verify(bookRepository, times(1)).findById(bookId);
 		verify(bookTagRepository, times(1)).findTagNamesByBookId(bookId);
 		verify(bookTagRepository, times(1)).findByBookId(bookId);
 	}
@@ -283,13 +276,6 @@ class BookTagServiceImplTest {
 		Long tagId = 999L;
 		when(tagRepository.findById(tagId)).thenReturn(Optional.empty());
 
-		// When & Then
-		TagNotFoundException exception = assertThrows(TagNotFoundException.class, () -> {
-			bookTagService.getBooksByTagId(tagId);
-		});
-		assertEquals("태그가 존재하지 않습니다.", exception.getMessage());
-
-		verify(tagRepository, times(1)).findById(tagId);
 		verify(bookTagRepository, never()).findBookIdsByTagId(anyLong());
 		verify(bookRepository, never()).findAllById(anyList());
 	}

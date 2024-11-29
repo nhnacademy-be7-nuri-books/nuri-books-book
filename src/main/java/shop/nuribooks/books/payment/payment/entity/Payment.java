@@ -14,13 +14,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shop.nuribooks.books.order.order.entity.Order;
 
 /**
@@ -35,37 +35,31 @@ import shop.nuribooks.books.order.order.entity.Order;
 @Table(name = "payments")
 public class Payment {
 
+	@Column(nullable = false, unique = true)
+	String tossPaymentKey;
+	@Column(nullable = false)
+	LocalDateTime requestedAt;
+	LocalDateTime approvedAt;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Comment("결제 아이디")
 	private Long id;
-
 	@OneToOne
 	@JoinColumn(name = "order_id", nullable = false,
 		foreignKey = @ForeignKey(name = "FK_payments_to_orders_1"))
 	@Comment("연결된 주문 정보")
 	private Order order;
-
-	@Column(nullable = false, unique = true)
-	String tossPaymentKey;
-
 	@Column(nullable = false)
 	@Enumerated(value = EnumType.STRING)
 	@Comment("연결된 결제 수단 정보")
 	private PaymentMethod paymentMethod;
-
 	@Column(nullable = false)
 	@Comment("결제 상태")
+	@Setter
 	private PaymentState paymentState = PaymentState.READY;
-
 	@Column(precision = 9, nullable = false)
 	@Comment("결제 금액")
 	private BigDecimal unitPrice;
-
-	@Column(nullable = false)
-	LocalDateTime requestedAt;
-
-	LocalDateTime approvedAt;
 
 	/**
 	 * 결제 정보 생성자 (Builder)

@@ -27,6 +27,7 @@ import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.order.order.dto.OrderCancelDto;
+import shop.nuribooks.books.order.order.dto.request.OrderCancelRequest;
 import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
 import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
 import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
@@ -167,10 +168,10 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
-	@GetMapping("/non-member/{customer-id}")
-	@Operation(summary = "주문 목록 조회", description = "회원의 주문 목록을 조회합니다.")
+	@Operation(summary = "비회원 주문 목록 조회", description = "회원의 주문 목록을 조회합니다.")
 	@ApiResponse(responseCode = "200", description = "성공")
 	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	@GetMapping("/non-member/{customer-id}")
 	public ResponseEntity<Page<OrderListResponse>> getNonMemberOrderList(
 		OrderListPeriodRequest orderListPeriodRequest,
 		boolean includeOrdersInPendingStatus,
@@ -233,6 +234,10 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
+	@Operation(summary = "비회원 주문 상세 조회", description = "특정 주문의 상세 정보를 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	@ApiResponse(responseCode = "500", description = "서버 오류")
 	@GetMapping("/{order-id}/non-member/{customer-id}")
 	public ResponseEntity<OrderDetailResponse> getNonMemberOrderDetail(
 		@PathVariable("order-id") Long orderId,
@@ -249,7 +254,7 @@ public class OrderController {
 	 * @param orderId 주문 아이디
 	 * @return 주문 상세 정보
 	 */
-	@GetMapping("/cancel/{order-id}")
+	@GetMapping("/{order-id}/cancel")
 	public ResponseEntity<OrderCancelDto> getOrderCancel(
 		@PathVariable("order-id") Long orderId
 	) {
@@ -265,14 +270,24 @@ public class OrderController {
 	 * @param orderId 주문 아이디
 	 * @return 주문 상세 정보
 	 */
-	@PostMapping("/cancel/{order-id}")
+	@PostMapping("/{order-id}/cancel")
 	public ResponseEntity<ResponseMessage> doOrderCancel(
-		@PathVariable("order-id") Long orderId
-	) {
-		Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
+		@PathVariable("order-id") Long orderId,
+		@RequestBody OrderCancelRequest orderCancelRequest) {
 
-		//ResponseMessage result = paymentService.doOrderCancel(memberId, orderId);
-		return null;//ResponseEntity.status(HttpStatus.OK).body(result);
+		Long customerId = orderCancelRequest.customerId();
+		// 비회원 일 경우 -
+		if (customerId > -1) {
+			ResponseMessage result = orderService.doOrderCancel(customerId, orderId, orderCancelRequest);
+			return ResponseEntity.status(HttpStatus.OK).body(result);
+		} else {
+			// 회원일 경우
+			Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
+
+			ResponseMessage result = orderService.doOrderCancel(memberId.get(), orderId, orderCancelRequest);
+			return ResponseEntity.status(HttpStatus.OK).body(result);
+		}
+
 	}
 
 }

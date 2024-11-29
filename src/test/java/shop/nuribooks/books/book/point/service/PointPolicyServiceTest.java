@@ -28,7 +28,7 @@ import shop.nuribooks.books.book.point.service.impl.PointPolicyServiceImpl;
 import shop.nuribooks.books.exception.ResourceAlreadyExistException;
 
 @ExtendWith(MockitoExtension.class)
-public class PointPolicyServiceTest {
+class PointPolicyServiceTest {
 	@InjectMocks
 	private PointPolicyServiceImpl pointPolicyService;
 
@@ -40,7 +40,7 @@ public class PointPolicyServiceTest {
 	private PointPolicyResponse pointPolicyResponse;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		this.pointPolicyRequest = new PointPolicyRequest(PolicyType.FIXED, "임시", BigDecimal.valueOf(100));
 		this.pointPolicy = pointPolicyRequest.toEntity();
 		this.pointPolicyResponse = new PointPolicyResponse() {
@@ -69,7 +69,7 @@ public class PointPolicyServiceTest {
 	}
 
 	@Test
-	public void getPointPolicyList() {
+	void getPointPolicyList() {
 		when(pointPolicyRepository.findAllByDeletedAtIsNull(any())).thenReturn(
 			new PageImpl(List.of(this.pointPolicyResponse),
 				PageRequest.of(0, 10), 1));
@@ -77,28 +77,28 @@ public class PointPolicyServiceTest {
 	}
 
 	@Test
-	public void registerPointPolicyAlready() {
+	void registerPointPolicyAlready() {
 		when(pointPolicyRepository.existsByNameIgnoreCaseAndDeletedAtIsNull(anyString())).thenReturn(true);
 		assertThrows(ResourceAlreadyExistException.class,
 			() -> this.pointPolicyService.registerPointPolicy(pointPolicyRequest));
 	}
 
 	@Test
-	public void registerPointPolicy() {
+	void registerPointPolicy() {
 		when(pointPolicyRepository.existsByNameIgnoreCaseAndDeletedAtIsNull(anyString())).thenReturn(false);
 		when(pointPolicyRepository.save(any())).thenReturn(pointPolicy);
 		assertEquals(pointPolicy, this.pointPolicyService.registerPointPolicy(pointPolicyRequest));
 	}
 
 	@Test
-	public void updatePointPolicyFail() {
+	void updatePointPolicyFail() {
 		when(pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(anyLong())).thenReturn(Optional.empty());
 		assertThrows(PointPolicyNotFoundException.class,
 			() -> pointPolicyService.updatePointPolicy(2, pointPolicyRequest));
 	}
 
 	@Test
-	public void updatePointPolicySuccess() {
+	void updatePointPolicySuccess() {
 		PointPolicyRequest ppr = new PointPolicyRequest(PolicyType.FIXED, "흠.", BigDecimal.valueOf(19));
 		when(pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(anyLong())).thenReturn(
 			Optional.of(pointPolicy));
@@ -106,14 +106,14 @@ public class PointPolicyServiceTest {
 	}
 
 	@Test
-	public void deletePointPolicyFail() {
+	void deletePointPolicyFail() {
 		when(pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(anyLong())).thenReturn(Optional.empty());
 		assertThrows(PointPolicyNotFoundException.class,
 			() -> pointPolicyService.deletePointPolicy(2));
 	}
 
 	@Test
-	public void deletePointPolicySuccess() {
+	void deletePointPolicySuccess() {
 		when(pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(anyLong())).thenReturn(
 			Optional.of(pointPolicy));
 		pointPolicyService.deletePointPolicy(1);

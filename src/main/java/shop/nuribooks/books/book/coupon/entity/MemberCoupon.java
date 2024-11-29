@@ -68,7 +68,7 @@ public class MemberCoupon {
 		}
 	}
 
-	public void setUsed() {
-		this.isUsed = true;
+	public void setUsed(boolean isUsed) {
+		this.isUsed = isUsed;
 	}
 }

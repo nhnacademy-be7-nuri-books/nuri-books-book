@@ -24,7 +24,7 @@ import shop.nuribooks.books.book.point.dto.response.PointHistoryResponse;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 
 @WebMvcTest(PointHistoryAdminController.class)
-public class PointHistoryAdminControllerTest {
+class PointHistoryAdminControllerTest {
 
 	@Autowired
 	MockMvc mockMvc;

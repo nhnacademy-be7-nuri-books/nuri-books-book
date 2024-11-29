@@ -6,5 +6,5 @@ import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.repository.querydsl.CouponCustomRepository;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long>, CouponCustomRepository {
-	boolean existsByNameIgnoreCaseAndExpiredDateIsNull(String name);
+	boolean existsByNameIgnoreCaseAndDeletedAtIsNull(String name);
 }

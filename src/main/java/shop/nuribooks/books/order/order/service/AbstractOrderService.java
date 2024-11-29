@@ -19,6 +19,7 @@ import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.order.OrderNotFoundException;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
 import shop.nuribooks.books.member.address.entity.Address;
 import shop.nuribooks.books.member.address.repository.AddressRepository;
@@ -28,6 +29,8 @@ import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.dto.MemberPointDTO;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
+import shop.nuribooks.books.order.order.entity.Order;
+import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailRequest;
 import shop.nuribooks.books.order.shipping.dto.ShippingPolicyResponse;
 import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
@@ -46,6 +49,7 @@ public abstract class AbstractOrderService {
 	protected final RedisCartRepository redisCartRepository;
 	protected final ShippingPolicyRepository shippingPolicyRepository;
 	protected final MemberRepository memberRepository;
+	protected final OrderRepository orderRepository;
 
 	protected final ShippingService shippingService;
 	protected final WrappingPaperService wrappingPaperService;
@@ -119,6 +123,12 @@ public abstract class AbstractOrderService {
 		}
 
 		return calculatedTotalPrice.compareTo(orderTotalPrice) == 0;
+	}
+
+	protected Order getOrderById(Long orderId) {
+		return orderRepository.findById(orderId).orElseThrow(
+			() -> new OrderNotFoundException("해당 주문 정보가 존재하지 않습니다.")
+		);
 	}
 
 	/**
