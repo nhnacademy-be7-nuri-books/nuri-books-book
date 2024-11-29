@@ -167,10 +167,10 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
-	@GetMapping("/non-member/{customer-id}")
-	@Operation(summary = "주문 목록 조회", description = "회원의 주문 목록을 조회합니다.")
+	@Operation(summary = "비회원 주문 목록 조회", description = "회원의 주문 목록을 조회합니다.")
 	@ApiResponse(responseCode = "200", description = "성공")
 	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	@GetMapping("/non-member/{customer-id}")
 	public ResponseEntity<Page<OrderListResponse>> getNonMemberOrderList(
 		OrderListPeriodRequest orderListPeriodRequest,
 		boolean includeOrdersInPendingStatus,
@@ -233,6 +233,10 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
+	@Operation(summary = "비회원 주문 상세 조회", description = "특정 주문의 상세 정보를 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	@ApiResponse(responseCode = "500", description = "서버 오류")
 	@GetMapping("/{order-id}/non-member/{customer-id}")
 	public ResponseEntity<OrderDetailResponse> getNonMemberOrderDetail(
 		@PathVariable("order-id") Long orderId,
