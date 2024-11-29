@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.common.annotation.HasRole;
@@ -28,12 +31,22 @@ import shop.nuribooks.books.order.wrapping.service.WrappingPaperService;
 public class WrappingPaperAdminController {
 	private final WrappingPaperService wrappingPaperService;
 
+	@Operation(summary = "포장지 목록 조회", description = "포장지 목록을 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+	})
 	@HasRole(role = AuthorityType.ADMIN)
 	@GetMapping
 	public ResponseEntity<Page<WrappingPaperResponse>> getWrappingPapers(Pageable pageable) {
 		return ResponseEntity.status(HttpStatus.OK).body(wrappingPaperService.getWrappingPaperResponse(pageable));
 	}
 
+	@Operation(summary = "포장지 등록", description = "포장지 등록을 합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+	})
 	@HasRole(role = AuthorityType.ADMIN)
 	@PostMapping
 	public ResponseEntity<ResponseMessage> registerWrappingPaper(
@@ -44,6 +57,11 @@ public class WrappingPaperAdminController {
 			.body(new ResponseMessage(HttpStatus.CREATED.value(), "포장지 등록 성공"));
 	}
 
+	@Operation(summary = "포장지 수정", description = "포장지 정보를 수정합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "수정 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+	})
 	@HasRole(role = AuthorityType.ADMIN)
 	@PutMapping("/{wrapping-paper-id}")
 	public ResponseEntity<ResponseMessage> updateWrappingPaper(
@@ -55,6 +73,11 @@ public class WrappingPaperAdminController {
 			.body(new ResponseMessage(HttpStatus.OK.value(), "포장지 수정 성공"));
 	}
 
+	@Operation(summary = "포장지 삭제", description = "포장지를 삭제합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "삭제 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+	})
 	@HasRole(role = AuthorityType.ADMIN)
 	@DeleteMapping("/{wrapping-paper-id}")
 	public ResponseEntity<ResponseMessage> removeWrappingPaper(
