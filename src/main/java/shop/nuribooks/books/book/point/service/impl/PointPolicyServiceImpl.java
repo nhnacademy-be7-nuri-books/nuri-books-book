@@ -39,7 +39,7 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 	public PointPolicy registerPointPolicy(PointPolicyRequest pointPolicyRequest) {
 		Boolean isExist = this.pointPolicyRepository.existsByNameIgnoreCaseAndDeletedAtIsNull(
 			pointPolicyRequest.name());
-		if (isExist) {
+		if (Boolean.TRUE.equals(isExist)) {
 			throw new ResourceAlreadyExistException("같은 이름의 포인트 정책이 이미 존재합니다.");
 		}
 
