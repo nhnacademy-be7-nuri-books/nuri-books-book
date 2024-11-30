@@ -117,6 +117,6 @@ class PointPolicyServiceTest {
 		when(pointPolicyRepository.findPointPolicyByIdAndDeletedAtIsNull(anyLong())).thenReturn(
 			Optional.of(pointPolicy));
 		pointPolicyService.deletePointPolicy(1);
-		assert (pointPolicy.getDeletedAt() != null);
+		assertNotNull(pointPolicy.getDeletedAt());
 	}
 }

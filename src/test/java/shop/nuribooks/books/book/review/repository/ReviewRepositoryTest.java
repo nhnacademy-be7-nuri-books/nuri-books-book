@@ -88,20 +88,20 @@ class ReviewRepositoryTest {
 	@Test
 	void getReviewWithBookIdTest() {
 		List<ReviewMemberResponse> response = reviewRepository.findReviewsByBookId(book.getId(), PageRequest.of(0, 2));
-		assertEquals(response.size(), 1);
+		assertEquals(1, response.size());
 	}
 
 	@Test
 	void getScoreWithBookIdTest() {
 		double response = reviewRepository.findScoreByBookId(book.getId());
-		assertEquals(response, reviews.get(0).getScore());
+		assertEquals(reviews.get(0).getScore(), response);
 	}
 
 	@Test
 	void getReviewWithMemberIdTest() {
 		List<ReviewBookResponse> response = reviewRepository.findReviewsByMemberId(member.getId(),
 			PageRequest.of(0, 2));
-		assertEquals(response.size(), reviews.size());
+		assertEquals(reviews.size(), response.size());
 	}
 
 	@Test
