@@ -106,7 +106,8 @@ class PointHistoryServiceTest {
 		when(pointHistoryRepository.save(any())).thenReturn(reviewSavingPoint);
 		when(pointPolicyRepository.findPointPolicyByNameIgnoreCaseAndDeletedAtIsNull(anyString())).thenReturn(
 			Optional.of(pointPolicy));
-		PointHistory result = this.pointHistoryService.registerPointHistory(pointHistoryRequest, PolicyName.REVIEW);
+		ReviewSavingPoint result = (ReviewSavingPoint)this.pointHistoryService.registerPointHistory(pointHistoryRequest,
+			PolicyName.REVIEW);
 		assertEquals(reviewSavingPoint, result);
 	}
 

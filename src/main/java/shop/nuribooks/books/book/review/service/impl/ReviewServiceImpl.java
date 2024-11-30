@@ -167,7 +167,7 @@ public class ReviewServiceImpl implements ReviewService {
 			.orElseThrow(RequiredHeaderIsNullException::new);
 		// 기존 review update 처리
 		Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
-		if (review.getMember().getId() != ownerId) {
+		if (review.getMember().getId().equals(ownerId)) {
 			throw new ReviewNotFoundException();
 		}
 		review.update(reviewUpdateRequest);
