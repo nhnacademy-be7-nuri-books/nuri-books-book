@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import jakarta.validation.constraints.NotNull;
 import shop.nuribooks.books.book.point.entity.PointPolicy;
 import shop.nuribooks.books.book.point.entity.child.OrderUsingPoint;
-import shop.nuribooks.books.book.point.exception.PointUsingMuchMoreException;
+import shop.nuribooks.books.book.point.exception.PointOverException;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.order.order.entity.Order;
 
@@ -21,7 +21,7 @@ public class OrderUsingPointRequest extends PointHistoryRequest {
 		this.order = order;
 		this.amount = amount;
 		if (member.getPoint().compareTo(amount) < 0)
-			throw new PointUsingMuchMoreException();
+			throw new PointOverException();
 	}
 
 	@Override
