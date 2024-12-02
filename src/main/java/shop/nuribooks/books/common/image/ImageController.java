@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ImageController {
 	private final ImageManagerService imageManagerService;
+	private final String rootPath = "/nuribooks";
 
 	@Operation(summary = "이미지 업로드", description = "이미지를 업로드하고 해당 이미지의 URL을 반환하는 엔드포인트입니다.")
 	@ApiResponses(value = {
@@ -51,7 +52,7 @@ public class ImageController {
 	public ResponseEntity<List<String>> uploadImages(
 		@RequestPart(value = "files", required = false) List<MultipartFile> files) {
 		try {
-			String basePath = "/nuribooks/review";
+			String basePath = rootPath + "/review";
 			List<String> imageUrls = imageManagerService.uploadImages(files, basePath);
 			return ResponseEntity.ok(imageUrls);
 		} catch (Exception ex) {

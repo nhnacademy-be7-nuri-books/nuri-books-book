@@ -59,12 +59,4 @@ public class PointHistory {
 	@ManyToOne
 	@JoinColumn(name = "point_policy_id", nullable = false)
 	private PointPolicy pointPolicy;
-
-	// public PointHistory(BigDecimal amount, String description, Member member, PointPolicy pointPolicy) {
-	// 	this.amount = amount;
-	// 	this.description = description;
-	// 	this.member = member;
-	// 	this.pointPolicy = pointPolicy;
-	// 	this.createdAt = LocalDateTime.now();
-	// }
 }
