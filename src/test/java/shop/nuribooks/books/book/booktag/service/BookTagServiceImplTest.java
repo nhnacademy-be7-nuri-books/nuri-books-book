@@ -209,7 +209,7 @@ class BookTagServiceImplTest {
 
 	@DisplayName("도서 태그 등록 실패 - 도서 없음")
 	@Test
-	public void failed_getBookTag() {
+	void failed_getBookTag() {
 		// Given
 		Long bookId = 1L;
 
@@ -223,7 +223,7 @@ class BookTagServiceImplTest {
 
 	@DisplayName("도서에 등록된 태그 조회 실패 - bookTagId는 null")
 	@Test
-	public void failed1_getBookTag() {
+	void failed1_getBookTag() {
 		// Given
 		Long bookId = 1L;
 
