@@ -2,11 +2,11 @@ package shop.nuribooks.books.book.category.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
-import shop.nuribooks.books.common.message.PagedResponse;
 
 public interface BookCategoryService {
 	void registerBookCategory(Long bookId, Long categoryId);
@@ -17,5 +17,5 @@ public interface BookCategoryService {
 
 	List<List<SimpleCategoryResponse>> findCategoriesByBookId(Long bookId);
 
-	PagedResponse<BookContributorsResponse> findBooksByCategoryId(Long categoryId, Pageable pageable);
+	Page<BookContributorsResponse> findBooksByCategoryId(Long categoryId, Pageable pageable);
 }
