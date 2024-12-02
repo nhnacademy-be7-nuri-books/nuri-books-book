@@ -66,7 +66,6 @@ class ImageManagerControllerTest {
 	void uploadImagesTestFail() throws Exception {
 		MockMultipartFile multipartFile = new MockMultipartFile("filename",
 			"contentimnida".getBytes(StandardCharsets.UTF_8));
-		String result = "ImageUpload Fail";
 		when(imageManagerService.uploadImages(anyList(), anyString())).thenThrow(IOException.class);
 		mockMvc.perform(MockMvcRequestBuilders.multipart("/api/image/bulk")
 				.file("files", multipartFile.getBytes())
