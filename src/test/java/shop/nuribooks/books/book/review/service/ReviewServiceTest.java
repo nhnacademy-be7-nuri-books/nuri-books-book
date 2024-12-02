@@ -134,7 +134,7 @@ class ReviewServiceTest {
 
 	@Test
 	void registerSuccessWithPolicyName() {
-		ReviewRequest newReviewRequest = new ReviewRequest("제에목", "내앵애애애애용", 1, book.getId(), List.of());
+		ReviewRequest newReviewRequest = new ReviewRequest("제에목", "내앵애애애애용", 1, book.getId(), null);
 		Review newReview = newReviewRequest.toEntity(member, book, orderDetail);
 		TestUtils.setIdForEntity(newReview, 1L);
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
