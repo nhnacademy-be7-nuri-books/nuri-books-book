@@ -27,7 +27,7 @@ public class CouponCustomRepositoryImpl implements CouponCustomRepository {
 		return queryFactory.selectFrom(coupon)
 			.where(coupon.name.likeIgnoreCase(name)
 				.or(coupon.name.likeIgnoreCase("%웰컴%"))
-				.and(coupon.expiredDate.isNull()))
+				.and(coupon.deletedAt.isNull()))
 			.fetchFirst();
 	}
 
@@ -46,7 +46,7 @@ public class CouponCustomRepositoryImpl implements CouponCustomRepository {
 				coupon.expiredAt,
 				coupon.period,
 				coupon.expirationType,
-				coupon.expiredDate,
+				coupon.deletedAt,
 				coupon.couponType
 			))
 			.from(coupon)

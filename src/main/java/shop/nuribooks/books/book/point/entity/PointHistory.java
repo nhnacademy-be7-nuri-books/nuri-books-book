@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,7 +28,8 @@ import shop.nuribooks.books.member.member.entity.Member;
 @Getter
 @NoArgsConstructor
 @SuperBuilder
-@DiscriminatorColumn
+@DiscriminatorColumn(name = "")
+@DiscriminatorValue(value = "몰랑")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "point_histories")
 public class PointHistory {

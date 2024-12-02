@@ -100,7 +100,6 @@ public class BookTagServiceImpl implements BookTagService {
 	@Override
 	public List<BookResponse> getBooksByTagId(Long tagId) {
 
-
 		List<Long> bookIds = bookTagRepository.findBookIdsByTagId(tagId);
 
 		List<Book> books = bookRepository.findAllById(bookIds);
