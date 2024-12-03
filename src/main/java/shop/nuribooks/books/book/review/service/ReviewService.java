@@ -7,6 +7,7 @@ import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewScoreResponse;
 import shop.nuribooks.books.common.message.PagedResponse;
 
 public interface ReviewService {
@@ -17,7 +18,7 @@ public interface ReviewService {
 	 * @param bookId
 	 * @return
 	 */
-	double getScoreByBookId(long bookId);
+	ReviewScoreResponse getScoreByBookId(long bookId);
 
 	/**
 	 * 도서와 관련된 review 목록 반환

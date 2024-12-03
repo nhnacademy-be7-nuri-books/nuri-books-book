@@ -22,6 +22,7 @@ import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewScoreResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
 import shop.nuribooks.books.common.message.PagedResponse;
 
@@ -87,5 +88,11 @@ public class ReviewController {
 		ReviewMemberResponse response = this.reviewService.updateReview(reviewUpdateRequest, reviewId);
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	@GetMapping("/api/books/{bookId}/score")
+	public ResponseEntity<ReviewScoreResponse> getReviewScore(@PathVariable long bookId) {
+		ReviewScoreResponse reviewScoreResponse = reviewService.getScoreByBookId(bookId);
+		return ResponseEntity.status(HttpStatus.OK).body(reviewScoreResponse);
 	}
 }

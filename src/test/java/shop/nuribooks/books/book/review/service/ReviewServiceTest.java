@@ -27,6 +27,7 @@ import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewScoreResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
@@ -153,7 +154,7 @@ public class ReviewServiceTest {
 	public void registerSuccess() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		Review review1 = reviewRequest.toEntity(member, book, orderDetail);
-		TestUtils.setIdForEntity(review1, 1l);
+		TestUtils.setIdForEntity(review1, 1L);
 		when(reviewRepository.save(any())).thenReturn(review1);
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(anyLong(), anyLong(),
@@ -215,7 +216,10 @@ public class ReviewServiceTest {
 		double score = 4.1;
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findScoreByBookId(1)).thenReturn(score);
-		assertEquals(reviewService.getScoreByBookId(1), score);
+
+		ReviewScoreResponse response = reviewService.getScoreByBookId(1);
+
+		assertEquals(score, response.avgScore());
 	}
 
 	@Test
