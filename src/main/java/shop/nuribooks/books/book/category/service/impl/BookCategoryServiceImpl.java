@@ -28,9 +28,8 @@ import shop.nuribooks.books.exception.category.CategoryNotFoundException;
  * @author janghyun
  */
 @Transactional(readOnly = true)
-@RequiredArgsConstructor add
+@RequiredArgsConstructor
 @Service
-
 public class BookCategoryServiceImpl implements BookCategoryService {
 	private final BookRepository bookRepository;
 	private final CategoryRepository categoryRepository;
