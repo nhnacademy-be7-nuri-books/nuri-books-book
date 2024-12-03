@@ -22,7 +22,7 @@ import shop.nuribooks.books.cart.cartdetail.entity.RedisCartDetail;
 
 @SpringBootTest
 @Testcontainers(disabledWithoutDocker = true)
-class CustomerCartRepositoryImplTest extends TestRedisContainer {
+class RedisCartRepositoryImplTest extends TestRedisContainer {
 
 	private static HashOperations<String, String, Integer> hashOperations;
 	@Autowired
