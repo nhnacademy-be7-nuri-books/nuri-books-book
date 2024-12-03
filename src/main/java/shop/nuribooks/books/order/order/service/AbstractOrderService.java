@@ -240,4 +240,15 @@ public abstract class AbstractOrderService {
 			.map(entry -> getBookOrderResponses(entry.getKey(), entry.getValue()))
 			.toList());
 	}
+
+	/**
+	 * 주문 정보 가져오기
+	 * @param orderId 주문아이디
+	 * @return 주문 정보
+	 */
+	protected Order getOrder(Long orderId) {
+		return orderRepository.findById(orderId).orElseThrow(
+			() -> new OrderNotFoundException("해당 주문 정보가 존재하지 않습니다.")
+		);
+	}
 }

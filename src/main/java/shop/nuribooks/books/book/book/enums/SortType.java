@@ -35,7 +35,7 @@ public enum SortType {
 		return type;
 	}
 
-	public Expression<?> getExpression() {
+	public Expression getExpression() {
 		return this.exp;
 	}
 

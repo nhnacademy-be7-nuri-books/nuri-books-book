@@ -124,6 +124,7 @@ public class PaymentServiceImpl implements PaymentService {
 		return ResponseMessage.builder().message("성공").statusCode(201).build();
 	}
 
+	@Transactional
 	@Override
 	public ResponseMessage cancelPayment(Order order, String reason) {
 
@@ -208,9 +209,9 @@ public class PaymentServiceImpl implements PaymentService {
 	private void handlePointSaving(Order order) {
 		Optional<Member> member = memberRepository.findById(order.getCustomer().getId());
 
-		member.ifPresent(value -> {
-			publisher.publishEvent(new PointSavedEvent(value, order, order.getBooksPrice()));
-		});
+		member.ifPresent(value ->
+			publisher.publishEvent(new PointSavedEvent(value, order, order.getBooksPrice()))
+		);
 	}
 
 	//재고 업데이트 메시지 발행

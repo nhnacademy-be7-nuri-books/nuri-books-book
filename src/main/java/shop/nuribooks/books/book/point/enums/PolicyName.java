@@ -14,6 +14,7 @@ public enum PolicyName {
 		this.korName = korName;
 	}
 
+	@Override
 	public String toString() {
 		return this.korName;
 	}

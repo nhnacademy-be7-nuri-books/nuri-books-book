@@ -21,6 +21,7 @@ import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class AddressServiceImpl implements AddressService {
 	private static final int ADDRESS_MAXIMUM_SIZE = 10;
 
@@ -57,7 +58,6 @@ public class AddressServiceImpl implements AddressService {
 		return size == 0;
 	}
 
-	@Transactional(readOnly = true)
 	public List<AddressResponse> findAddressesByMemberId(Long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
