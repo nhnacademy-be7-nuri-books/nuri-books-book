@@ -56,7 +56,7 @@ public class CartController {
 	@PostMapping("/api/cart/load-to-redis")
 	public ResponseEntity<Void> loadCartToRedis(@RequestBody CartLoadRequest request) {
 		cartService.loadCart(request);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok().build();
 	}
 
 	@DeleteMapping("/api/cart/{cart-id}/book/{book-id}")
