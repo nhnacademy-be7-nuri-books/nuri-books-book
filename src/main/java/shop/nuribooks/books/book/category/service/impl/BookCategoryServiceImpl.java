@@ -17,7 +17,6 @@ import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
-import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.category.BookCategoryAlreadyExistsException;
 import shop.nuribooks.books.exception.category.BookCategoryNotFoundException;
@@ -29,8 +28,9 @@ import shop.nuribooks.books.exception.category.CategoryNotFoundException;
  * @author janghyun
  */
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
+@RequiredArgsConstructor add
 @Service
+
 public class BookCategoryServiceImpl implements BookCategoryService {
 	private final BookRepository bookRepository;
 	private final CategoryRepository categoryRepository;
@@ -125,17 +125,13 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			throw new CategoryNotFoundException();
 		}
 
-		if (pageable.getPageNumber() < 0) {
-			throw new InvalidPageRequestException();
-		}
-
 		List<Long> categoryIds = categoryRepository.findAllChildCategoryIds(categoryId);
 
 		return bookCategoryRepository.findBooksByCategoryIdWithPaging(
 			categoryIds,
 			pageable
 		);
-		
+
 	}
 
 }

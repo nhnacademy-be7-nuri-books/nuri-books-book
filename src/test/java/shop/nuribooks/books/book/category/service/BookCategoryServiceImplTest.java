@@ -15,9 +15,11 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
@@ -289,7 +291,7 @@ class BookCategoryServiceImplTest {
 		verify(bookRepository, times(1)).existsById(bookId);
 		verify(bookCategoryRepository, never()).findCategoriesByBookId(bookId);
 	}
-	
+
 	@DisplayName("존재하지 않는 카테고리 ID로 조회 시 CategoryNotFoundException 발생")
 	@Test
 	@Order(12)
@@ -310,4 +312,49 @@ class BookCategoryServiceImplTest {
 		verify(bookCategoryRepository, never()).countBookByCategoryIds(anyList());
 	}
 
+	@DisplayName("도서 ID로 모든 연관된 카테고리 삭제 성공")
+	@Test
+	@Order(11)
+	void deleteBookCategories_Success() {
+		// Given
+		Long bookId = 1L;
+		List<BookCategory> bookCategories = List.of(
+			mock(BookCategory.class),
+			mock(BookCategory.class)
+		);
+
+		when(bookCategoryRepository.findByBookId(bookId)).thenReturn(bookCategories);
+
+		// When
+		bookCategoryService.deleteBookCategories(bookId);
+
+		// Then
+		verify(bookCategoryRepository, times(1)).findByBookId(bookId);
+		verify(bookCategoryRepository, times(1)).deleteAll(bookCategories);
+	}
+
+	@DisplayName("카테고리 ID로 책 조회 성공")
+	@Test
+	@Order(13)
+	void findBooksByCategoryId_Success() {
+		// Given
+		Long categoryId = 1L;
+		Pageable pageable = PageRequest.of(0, 10);
+		List<Long> categoryIds = List.of(1L, 2L);
+		Page<BookContributorsResponse> bookPage = mock(Page.class);
+
+		when(categoryRepository.existsById(categoryId)).thenReturn(true);
+		when(categoryRepository.findAllChildCategoryIds(categoryId)).thenReturn(categoryIds);
+		when(bookCategoryRepository.findBooksByCategoryIdWithPaging(categoryIds, pageable))
+			.thenReturn(bookPage);
+
+		// When
+		Page<BookContributorsResponse> result = bookCategoryService.findBooksByCategoryId(categoryId, pageable);
+
+		// Then
+		assertThat(result).isNotNull();
+		verify(categoryRepository, times(1)).existsById(categoryId);
+		verify(categoryRepository, times(1)).findAllChildCategoryIds(categoryId);
+		verify(bookCategoryRepository, times(1)).findBooksByCategoryIdWithPaging(categoryIds, pageable);
+	}
 }
