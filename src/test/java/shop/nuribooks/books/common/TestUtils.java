@@ -22,6 +22,8 @@ import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.order.order.entity.Order;
 import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderdetail.entity.OrderState;
+import shop.nuribooks.books.order.shipping.entity.Shipping;
+import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
 
 public class TestUtils {
 	public static void setIdForEntity(Object entity, Long id) {
@@ -164,6 +166,31 @@ public class TestUtils {
 			.order(order)
 			.orderState(OrderState.PENDING)
 			.unitPrice(BigDecimal.valueOf(10000))
+			.build();
+	}
+
+	public static ShippingPolicy createShippingPolicy() {
+		return ShippingPolicy.builder()
+			.shippingFee(1000)
+			.expiration(null)
+			.minimumOrderPrice(BigDecimal.valueOf(10000))
+			.build();
+	}
+
+	public static Shipping createShipping(Order order, ShippingPolicy shippingPolicy) {
+		return Shipping.builder()
+			.order(order)
+			.shippingPolicy(shippingPolicy)
+			.recipientAddress("보내는 주소")
+			.recipientAddressDetail("보내는 상세 주소.")
+			.recipientName("보내는 이름.")
+			.recipientPhoneNumber("01012345678")
+			.recipientZipcode("12345")
+			.senderName("받는 이름")
+			.senderPhoneNumber("01087654321")
+			.orderInvoiceNumber("12312341214")
+			.shippingAt(LocalDateTime.now().minusDays(3L))
+			.shippingCompletedAt(LocalDateTime.now())
 			.build();
 	}
 }
