@@ -58,7 +58,7 @@ class CategoryControllerTest {
 		// given
 		CategoryRequest dto = new CategoryRequest("여행");
 		Category category = Category.builder().name("여행").build();
-		CategoryResponse response = CategoryResponse.from(category);
+		CategoryResponse.from(category);
 		when(categoryService.registerMainCategory(any(CategoryRequest.class))).thenReturn(category);
 
 		// when & then
@@ -78,7 +78,26 @@ class CategoryControllerTest {
 		CategoryRequest dto = new CategoryRequest("국내 여행");
 		Category parentCategory = Category.builder().name("여행").build();
 		Category subCategory = Category.builder().name("국내 여행").parentCategory(parentCategory).build();
-		CategoryResponse response = CategoryResponse.from(subCategory);
+		CategoryResponse.from(subCategory);
+		when(categoryService.registerSubCategory(any(CategoryRequest.class), eq(parentCategoryId))).thenReturn(
+			subCategory);
+
+		// when & then
+		mockMvc.perform(post("/api/categories/{categoryId}", parentCategoryId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(dto)))
+			.andExpect(status().isCreated());
+	}
+
+	@Test
+	void registerSubCategory_whenValidRequest_thenReturnsCreated_Rec() throws Exception {
+		// given
+		Long parentCategoryId = 1L;
+		CategoryRequest dto = new CategoryRequest("국내 여행");
+		Category parentCategory = Category.builder().name("여행").build();
+		Category subCategory = Category.builder().name("국내 여행").parentCategory(parentCategory).build();
+		parentCategory.getSubCategory().add(subCategory);
+		CategoryResponse.from(parentCategory);
 		when(categoryService.registerSubCategory(any(CategoryRequest.class), eq(parentCategoryId))).thenReturn(
 			subCategory);
 
@@ -291,6 +310,74 @@ class CategoryControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.message").value("Category not found with ID: " + categoryId));
+	}
+
+	/**
+	 * 트리 구조로 모든 카테고리를 조회할 때, HTTP 상태 코드 200(OK)을 반환하고 올바른 데이터 형식을 받는지 테스트합니다.
+	 */
+	@Test
+	@DisplayName("카테고리 트리를 조회할 때 HTTP 상태 코드 200 반환")
+	void getAllCategoryTree_whenCalled_thenReturnsOk() throws Exception {
+		// Given
+		List<CategoryResponse> categoryTree = List.of(
+			new CategoryResponse(1L, "Parent", List.of(
+				new CategoryResponse(2L, "Child", List.of())
+			))
+		);
+
+		when(categoryService.getAllCategoryTree()).thenReturn(categoryTree);
+
+		// When & Then
+		mockMvc.perform(get("/api/categories/tree")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.length()").value(1))
+			.andExpect(jsonPath("$[0].name").value("Parent"))
+			.andExpect(jsonPath("$[0].subCategories[0].name").value("Child"));
+
+		verify(categoryService, times(1)).getAllCategoryTree();
+	}
+
+	/**
+	 * 특정 카테고리의 이름을 조회할 때 HTTP 상태 코드 200(OK)을 반환하고 올바른 이름을 포함하는지 테스트합니다.
+	 */
+	@Test
+	@DisplayName("카테고리 이름 조회 성공 시 HTTP 상태 코드 200 반환")
+	void getCategoryName_whenValidId_thenReturnsOk() throws Exception {
+		// Given
+		Long categoryId = 1L;
+		CategoryRequest categoryRequest = new CategoryRequest("Travel");
+
+		when(categoryService.getCategoryNameById(categoryId)).thenReturn(categoryRequest);
+
+		// When & Then
+		mockMvc.perform(get("/api/categories/{category-id}/name", categoryId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.name").value("Travel"));
+
+		verify(categoryService, times(1)).getCategoryNameById(categoryId);
+	}
+
+	/**
+	 * 존재하지 않는 카테고리 ID로 이름을 조회할 때 HTTP 상태 코드 404(Not Found)를 반환하는지 테스트합니다.
+	 */
+	@Test
+	@DisplayName("존재하지 않는 카테고리 이름 조회 시 HTTP 상태 코드 404 반환")
+	void getCategoryName_whenInvalidId_thenReturnsNotFound() throws Exception {
+		// Given
+		Long categoryId = 999L;
+
+		doThrow(new CategoryNotFoundException("Category not found with ID: " + categoryId))
+			.when(categoryService).getCategoryNameById(categoryId);
+
+		// When & Then
+		mockMvc.perform(get("/api/categories/{category-id}/name", categoryId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.message").value("Category not found with ID: " + categoryId));
+
+		verify(categoryService, times(1)).getCategoryNameById(categoryId);
 	}
 
 }
