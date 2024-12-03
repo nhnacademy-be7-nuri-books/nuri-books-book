@@ -55,13 +55,6 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 
 	@Override
 	public Double findScoreByBookId(long bookId) {
-		/*Double avgScore = queryFactory
-			.select(review.score.avg())
-			.from(review)
-			.where(review.book.id.eq(bookId))
-			.fetchOne();
-
-		return Math.round(avgScore * 100.0) / 100.0;*/
 		return queryFactory
 			.select(review.score.avg())
 			.from(review)
