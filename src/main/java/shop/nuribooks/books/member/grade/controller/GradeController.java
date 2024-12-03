@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.common.message.ResponseMessage;
+import shop.nuribooks.books.member.grade.dto.MemberGradeBatchDto;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
@@ -118,5 +119,18 @@ public class GradeController {
 
 		return ResponseEntity.status(OK).body(response);
 	}
-}
 
+	/**
+	 * 등급과 회원 배치 리스트 전송
+	 */
+	@Operation(summary = "회원 등급 배치 리스트 전송", description = "구매금액에 따른 등급 요구조건을 만족한 회원과 등급의 Id를 반환합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "회원 등급 배치 리스트 조회 성공")
+	})
+	@GetMapping("/batch-list")
+	public ResponseEntity<List<MemberGradeBatchDto>> getMemberGradeBatchListByRequirement() {
+		List<MemberGradeBatchDto> response = gradeService.getMemberGradeBatchListByRequirement();
+
+		return ResponseEntity.status(OK).body(response);
+	}
+}

@@ -1,5 +1,8 @@
 package shop.nuribooks.books.member.grade.service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,12 +16,14 @@ import shop.nuribooks.books.exception.member.GradeInUseException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
 import shop.nuribooks.books.member.grade.dto.DtoMapper;
 import shop.nuribooks.books.member.grade.dto.EntityMapper;
+import shop.nuribooks.books.member.grade.dto.MemberGradeBatchDto;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeListResponse;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
+import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 /**
@@ -101,6 +106,43 @@ public class GradeServiceImpl implements GradeService {
 		return grades.stream()
 			.map(DtoMapper::toListDto)
 			.toList();
+	}
+
+	/**
+	 * 배치 서버로 각 등급의 requirement를 만족하는 member의 id와 해당 등급의 id를 반환
+	 */
+	public List<MemberGradeBatchDto> getMemberGradeBatchListByRequirement() {
+		List<MemberGradeBatchDto> batchList = new ArrayList<>();
+
+		List<Grade> gradeList = gradeRepository.findAll().stream()
+			.sorted(Comparator.comparing(Grade::getRequirement))
+			.toList();
+
+		// 각 member의 소비 금액에 대해 적합한 grade의 requirement 구간 찾기
+		for (Member member : memberRepository.findAll()) {
+			BigDecimal payment = member.getTotalPaymentAmount();
+
+			// 각 grade의 requirement에 맞는 범위 찾기
+			for (int i = 0; i < gradeList.size(); i++) {
+				BigDecimal lowerRequirement =
+					(i == 0) ? BigDecimal.ZERO : gradeList.get(i).getRequirement();
+				BigDecimal upperRequirement =
+					(i == gradeList.size() - 1) ? null : gradeList.get(i + 1).getRequirement();
+
+				if (upperRequirement == null) {
+					batchList.add(new MemberGradeBatchDto(member.getId(), gradeList.get(i).getId()));
+					break;
+				}
+
+				// member의 소비 금액이 (i)번째 requirement와 (i+1)번째 requirement 사이에 해당하는지 확인
+				if ((lowerRequirement.compareTo(payment) <= 0) && (payment.compareTo(upperRequirement) < 0)) {
+					batchList.add(new MemberGradeBatchDto(member.getId(), gradeList.get(i).getId()));
+					break; // 적합한 범위를 찾으면 더 이상 확인할 필요 없음
+				}
+			}
+		}
+
+		return batchList;
 	}
 
 	/**
