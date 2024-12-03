@@ -23,7 +23,6 @@ import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
-import shop.nuribooks.books.common.message.PagedResponse;
 
 @Slf4j
 @RestController
@@ -65,11 +64,11 @@ public class ReviewController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@GetMapping("/api/members/{memberId}/reviews")
-	public ResponseEntity<PagedResponse<ReviewBookResponse>> getReviewBook(
+	public ResponseEntity<Page<ReviewBookResponse>> getReviewBook(
 		@PathVariable("memberId") long memberId,
 		Pageable pageable
 	) {
-		PagedResponse<ReviewBookResponse> response = this.reviewService.getReviewsByMemberId(memberId, pageable);
+		Page<ReviewBookResponse> response = this.reviewService.getReviewsByMemberId(memberId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
