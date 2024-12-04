@@ -32,6 +32,7 @@ import shop.nuribooks.books.order.shipping.entity.Shipping;
 import shop.nuribooks.books.order.shipping.repository.ShippingRepository;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class RefundServiceImpl implements RefundService {
 	public static final int MAXIMUM_REFUND_DAY = 10;
@@ -43,7 +44,6 @@ public class RefundServiceImpl implements RefundService {
 	private final PointHistoryService pointHistoryService;
 	private final ShippingRepository shippingRepository;
 
-	// 단순 변심에 의한 반품
 	@Override
 	public RefundInfoResponse getRefundInfoResponse(Long orderId, Pageable pageable) {
 		Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
@@ -80,7 +80,6 @@ public class RefundServiceImpl implements RefundService {
 		return new RefundInfoResponse(refundInfo);
 	}
 
-	// 단순 변심에 의한 반품
 	@Override
 	@Transactional
 	public RefundResponse refund(Long orderId, RefundRequest refundRequest) {
