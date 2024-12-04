@@ -192,7 +192,9 @@ public class TestUtils {
 			.orderInvoiceNumber("12312341214")
 			.shippingAt(LocalDateTime.now().minusDays(3L))
 			.shippingCompletedAt(LocalDateTime.now())
-      
+			.build();
+	}
+
 	public static WrappingPaper createWrappingPaper() {
 		return WrappingPaper.builder()
 			.title("포장지입미다")
