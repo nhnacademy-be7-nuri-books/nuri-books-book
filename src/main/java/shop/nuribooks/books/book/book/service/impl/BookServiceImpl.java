@@ -3,7 +3,6 @@ package shop.nuribooks.books.book.book.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -13,26 +12,25 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.nuribooks.books.book.book.dto.AladinBookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.dto.BookListResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.book.service.BookService;
+import shop.nuribooks.books.book.book.service.CategoryRegisterService;
+import shop.nuribooks.books.book.book.strategy.BookRegisterStrategy;
+import shop.nuribooks.books.book.book.strategy.BookRegisterStrategyProvider;
 import shop.nuribooks.books.book.book.utility.BookUtils;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.entity.BookContributor;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.booktag.service.BookTagService;
-import shop.nuribooks.books.book.category.entity.BookCategory;
-import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
@@ -46,7 +44,6 @@ import shop.nuribooks.books.book.publisher.repository.PublisherRepository;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.book.ResourceAlreadyExistIsbnException;
-import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 import shop.nuribooks.books.exception.contributor.InvalidContributorRoleException;
 
 @Slf4j
@@ -64,6 +61,8 @@ public class BookServiceImpl implements BookService {
 	private final BookCategoryRepository bookCategoryRepository;
 	private final BookTagService bookTagService;
 	private final BookCategoryService bookCategoryService;
+	private final BookRegisterStrategyProvider bookRegisterStrategyProvider;
+	private final CategoryRegisterService categoryRegisterService;
 
 	@Transactional
 	@Override
@@ -88,11 +87,8 @@ public class BookServiceImpl implements BookService {
 		List<ParsedContributor> parsedContributors = parseContributors(reqDto.getAuthor());
 		saveContributors(parsedContributors, book);
 
-		if (reqDto instanceof AladinBookRegisterRequest aladinReq) {
-			registerAladinCategories(aladinReq.getCategoryName(), book);
-		} else if (reqDto instanceof PersonallyBookRegisterRequest personallyReq) {
-			registerPersonallyCategories(personallyReq.getCategoryIds(), book);
-		}
+		BookRegisterStrategy strategy = bookRegisterStrategyProvider.getStrategy(reqDto);
+		strategy.registerCategory(reqDto, book);
 
 		if (reqDto.getTagIds() != null && !reqDto.getTagIds().isEmpty()) {
 			bookTagService.registerTagToBook(book.getId(), reqDto.getTagIds());
@@ -124,8 +120,6 @@ public class BookServiceImpl implements BookService {
 
 		List<BookContributorsResponse> bookListResponses = books.stream()
 			.map(book -> {
-				// BookListResponse bookDetails = BookListResponse.of(book);
-				// log.info("Fetching contributors for bookId: {}", book.getId());
 				List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(
 					book.id());
 				Map<String, List<String>> contributorsByRole = BookUtils.groupContributorsByRole(contributors);
@@ -156,7 +150,7 @@ public class BookServiceImpl implements BookService {
 		bookTagService.registerTagToBook(book.getId(), bookUpdateReq.tagIds());
 
 		bookCategoryService.deleteBookCategories(bookId);
-		registerPersonallyCategories(bookUpdateReq.categoryIds(), book);
+		categoryRegisterService.registerPersonallyCategories(bookUpdateReq.categoryIds(), book);
 	}
 
 	//관리자페이지에서 관리자의 도서 삭제 기능
@@ -214,50 +208,6 @@ public class BookServiceImpl implements BookService {
 				.build();
 
 			bookContributorRepository.save(bookContributor);
-		}
-	}
-
-	//category 저장 메서드
-	private void registerAladinCategories(String categoryName, Book book) {
-		String[] categoryNames = categoryName.split(">");
-		Category currentParentCategory = null;
-
-		for (int i = 0; i < categoryNames.length; i++) {
-			final String name = categoryNames[i].trim();
-			final Category parentCategory = currentParentCategory;
-
-			Optional<Category> categoryOpt = categoryRepository.findByNameAndParentCategory(name, parentCategory);
-
-			currentParentCategory = categoryOpt.orElseGet(() -> {
-				Category category = Category.builder()
-					.name(name)
-					.parentCategory(parentCategory)
-					.build();
-				return categoryRepository.save(category);
-			});
-
-			if (i == categoryNames.length - 1) {
-				BookCategory bookCategory = BookCategory.builder()
-					.book(book)
-					.category(currentParentCategory)
-					.build();
-				bookCategoryRepository.save(bookCategory);
-			}
-		}
-	}
-
-	//직접등록 시 북카테고리 저장
-	private void registerPersonallyCategories(List<Long> categoryIds, Book book) {
-		for (Long categoryId : categoryIds) {
-			Category category = categoryRepository.findById(categoryId)
-				.orElseThrow(CategoryNotFoundException::new);
-
-			BookCategory bookCategory = BookCategory.builder()
-				.book(book)
-				.category(category)
-				.build();
-
-			bookCategoryRepository.save(bookCategory);
 		}
 	}
 
