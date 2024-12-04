@@ -117,8 +117,8 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 		}
 
 		if (discountType.equals(DiscountType.FIXED)
-			&& BigDecimal.valueOf(discount).compareTo(maximumDiscountPrice) < 0) {
-			throw new InvalidCouponException("최대 할인 금액은 할인 금액보다 작을 수 없습니다.");
+			&& BigDecimal.valueOf(discount).compareTo(maximumDiscountPrice) != 0) {
+			throw new InvalidCouponException("할인 금액은 최대 할인 금액과 같아야 합니다.");
 		}
 
 	}
