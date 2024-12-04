@@ -190,7 +190,7 @@ public class TestUtils {
 			.senderName("받는 이름")
 			.senderPhoneNumber("01087654321")
 			.orderInvoiceNumber("12312341214")
-			.shippingAt(LocalDateTime.now().minusDays(3L))
+			.shippingAt(LocalDateTime.of(2020, 2, 22, 22, 22, 22))
 			.shippingCompletedAt(LocalDateTime.now())
 			.build();
 	}
