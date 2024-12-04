@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,16 +102,28 @@ public class GradeServiceImpl implements GradeService {
 	 */
 	@Override
 	public List<GradeListResponse> getGradeList() {
-		List<Grade> grades = gradeRepository.findAll();
+		List<Grade> grades = gradeRepository.findAll().stream()
+			.sorted(Comparator.comparing(Grade::getRequirement))
+			.toList();
 
-		return grades.stream()
-			.map(DtoMapper::toListDto)
+		return IntStream.range(0, grades.size())  // 순차적인 인덱스를 생성
+			.mapToObj(index -> {
+				Grade grade = grades.get(index);
+				// 새로운 GradeListResponse 객체를 id를 포함하여 생성
+				return GradeListResponse.builder()
+					.id(index + 1)  // 순차적인 id (1부터 시작)
+					.name(grade.getName())
+					.pointRate(grade.getPointRate())
+					.requirement(grade.getRequirement())
+					.build();
+			})
 			.toList();
 	}
 
 	/**
 	 * 배치 서버로 각 등급의 requirement를 만족하는 member의 id와 해당 등급의 id를 반환
 	 */
+	@Override
 	public List<MemberGradeBatchDto> getMemberGradeBatchListByRequirement() {
 		List<MemberGradeBatchDto> batchList = new ArrayList<>();
 

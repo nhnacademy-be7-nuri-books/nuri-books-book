@@ -102,8 +102,8 @@ public class GradeController {
 	public ResponseEntity<ResponseMessage> gradeDelete(@PathVariable String name) {
 		gradeService.deleteGrade(name);
 
-		return ResponseEntity.status(NO_CONTENT).body(
-			new ResponseMessage(NO_CONTENT.value(), "등급이 성공적으로 삭제되었습니다."));
+		return ResponseEntity.status(OK).body(
+			new ResponseMessage(OK.value(), "등급이 성공적으로 삭제되었습니다."));
 	}
 
 	/**
