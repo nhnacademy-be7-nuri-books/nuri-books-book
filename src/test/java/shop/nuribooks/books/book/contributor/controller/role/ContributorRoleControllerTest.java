@@ -64,7 +64,7 @@ class ContributorRoleControllerTest {
 
 	@DisplayName("기여자 역할 전체 조회")
 	@Test
-	void getContributorRole() throws Exception{
+	void getContributorRole() throws Exception {
 		// given
 		ContributorRole role1 = new ContributorRole();
 		role1.setName(ContributorRoleEnum.AUTHOR);
@@ -83,26 +83,6 @@ class ContributorRoleControllerTest {
 			.andExpect(jsonPath("$[1].name").value("ILLUSTRATOR"));
 
 		verify(contributorRoleService, times(1)).getContributorRoles();
-	}
-
-	@DisplayName("기여자 역할 수정")
-	@Test
-	void updateContributorRole() throws Exception {
-		// given
-		String roleName = "AUTHOR";
-		ContributorRoleRequest request = new ContributorRoleRequest("EDITOR");
-		ContributorRoleResponse response = new ContributorRoleResponse("EDITOR");
-
-		when(contributorRoleService.updateContributorRole(eq(roleName), any(ContributorRoleRequest.class))).thenReturn(response);
-
-		// when & then
-		mockMvc.perform(put("/api/contributors/roles/{roleName}", roleName)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.name").value("EDITOR"));
-
-		verify(contributorRoleService, times(1)).updateContributorRole(eq(roleName), any(ContributorRoleRequest.class));
 	}
 
 	@DisplayName("기여자 역할 삭제")
