@@ -13,12 +13,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
+import shop.nuribooks.books.member.member.dto.request.MemberSearchRequest;
+import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
@@ -68,7 +72,7 @@ class MemberRepositoryTest {
 	@DisplayName("등급의 id로 회원 등록 여부 확인")
 	@Test
 	void existsByGradeId() {
-	    //given
+		//given
 		Member savedMember = getSavedMember();
 
 		//when
@@ -112,6 +116,27 @@ class MemberRepositoryTest {
 			.containsExactly(savedMember.getUsername());
 	}
 
+	@DisplayName("다양한 검색 조건으로 회원 검색")
+	@Test
+	void searchMembersWithPaging() {
+		//given
+		Member savedMember = getSavedMember();
+
+		MemberSearchRequest searchRequest = MemberSearchRequest.builder()
+			.name("nuri")
+			.gender(GenderType.MALE)
+			.build();
+
+		PageRequest pageRequest = PageRequest.of(0, 50);
+
+		//when
+		Page<MemberSearchResponse> result =
+			memberRepository.searchMembersWithPaging(searchRequest, pageRequest);
+
+		//then
+		assertThat(result).hasSize(1);
+		assertThat(result.getContent().getFirst().gender()).isEqualTo(savedMember.getGender());
+	}
 
 	/**
 	 * 테스트를 위해 repository에 grade, customer, member 저장 후 member 반환
