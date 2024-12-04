@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.nuribooks.books.member.grade.dto.DtoMapper;
+import shop.nuribooks.books.member.grade.dto.MemberGradeBatchDto;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
@@ -154,8 +155,8 @@ class GradeControllerTest {
 		ResultActions result = mockMvc.perform(delete("/api/members/grades/{name}", requiredName));
 
 		//then
-		result.andExpect(status().isNoContent())
-			.andExpect(jsonPath("statusCode").value("204"))
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("statusCode").value("200"))
 			.andExpect(jsonPath("message").value("등급이 성공적으로 삭제되었습니다."));
 	}
 
@@ -175,6 +176,23 @@ class GradeControllerTest {
 			.andExpect(jsonPath("$", Matchers.hasSize(2)))
 			.andExpect(jsonPath("$[0].name").value(response.get(0).name()))
 			.andExpect(jsonPath("$[1].name").value(response.get(1).name()));
+	}
+
+	@DisplayName("등급과 회원 배치 리스트 전송 성공")
+	@Test
+	void getMemberGradeBatchListByRequirement() throws Exception {
+		//given
+		List<MemberGradeBatchDto> response = getMemberGradeBatchDtoList();
+		when(gradeService.getMemberGradeBatchListByRequirement()).thenReturn(response);
+
+		//when
+		ResultActions result = mockMvc.perform(get("/api/members/grades/batch-list"));
+
+		//then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$", Matchers.hasSize(2)))
+			.andExpect(jsonPath("$[0].customerId").value(response.get(0).customerId()))
+			.andExpect(jsonPath("$[1].gradeId").value(response.get(1).gradeId()));
 	}
 
 	/**
@@ -250,5 +268,13 @@ class GradeControllerTest {
 		return getSavedGrades().stream()
 			.map(DtoMapper::toListDto)
 			.collect(Collectors.toList());
+	}
+
+	/**
+	 * 테스트를 위한 MemberGradeBatchDto 리스트 생성
+	 */
+	private List<MemberGradeBatchDto> getMemberGradeBatchDtoList() {
+		return List.of(
+			new MemberGradeBatchDto(1L, 1), new MemberGradeBatchDto(2L, 2));
 	}
 }

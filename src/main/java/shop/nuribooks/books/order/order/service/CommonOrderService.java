@@ -14,8 +14,8 @@ import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
+import shop.nuribooks.books.book.coupon.enums.DiscountType;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
-import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
@@ -40,7 +40,7 @@ import shop.nuribooks.books.order.wrapping.entity.WrappingPaper;
 import shop.nuribooks.books.order.wrapping.service.WrappingPaperService;
 
 @AllArgsConstructor
-public abstract class AbstractOrderService {
+public class CommonOrderService {
 
 	protected final CustomerRepository customerRepository;
 	protected final BookRepository bookRepository;
@@ -99,7 +99,8 @@ public abstract class AbstractOrderService {
 
 		BigDecimal calculatedTotalPrice;
 
-		if (Objects.isNull(memberCouponAllType) || memberCouponAllType.policyType().compareTo(PolicyType.FIXED) == 0) {
+		if (Objects.isNull(memberCouponAllType)
+			|| memberCouponAllType.discountType().compareTo(DiscountType.FIXED) == 0) {
 			calculatedTotalPrice = bookTotalPrice
 				.subtract(couponDiscount) // 쿠폰 값 제외
 				.subtract(usedPoint) // 사용된 포인트 제외
@@ -125,6 +126,12 @@ public abstract class AbstractOrderService {
 		return calculatedTotalPrice.compareTo(orderTotalPrice) == 0;
 	}
 
+	/**
+	 * 주문 정보 찾기
+	 *
+	 * @param orderId 주문 아이디
+	 * @return 주문 정보
+	 */
 	protected Order getOrderById(Long orderId) {
 		return orderRepository.findById(orderId).orElseThrow(
 			() -> new OrderNotFoundException("해당 주문 정보가 존재하지 않습니다.")

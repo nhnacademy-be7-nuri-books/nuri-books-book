@@ -20,6 +20,7 @@ import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewScoreResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.event.ReviewRegisteredEvent;
 import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
@@ -84,10 +85,15 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public double getScoreByBookId(long bookId) {
+	public ReviewScoreResponse getScoreByBookId(long bookId) {
 		if (!bookRepository.existsById(bookId))
 			throw new BookIdNotFoundException();
-		return this.reviewRepository.findScoreByBookId(bookId);
+
+		Double avgScore = reviewRepository.findScoreByBookId(bookId);
+
+		double roundAvgScore = avgScore != null ? Math.round(avgScore * 10.0) / 10.0 : 0.0;
+
+		return new ReviewScoreResponse(roundAvgScore);
 	}
 
 	/**

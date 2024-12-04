@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +21,18 @@ import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.member.GradeAlreadyExistsException;
 import shop.nuribooks.books.exception.member.GradeInUseException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
+import shop.nuribooks.books.member.customer.entity.Customer;
+import shop.nuribooks.books.member.grade.dto.MemberGradeBatchDto;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
 import shop.nuribooks.books.member.grade.dto.response.GradeListResponse;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.grade.repository.GradeRepository;
+import shop.nuribooks.books.member.member.entity.AuthorityType;
+import shop.nuribooks.books.member.member.entity.GenderType;
+import shop.nuribooks.books.member.member.entity.Member;
+import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -211,6 +219,25 @@ class GradeServiceImplTest {
 		assertThat(response.get(1).name()).isEqualTo(savedGrades.get(1).getName());
 	}
 
+	@DisplayName("회원과 등급 배치 리스트 생성")
+	@Test
+	void getMemberGradeBatchListByRequirement() {
+		//given
+		List<Grade> savedGrades = getSavedGrades();
+		List<Member> savedMembers = List.of(getSavedMember());
+
+		when(gradeRepository.findAll()).thenReturn(savedGrades);
+		when(memberRepository.findAll()).thenReturn(savedMembers);
+
+		//when
+		List<MemberGradeBatchDto> response = gradeServiceImpl.getMemberGradeBatchListByRequirement();
+
+		//then
+		assertThat(response).hasSize(1);
+		assertThat(response.get(0).customerId()).isEqualTo(savedMembers.get(0).getCustomer().getId());
+		assertThat(response.get(0).gradeId()).isEqualTo(savedGrades.get(1).getId());
+	}
+
 	/**
 	 * 테스트를 위한 GradeRegisterRequest 생성
 	 */
@@ -240,8 +267,8 @@ class GradeServiceImplTest {
 		return Grade.builder()
 			.id(1)
 			.name("STANDARD")
-			.pointRate(3)
-			.requirement(BigDecimal.valueOf(100_000))
+			.pointRate(1)
+			.requirement(BigDecimal.valueOf(0))
 			.build();
 	}
 
@@ -250,8 +277,52 @@ class GradeServiceImplTest {
 	 */
 	private List<Grade> getSavedGrades() {
 		return Arrays.asList(
-			new Grade(1, "STANDARD", 3, BigDecimal.valueOf(100_000)),
-			new Grade(2, "SILVER", 5, BigDecimal.valueOf(200_000))
+			new Grade(1, "STANDARD", 1, BigDecimal.valueOf(0)),
+			new Grade(2, "GOLD", 3, BigDecimal.valueOf(200_000))
 		);
+	}
+
+	/**
+	 * 테스트를 위한 회원 목록 생성
+	 */
+	private Member getSavedMember() {
+		return Member.builder()
+			.id(1L)
+			.customer(getSavedCustomer())
+			.authority(AuthorityType.MEMBER)
+			.grade(getGrade())
+			.status(StatusType.ACTIVE)
+			.gender(GenderType.MALE)
+			.username("nuribooks95")
+			.birthday(LocalDate.of(1988, 8, 12))
+			.createdAt(LocalDateTime.now())
+			.point(BigDecimal.ZERO)
+			.totalPaymentAmount(BigDecimal.valueOf(200000))
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 등급 생성
+	 */
+	private Grade getGrade() {
+		return Grade.builder()
+			.id(1)
+			.name("STANDARD")
+			.pointRate(1)
+			.requirement(BigDecimal.valueOf(0))
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 비회원 생성
+	 */
+	private Customer getSavedCustomer() {
+		return Customer.builder()
+			.id(1L)
+			.name("boho")
+			.password("abc123")
+			.phoneNumber("01082828282")
+			.email("nhnacademy@nuriBooks.com")
+			.build();
 	}
 }

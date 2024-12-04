@@ -2,6 +2,7 @@ package shop.nuribooks.books.member.grade.service;
 
 import java.util.List;
 
+import shop.nuribooks.books.member.grade.dto.MemberGradeBatchDto;
 import shop.nuribooks.books.member.grade.dto.request.GradeRegisterRequest;
 import shop.nuribooks.books.member.grade.dto.request.GradeUpdateRequest;
 import shop.nuribooks.books.member.grade.dto.response.GradeDetailsResponse;
@@ -21,4 +22,6 @@ public interface GradeService {
 	void deleteGrade(String name);
 
 	List<GradeListResponse> getGradeList();
+
+	List<MemberGradeBatchDto> getMemberGradeBatchListByRequirement();
 }
