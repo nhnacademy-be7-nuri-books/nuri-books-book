@@ -105,6 +105,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 			.from(book)
 			.leftJoin(review).on(review.book.id.eq(book.id))
 			.where(book.deletedAt.isNull())
+			.groupBy(book.id)
 			.orderBy(review.score.avg().desc())
 			.limit(8)
 			.fetch();
