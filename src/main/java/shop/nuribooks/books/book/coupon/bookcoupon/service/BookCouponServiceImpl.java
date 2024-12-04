@@ -28,10 +28,7 @@ public class BookCouponServiceImpl implements BookCouponService {
 
 		Coupon coupon = Coupon.builder()
 			.name(request.name())
-			.policyType(request.policyType())
-			.discount(request.discount())
-			.minimumOrderPrice(request.minimumOrderPrice())
-			.maximumDiscountPrice(request.maximumDiscountPrice())
+			.couponPolicy(request.couponPolicy())
 			.expirationType(request.expirationType())
 			.expiredAt(request.expiredAt())
 			.period(request.period())

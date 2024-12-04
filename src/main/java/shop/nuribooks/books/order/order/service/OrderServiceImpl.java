@@ -27,13 +27,13 @@ import shop.nuribooks.books.book.coupon.dto.CouponAppliedOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.entity.AllAppliedCoupon;
 import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
+import shop.nuribooks.books.book.coupon.enums.DiscountType;
 import shop.nuribooks.books.book.coupon.repository.AllAppliedCouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
 import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.entity.child.OrderSavingPoint;
 import shop.nuribooks.books.book.point.entity.child.OrderUsingPoint;
-import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.book.point.repository.OrderSavingPointRepository;
 import shop.nuribooks.books.book.point.repository.OrderUsingPointRepository;
 import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
@@ -875,15 +875,15 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 		MemberCoupon memberCoupon = memberCouponRepository.findById(orderTempRegisterRequest.allAppliedCoupon())
 			.orElseThrow(MemberCartNotFoundException::new);
 
-		BigDecimal discountPrice = BigDecimal.valueOf(memberCoupon.getCoupon().getDiscount());
+		BigDecimal discountPrice = BigDecimal.valueOf(memberCoupon.getCoupon().getCouponPolicy().getDiscount());
 
 		// 쿠폰 정책에 따라 할인가 적용
-		if (memberCoupon.getCoupon().getPolicyType().compareTo(PolicyType.RATED) == 0) {
+		if (memberCoupon.getCoupon().getCouponPolicy().getDiscountType().compareTo(DiscountType.RATED) == 0) {
 			BigDecimal tempPrice = orderTempRegisterRequest.paymentBooks()
 				.multiply(discountPrice.divide(BigDecimal.valueOf(100), 1, RoundingMode.HALF_UP));
 
-			if (tempPrice.compareTo(memberCoupon.getCoupon().getMaximumDiscountPrice()) >= 0) {
-				discountPrice = memberCoupon.getCoupon().getMaximumDiscountPrice();
+			if (tempPrice.compareTo(memberCoupon.getCoupon().getCouponPolicy().getMaximumDiscountPrice()) >= 0) {
+				discountPrice = memberCoupon.getCoupon().getCouponPolicy().getMaximumDiscountPrice();
 			}
 		}
 

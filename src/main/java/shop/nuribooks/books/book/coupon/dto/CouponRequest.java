@@ -9,10 +9,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
+import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 import shop.nuribooks.books.book.coupon.enums.IssuanceType;
-import shop.nuribooks.books.book.point.enums.PolicyType;
 
 public record CouponRequest(
 
@@ -21,7 +21,7 @@ public record CouponRequest(
 	String name,
 
 	@NotNull(message = "쿠폰 할인 유형은 필수입니다.")
-	PolicyType policyType,
+	CouponPolicy couponPolicy,
 
 	@NotNull(message = "할인 할당량은 필수입니다.")
 	@Min(value = 1, message = "할인 할당량은 필수입니다.")
@@ -60,10 +60,7 @@ public record CouponRequest(
 		return Coupon.builder()
 			.name(name)
 			.couponType(couponType)
-			.policyType(policyType)
-			.discount(discount)
-			.minimumOrderPrice(minimumOrderPrice)
-			.maximumDiscountPrice(maximumDiscountPrice)
+			.couponPolicy(couponPolicy)
 			.expirationType(expirationType)
 			.period(period)
 			.expiredAt(expiredAt)

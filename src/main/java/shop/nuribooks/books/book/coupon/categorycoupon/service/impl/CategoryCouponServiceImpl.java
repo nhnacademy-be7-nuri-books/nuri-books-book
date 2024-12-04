@@ -28,12 +28,10 @@ public class CategoryCouponServiceImpl implements CategoryCouponService {
 	@Transactional
 	@Override
 	public void registerCategoryCoupon(CategoryCouponRequest categoryCouponRequest) {
+
 		Coupon coupon = Coupon.builder()
 			.name(categoryCouponRequest.name())
-			.policyType(categoryCouponRequest.policyType())
-			.discount(categoryCouponRequest.discount())
-			.minimumOrderPrice(categoryCouponRequest.minimumOrderPrice())
-			.maximumDiscountPrice(categoryCouponRequest.maximumDiscountPrice())
+			.couponPolicy(categoryCouponRequest.couponPolicy())
 			.expirationType(categoryCouponRequest.expirationType())
 			.expiredAt(categoryCouponRequest.expiredAt())
 			.period(categoryCouponRequest.period())
