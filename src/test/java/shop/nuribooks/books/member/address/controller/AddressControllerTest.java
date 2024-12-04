@@ -148,5 +148,4 @@ class AddressControllerTest {
 			)
 			.andExpect(status().isOk());
 	}
-
 }

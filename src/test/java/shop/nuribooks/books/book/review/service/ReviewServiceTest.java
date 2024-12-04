@@ -32,7 +32,6 @@ import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
 import shop.nuribooks.books.common.TestUtils;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
@@ -261,10 +260,10 @@ class ReviewServiceTest {
 		List<ReviewBookResponse> res = new LinkedList<>();
 		when(memberRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByMemberId(anyLong(), any())).thenReturn(res);
-		PagedResponse<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
-		assertEquals(0, pageRes.content().size());
-		assertEquals(0, pageRes.page());
-		assertEquals(1, pageRes.size());
+		Page<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
+		assertEquals(0, pageRes.getContent().size());
+		assertEquals(0, pageRes.getNumber());
+		assertEquals(1, pageRes.getSize());
 	}
 
 	@Test
@@ -274,9 +273,9 @@ class ReviewServiceTest {
 		when(reviewRepository.findReviewsByMemberId(anyLong(), any())).thenReturn(res);
 		List<ReviewImageDto> reviewImages = List.of(new ReviewImageDto(1L, reviewImageResponse));
 		when(reviewImageRepository.findReviewImagesByReviewIds(anyList())).thenReturn(reviewImages);
-		PagedResponse<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
-		assertEquals(1, pageRes.content().size());
-		assertEquals(0, pageRes.page());
-		assertEquals(1, pageRes.size());
+		Page<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
+		assertEquals(1, pageRes.getContent().size());
+		assertEquals(0, pageRes.getNumber());
+		assertEquals(1, pageRes.getSize());
 	}
 }
