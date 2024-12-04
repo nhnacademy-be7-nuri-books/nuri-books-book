@@ -25,12 +25,22 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 
 	private final CouponPolicyRepository couponPolicyRepository;
 
+	/**
+	 * 모든 쿠폰 정책 조회하는 메서드
+	 * @param pageable
+	 * @return
+	 */
 	@Override
 	public Page<CouponPolicyResponse> getCouponPolicies(Pageable pageable) {
 		Page<CouponPolicy> couponPolicies = couponPolicyRepository.findAll(pageable);
 		return couponPolicies.map(CouponPolicyResponse::of);
 	}
 
+	/**
+	 * 해당 id 쿠폰 정책 조회하는 메서드
+	 * @param id
+	 * @return
+	 */
 	@Override
 	public CouponPolicyResponse getCouponPolicy(Long id) {
 		CouponPolicy couponPolicy = couponPolicyRepository.findById(id)
@@ -39,12 +49,17 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 		return CouponPolicyResponse.of(couponPolicy);
 	}
 
+	/**
+	 * 쿠폰 정책 등록하는 메서드
+	 * @param request
+	 * @return
+	 */
 	@Override
 	public CouponPolicy registerCouponPolicy(CouponPolicyRequest request) {
 
 		Optional<CouponPolicy> existingCouponPolicy = couponPolicyRepository.findByName(request.name());
 		if (existingCouponPolicy.isPresent()) {
-			throw new CouponPolicyAlreadyExistsException();  // 이미 존재하면 예외 처리
+			throw new CouponPolicyAlreadyExistsException();
 		}
 
 		validateCouponRequest(request);
@@ -52,6 +67,12 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 		return couponPolicyRepository.save(couponPolicy);
 	}
 
+	/**
+	 * 쿠폰 정책 수정하는 메서드
+	 * @param id
+	 * @param request
+	 * @return
+	 */
 	@Transactional
 	@Override
 	public CouponPolicy updateCouponPolicy(Long id, CouponPolicyRequest request) {
@@ -62,6 +83,10 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 		return couponPolicy;
 	}
 
+	/**
+	 * 쿠폰 정책 삭제하는 메서드
+	 * @param id
+	 */
 	@Transactional
 	@Override
 	public void deleteCouponPolicy(Long id) {
