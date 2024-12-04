@@ -17,7 +17,6 @@ import org.mockito.MockitoAnnotations;
 
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
-import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorRegisterRequest;
@@ -51,9 +50,6 @@ class BookContributorServiceImplTest {
 
 	@Mock
 	private ContributorRoleRepository contributorRoleRepository;
-
-	@Mock
-	private BookMapper bookMapper;
 
 	private Book book;
 	private Contributor contributor;
