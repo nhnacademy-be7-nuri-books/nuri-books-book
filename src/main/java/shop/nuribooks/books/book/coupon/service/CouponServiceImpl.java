@@ -1,6 +1,5 @@
 package shop.nuribooks.books.book.coupon.service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import org.springframework.data.domain.Page;
@@ -14,11 +13,12 @@ import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
+import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 import shop.nuribooks.books.book.coupon.enums.IssuanceType;
+import shop.nuribooks.books.book.coupon.repository.CouponPolicyRepository;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
-import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.exception.coupon.CouponAlreadyExistsException;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
 import shop.nuribooks.books.exception.coupon.InvalidCouponException;
@@ -29,6 +29,7 @@ import shop.nuribooks.books.member.member.entity.Member;
 public class CouponServiceImpl implements CouponService {
 	private final CouponRepository couponRepository;
 	private final MemberCouponService memberCouponService;
+	private final CouponPolicyRepository couponPolicyRepository;
 
 	/**
 	 * 쿠폰 등록하는 메서드
@@ -42,7 +43,20 @@ public class CouponServiceImpl implements CouponService {
 			throw new CouponAlreadyExistsException();
 		}
 
-		Coupon coupon = request.toEntity();
+		CouponPolicy couponPolicy = couponPolicyRepository.findById(request.couponPolicyId()).orElseThrow(
+			CouponNotFoundException::new);
+
+		Coupon coupon = Coupon.builder()
+			.name(request.name())
+			.couponPolicy(couponPolicy)
+			.couponType(request.couponType())
+			.expirationType(request.expirationType())
+			.period(request.period())
+			.expiredAt(request.expiredAt())
+			.issuanceType(request.issuanceType())
+			.quantity(request.quantity())
+			.build();
+
 		return couponRepository.save(coupon);
 	}
 
@@ -128,22 +142,8 @@ public class CouponServiceImpl implements CouponService {
 	}
 
 	public void validateCouponRequest(CouponRequest couponRequest) {
-		validateDiscountPolicy(couponRequest.policyType(), couponRequest.discount());
-		validateOrderPriceConsistency(couponRequest.minimumOrderPrice(), couponRequest.maximumDiscountPrice());
 		validateExpiration(couponRequest.expirationType(), couponRequest.period(), couponRequest.expiredAt());
 		validateIssuanceTypeAndQuantity(couponRequest.issuanceType(), couponRequest.quantity());
-	}
-
-	private void validateDiscountPolicy(PolicyType policyType, Integer discount) {
-		if (policyType == PolicyType.RATED && (discount <= 0 || discount > 100)) {
-			throw new InvalidCouponException("RATED 타입의 Discount는 1~100 사이의 값이어야 합니다.");
-		}
-	}
-
-	private void validateOrderPriceConsistency(BigDecimal minimumOrderPrice, BigDecimal maximumDiscountPrice) {
-		if (maximumDiscountPrice.compareTo(minimumOrderPrice) < 0) {
-			throw new InvalidCouponException("Maximum Discount Price는 Minimum Order Price보다 크거나 같아야 합니다.");
-		}
 	}
 
 	private void validateExpiration(ExpirationType expirationType, Integer expirationDays, LocalDate expiredAt) {

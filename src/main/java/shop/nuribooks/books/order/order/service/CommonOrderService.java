@@ -14,8 +14,8 @@ import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
+import shop.nuribooks.books.book.coupon.enums.DiscountType;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
-import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
@@ -99,7 +99,8 @@ public class CommonOrderService {
 
 		BigDecimal calculatedTotalPrice;
 
-		if (Objects.isNull(memberCouponAllType) || memberCouponAllType.policyType().compareTo(PolicyType.FIXED) == 0) {
+		if (Objects.isNull(memberCouponAllType)
+			|| memberCouponAllType.discountType().compareTo(DiscountType.FIXED) == 0) {
 			calculatedTotalPrice = bookTotalPrice
 				.subtract(couponDiscount) // 쿠폰 값 제외
 				.subtract(usedPoint) // 사용된 포인트 제외

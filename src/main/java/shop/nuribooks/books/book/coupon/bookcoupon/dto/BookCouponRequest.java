@@ -1,13 +1,10 @@
 package shop.nuribooks.books.book.coupon.bookcoupon.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import shop.nuribooks.books.book.book.entity.Book;
@@ -15,7 +12,6 @@ import shop.nuribooks.books.book.coupon.bookcoupon.entity.BookCoupon;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
-import shop.nuribooks.books.book.point.enums.PolicyType;
 
 @Builder
 public record BookCouponRequest(
@@ -24,21 +20,7 @@ public record BookCouponRequest(
 	String name,
 
 	@NotNull(message = "쿠폰 할인 유형은 필수입니다.")
-	PolicyType policyType,
-
-	@NotNull(message = "할인 할당량은 필수입니다.")
-	@Min(value = 1, message = "할인 할당량은 필수입니다.")
-	int discount,
-
-	@NotNull(message = "최소 주문 금액은 필수입니다.")
-	@Digits(integer = 10, fraction = 0)
-	@PositiveOrZero(message = "최소 주문 금액은 0 이상이어야 합니다.")
-	BigDecimal minimumOrderPrice,
-
-	@NotNull(message = "최대 할인 금액은 필수입니다.")
-	@Digits(integer = 10, fraction = 0)
-	@Min(value = 1, message = "최대 할인 금액은 1원 이상이어야 합니다.")
-	BigDecimal maximumDiscountPrice,
+	Long couponPolicyId,
 
 	@NotNull(message = "시작일시는 필수입니다.")
 	LocalDate createdAt,

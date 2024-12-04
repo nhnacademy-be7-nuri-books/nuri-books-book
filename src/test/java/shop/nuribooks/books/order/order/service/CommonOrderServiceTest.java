@@ -27,8 +27,8 @@ import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
+import shop.nuribooks.books.book.coupon.enums.DiscountType;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
-import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
@@ -178,7 +178,7 @@ class CommonOrderServiceTest {
 
 		MemberCouponOrderDto memberCouponAllType = mock(MemberCouponOrderDto.class);
 		when(memberCouponAllType.discount()).thenReturn(10);
-		when(memberCouponAllType.policyType()).thenReturn(PolicyType.RATED);
+		when(memberCouponAllType.discountType()).thenReturn(DiscountType.RATED);
 		when(memberCouponAllType.maximumDiscountPrice()).thenReturn(new BigDecimal("1000"));
 		when(memberCouponService.getMemberCoupon(anyLong())).thenReturn(memberCouponAllType);
 
@@ -216,7 +216,7 @@ class CommonOrderServiceTest {
 
 		MemberCouponOrderDto memberCouponAllType = mock(MemberCouponOrderDto.class);
 		when(memberCouponAllType.discount()).thenReturn(10);
-		when(memberCouponAllType.policyType()).thenReturn(PolicyType.RATED);
+		when(memberCouponAllType.discountType()).thenReturn(DiscountType.RATED);
 		when(memberCouponAllType.maximumDiscountPrice()).thenReturn(new BigDecimal("2000"));
 		when(memberCouponService.getMemberCoupon(anyLong())).thenReturn(memberCouponAllType);
 
