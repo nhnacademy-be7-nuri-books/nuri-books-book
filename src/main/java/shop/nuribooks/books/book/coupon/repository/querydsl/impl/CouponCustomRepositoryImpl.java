@@ -32,7 +32,7 @@ public class CouponCustomRepositoryImpl implements CouponCustomRepository {
 	}
 
 	@Override
-	public Page<CouponResponse> findCouponsByCouponId(Pageable pageable, CouponType type) {
+	public Page<CouponResponse> findCouponsByCouponType(Pageable pageable, CouponType type) {
 		QCoupon coupon = QCoupon.coupon;
 
 		List<CouponResponse> results = queryFactory.select(Projections.constructor(CouponResponse.class,

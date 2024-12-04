@@ -10,5 +10,5 @@ import shop.nuribooks.books.book.coupon.enums.CouponType;
 public interface CouponCustomRepository {
 	Coupon findCouponsByNameLike(String name);
 
-	Page<CouponResponse> findCouponsByCouponId(Pageable pageable, CouponType type);
+	Page<CouponResponse> findCouponsByCouponType(Pageable pageable, CouponType type);
 }
