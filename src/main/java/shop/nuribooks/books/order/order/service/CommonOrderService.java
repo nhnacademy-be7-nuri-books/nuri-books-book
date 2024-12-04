@@ -40,7 +40,7 @@ import shop.nuribooks.books.order.wrapping.entity.WrappingPaper;
 import shop.nuribooks.books.order.wrapping.service.WrappingPaperService;
 
 @AllArgsConstructor
-public abstract class AbstractOrderService {
+public class CommonOrderService {
 
 	protected final CustomerRepository customerRepository;
 	protected final BookRepository bookRepository;
@@ -125,6 +125,12 @@ public abstract class AbstractOrderService {
 		return calculatedTotalPrice.compareTo(orderTotalPrice) == 0;
 	}
 
+	/**
+	 * 주문 정보 찾기
+	 *
+	 * @param orderId 주문 아이디
+	 * @return 주문 정보
+	 */
 	protected Order getOrderById(Long orderId) {
 		return orderRepository.findById(orderId).orElseThrow(
 			() -> new OrderNotFoundException("해당 주문 정보가 존재하지 않습니다.")
