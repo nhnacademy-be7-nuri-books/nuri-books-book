@@ -47,6 +47,7 @@ public class RabbitmqConfig {
 		connectionFactory.setPort(response.port());
 		connectionFactory.setUsername(response.userName());
 		connectionFactory.setPassword(response.password());
+		connectionFactory.setVirtualHost(response.vhost());
 		return connectionFactory;
 	}
 
@@ -64,6 +65,8 @@ public class RabbitmqConfig {
 
 		// 모든 메시지 Persistent 설정
 		rabbitTemplate.setBeforePublishPostProcessors(message -> {
+			message.getMessageProperties().setContentType("application/json");
+			message.getMessageProperties().setContentEncoding("UTF-8");
 			message.getMessageProperties().setDeliveryMode(MessageProperties.DEFAULT_DELIVERY_MODE);
 			return message;
 		});
