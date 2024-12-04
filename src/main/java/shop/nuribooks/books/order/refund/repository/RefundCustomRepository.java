@@ -8,5 +8,5 @@ public interface RefundCustomRepository {
 	 * from
 	 * where
 	 */
-	public RefundInfoDto findRefundInfo(Long orderId);
+	RefundInfoDto findRefundInfo(Long orderId);
 }

@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,30 +21,43 @@ import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
+import shop.nuribooks.books.order.refund.dto.RefundInfoDto;
 import shop.nuribooks.books.order.refund.dto.request.RefundRequest;
 import shop.nuribooks.books.order.refund.dto.response.RefundInfo;
 import shop.nuribooks.books.order.refund.dto.response.RefundInfoResponse;
 import shop.nuribooks.books.order.refund.dto.response.RefundResponse;
 import shop.nuribooks.books.order.refund.entity.Refund;
 import shop.nuribooks.books.order.refund.repository.RefundRepository;
-import shop.nuribooks.books.order.shipping.entity.Shipping;
-import shop.nuribooks.books.order.shipping.repository.ShippingRepository;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
 public class RefundServiceImpl implements RefundService {
 	public static final int MAXIMUM_REFUND_DAY = 10;
+	public static final long REFUND_SHIPPING_PRICE = 2500L;
 
 	private final RefundRepository refundRepository;
 	private final OrderDetailRepository orderDetailRepository;
 	private final OrderRepository orderRepository;
 	private final MemberRepository memberRepository;
 	private final PointHistoryService pointHistoryService;
-	private final ShippingRepository shippingRepository;
+
+	private static RefundInfo getRefundInfo(RefundInfoDto refundInfoDto) {
+		BigDecimal paymentPrice = refundInfoDto.paymentPrice();
+		BigDecimal shippingPrice = BigDecimal.valueOf(REFUND_SHIPPING_PRICE);
+		BigDecimal savingPointAmount = refundInfoDto.orderSavingPoint();
+		BigDecimal deductedAmount = shippingPrice.add(savingPointAmount);
+
+		BigDecimal totalRefundAmount =
+			paymentPrice.subtract(deductedAmount).compareTo(BigDecimal.ZERO) > 0 ?
+				paymentPrice.subtract(deductedAmount) : BigDecimal.ZERO;
+
+		return new RefundInfo(paymentPrice, shippingPrice, savingPointAmount, deductedAmount,
+			totalRefundAmount);
+	}
 
 	@Override
-	public RefundInfoResponse getRefundInfoResponse(Long orderId, Pageable pageable) {
+	public RefundInfoResponse getRefundInfoResponse(Long orderId) {
 
 		List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(orderId);
 		orderDetailList.forEach(
@@ -56,27 +68,12 @@ public class RefundServiceImpl implements RefundService {
 			}
 		);
 
-		Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
+		RefundInfoDto refundInfoDto = refundRepository.findRefundInfo(orderId);
 
-		Shipping shipping = shippingRepository.findByOrder(order);
-		if (isAfterMaximumRefundDay(shipping)) {
+		if (isAfterMaximumRefundDay(refundInfoDto.shippingAt())) {
 			throw new RefundNotAllowedException("출고일로부터 10일 이내 반품 가능합니다");
 		}
-
-		BigDecimal paymentPrice = order.getPaymentPrice();
-
-		// 일단은 반품 배송비 2500원으로 생각
-		BigDecimal shippingPrice = BigDecimal.valueOf(2500L);
-		BigDecimal savingPointAmount = orderRepository.findOrderSavingPoint(orderId);
-
-		BigDecimal deductedAmount = shippingPrice.add(savingPointAmount);
-
-		BigDecimal totalRefundAmount =
-			paymentPrice.subtract(deductedAmount).compareTo(BigDecimal.ZERO) > 0 ?
-				paymentPrice.subtract(deductedAmount) : BigDecimal.ZERO;
-
-		RefundInfo refundInfo = new RefundInfo(paymentPrice, shippingPrice, savingPointAmount, deductedAmount,
-			totalRefundAmount);
+		RefundInfo refundInfo = getRefundInfo(refundInfoDto);
 
 		return new RefundInfoResponse(refundInfo);
 	}
@@ -106,8 +103,8 @@ public class RefundServiceImpl implements RefundService {
 		return RefundResponse.of(saved);
 	}
 
-	private boolean isAfterMaximumRefundDay(Shipping shipping) {
-		return LocalDateTime.now().isAfter(shipping.getShippingAt().plusDays(MAXIMUM_REFUND_DAY));
+	private boolean isAfterMaximumRefundDay(LocalDateTime shippingAt) {
+		return LocalDateTime.now().isAfter(shippingAt.plusDays(MAXIMUM_REFUND_DAY));
 	}
 
 	private Member getMember(Order order) {
