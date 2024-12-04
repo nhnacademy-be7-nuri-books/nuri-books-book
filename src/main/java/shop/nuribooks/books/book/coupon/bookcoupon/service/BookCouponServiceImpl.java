@@ -11,9 +11,12 @@ import shop.nuribooks.books.book.coupon.bookcoupon.dto.BookCouponResponse;
 import shop.nuribooks.books.book.coupon.bookcoupon.entity.BookCoupon;
 import shop.nuribooks.books.book.coupon.bookcoupon.repository.BookCouponRepository;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
+import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
+import shop.nuribooks.books.book.coupon.repository.CouponPolicyRepository;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.coupon.BookCouponNotFoundException;
+import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
 
 @RequiredArgsConstructor
 @Service
@@ -21,14 +24,17 @@ public class BookCouponServiceImpl implements BookCouponService {
 	private final BookRepository bookRepository;
 	private final CouponRepository couponRepository;
 	private final BookCouponRepository bookCouponRepository;
+	private final CouponPolicyRepository couponPolicyRepository;
 
 	@Transactional
 	@Override
 	public BookCoupon registerBookCoupon(BookCouponRequest request) {
+		CouponPolicy couponPolicy = couponPolicyRepository.findById(request.couponPolicyId()).orElseThrow(
+			CouponNotFoundException::new);
 
 		Coupon coupon = Coupon.builder()
 			.name(request.name())
-			.couponPolicy(request.couponPolicy())
+			.couponPolicy(couponPolicy)
 			.expirationType(request.expirationType())
 			.expiredAt(request.expiredAt())
 			.period(request.period())

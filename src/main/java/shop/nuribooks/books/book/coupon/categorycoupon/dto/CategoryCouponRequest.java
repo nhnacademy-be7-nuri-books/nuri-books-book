@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 
@@ -15,7 +14,7 @@ public record CategoryCouponRequest(
 	String name,
 
 	@NotNull(message = "쿠폰 할인 유형은 필수입니다.")
-	CouponPolicy couponPolicy,
+	Long couponPolicyId,
 
 	@NotNull(message = "시작일시는 필수입니다.")
 	LocalDate createdAt,

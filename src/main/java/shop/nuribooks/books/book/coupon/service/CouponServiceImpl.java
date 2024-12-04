@@ -13,9 +13,11 @@ import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
+import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 import shop.nuribooks.books.book.coupon.enums.IssuanceType;
+import shop.nuribooks.books.book.coupon.repository.CouponPolicyRepository;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.exception.coupon.CouponAlreadyExistsException;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
@@ -27,6 +29,7 @@ import shop.nuribooks.books.member.member.entity.Member;
 public class CouponServiceImpl implements CouponService {
 	private final CouponRepository couponRepository;
 	private final MemberCouponService memberCouponService;
+	private final CouponPolicyRepository couponPolicyRepository;
 
 	/**
 	 * 쿠폰 등록하는 메서드
@@ -40,7 +43,20 @@ public class CouponServiceImpl implements CouponService {
 			throw new CouponAlreadyExistsException();
 		}
 
-		Coupon coupon = request.toEntity();
+		CouponPolicy couponPolicy = couponPolicyRepository.findById(request.couponPolicyId()).orElseThrow(
+			CouponNotFoundException::new);
+
+		Coupon coupon = Coupon.builder()
+			.name(request.name())
+			.couponPolicy(couponPolicy)
+			.couponType(request.couponType())
+			.expirationType(request.expirationType())
+			.period(request.period())
+			.expiredAt(request.expiredAt())
+			.issuanceType(request.issuanceType())
+			.quantity(request.quantity())
+			.build();
+
 		return couponRepository.save(coupon);
 	}
 

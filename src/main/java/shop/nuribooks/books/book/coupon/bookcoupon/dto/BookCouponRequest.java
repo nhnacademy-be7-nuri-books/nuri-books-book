@@ -10,7 +10,6 @@ import lombok.Builder;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.coupon.bookcoupon.entity.BookCoupon;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
-import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 
@@ -21,7 +20,7 @@ public record BookCouponRequest(
 	String name,
 
 	@NotNull(message = "쿠폰 할인 유형은 필수입니다.")
-	CouponPolicy couponPolicy,
+	Long couponPolicyId,
 
 	@NotNull(message = "시작일시는 필수입니다.")
 	LocalDate createdAt,
