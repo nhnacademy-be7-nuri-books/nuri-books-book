@@ -46,7 +46,6 @@ public class RefundServiceImpl implements RefundService {
 
 	@Override
 	public RefundInfoResponse getRefundInfoResponse(Long orderId, Pageable pageable) {
-		Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
 
 		List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(orderId);
 		orderDetailList.forEach(
@@ -56,6 +55,8 @@ public class RefundServiceImpl implements RefundService {
 				}
 			}
 		);
+
+		Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
 
 		Shipping shipping = shippingRepository.findByOrder(order);
 		if (isAfterMaximumRefundDay(shipping)) {

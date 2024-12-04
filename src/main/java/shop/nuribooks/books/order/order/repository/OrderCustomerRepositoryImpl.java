@@ -1,6 +1,5 @@
 package shop.nuribooks.books.order.order.repository;
 
-import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -123,14 +122,4 @@ public class OrderCustomerRepositoryImpl implements OrderCustomerRepository {
 
 	}
 
-	@Override
-	public BigDecimal findOrderSavingPoint(Long orderId) {
-		QOrder order = QOrder.order;
-		QOrderSavingPoint orderSavingPoint = QOrderSavingPoint.orderSavingPoint;
-		return queryFactory.select(orderSavingPoint.amount)
-			.from(order)
-			.join(orderSavingPoint).on(orderSavingPoint.order.id.eq(orderId))
-			.where(order.id.eq(orderId))
-			.fetchOne();
-	}
 }
