@@ -62,7 +62,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 			throw new CouponPolicyAlreadyExistsException();
 		}
 
-		validateCouponRequest(request);
+		validateCouponPolicyRequest(request);
 		CouponPolicy couponPolicy = request.toEntity();
 		return couponPolicyRepository.save(couponPolicy);
 	}
@@ -78,7 +78,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 	public CouponPolicy updateCouponPolicy(Long id, CouponPolicyRequest request) {
 		CouponPolicy couponPolicy = couponPolicyRepository.findById(id)
 			.orElseThrow(CouponPolicyNotFoundException::new);
-		validateCouponRequest(request);
+		validateCouponPolicyRequest(request);
 		couponPolicy.update(request);
 		return couponPolicy;
 	}
@@ -96,7 +96,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 		couponPolicyRepository.delete(couponPolicy);
 	}
 
-	public void validateCouponRequest(CouponPolicyRequest request) {
+	public void validateCouponPolicyRequest(CouponPolicyRequest request) {
 		validateDiscountPolicy(request.discountType(), request.discount());
 		if (request.maximumDiscountPrice() != null) {
 			validateOrderPriceConsistency(request.minimumOrderPrice(), request.maximumDiscountPrice(),
