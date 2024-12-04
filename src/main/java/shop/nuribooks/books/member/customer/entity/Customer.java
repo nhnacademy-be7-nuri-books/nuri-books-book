@@ -51,11 +51,4 @@ public class Customer {
 	public void changeCustomerPassword(String password) {
 		this.password = password;
 	}
-
-	public void changeToSoftDeleted() {
-		this.name = "";
-		this.password = "";
-		this.phoneNumber = "";
-		this.email = "";
-	}
 }

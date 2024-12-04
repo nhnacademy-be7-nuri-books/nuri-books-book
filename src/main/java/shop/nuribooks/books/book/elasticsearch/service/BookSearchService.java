@@ -10,6 +10,7 @@ import shop.nuribooks.books.book.elasticsearch.enums.SearchType;
 import shop.nuribooks.books.book.elasticsearch.enums.SortType;
 
 public interface BookSearchService {
-	Page<BookDocument> searchBooks(String keyword, SearchType searchType, SortType sortType, Pageable pageable) throws
+	Page<BookDocument> searchBooks(String keyword, Long categoryId, SearchType searchType, SortType sortType,
+		Pageable pageable) throws
 		IOException;
 }

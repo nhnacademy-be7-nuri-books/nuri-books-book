@@ -20,7 +20,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
-import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.service.CouponService;
 import shop.nuribooks.books.common.annotation.HasRole;
@@ -47,17 +46,28 @@ public class CouponController {
 			.body(new ResponseMessage(HttpStatus.CREATED.value(), "쿠폰 생성 성공"));
 	}
 
-	@Operation(summary = "쿠폰 목록 조회", description = "쿠폰 목록을 조회합니다.")
+	@Operation(summary = "쿠폰 타입별 목록 조회", description = "쿠폰 타입별 목록을 조회합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "조회 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
 	@HasRole(role = AuthorityType.ADMIN)
 	@GetMapping
-	public ResponseEntity<Page<CouponResponse>> getCoupons(
-		@RequestParam(value = "type", defaultValue = "ALL") CouponType type,
-		Pageable pageable) {
+	public ResponseEntity<Page<CouponResponse>> getCoupons(@RequestParam CouponType type, Pageable pageable) {
 		Page<CouponResponse> couponPolicyResponses = couponService.getCoupons(type, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(couponPolicyResponses);
+	}
+
+
+	@Operation(summary = "쿠폰 전체 목록 조회", description = "쿠폰 전체 목록을 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+	})
+	@HasRole(role = AuthorityType.ADMIN)
+	@GetMapping("/list")
+	public ResponseEntity<Page<CouponResponse>> getCoupons(Pageable pageable) {
+		Page<CouponResponse> couponPolicyResponses = couponService.getAllCoupons(pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(couponPolicyResponses);
 	}
 
@@ -68,8 +78,8 @@ public class CouponController {
 	})
 	@HasRole(role = AuthorityType.ADMIN)
 	@GetMapping("/{coupon-id}")
-	public ResponseEntity<Coupon> getCoupons(@PathVariable(name = "coupon-id") Long id) {
-		Coupon coupon = couponService.getCouponById(id);
+	public ResponseEntity<CouponResponse> getCoupon(@PathVariable(name = "coupon-id") Long id) {
+		CouponResponse coupon = couponService.getCouponById(id);
 		return ResponseEntity.status(HttpStatus.OK).body(coupon);
 	}
 

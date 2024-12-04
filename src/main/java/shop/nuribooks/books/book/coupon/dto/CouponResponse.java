@@ -7,14 +7,14 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
+import shop.nuribooks.books.book.coupon.enums.DiscountType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
-import shop.nuribooks.books.book.point.enums.PolicyType;
 
 @Builder
 public record CouponResponse(
 	Long id,
-	PolicyType policyType,
 	String name,
+	DiscountType discountType,
 	int discount,
 	BigDecimal minimumOrderPrice,
 	BigDecimal maximumDiscountPrice,
@@ -29,15 +29,15 @@ public record CouponResponse(
 		return CouponResponse.builder()
 			.id(coupon.getId())
 			.name(coupon.getName())
-			.policyType(coupon.getPolicyType())
-			.discount(coupon.getDiscount())
-			.minimumOrderPrice(coupon.getMinimumOrderPrice())
-			.maximumDiscountPrice(coupon.getMaximumDiscountPrice())
+			.discountType(coupon.getCouponPolicy().getDiscountType())
+			.discount(coupon.getCouponPolicy().getDiscount())
+			.minimumOrderPrice(coupon.getCouponPolicy().getMinimumOrderPrice())
+			.maximumDiscountPrice(coupon.getCouponPolicy().getMaximumDiscountPrice())
 			.createdAt(coupon.getCreatedAt())
 			.expiredAt(coupon.getExpiredAt())
 			.expirationType(coupon.getExpirationType())
 			.period(coupon.getPeriod())
-			.expiredDate(coupon.getExpiredDate())
+			.expiredDate(coupon.getDeletedAt())
 			.couponType(coupon.getCouponType())
 			.build();
 	}

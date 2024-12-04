@@ -1,6 +1,8 @@
 package shop.nuribooks.books.member.member.event.handler;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -19,6 +21,7 @@ public class RegisterEventHandler {
 	private final CouponService couponService;
 
 	// point event listener 추가.
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void createPointHistory(RegisteredEvent event) {
 		Member member = event.getMember();

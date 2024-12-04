@@ -15,18 +15,17 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
-import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.book.review.dto.ReviewImageDto;
 import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewScoreResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.event.ReviewRegisteredEvent;
 import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.ReviewService;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
@@ -47,7 +46,6 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ReviewRepository reviewRepository;
 	private final ReviewImageRepository reviewImageRepository;
 	private final OrderDetailRepository orderDetailRepository;
-	private final PointHistoryService pointHistoryService;
 	private final ApplicationEventPublisher publisher;
 
 	/**
@@ -87,10 +85,15 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public double getScoreByBookId(long bookId) {
+	public ReviewScoreResponse getScoreByBookId(long bookId) {
 		if (!bookRepository.existsById(bookId))
 			throw new BookIdNotFoundException();
-		return this.reviewRepository.findScoreByBookId(bookId);
+
+		Double avgScore = reviewRepository.findScoreByBookId(bookId);
+
+		double roundAvgScore = avgScore != null ? Math.round(avgScore * 10.0) / 10.0 : 0.0;
+
+		return new ReviewScoreResponse(roundAvgScore);
 	}
 
 	/**
@@ -106,7 +109,7 @@ public class ReviewServiceImpl implements ReviewService {
 		// review만 가져오기
 		List<ReviewMemberResponse> reviews = this.reviewRepository.findReviewsByBookId(bookId, pageable);
 		// 리뷰가 있다면, 이미지 조합하기
-		if (reviews.size() > 0) {
+		if (!reviews.isEmpty()) {
 			// review id가 key인 map 생성 및 초기화
 			Map<Long, ReviewMemberResponse> reviewMap = new LinkedHashMap<>();
 			for (ReviewMemberResponse rmr : reviews) {
@@ -125,9 +128,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		long totalElement = this.reviewRepository.countByBookId(bookId);
 
-		Page<ReviewMemberResponse> page = new PageImpl(reviews, pageable, totalElement);
-
-		return page;
+		return new PageImpl<>(reviews, pageable, totalElement);
 	}
 
 	/**
@@ -137,14 +138,14 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public PagedResponse<ReviewBookResponse> getReviewsByMemberId(long memberId, Pageable pageable) {
+	public Page<ReviewBookResponse> getReviewsByMemberId(long memberId, Pageable pageable) {
 		if (!memberRepository.existsById(memberId))
 			throw new MemberNotFoundException("유저를 찾을 수 없습니다.");
 		// review만 가져오기
 		List<ReviewBookResponse> reviews = this.reviewRepository.findReviewsByMemberId(memberId, pageable);
 
 		// 리뷰가 있다면, 이미지 조합하기
-		if (reviews.size() > 0) {
+		if (!reviews.isEmpty()) {
 			// review id가 key인 map 생성 및 초기화
 			Map<Long, ReviewBookResponse> reviewMap = new LinkedHashMap<>();
 			for (ReviewBookResponse rbr : reviews) {
@@ -162,9 +163,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		int totalElement = (int)this.reviewRepository.countByMemberId(memberId);
 
-		PagedResponse pagedResponse = PagedResponse.of(reviews, pageable, totalElement);
-
-		return pagedResponse;
+		return new PageImpl<>(reviews, pageable, totalElement);
 	}
 
 	@Transactional
@@ -173,7 +172,7 @@ public class ReviewServiceImpl implements ReviewService {
 			.orElseThrow(RequiredHeaderIsNullException::new);
 		// 기존 review update 처리
 		Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
-		if (review.getMember().getId() != ownerId) {
+		if (!review.getMember().getId().equals(ownerId)) {
 			throw new ReviewNotFoundException();
 		}
 		review.update(reviewUpdateRequest);

@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,6 @@ import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
-@Transactional
 @SpringBootTest
 class AddressServiceTest {
 
@@ -45,18 +45,25 @@ class AddressServiceTest {
 	@Autowired
 	private GradeRepository gradeRepository;
 
-	@DisplayName("회원의 주소를 생성한다.")
-	@Test
-	void addAddress() {
-		// given
+	private Member member;
+
+	@BeforeEach
+	void setUp() {
 		Customer customer = TestUtils.createCustomer();
-		customerRepository.save(customer);
+		Customer savedCustomer = customerRepository.save(customer);
 
 		Grade grade = creategrade();
-		gradeRepository.save(grade);
+		Grade savedGrade = gradeRepository.save(grade);
 
-		Member member = TestUtils.createMember(customer, grade);
+		member = TestUtils.createMember(savedCustomer, savedGrade);
 		memberRepository.save(member);
+	}
+
+	@DisplayName("회원의 주소를 생성한다.")
+	@Test
+	@Transactional
+	void addAddress() {
+		// given
 
 		AddressRegisterRequest request = AddressRegisterRequest.builder()
 			.name("test")
@@ -73,16 +80,9 @@ class AddressServiceTest {
 
 	@DisplayName("회원의 주소 리스트를 조회한다.")
 	@Test
+	@Transactional
 	void findAddressesByMemberId() {
 		// given
-		Customer customer = TestUtils.createCustomer();
-		customerRepository.save(customer);
-
-		Grade grade = creategrade();
-		gradeRepository.save(grade);
-
-		Member member = TestUtils.createMember(customer, grade);
-		memberRepository.save(member);
 
 		Address address = createAddress(member);
 		addressRepository.save(address);
@@ -97,17 +97,9 @@ class AddressServiceTest {
 
 	@DisplayName("회원의 등록된 주소를 삭제한다.")
 	@Test
+	@Transactional
 	void removeAddress() {
 		// given
-
-		Customer customer = TestUtils.createCustomer();
-		customerRepository.save(customer);
-
-		Grade grade = creategrade();
-		gradeRepository.save(grade);
-
-		Member member = TestUtils.createMember(customer, grade);
-		memberRepository.save(member);
 
 		Address address = createAddress(member);
 		addressRepository.save(address);
@@ -122,16 +114,9 @@ class AddressServiceTest {
 
 	@DisplayName("회원의 등록된 주소를 수정한다.")
 	@Test
+	@Transactional
 	void modifyAddress() {
 		// given
-		Customer customer = TestUtils.createCustomer();
-		customerRepository.save(customer);
-
-		Grade grade = creategrade();
-		gradeRepository.save(grade);
-
-		Member member = TestUtils.createMember(customer, grade);
-		memberRepository.save(member);
 
 		Address address = createAddress(member);
 		addressRepository.save(address);

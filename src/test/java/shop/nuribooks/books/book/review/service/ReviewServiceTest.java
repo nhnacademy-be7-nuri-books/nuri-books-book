@@ -27,12 +27,12 @@ import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewScoreResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
 import shop.nuribooks.books.common.TestUtils;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
@@ -46,7 +46,7 @@ import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class ReviewServiceTest {
+class ReviewServiceTest {
 	@Mock
 	private ApplicationEventPublisher publisher;
 	@InjectMocks
@@ -72,7 +72,7 @@ public class ReviewServiceTest {
 	private OrderDetail orderDetail;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		member = TestUtils.createMember(TestUtils.createCustomer(), TestUtils.creategrade());
 		TestUtils.setIdForEntity(member, 1L);
 
@@ -113,7 +113,7 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void registerMemberNotFound() {
+	void registerMemberNotFound() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 		MemberIdContext.setMemberId(member.getId());
 		assertThrows(MemberNotFoundException.class,
@@ -121,7 +121,7 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void registerOrderDetailNotFound() {
+	void registerOrderDetailNotFound() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(anyLong(), anyLong(),
@@ -133,8 +133,8 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void registerSuccessWithPolicyName() {
-		ReviewRequest newReviewRequest = new ReviewRequest("제에목", "내앵애애애애용", 1, book.getId(), List.of());
+	void registerSuccessWithPolicyName() {
+		ReviewRequest newReviewRequest = new ReviewRequest("제에목", "내앵애애애애용", 1, book.getId(), null);
 		Review newReview = newReviewRequest.toEntity(member, book, orderDetail);
 		TestUtils.setIdForEntity(newReview, 1L);
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
@@ -150,10 +150,10 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void registerSuccess() {
+	void registerSuccess() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		Review review1 = reviewRequest.toEntity(member, book, orderDetail);
-		TestUtils.setIdForEntity(review1, 1l);
+		TestUtils.setIdForEntity(review1, 1L);
 		when(reviewRepository.save(any())).thenReturn(review1);
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(anyLong(), anyLong(),
@@ -166,14 +166,14 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void registerByNullUser() {
+	void registerByNullUser() {
 		MemberIdContext.setMemberId(null);
 		assertThrows(RequiredHeaderIsNullException.class,
 			() -> reviewService.registerReview(reviewRequest));
 	}
 
 	@Test
-	public void updateFailed() {
+	void updateFailed() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.empty());
 		MemberIdContext.setMemberId(member.getId());
 		assertThrows(ReviewNotFoundException.class,
@@ -181,7 +181,7 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void updatedByOtherUser() {
+	void updatedByOtherUser() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
 		MemberIdContext.setMemberId(member.getId() + 10);
 		assertThrows(ReviewNotFoundException.class,
@@ -189,14 +189,14 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void updatedByNullUser() {
+	void updatedByNullUser() {
 		MemberIdContext.setMemberId(null);
 		assertThrows(RequiredHeaderIsNullException.class,
 			() -> reviewService.updateReview(reviewUpdateRequest, review.getId()));
 	}
 
 	@Test
-	public void updateSuccess() {
+	void updateSuccess() {
 		when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
 		MemberIdContext.setMemberId(member.getId());
 		assertEquals(ReviewMemberResponse.of(review),
@@ -204,29 +204,32 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void getScoreFail() {
+	void getScoreFail() {
 		when(bookRepository.existsById(anyLong())).thenReturn(false);
 		assertThrows(BookIdNotFoundException.class,
 			() -> this.reviewService.getScoreByBookId(1));
 	}
 
 	@Test
-	public void getScoreSuccess() {
+	void getScoreSuccess() {
 		double score = 4.1;
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findScoreByBookId(1)).thenReturn(score);
-		assertEquals(reviewService.getScoreByBookId(1), score);
+
+		ReviewScoreResponse response = reviewService.getScoreByBookId(1);
+
+		assertEquals(score, response.avgScore());
 	}
 
 	@Test
-	public void getReviewsAndMemFail() {
+	void getReviewsAndMemFail() {
 		when(bookRepository.existsById(anyLong())).thenReturn(false);
 		assertThrows(BookIdNotFoundException.class,
 			() -> this.reviewService.getReviewsByBookId(1, PageRequest.of(0, 1)));
 	}
 
 	@Test
-	public void getReviewsAndMemSuccess() {
+	void getReviewsAndMemSuccess() {
 		List<ReviewMemberResponse> res = new LinkedList<>();
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByBookId(anyLong(), any())).thenReturn(res);
@@ -237,7 +240,7 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void getReviewsAndMemFullSuccess() {
+	void getReviewsAndMemFullSuccess() {
 		List<ReviewMemberResponse> res = List.of(ReviewMemberResponse.of(review));
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByBookId(anyLong(), any())).thenReturn(res);
@@ -250,33 +253,33 @@ public class ReviewServiceTest {
 	}
 
 	@Test
-	public void getReviewsAndBookFail() {
+	void getReviewsAndBookFail() {
 		when(memberRepository.existsById(anyLong())).thenReturn(false);
 		assertThrows(MemberNotFoundException.class,
 			() -> this.reviewService.getReviewsByMemberId(1, PageRequest.of(0, 2)));
 	}
 
 	@Test
-	public void getReviewsAndBookSuccess() {
+	void getReviewsAndBookSuccess() {
 		List<ReviewBookResponse> res = new LinkedList<>();
 		when(memberRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByMemberId(anyLong(), any())).thenReturn(res);
-		PagedResponse<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
-		assertEquals(0, pageRes.content().size());
-		assertEquals(0, pageRes.page());
-		assertEquals(1, pageRes.size());
+		Page<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
+		assertEquals(0, pageRes.getContent().size());
+		assertEquals(0, pageRes.getNumber());
+		assertEquals(1, pageRes.getSize());
 	}
 
 	@Test
-	public void getReviewsAndBookFullSuccess() {
+	void getReviewsAndBookFullSuccess() {
 		List<ReviewBookResponse> res = List.of(ReviewBookResponse.of(review));
 		when(memberRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByMemberId(anyLong(), any())).thenReturn(res);
 		List<ReviewImageDto> reviewImages = List.of(new ReviewImageDto(1L, reviewImageResponse));
 		when(reviewImageRepository.findReviewImagesByReviewIds(anyList())).thenReturn(reviewImages);
-		PagedResponse<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
-		assertEquals(1, pageRes.content().size());
-		assertEquals(0, pageRes.page());
-		assertEquals(1, pageRes.size());
+		Page<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
+		assertEquals(1, pageRes.getContent().size());
+		assertEquals(0, pageRes.getNumber());
+		assertEquals(1, pageRes.getSize());
 	}
 }

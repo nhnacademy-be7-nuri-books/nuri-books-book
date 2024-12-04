@@ -20,6 +20,7 @@ public class RefundReturningPointRequest extends PointHistoryRequest {
 		this.amount = amount;
 	}
 
+	@Override
 	public RefundReturningPoint toEntity(PointPolicy pointPolicy) {
 		return RefundReturningPoint.builder()
 			.amount(amount)

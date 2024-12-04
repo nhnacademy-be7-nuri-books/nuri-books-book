@@ -17,10 +17,10 @@ public enum SortType {
 	REVIEW_COUNT_DESC(review.id.count(), Order.DESC),
 	REVIEW_COUNT_ASC(review.id.count(), Order.ASC);
 
-	private Expression exp;
+	private Expression<?> exp;
 	private Order order;
 
-	SortType(Expression exp, Order order) {
+	<T> SortType(Expression<T> exp, Order order) {
 		this.exp = exp;
 		this.order = order;
 	}

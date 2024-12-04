@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 
 import jakarta.validation.Valid;
 import shop.nuribooks.books.common.message.ResponseMessage;
+import shop.nuribooks.books.order.order.dto.OrderCancelDto;
+import shop.nuribooks.books.order.order.dto.request.OrderCancelRequest;
 import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
 import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
 import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
@@ -85,5 +87,48 @@ public interface OrderService {
 		OrderListPeriodRequest orderListPeriodRequest,
 		Optional<Long> userId);
 
-	OrderDetailResponse getOrderDetail(Optional<Long> userId, Long orderId, Pageable pageable);
+	Page<OrderListResponse> getNonMemberOrderList(
+		boolean includeOrdersInPendingStatus,
+		Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest,
+		Optional<Long> userId);
+
+	/**
+	 * 주문 상세 조회
+	 * @param memberId 사용자 아이디
+	 * @param orderId 주문 아이디
+	 * @param pageable 페이ㅣ
+	 * @return 주문 상세 내역
+	 */
+	OrderDetailResponse getOrderDetail(Optional<Long> memberId, Long orderId, Pageable pageable);
+
+	OrderDetailResponse getNonMemberOrderDetail(Optional<Long> customerId, Long orderId, Pageable pageable);
+
+	/**
+	 * 주문 취소/환불 목록 가져오기
+	 *
+	 * @param pageable 페이지
+	 * @param orderListPeriodRequest 적용 날짜
+	 * @param memberId 사용자 아이디
+	 * @return 주문 취소/환불 목록
+	 */
+	Page<OrderListResponse> getCancelledOrderList(Pageable pageable, OrderListPeriodRequest orderListPeriodRequest,
+		Optional<Long> memberId);
+
+	/**
+	 * 주문 취소 폼 불러오기
+	 * @param memberId 사용자 아이디
+	 * @param orderId 주문 아이디
+	 * @return 주문 취소 폼
+	 */
+	OrderCancelDto getOrderCancel(Optional<Long> memberId, Long orderId);
+
+	/**
+	 * 주문 취소 (결제 취소)
+	 *
+	 * @param customerId 사용자 아이디
+	 * @param orderId 주문 아이디
+	 * @return 응답 결과
+	 */
+	ResponseMessage doOrderCancel(Long customerId, Long orderId, OrderCancelRequest orderCancelRequest);
 }

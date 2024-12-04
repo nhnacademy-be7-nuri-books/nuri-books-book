@@ -33,13 +33,12 @@ import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @DataJpaTest
 @Import({QuerydslConfiguration.class})
-public class ReviewRepositoryTest {
+class ReviewRepositoryTest {
+	private final List<Review> reviews = new LinkedList<>();
 	@Autowired
 	private MemberRepository memberRepository;
-
 	@Autowired
 	private BookRepository bookRepository;
-
 	@Autowired
 	private ReviewRepository reviewRepository;
 	@Autowired
@@ -50,10 +49,8 @@ public class ReviewRepositoryTest {
 	private OrderDetailRepository orderDetailRepository;
 	@Autowired
 	private OrderRepository orderRepository;
-
 	private Member member;
 	private Book book;
-	private final List<Review> reviews = new LinkedList<>();
 
 	@BeforeEach
 	void setUp() {
@@ -91,20 +88,20 @@ public class ReviewRepositoryTest {
 	@Test
 	void getReviewWithBookIdTest() {
 		List<ReviewMemberResponse> response = reviewRepository.findReviewsByBookId(book.getId(), PageRequest.of(0, 2));
-		assertEquals(response.size(), 1);
+		assertEquals(1, response.size());
 	}
 
 	@Test
 	void getScoreWithBookIdTest() {
 		double response = reviewRepository.findScoreByBookId(book.getId());
-		assertEquals(response, reviews.get(0).getScore());
+		assertEquals(reviews.get(0).getScore(), response);
 	}
 
 	@Test
 	void getReviewWithMemberIdTest() {
 		List<ReviewBookResponse> response = reviewRepository.findReviewsByMemberId(member.getId(),
 			PageRequest.of(0, 2));
-		assertEquals(response.size(), reviews.size());
+		assertEquals(reviews.size(), response.size());
 	}
 
 	@Test

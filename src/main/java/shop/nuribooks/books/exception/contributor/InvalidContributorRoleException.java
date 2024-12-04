@@ -8,4 +8,8 @@ public class InvalidContributorRoleException extends BadRequestException {
 		super(message);
 	}
 
+	public InvalidContributorRoleException() {
+		super("잘못된 형식입니다.");
+	}
+
 }

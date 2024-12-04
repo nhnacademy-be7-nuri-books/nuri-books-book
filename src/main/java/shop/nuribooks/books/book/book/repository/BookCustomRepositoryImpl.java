@@ -11,13 +11,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.BookListResponse;
-import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
+import shop.nuribooks.books.book.book.dto.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.QBook;
 import shop.nuribooks.books.book.book.enums.SortType;
@@ -25,7 +25,7 @@ import shop.nuribooks.books.book.publisher.entity.QPublisher;
 
 @Repository
 @RequiredArgsConstructor
-public class BookCustomRepositoryImpl implements BookCustomRepository{
+public class BookCustomRepositoryImpl implements BookCustomRepository {
 
 	private final JPAQueryFactory queryFactory;
 
@@ -57,13 +57,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 
 		pageable.getSort().forEach(order -> {
 			SortType type = SortType.convert(order.getProperty());
-			OrderSpecifier orderSpecifier = new OrderSpecifier(type.getOrder(), type.getExpression());
+			OrderSpecifier<?> orderSpecifier = new OrderSpecifier(type.getOrder(), type.getExpression());
 			query.orderBy(orderSpecifier);
 		});
 
-		List<BookListResponse> books = query.fetch();
-
-		return books;
+		return query.fetch();
 	}
 
 	@Override
@@ -79,11 +77,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 	}
 
 	@Override
-	public List<TopBookLikeResponse> findTopBooksByLikes() {
+	public List<TopBookResponse> findTopBooksByLikes() {
 		QBook book = QBook.book;
 
 		return queryFactory.select(Projections.constructor(
-				TopBookLikeResponse.class,
+				TopBookResponse.class,
 				book.id,
 				book.thumbnailImageUrl,
 				book.title
@@ -91,7 +89,25 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 			.from(book)
 			.where(book.deletedAt.isNull())
 			.orderBy(book.likeCount.desc())
-			.limit(10)
+			.limit(8)
+			.fetch();
+	}
+
+	@Override
+	public List<TopBookResponse> findTopBooksByScore() {
+		return queryFactory
+			.select(Projections.constructor(
+				TopBookResponse.class,
+				book.id,
+				book.thumbnailImageUrl,
+				book.title
+			))
+			.from(book)
+			.leftJoin(review).on(review.book.id.eq(book.id))
+			.where(book.deletedAt.isNull())
+			.groupBy(book.id)
+			.orderBy(review.score.avg().desc())
+			.limit(8)
 			.fetch();
 	}
 
@@ -101,9 +117,9 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 		return queryFactory.selectFrom(book)
 			.where(book.deletedAt.isNull())
 			.fetch();
-  }
+	}
 
-  @Override
+	@Override
 	public long countBook() {
 		return Optional.ofNullable(
 				queryFactory.select(book.count())

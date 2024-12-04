@@ -148,7 +148,6 @@ public class MemberController {
 	@PutMapping("/api/members/me")
 	public ResponseEntity<ResponseMessage> memberUpdate(
 		@RequestBody @Valid MemberPasswordUpdateRequest request) {
-		// TODO: 동일한 password를 입력해도 항상 다른 암호화된 비밀번호가 넘어옴.
 
 		Long memberId = MemberIdContext.getMemberId();
 		memberService.updateMember(memberId, request);
@@ -157,6 +156,14 @@ public class MemberController {
 			"회원 정보가 수정되었습니다."));
 	}
 
+	/**
+	 * username으로 회원의 최근 로그인 일시 업데이트
+	 */
+	@Operation(summary = "회원의 최근 로그인 일시 업데이트", description = "username으로 회원의 최근 로그인 일시를 업데이트합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "회원의 최근 로그인 일시 업데이트 성공"),
+		@ApiResponse(responseCode = "404", description = "회원이 존재하지 않음")
+	})
 	@PutMapping("/api/members/{username}/login-time")
 	public ResponseEntity<ResponseMessage> memberLatestLoginAtUpdate(@PathVariable String username) {
 
@@ -166,6 +173,14 @@ public class MemberController {
 			"최근 로그인 시간이 수정되었습니다."));
 	}
 
+	/**
+	 * username으로 회원의 휴면 상태 해제
+	 */
+	@Operation(summary = "회원 휴면 상태 해제", description = "username으로 회원의 휴면 상태를 해제합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "회원의 휴면 상태 해제 성공"),
+		@ApiResponse(responseCode = "404", description = "회원이 존재하지 않음")
+	})
 	@PutMapping("/api/members/{username}/active")
 	public ResponseEntity<ResponseMessage> memberReactive(@PathVariable String username) {
 

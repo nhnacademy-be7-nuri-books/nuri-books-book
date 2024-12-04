@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,7 +20,7 @@ import shop.nuribooks.books.book.book.dto.BookListResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
+import shop.nuribooks.books.book.book.dto.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
@@ -179,8 +178,15 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public List<TopBookLikeResponse> getTopBookLikes() {
-		return bookRepository.findTopBooksByLikes();
+	public List<TopBookResponse> getTopBookLikes() {
+		List<TopBookResponse> likes = bookRepository.findTopBooksByLikes();
+		return likes != null ? likes : List.of();
+	}
+
+	@Override
+	public List<TopBookResponse> getTopBookScores() {
+		List<TopBookResponse> scores = bookRepository.findTopBooksByScore();
+		return scores != null ? scores : List.of();
 	}
 
 	//Contributor 저장 메서드
@@ -291,6 +297,15 @@ public class BookServiceImpl implements BookService {
 		return parsedContributors;
 	}
 
+	@Override
+	public List<BookResponse> getAllBooks() {
+		List<Book> books = bookRepository.findAllAndDeletedAtIsNull();
+
+		return books.stream()
+			.map(bookMapper::toBookResponse)
+			.toList();
+	}
+
 	/**
 	 * 도서 저장과 밀접하게 관련되었다 생각하여 서비스 내부에 해당 클래스를 선언했습니다.
 	 * 알라딘 api에서는 기여자에 대한 내용이 <author>모구랭 (지은이), 이르 (원작)</author> 이런식으로 응답이 오기 때문에
@@ -312,15 +327,6 @@ public class BookServiceImpl implements BookService {
 		public String getRole() {
 			return role;
 		}
-	}
-
-	@Override
-	public List<BookResponse> getAllBooks() {
-		List<Book> books = bookRepository.findAllAndDeletedAtIsNull();
-
-		return books.stream()
-			.map(bookMapper::toBookResponse)
-			.collect(Collectors.toList());
 	}
 }
 

@@ -25,16 +25,15 @@ import shop.nuribooks.books.book.point.dto.request.PointPolicyRequest;
 import shop.nuribooks.books.book.point.dto.response.PointPolicyResponse;
 import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.book.point.service.PointPolicyService;
-import shop.nuribooks.books.common.ControllerTestSupport;
 
-public class PointPolicyControllerTest extends ControllerTestSupport {
+@WebMvcTest(PointPolicyController.class)
+class PointPolicyControllerTest {
+	@MockBean
+	protected PointPolicyService pointPolicyService;
 	@Autowired
 	private MockMvc mockMvc;
-
-
 	@Autowired
 	private ObjectMapper objectMapper;
-
 	private PointPolicyRequest pointPolicyRequest;
 	private PointPolicyResponse pointPolicyResponse;
 

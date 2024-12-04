@@ -1,5 +1,7 @@
 package shop.nuribooks.books.book.coupon.service;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -9,12 +11,17 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
-import shop.nuribooks.books.book.coupon.dto.MemberCouponRegisterRequest;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
+import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
+import shop.nuribooks.books.book.coupon.enums.ExpirationType;
+import shop.nuribooks.books.book.coupon.enums.IssuanceType;
+import shop.nuribooks.books.book.coupon.repository.CouponPolicyRepository;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.exception.coupon.CouponAlreadyExistsException;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
+import shop.nuribooks.books.exception.coupon.InvalidCouponException;
 import shop.nuribooks.books.member.member.entity.Member;
 
 @RequiredArgsConstructor
@@ -22,6 +29,7 @@ import shop.nuribooks.books.member.member.entity.Member;
 public class CouponServiceImpl implements CouponService {
 	private final CouponRepository couponRepository;
 	private final MemberCouponService memberCouponService;
+	private final CouponPolicyRepository couponPolicyRepository;
 
 	/**
 	 * 쿠폰 등록하는 메서드
@@ -31,24 +39,47 @@ public class CouponServiceImpl implements CouponService {
 	 */
 	@Override
 	public Coupon registerCoupon(CouponRequest request) {
-		if (couponRepository.existsByNameIgnoreCaseAndExpiredDateIsNull(request.name())) {
+		if (couponRepository.existsByNameIgnoreCaseAndDeletedAtIsNull(request.name())) {
 			throw new CouponAlreadyExistsException();
 		}
 
-		Coupon coupon = request.toEntity();
+		CouponPolicy couponPolicy = couponPolicyRepository.findById(request.couponPolicyId()).orElseThrow(
+			CouponNotFoundException::new);
+
+		Coupon coupon = Coupon.builder()
+			.name(request.name())
+			.couponPolicy(couponPolicy)
+			.couponType(request.couponType())
+			.expirationType(request.expirationType())
+			.period(request.period())
+			.expiredAt(request.expiredAt())
+			.issuanceType(request.issuanceType())
+			.quantity(request.quantity())
+			.build();
+
 		return couponRepository.save(coupon);
 	}
 
 	/**
-	 * 모든 쿠폰 조회하는 메서드
+	 * 쿠폰 타입별로 조회하는 메서드
 	 *
 	 * @param pageable
 	 * @return
 	 */
 	@Override
 	public Page<CouponResponse> getCoupons(CouponType type, Pageable pageable) {
-		Page<CouponResponse> coupons = couponRepository.findCouponsByCouponId(pageable, type);
-		return coupons;
+		return couponRepository.findCouponsByCouponId(pageable, type);
+	}
+
+	/**
+	 * 모든 쿠폰 조회하는 메서드
+	 * @param pageable
+	 * @return
+	 */
+	@Override
+	public Page<CouponResponse> getAllCoupons(Pageable pageable) {
+		Page<Coupon> coupons = couponRepository.findAll(pageable);
+		return coupons.map(CouponResponse::of);
 	}
 
 	/**
@@ -58,11 +89,11 @@ public class CouponServiceImpl implements CouponService {
 	 * @return
 	 */
 	@Override
-	public Coupon getCouponById(Long id) {
+	public CouponResponse getCouponById(Long id) {
 		Coupon coupon = couponRepository.findById(id)
-			.orElseThrow(() -> new CouponNotFoundException());
+			.orElseThrow(CouponNotFoundException::new);
 
-		return coupon;
+		return CouponResponse.of(coupon);
 	}
 
 	/**
@@ -76,7 +107,7 @@ public class CouponServiceImpl implements CouponService {
 	@Transactional
 	public Coupon updateCoupon(Long id, CouponRequest request) {
 		Coupon coupon = couponRepository.findById(id)
-			.orElseThrow(() -> new CouponNotFoundException());
+			.orElseThrow(CouponNotFoundException::new);
 
 		coupon.update(request);
 		return coupon;
@@ -92,7 +123,7 @@ public class CouponServiceImpl implements CouponService {
 	public void issueWelcomeCoupon(Member member) {
 		Coupon welcomeCoupon = couponRepository.findCouponsByNameLike("%WELCOME%");
 
-		MemberCouponRegisterRequest request = new MemberCouponRegisterRequest(member.getId(), welcomeCoupon.getId());
+		MemberCouponIssueRequest request = new MemberCouponIssueRequest(member.getId(), welcomeCoupon.getId());
 		memberCouponService.registerMemberCoupon(request);
 	}
 
@@ -105,9 +136,51 @@ public class CouponServiceImpl implements CouponService {
 	@Transactional
 	public void expireCoupon(Long id) {
 		Coupon coupon = couponRepository.findById(id)
-			.orElseThrow(() -> new CouponNotFoundException());
+			.orElseThrow(CouponNotFoundException::new);
 
 		coupon.expire();
+	}
+
+	public void validateCouponRequest(CouponRequest couponRequest) {
+		validateExpiration(couponRequest.expirationType(), couponRequest.period(), couponRequest.expiredAt());
+		validateIssuanceTypeAndQuantity(couponRequest.issuanceType(), couponRequest.quantity());
+	}
+
+	private void validateExpiration(ExpirationType expirationType, Integer expirationDays, LocalDate expiredAt) {
+		if (expirationType == null) {
+			throw new InvalidCouponException("ExpirationType은 필수 값입니다.");
+		}
+
+		switch (expirationType) {
+			case ExpirationType.DATE -> validateDateExpiration(expiredAt);
+			case ExpirationType.DAYS -> validateDaysExpiration(expirationDays);
+			default -> throw new InvalidCouponException("알 수 없는 ExpirationType입니다.");
+
+		}
+	}
+
+	private void validateDateExpiration(LocalDate expiredAt) {
+		if (expiredAt == null) {
+			throw new InvalidCouponException("DATE 타입의 쿠폰은 expiredAt이 필수 값입니다.");
+		}
+		if (expiredAt.isBefore(LocalDate.now())) {
+			throw new InvalidCouponException("DATE 타입의 쿠폰은 유효한 expiredAt이 필요합니다.");
+		}
+	}
+
+	private void validateDaysExpiration(Integer expirationDays) {
+		if (expirationDays == null || expirationDays <= 0) {
+			throw new InvalidCouponException("DAYS 타입의 ExpirationDays는 1 이상의 값이어야 합니다.");
+		}
+	}
+
+	private void validateIssuanceTypeAndQuantity(IssuanceType issuanceType, Integer quantity) {
+		if (issuanceType == IssuanceType.LIMITED && (quantity == null || quantity <= 0)) {
+			throw new InvalidCouponException("LIMITED 타입 쿠폰은 1 이상의 quantity가 필요합니다.");
+		}
+		if (issuanceType == IssuanceType.UNLIMITED && quantity != null) {
+			throw new InvalidCouponException("UNLIMITED 타입 쿠폰은 quantity가 null이어야 합니다.");
+		}
 	}
 
 }

@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -13,19 +15,21 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.common.ControllerTestSupport;
+import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.exception.InvalidPageRequestException;
 
-public class BookControllerTest extends ControllerTestSupport {
+@WebMvcTest(BookController.class)
+class BookControllerTest {
 
+	@MockBean
+	protected BookService bookService;
 	@Autowired
 	private MockMvc mockMvc;
-
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	@Test
-	public void getBooks_ShouldReturnBadRequest_WhenPageIsOutOfRange() throws Exception {
+	void getBooks_ShouldReturnBadRequest_WhenPageIsOutOfRange() throws Exception {
 		Pageable pageable = PageRequest.of(10, 10);
 		when(bookService.getBooks(pageable)).thenThrow(new InvalidPageRequestException());
 
@@ -38,7 +42,7 @@ public class BookControllerTest extends ControllerTestSupport {
 	}
 
 	/*@Test
-	public void updateBook_ShouldReturnOk_WhenRequestIsValid() throws Exception {
+	void updateBook_ShouldReturnOk_WhenRequestIsValid() throws Exception {
 		Long bookId = 1L;
 		BookUpdateRequest bookUpdateReq = new BookUpdateRequest(
 			1L,
@@ -66,7 +70,7 @@ public class BookControllerTest extends ControllerTestSupport {
 	}*/
 
 	@Test
-	public void deleteBook_ShouldReturnNoContent_WhenBookExists() throws Exception {
+	void deleteBook_ShouldReturnNoContent_WhenBookExists() throws Exception {
 		Long bookId = 1L;
 
 		doNothing().when(bookService).deleteBook(bookId);
@@ -77,7 +81,7 @@ public class BookControllerTest extends ControllerTestSupport {
 	}
 
 	/*@Test
-	public void deleteBook_ShouldReturnNotFound_WhenBookDoesNotExist() throws Exception {
+	void deleteBook_ShouldReturnNotFound_WhenBookDoesNotExist() throws Exception {
 		Long bookId = 9999L;
 
 		doThrow(new ResourceNotFoundException("도서를 찾을 수 없습니다.")).when(bookService).deleteBook(bookId);

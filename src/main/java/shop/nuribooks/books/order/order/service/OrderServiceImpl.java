@@ -1,6 +1,7 @@
 package shop.nuribooks.books.order.order.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,20 +23,26 @@ import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.dto.BookOrderResponse;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
+import shop.nuribooks.books.book.coupon.dto.CouponAppliedOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.entity.AllAppliedCoupon;
 import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
+import shop.nuribooks.books.book.coupon.enums.DiscountType;
 import shop.nuribooks.books.book.coupon.repository.AllAppliedCouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
-import shop.nuribooks.books.book.point.enums.PolicyType;
-import shop.nuribooks.books.book.point.repository.PointPolicyRepository;
-import shop.nuribooks.books.book.point.service.PointHistoryService;
+import shop.nuribooks.books.book.point.entity.PointHistory;
+import shop.nuribooks.books.book.point.entity.child.OrderSavingPoint;
+import shop.nuribooks.books.book.point.entity.child.OrderUsingPoint;
+import shop.nuribooks.books.book.point.repository.OrderSavingPointRepository;
+import shop.nuribooks.books.book.point.repository.OrderUsingPointRepository;
+import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
 import shop.nuribooks.books.cart.entity.RedisCartKey;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
 import shop.nuribooks.books.common.message.ResponseMessage;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.MemberCartNotFoundException;
+import shop.nuribooks.books.exception.member.MemberNotFoundException;
 import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
 import shop.nuribooks.books.exception.order.NoStockAvailableException;
 import shop.nuribooks.books.exception.order.OrderNotFoundException;
@@ -53,7 +60,9 @@ import shop.nuribooks.books.member.customer.repository.CustomerRepository;
 import shop.nuribooks.books.member.member.dto.MemberPointDTO;
 import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
+import shop.nuribooks.books.order.order.dto.OrderCancelDto;
 import shop.nuribooks.books.order.order.dto.OrderSummaryDto;
+import shop.nuribooks.books.order.order.dto.request.OrderCancelRequest;
 import shop.nuribooks.books.order.order.dto.request.OrderListPeriodRequest;
 import shop.nuribooks.books.order.order.dto.request.OrderRegisterRequest;
 import shop.nuribooks.books.order.order.dto.response.OrderInformationResponse;
@@ -61,12 +70,15 @@ import shop.nuribooks.books.order.order.dto.response.OrderListResponse;
 import shop.nuribooks.books.order.order.dto.response.OrderPageResponse;
 import shop.nuribooks.books.order.order.dto.response.OrderRegisterResponse;
 import shop.nuribooks.books.order.order.entity.Order;
+import shop.nuribooks.books.order.order.event.OrderCancelPointEvent;
 import shop.nuribooks.books.order.order.event.PointUsedEvent;
 import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailItemDto;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailItemPageDto;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailRequest;
 import shop.nuribooks.books.order.orderdetail.dto.OrderDetailResponse;
+import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
+import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 import shop.nuribooks.books.order.orderdetail.service.OrderDetailService;
 import shop.nuribooks.books.order.shipping.dto.ShippingInfoDto;
@@ -80,22 +92,24 @@ import shop.nuribooks.books.order.wrapping.entity.WrappingPaper;
 import shop.nuribooks.books.order.wrapping.service.WrappingPaperService;
 import shop.nuribooks.books.payment.payment.dto.PaymentInfoDto;
 import shop.nuribooks.books.payment.payment.dto.PaymentRequest;
+import shop.nuribooks.books.payment.payment.service.PaymentService;
 
 @Service
 @Transactional(readOnly = true)
 @Slf4j
-public class OrderServiceImpl extends AbstractOrderService implements OrderService {
+public class OrderServiceImpl extends CommonOrderService implements OrderService {
 
-	private final OrderRepository orderRepository;
 	private final OrderDetailRepository orderDetailRepository;
 	private final ShippingRepository shippingRepository;
-	private final PointPolicyRepository pointPolicyRepository;
 	private final MemberCouponRepository memberCouponRepository;
 	private final AllAppliedCouponRepository allAppliedCouponRepository;
+	private final OrderUsingPointRepository orderUsingPointRepository;
+	private final PointHistoryRepository pointHistoryRepository;
 
 	private final OrderDetailService orderDetailService;
-	private final PointHistoryService pointHistoryService;
 	private final ApplicationEventPublisher publisher;
+	private final PaymentService paymentService;
+	private final OrderSavingPointRepository orderSavingPointRepository;
 
 	public OrderServiceImpl(CustomerRepository customerRepository,
 		BookRepository bookRepository,
@@ -107,15 +121,16 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		OrderRepository orderRepository,
 		OrderDetailRepository orderDetailRepository,
 		ShippingRepository shippingRepository,
-		PointPolicyRepository pointPolicyRepository,
 		ShippingService shippingService,
 		MemberCouponRepository memberCouponRepository,
 		OrderDetailService orderDetailService,
-		PointHistoryService pointHistoryService,
 		WrappingPaperService wrappingPaperService,
 		MemberCouponService memberCouponService,
 		AllAppliedCouponRepository allAppliedCouponRepository,
-		ApplicationEventPublisher publisher) {
+		OrderUsingPointRepository orderUsingPointRepository, PointHistoryRepository pointHistoryRepository,
+		ApplicationEventPublisher publisher,
+		PaymentService paymentService,
+		OrderSavingPointRepository orderSavingPointRepository) {
 		super(customerRepository,
 			bookRepository,
 			addressRepository,
@@ -123,18 +138,21 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 			redisCartRepository,
 			shippingPolicyRepository,
 			memberRepository,
+			orderRepository,
 			shippingService,
 			wrappingPaperService,
-			memberCouponService);
-		this.orderRepository = orderRepository;
+			memberCouponService
+		);
 		this.orderDetailRepository = orderDetailRepository;
 		this.shippingRepository = shippingRepository;
-		this.pointPolicyRepository = pointPolicyRepository;
 		this.memberCouponRepository = memberCouponRepository;
 		this.orderDetailService = orderDetailService;
-		this.pointHistoryService = pointHistoryService;
 		this.allAppliedCouponRepository = allAppliedCouponRepository;
+		this.orderUsingPointRepository = orderUsingPointRepository;
+		this.pointHistoryRepository = pointHistoryRepository;
 		this.publisher = publisher;
+		this.paymentService = paymentService;
+		this.orderSavingPointRepository = orderSavingPointRepository;
 	}
 
 	/**
@@ -335,7 +353,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		// 배송지 등록
 		shippingService.registerShipping(savedOrder, orderTempRegisterRequest.shippingRegister());
 
-		// todo : 회원 쿠폰 처리
+		// 회원 쿠폰 처리
 
 		// 주문 전체 적용 쿠폰
 		if (Objects.nonNull(orderTempRegisterRequest.allAppliedCoupon())) {
@@ -400,19 +418,17 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		String frontOrderId = paymentRequest.orderId();
 		Long orderId = Long.parseLong(frontOrderId.substring(frontOrderId.length() - 4));
 
-		Optional<Order> order = orderRepository.findById(orderId);
+		Order order = getOrderById(orderId);
 
-		if (order.isPresent()) {
-			if (!orderDetailService.checkStock(order.get())) {
-				log.error("결제 중 재고 없음");
-				throw new NoStockAvailableException("결제 중");
-			}
+		if (!orderDetailService.checkStock(order)) {
+			log.error("결제 중 재고 없음");
+			throw new NoStockAvailableException("결제 중");
+		}
 
-			BigDecimal paymentPrice = new BigDecimal(paymentRequest.amount());
-			if (order.get().getPaymentPrice().compareTo(paymentPrice) != 0) {
-				log.error("클라이언트에서 결제하려는 금액이 서버의 금액과 일치하지 않음");
-				throw new PriceMismatchException();
-			}
+		BigDecimal paymentPrice = new BigDecimal(paymentRequest.amount());
+		if (order.getPaymentPrice().compareTo(paymentPrice) != 0) {
+			log.error("클라이언트에서 결제하려는 금액이 서버의 금액과 일치하지 않음");
+			throw new PriceMismatchException();
 		}
 
 		log.debug("재고 최종 검증 성공");
@@ -429,7 +445,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 	 * @param includeOrdersInPendingStatus 대기 미포함 여부
 	 * @param pageable 페이지
 	 * @param orderListPeriodRequest 적용 날짜
-	 * @param userId 사용자 아이디
+	 * @param memberId 사용자 아이디
 	 * @return 주문 목록
 	 */
 	@Override
@@ -437,15 +453,92 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		boolean includeOrdersInPendingStatus,
 		Pageable pageable,
 		OrderListPeriodRequest orderListPeriodRequest,
-		Optional<Long> userId) {
+		Optional<Long> memberId) {
 
 		OrderPageResponse result = null;
-		if (userId.isPresent()) {
-			result = orderRepository.findOrders(includeOrdersInPendingStatus, userId.get(),
+		if (memberId.isPresent()) {
+			result = orderRepository.findOrders(includeOrdersInPendingStatus, memberId.get(),
 				pageable, orderListPeriodRequest);
 		}
 
-		return new PageImpl(result.orders(), pageable, result.totalCount());
+		return new PageImpl<>(result.orders(), pageable, result.totalCount());
+	}
+
+	@Override
+	public Page<OrderListResponse> getNonMemberOrderList(boolean includeOrdersInPendingStatus, Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest, Optional<Long> customerId) {
+		OrderPageResponse result = null;
+		if (customerId.isPresent()) {
+			result = orderRepository.findNonMemberOrders(includeOrdersInPendingStatus, customerId.get(),
+				pageable, orderListPeriodRequest);
+		}
+
+		return new PageImpl<>(result.orders(), pageable, result.totalCount());
+	}
+
+	/**
+	 * 주문 취소/환불 목록 가져오기
+	 *
+	 * @param pageable 페이지
+	 * @param orderListPeriodRequest 적용 날짜
+	 * @param memberId 사용자 아이디
+	 * @return 주문 취소/환불 목록
+	 */
+	@Override
+	public Page<OrderListResponse> getCancelledOrderList(Pageable pageable,
+		OrderListPeriodRequest orderListPeriodRequest, Optional<Long> memberId) {
+
+		OrderPageResponse result = null;
+		if (memberId.isPresent()) {
+			result = orderRepository.findCancelledOrders(memberId.get(),
+				pageable, orderListPeriodRequest);
+		}
+
+		return new PageImpl<>(result.orders(), pageable, result.totalCount());
+	}
+
+	/**
+	 * 주문 취소 폼 불러오기
+	 * @param memberId 사용자 아이디
+	 * @param orderId 주문 아이디
+	 * @return 주문 취소 폼
+	 */
+	@Override
+	public OrderCancelDto getOrderCancel(Optional<Long> memberId, Long orderId) {
+
+		Order order = getOrderById(orderId);
+
+		// 주문 쿠폰
+		Optional<AllAppliedCoupon> allAppliedCoupon = allAppliedCouponRepository.findByOrder(order);
+		List<CouponAppliedOrderDto> bookAppliedCouponList = new ArrayList<>();
+		if (allAppliedCoupon.isPresent()) {
+			Optional<MemberCoupon> memberCoupon = memberCouponRepository.findById(allAppliedCoupon.get().getId());
+			if (memberCoupon.isPresent()) {
+				CouponAppliedOrderDto couponAppliedOrderDto = CouponAppliedOrderDto.builder()
+					.name(memberCoupon.get().getCoupon().getName())
+					.discountPrice(allAppliedCoupon.get().getDiscount_price())
+					.couponType(memberCoupon.get().getCoupon().getCouponType())
+					.build();
+
+				bookAppliedCouponList.add(couponAppliedOrderDto);
+			}
+		}
+
+		// 도서 쿠폰
+
+		// 포인트
+		BigDecimal appliedPoint = BigDecimal.ZERO;
+		Optional<OrderUsingPoint> orderUsingPoint = orderUsingPointRepository.findByOrder(order);
+
+		if (orderUsingPoint.isPresent()) {
+			appliedPoint = orderUsingPoint.get().getAmount();
+		}
+
+		return OrderCancelDto.builder()
+			.paymentPrice(order.getPaymentPrice())
+			.bookAppliedCouponList(bookAppliedCouponList)
+			.usingPoint(appliedPoint)
+			.build();
 	}
 
 	/**
@@ -458,12 +551,67 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 	@Override
 	public OrderDetailResponse getOrderDetail(Optional<Long> userId, Long orderId, Pageable pageable) {
 
-		Order order = orderRepository.findById(orderId).orElseThrow(
-			() -> new OrderNotFoundException("해당 주문 정보가 존재하지 않습니다.")
-		);
+		Order order = getOrder(orderId);
 
 		if (!Objects.equals(order.getCustomer().getId(), userId.get())) {
 			log.error("주문 상세 조회 - {} 가 소유한 주문이 아님", userId.get());
+			throw new OrderNotBelongsToUserException("해당 주문 정보의 소유자가 아닙니다.");
+		}
+
+		WrappingPaper wrappingPaper = order.getWrappingPaper();
+		WrappingPaperResponse wrappingPaperResponse = null;
+
+		if (Objects.nonNull(wrappingPaper)) {
+			wrappingPaperResponse = WrappingPaperResponse.builder()
+				.id(wrappingPaper.getId())
+				.title(wrappingPaper.getTitle())
+				.imageUrl(wrappingPaper.getImageUrl())
+				.wrappingPrice(wrappingPaper.getWrappingPrice())
+				.build();
+		}
+
+		// 주문 요약 정보
+		OrderSummaryDto orderSummaryDto = OrderSummaryDto.builder()
+			.title(order.getTitle())
+			.orderedAt(order.getOrderedAt())
+			.wrappingInfo(wrappingPaperResponse)
+			.build();
+
+		// 배송 정보
+		Shipping shipping = shippingRepository.findByOrder(order);
+
+		ShippingInfoDto shippingInfoDto = ShippingInfoDto.builder()
+			.recipientName(shipping.getRecipientName())
+			.recipientPhoneNumber(shipping.getRecipientPhoneNumber())
+			.recipientAddress(shipping.getRecipientAddress())
+			.recipientAddressDetail(shipping.getRecipientAddressDetail())
+			.recipientZipcode(shipping.getRecipientZipcode())
+			.build();
+
+		// 주문 항목
+		OrderDetailItemPageDto orderDetailItem = orderDetailRepository.findOrderDetail(orderId, pageable);
+
+		Page<OrderDetailItemDto> orderListResponses =
+			new PageImpl<>(orderDetailItem.orderDetailItem(), pageable, orderDetailItem.totalCount());
+
+		// 결제 항목
+		PaymentInfoDto paymentInfoDto = orderRepository.findPaymentInfo(orderId);
+
+		return OrderDetailResponse.builder()
+			.order(orderSummaryDto)
+			.orderItems(orderListResponses)
+			.shipping(shippingInfoDto)
+			.payment(paymentInfoDto).build();
+	}
+
+	@Override
+	public OrderDetailResponse getNonMemberOrderDetail(Optional<Long> customerId, Long orderId,
+		Pageable pageable) {
+
+		Order order = getOrder(orderId);
+
+		if (!Objects.equals(order.getCustomer().getId(), customerId.get())) {
+			log.error("주문 상세 조회 - {} 가 소유한 주문이 아님", customerId.get());
 			throw new OrderNotBelongsToUserException("해당 주문 정보의 소유자가 아닙니다.");
 		}
 
@@ -488,8 +636,9 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		OrderDetailItemPageDto orderDetailItem = orderDetailRepository.findOrderDetail(orderId, pageable);
 
 		Page<OrderDetailItemDto> orderListResponses =
-			new PageImpl(orderDetailItem.orderDetailItem(), pageable, orderDetailItem.totalCount());
+			new PageImpl<>(orderDetailItem.orderDetailItem(), pageable, orderDetailItem.totalCount());
 
+		// 결제 항목
 		PaymentInfoDto paymentInfoDto = orderRepository.findPaymentInfo(orderId);
 
 		return OrderDetailResponse.builder()
@@ -497,6 +646,121 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 			.orderItems(orderListResponses)
 			.shipping(shippingInfoDto)
 			.payment(paymentInfoDto).build();
+	}
+
+	/**
+	 * 주문 취소 (결제 취소)
+	 *
+	 * @param customerId 사용자 아이디
+	 * @param orderId 주문 아이디
+	 * @return 응답 결과
+	 */
+	@Override
+	@Transactional
+	public ResponseMessage doOrderCancel(Long customerId, Long orderId, OrderCancelRequest orderCancelRequest) {
+
+		// 회원이 맞는 지 확인
+		Customer customer = getCustomerById(customerId);
+
+		// 주문 정보 가져오기
+		Order order = orderRepository.findByIdAndCustomer(orderId, customer).orElseThrow(
+			() -> new OrderNotFoundException("해당 주문 정보가 존재하지 않습니다.")
+		);
+
+		// 결제 취소
+		List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
+		OrderState orderState = orderDetails.getFirst().getOrderState();
+		ResponseMessage responseMessage = null;
+
+		if (orderState.name().equals("PENDING")) {
+
+			for (OrderDetail orderDetail : orderDetails) {
+				orderDetail.setOrderState(OrderState.CANCELED);
+				orderDetailRepository.save(orderDetail);
+			}
+
+			Optional<AllAppliedCoupon> allAppliedCoupon = allAppliedCouponRepository.findByOrder(order);
+			if (allAppliedCoupon.isPresent()) {
+				Optional<MemberCoupon> memberCoupon = memberCouponRepository.findById(
+					allAppliedCoupon.get().getId());
+				if (memberCoupon.isPresent()) {
+					memberCoupon.get().setUsed(false);
+					memberCouponRepository.save(memberCoupon.get());
+
+					allAppliedCouponRepository.delete(allAppliedCoupon.get());
+				}
+			}
+
+			Optional<OrderUsingPoint> orderUsingPoint = orderUsingPointRepository.findByOrder(order);
+
+			if (orderUsingPoint.isPresent()) {
+
+				Member member = memberRepository.findById(customerId).orElseThrow(
+					() -> new MemberNotFoundException("회원 정보가 없습니다.")
+				);
+
+				PointHistory pointHistory = pointHistoryRepository.findById(orderUsingPoint.get().getId()).get();
+				publisher.publishEvent(new OrderCancelPointEvent(member, order, pointHistory.getAmount().abs()));
+
+			}
+
+			return ResponseMessage.builder()
+				.statusCode(200)
+				.message("취소 완료")
+				.build();
+
+		} else if (orderState.name().equals("PAID")) {
+
+			responseMessage = paymentService.cancelPayment(order, orderCancelRequest.reason());
+			if (responseMessage.statusCode() == 200) {
+
+				for (OrderDetail orderDetail : orderDetails) {
+					orderDetail.setOrderState(OrderState.CANCELED);
+					orderDetailRepository.save(orderDetail);
+				}
+
+				// 보상 처리
+				Optional<AllAppliedCoupon> allAppliedCoupon = allAppliedCouponRepository.findByOrder(order);
+				if (allAppliedCoupon.isPresent()) {
+					Optional<MemberCoupon> memberCoupon = memberCouponRepository.findById(
+						allAppliedCoupon.get().getId());
+					memberCoupon.get().setUsed(false);
+					memberCouponRepository.save(memberCoupon.get());
+
+					allAppliedCouponRepository.delete(allAppliedCoupon.get());
+				}
+
+				Optional<OrderSavingPoint> orderSavingPoint = orderSavingPointRepository.findByOrder(order);
+				Optional<OrderUsingPoint> orderUsingPoint = orderUsingPointRepository.findByOrder(order);
+
+				if (orderUsingPoint.isPresent()) {
+
+					Member member = memberRepository.findById(customerId).orElseThrow(
+						() -> new MemberNotFoundException("회원 정보가 없습니다.")
+					);
+
+					PointHistory pointUsingHistory = pointHistoryRepository.findById(orderUsingPoint.get().getId())
+						.get();
+					PointHistory pointSavingHistory = pointHistoryRepository.findById(orderSavingPoint.get().getId())
+						.get();
+
+					BigDecimal result = pointUsingHistory.getAmount().abs().subtract(pointSavingHistory.getAmount());
+
+					publisher.publishEvent(new OrderCancelPointEvent(member, order, result));
+
+				}
+
+			}
+
+			return responseMessage;
+
+		} else {
+			return ResponseMessage.builder()
+				.statusCode(401)
+				.message("취소할 수 없는 주문입니다.")
+				.build();
+		}
+
 	}
 
 	// -------------- private
@@ -602,24 +866,24 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 	private void handlePointUsage(Long id, Order savedOrder, BigDecimal usedPoint) {
 		Optional<Member> member = memberRepository.findById(id);
 
-		member.ifPresent(value -> {
-			publisher.publishEvent(new PointUsedEvent(value, savedOrder, usedPoint));
-		});
+		member.ifPresent(value ->
+			publisher.publishEvent(new PointUsedEvent(value, savedOrder, usedPoint))
+		);
 	}
 
 	private void processCoupon(OrderRegisterRequest orderTempRegisterRequest, Order savedOrder) {
 		MemberCoupon memberCoupon = memberCouponRepository.findById(orderTempRegisterRequest.allAppliedCoupon())
 			.orElseThrow(MemberCartNotFoundException::new);
 
-		BigDecimal discountPrice = BigDecimal.valueOf(memberCoupon.getCoupon().getDiscount());
+		BigDecimal discountPrice = BigDecimal.valueOf(memberCoupon.getCoupon().getCouponPolicy().getDiscount());
 
 		// 쿠폰 정책에 따라 할인가 적용
-		if (memberCoupon.getCoupon().getPolicyType().compareTo(PolicyType.RATED) == 0) {
+		if (memberCoupon.getCoupon().getCouponPolicy().getDiscountType().compareTo(DiscountType.RATED) == 0) {
 			BigDecimal tempPrice = orderTempRegisterRequest.paymentBooks()
-				.multiply(discountPrice.divide(BigDecimal.valueOf(100)));
+				.multiply(discountPrice.divide(BigDecimal.valueOf(100), 1, RoundingMode.HALF_UP));
 
-			if (tempPrice.compareTo(memberCoupon.getCoupon().getMaximumDiscountPrice()) >= 0) {
-				discountPrice = memberCoupon.getCoupon().getMaximumDiscountPrice();
+			if (tempPrice.compareTo(memberCoupon.getCoupon().getCouponPolicy().getMaximumDiscountPrice()) >= 0) {
+				discountPrice = memberCoupon.getCoupon().getCouponPolicy().getMaximumDiscountPrice();
 			}
 		}
 
@@ -633,7 +897,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		allAppliedCouponRepository.save(allAppliedCoupon);
 
 		// 쿠폰 사용 처리
-		memberCoupon.setUsed();
+		memberCoupon.setUsed(true);
 		memberCouponRepository.save(memberCoupon);
 	}
 

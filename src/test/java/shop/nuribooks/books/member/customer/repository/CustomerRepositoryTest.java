@@ -16,7 +16,7 @@ import shop.nuribooks.books.member.customer.entity.Customer;
 
 @DataJpaTest
 @Import(QuerydslConfiguration.class)
-public class CustomerRepositoryTest {
+class CustomerRepositoryTest {
 
 	@Autowired
 	private CustomerRepository customerRepository;
@@ -36,7 +36,7 @@ public class CustomerRepositoryTest {
 	@DisplayName("이메일로 비회원 등록 여부 확인")
 	@Test
 	void existsByEmail() {
-	    //given
+		//given
 		String email = "nuri@nhnacademy.com";
 
 		//when

@@ -1,19 +1,19 @@
 package shop.nuribooks.books.book.book.entity;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
+import org.junit.jupiter.api.Test;
+
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 
-public class BookTest {
+class BookTest {
 
 	@Test
-	public void testBookBuilder() {
+	void testBookBuilder() {
 		Publisher publisher = Publisher.builder().name("출판사 이름").build();
 		Book book = Book.builder()
 			.state(BookStateEnum.NORMAL)
@@ -42,7 +42,7 @@ public class BookTest {
 	}
 
 	/*@Test
-	public void testUpdateBookDetails() {
+	void testUpdateBookDetails() {
 		Publisher publisher = Publisher.builder().name("Publisher").build();
 		Book book = Book.builder()
 			.state(BookStateEnum.NEW)
@@ -84,7 +84,7 @@ public class BookTest {
 	}*/
 
 	@Test
-	public void testBuilderWithNullValues() {
+	void testBuilderWithNullValues() {
 		Book book = Book.builder()
 			.publisherId(null)
 			.state(null)
@@ -110,7 +110,7 @@ public class BookTest {
 	}
 
 	@Test
-	public void testIncrementViewCount() {
+	void testIncrementViewCount() {
 		Book book = Book.builder()
 			.state(BookStateEnum.NORMAL)
 			.publisherId(new Publisher("Publisher"))

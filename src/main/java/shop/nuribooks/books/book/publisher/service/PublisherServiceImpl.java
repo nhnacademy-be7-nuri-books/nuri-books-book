@@ -75,7 +75,7 @@ public class PublisherServiceImpl implements PublisherService {
 	@Override
 	public PublisherResponse getPublisher(Long id) {
 		Publisher publisher = publisherRepository.findById(id)
-			.orElseThrow(() -> new PublisherNotFoundException());
+			.orElseThrow(PublisherNotFoundException::new);
 		return PublisherResponse.of(publisher);
 	}
 
@@ -88,7 +88,7 @@ public class PublisherServiceImpl implements PublisherService {
 	@Override
 	public void deletePublisher(Long id) {
 		Publisher publisher = publisherRepository.findById(id)
-			.orElseThrow(() -> new PublisherNotFoundException());
+			.orElseThrow(PublisherNotFoundException::new);
 
 		publisherRepository.delete(publisher);
 	}
@@ -104,7 +104,7 @@ public class PublisherServiceImpl implements PublisherService {
 	@Override
 	public PublisherResponse updatePublisher(Long id, PublisherRequest request) {
 		Publisher publisher = publisherRepository.findById(id)
-			.orElseThrow(() -> new PublisherNotFoundException());
+			.orElseThrow(PublisherNotFoundException::new);
 
 		if (publisherRepository.existsByName(request.name())) {
 			throw new PublisherAlreadyExistsException();

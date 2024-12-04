@@ -5,7 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class StatusTypeTest {
+class StatusTypeTest {
 
 	@DisplayName("상태 enum을 String으로 변환")
 	@Test

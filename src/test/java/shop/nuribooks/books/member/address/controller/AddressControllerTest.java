@@ -11,20 +11,25 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.member.address.dto.requset.AddressEditRequest;
 import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
+import shop.nuribooks.books.member.address.service.AddressServiceImpl;
 
-class AddressControllerTest extends ControllerTestSupport {
+@WebMvcTest(AddressController.class)
+class AddressControllerTest {
 
 	@Autowired
 	ObjectMapper objectMapper;
+	@MockBean
+	private AddressServiceImpl addressService;
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -143,5 +148,4 @@ class AddressControllerTest extends ControllerTestSupport {
 			)
 			.andExpect(status().isOk());
 	}
-
 }

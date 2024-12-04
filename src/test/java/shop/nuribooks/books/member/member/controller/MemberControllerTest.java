@@ -16,6 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.annotation.PostConstruct;
-import shop.nuribooks.books.common.ControllerTestSupport;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.member.dto.request.MemberPasswordUpdateRequest;
@@ -39,12 +40,15 @@ import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.StatusType;
+import shop.nuribooks.books.member.member.service.MemberService;
 
-class MemberControllerTest extends ControllerTestSupport {
+@WebMvcTest(MemberController.class)
+class MemberControllerTest {
 
+	@MockBean
+	protected MemberService memberService;
 	@Autowired
 	private MockMvc mockMvc;
-
 	@Autowired
 	private ObjectMapper objectMapper;
 
@@ -233,6 +237,42 @@ class MemberControllerTest extends ControllerTestSupport {
 				.value(Matchers.containsString("비밀번호는 반드시 입력해야 합니다.")));
 	}
 
+	@DisplayName("회원 username으로 최근 로그인 시간 업데이트")
+	@Test
+	void memberLatestLoginAtUpdate() throws Exception {
+		//given
+		String username = "member50";
+
+		doNothing().when(memberService).updateMemberLatestLoginAt(username);
+
+		//when
+		ResultActions result = mockMvc.perform(put("/api/members/{username}/login-time", username));
+
+		//then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("statusCode").value("200"))
+			.andExpect(jsonPath("message")
+				.value("최근 로그인 시간이 수정되었습니다."));
+	}
+
+	@DisplayName("회원 username으로 휴면 해제")
+	@Test
+	void memberReactive() throws Exception {
+		//given
+		String username = "member50";
+
+		doNothing().when(memberService).reactiveMember(username);
+
+		//when
+		ResultActions result = mockMvc.perform(put("/api/members/{username}/active", username));
+
+		//then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("statusCode").value("200"))
+			.andExpect(jsonPath("message")
+				.value("회원의 휴면 상태가 해제되었습니다."));
+	}
+
 	@DisplayName("관리자가 다양한 검색 조건을 이용하여 회원 목록 조회")
 	@Test
 	void memberSearchWithPaging() throws Exception {
@@ -322,9 +362,9 @@ class MemberControllerTest extends ControllerTestSupport {
 	 */
 	private MemberDetailsResponse getMemberDetailsResponse() {
 		return MemberDetailsResponse.builder()
-			.username("abc123")
+			.username("abcd1234")
 			.name("boho")
-			.phoneNumber("042-8282-8282")
+			.phoneNumber("01082828282")
 			.email("boho@nhnacademy.com")
 			.point(BigDecimal.ZERO)
 			.totalPaymentAmount(BigDecimal.ZERO)
@@ -372,7 +412,7 @@ class MemberControllerTest extends ControllerTestSupport {
 			.customerId(1L)
 			.name("곽홍섭")
 			.gender(GenderType.MALE)
-			.phoneNumber("042-8282-8282")
+			.phoneNumber("01082828282")
 			.email("hongsup@nhnacademy.com")
 			.birthday(LocalDate.of(1987, 11, 28))
 			.username("abcd1234")

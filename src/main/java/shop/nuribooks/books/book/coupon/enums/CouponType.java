@@ -5,13 +5,15 @@ public enum CouponType {
 	BOOK("도서"),
 	CATEGORY("카테고리");
 
-	String korName;
+	private final String korName;
 
 	CouponType(String korName) {
 		this.korName = korName;
 	}
 
+	@Override
 	public String toString() {
 		return this.korName;
 	}
+
 }

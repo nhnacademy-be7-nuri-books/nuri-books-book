@@ -28,7 +28,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 			roleEnum = ContributorRoleEnum.valueOf(req.getName().toUpperCase());
 
 		} catch (IllegalArgumentException e) {
-			throw new InvalidContributorRoleException("잘못된 형식입니다.");
+			throw new InvalidContributorRoleException();
 
 		}
 
@@ -61,7 +61,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 			newRoleEnum = ContributorRoleEnum.valueOf(updatedRoleName);
 
 		} catch (IllegalArgumentException e) {
-			throw new InvalidContributorRoleException("잘못된 형식입니다.");
+			throw new InvalidContributorRoleException();
 		}
 
 		if (contributorRolesRepository.existsByName(newRoleEnum)) {
@@ -81,7 +81,7 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 		try {
 			roleEnum = ContributorRoleEnum.valueOf(roleName.toUpperCase());
 		} catch (IllegalArgumentException e) {
-			throw new InvalidContributorRoleException("잘못된 형식입니다.");
+			throw new InvalidContributorRoleException();
 		}
 
 		ContributorRole role = contributorRolesRepository.findByName(roleEnum)

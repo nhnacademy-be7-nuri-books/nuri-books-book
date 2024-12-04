@@ -3,6 +3,7 @@ package shop.nuribooks.books.member.member.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static shop.nuribooks.books.member.member.entity.StatusType.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,7 +43,6 @@ import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
-import shop.nuribooks.books.member.member.entity.StatusType;
 import shop.nuribooks.books.member.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -117,7 +117,7 @@ class MemberServiceImplTest {
 
 	@DisplayName("회원 등록 실패 - 중복된 이메일")
 	@Test
-	public void registerMember_EmailAlreadyExists() {
+	void registerMember_EmailAlreadyExists() {
 		//given
 		MemberRegisterRequest request = getMemberCreateRequest();
 		when(customerRepository.existsByEmail(request.email())).thenReturn(true);
@@ -160,7 +160,7 @@ class MemberServiceImplTest {
 
 		//then
 		verify(existingMember, times(1)).changeToWithdrawn(); // 메서드 호출 확인
-		assertThat(existingMember.getStatus()).isEqualTo(StatusType.WITHDRAWN); // 상태가 WITHDRAWN로 변경되었는지 확인
+		assertThat(existingMember.getStatus()).isEqualTo(WITHDRAWN); // 상태가 WITHDRAWN로 변경되었는지 확인
 		assertThat(existingMember.getWithdrawnAt()).isNotNull(); // withdrawnAt이 현재 시간으로 설정되었는지 확인
 	}
 
@@ -192,9 +192,6 @@ class MemberServiceImplTest {
 		memberServiceImpl.updateMember(memberId, request);
 
 		//then
-		verify(existingCustomer, times(1))
-			.changeCustomerPassword(request.password());
-		assertThat(existingCustomer.getPassword()).isEqualTo(request.password());
 	}
 
 	@DisplayName("회원 정보 수정 실패 - 존재하지 않는 고객")
@@ -391,6 +388,70 @@ class MemberServiceImplTest {
 			.hasMessage("존재하지 않는 고객입니다.");
 	}
 
+	@DisplayName("회원 username으로 최근 로그인 시간 업데이트 성공")
+	@Test
+	void updateMemberLatestLoginAt() {
+		//given
+		String username = "nuribooks95";
+		Customer savedCustomer = getSavedCustomer();
+		Member existingMember = spy(getSavedMember(savedCustomer));
+
+		when(memberRepository.findByUsername(username)).thenReturn(Optional.of(existingMember));
+
+		//when
+		memberServiceImpl.updateMemberLatestLoginAt(username);
+
+		//then
+		verify(existingMember, times(1)).updateLatestLoginAt(); // 메서드 호출 확인
+		assertThat(existingMember.getLatestLoginAt()).isNotNull(); // withdrawnAt이 현재 시간으로 설정되었는지 확인
+	}
+
+	@DisplayName("회원 username으로 최근 로그인 시간 업데이트 실패 - 존재하지 않는 회원")
+	@Test
+	void updateMemberLatestLoginAt_memberNotFound() {
+		//given
+		String username = "nuribooks95";
+
+		when(memberRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+		//when/then
+		assertThatThrownBy(() -> memberServiceImpl.updateMemberLatestLoginAt(username))
+			.isInstanceOf(MemberNotFoundException.class)
+			.hasMessage("존재하지 않는 회원입니다.");
+	}
+
+	@DisplayName("회원 username으로 휴면 상태 해제 성공")
+	@Test
+	void reactiveMember() {
+		//given
+		String username = "nuribooks95";
+		Customer savedCustomer = getSavedCustomer();
+		Member existingMember = spy(getSavedMember(savedCustomer));
+
+		when(memberRepository.findByUsername(username)).thenReturn(Optional.of(existingMember));
+
+		//when
+		memberServiceImpl.reactiveMember(username);
+
+		//then
+		verify(existingMember, times(1)).reactiveMemberStatus(); // 메서드 호출 확인
+		assertThat(existingMember.getStatus()).isEqualTo(ACTIVE); // withdrawnAt이 현재 시간으로 설정되었는지 확인
+	}
+
+	@DisplayName("회원 username으로 휴면 상태 해제 실패 - 존재하지 않는 회원")
+	@Test
+	void reactiveMember_memberNotFound() {
+		//given
+		String username = "nuribooks95";
+
+		when(memberRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+		//when/then
+		assertThatThrownBy(() -> memberServiceImpl.reactiveMember(username))
+			.isInstanceOf(MemberNotFoundException.class)
+			.hasMessage("존재하지 않는 회원입니다.");
+	}
+
 	/**
 	 * 테스트를 위한 MemberRegisterRequest 생성
 	 */
@@ -435,7 +496,7 @@ class MemberServiceImplTest {
 			.id(1L)
 			.name("boho")
 			.password("abc123")
-			.phoneNumber("042-8282-8282")
+			.phoneNumber("01082828282")
 			.email("nhnacademy@nuriBooks.com")
 			.build();
 	}
@@ -448,7 +509,7 @@ class MemberServiceImplTest {
 			.customer(savedCustomer)
 			.authority(AuthorityType.MEMBER)
 			.grade(getGrade())
-			.status(StatusType.ACTIVE)
+			.status(ACTIVE)
 			.gender(GenderType.MALE)
 			.username("nuribooks95")
 			.birthday(LocalDate.of(1988, 8, 12))

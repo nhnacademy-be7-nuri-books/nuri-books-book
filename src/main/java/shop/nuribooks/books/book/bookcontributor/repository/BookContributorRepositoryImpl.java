@@ -1,7 +1,6 @@
 package shop.nuribooks.books.book.bookcontributor.repository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -59,6 +58,6 @@ public class BookContributorRepositoryImpl implements BookContributorCustomRepos
 					roleEnum.getKorName()
 				);
 			})
-			.collect(Collectors.toList());
+			.toList();
 	}
 }

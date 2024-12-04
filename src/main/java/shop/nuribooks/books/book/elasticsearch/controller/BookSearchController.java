@@ -27,10 +27,11 @@ public class BookSearchController {
 	@GetMapping
 	public Page<BookDocument> searchBooks(
 		@RequestParam("keyword") String keyword,
-		@RequestParam(name = "search_type", required = false, defaultValue = "ALL") SearchType searchType,
-		@RequestParam(name = "sort_type", required = false, defaultValue = "ACCURACY") SortType sortType,
+		@RequestParam(value = "category_id", required = false) Long categoryId,
+		@RequestParam(value = "search_type", required = false, defaultValue = "ALL") SearchType searchType,
+		@RequestParam(value = "sort_type", required = false, defaultValue = "ACCURACY") SortType sortType,
 		Pageable pageable
 	) throws IOException {
-		return bookSearchService.searchBooks(keyword, searchType, sortType, pageable);
+		return bookSearchService.searchBooks(keyword, categoryId, searchType, sortType, pageable);
 	}
 }
