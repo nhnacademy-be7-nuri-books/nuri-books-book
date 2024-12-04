@@ -97,7 +97,7 @@ import shop.nuribooks.books.payment.payment.service.PaymentService;
 @Service
 @Transactional(readOnly = true)
 @Slf4j
-public class OrderServiceImpl extends AbstractOrderService implements OrderService {
+public class OrderServiceImpl extends CommonOrderService implements OrderService {
 
 	private final OrderDetailRepository orderDetailRepository;
 	private final ShippingRepository shippingRepository;
