@@ -31,8 +31,6 @@ import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse
 import shop.nuribooks.books.book.bookcontributor.entity.BookContributor;
 import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepository;
 import shop.nuribooks.books.book.booktag.service.BookTagService;
-import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
-import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
 import shop.nuribooks.books.book.contributor.entity.Contributor;
 import shop.nuribooks.books.book.contributor.entity.ContributorRole;
@@ -55,10 +53,8 @@ public class BookServiceImpl implements BookService {
 	private final PublisherRepository publisherRepository;
 	private final BookMapper bookMapper;
 	private final BookContributorRepository bookContributorRepository;
-	private final CategoryRepository categoryRepository;
 	private final ContributorRepository contributorRepository;
 	private final ContributorRoleRepository contributorRoleRepository;
-	private final BookCategoryRepository bookCategoryRepository;
 	private final BookTagService bookTagService;
 	private final BookCategoryService bookCategoryService;
 	private final BookRegisterStrategyProvider bookRegisterStrategyProvider;

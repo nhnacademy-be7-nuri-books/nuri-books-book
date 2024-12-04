@@ -23,16 +23,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import shop.nuribooks.books.book.book.dto.AladinBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.dto.BookListResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.book.service.impl.BookServiceImpl;
+import shop.nuribooks.books.book.book.strategy.BookRegisterStrategy;
+import shop.nuribooks.books.book.book.strategy.BookRegisterStrategyProvider;
 import shop.nuribooks.books.book.book.utility.BookUtils;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
 import shop.nuribooks.books.book.bookcontributor.entity.BookContributor;
@@ -40,11 +44,9 @@ import shop.nuribooks.books.book.bookcontributor.repository.BookContributorRepos
 import shop.nuribooks.books.book.booktag.repository.BookTagRepository;
 import shop.nuribooks.books.book.booktag.service.BookTagService;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
-import shop.nuribooks.books.book.category.entity.BookCategory;
-import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
-import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
+import shop.nuribooks.books.book.contributor.entity.Contributor;
 import shop.nuribooks.books.book.contributor.entity.ContributorRole;
 import shop.nuribooks.books.book.contributor.entity.ContributorRoleEnum;
 import shop.nuribooks.books.book.contributor.repository.ContributorRepository;
@@ -73,9 +75,6 @@ class BooksServiceImplTest {
 	private PublisherRepository publisherRepository;
 
 	@Mock
-	private CategoryRepository categoryRepository;
-
-	@Mock
 	private ContributorRepository contributorRepository;
 
 	@Mock
@@ -95,6 +94,12 @@ class BooksServiceImplTest {
 
 	@Mock
 	private BookCategoryService bookCategoryService;
+
+	@Mock
+	private BookRegisterStrategyProvider bookRegisterStrategyProvider;
+
+	@Mock
+	private CategoryRegisterService categoryRegisterService;
 
 	private AladinBookRegisterRequest aladinRegisterRequest;
 	private PersonallyBookRegisterRequest personallyRegisterRequest;
@@ -196,8 +201,11 @@ class BooksServiceImplTest {
 		when(bookRepository.save(any(Book.class))).thenReturn(book);
 		when(contributorRoleRepository.findByName(ContributorRoleEnum.AUTHOR))
 			.thenReturn(Optional.of(contributorRole));
-		when(categoryRepository.findByNameAndParentCategory(any(), any()))
-			.thenReturn(Optional.empty());
+
+		BookRegisterStrategy mockStrategy = mock(BookRegisterStrategy.class);
+		when(bookRegisterStrategyProvider.getStrategy(any(BaseBookRegisterRequest.class)))
+			.thenReturn(mockStrategy);
+		doNothing().when(mockStrategy).registerCategory(any(BaseBookRegisterRequest.class), any(Book.class));
 
 		bookService.registerBook(aladinRegisterRequest);
 
@@ -205,8 +213,7 @@ class BooksServiceImplTest {
 		verify(publisherRepository, times(1)).findByName(aladinRegisterRequest.getPublisherName());
 		verify(contributorRoleRepository, times(1)).findByName(ContributorRoleEnum.AUTHOR);
 		verify(bookContributorRepository, times(1)).save(any(BookContributor.class));
-		verify(categoryRepository, times(2)).save(any(Category.class));
-		verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
+		verify(mockStrategy, times(1)).registerCategory(any(BaseBookRegisterRequest.class), any(Book.class));
 	}
 
 	@Test
@@ -220,7 +227,11 @@ class BooksServiceImplTest {
 		when(bookRepository.save(any(Book.class))).thenReturn(book);
 		when(contributorRoleRepository.findByName(ContributorRoleEnum.AUTHOR))
 			.thenReturn(Optional.of(contributorRole));
-		when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(new Category()));
+
+		BookRegisterStrategy mockStrategy = mock(BookRegisterStrategy.class);
+		when(bookRegisterStrategyProvider.getStrategy(personallyRegisterRequest))
+			.thenReturn(mockStrategy);
+		doNothing().when(mockStrategy).registerCategory(personallyRegisterRequest, book);
 
 		bookService.registerBook(personallyRegisterRequest);
 
@@ -228,7 +239,7 @@ class BooksServiceImplTest {
 		verify(publisherRepository, times(1)).findByName(personallyRegisterRequest.getPublisherName());
 		verify(contributorRoleRepository, times(1)).findByName(ContributorRoleEnum.AUTHOR);
 		verify(bookContributorRepository, times(1)).save(any(BookContributor.class));
-		verify(bookCategoryRepository, times(2)).save(any(BookCategory.class));
+		verify(mockStrategy, times(1)).registerCategory(any(BaseBookRegisterRequest.class), any(Book.class));
 	}
 
 	@Test
@@ -261,11 +272,20 @@ class BooksServiceImplTest {
 		when(bookRepository.save(any(Book.class))).thenReturn(book);
 		when(contributorRoleRepository.findByName(ContributorRoleEnum.AUTHOR))
 			.thenReturn(Optional.of(contributorRole));
-		when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(new Category()));
+
+		BookRegisterStrategy mockStrategy = mock(BookRegisterStrategy.class);
+		when(bookRegisterStrategyProvider.getStrategy(any(BaseBookRegisterRequest.class)))
+			.thenReturn(mockStrategy);
+		doNothing().when(mockStrategy).registerCategory(any(BaseBookRegisterRequest.class), any(Book.class));
 
 		bookService.registerBook(personallyRegisterRequest);
 
+		verify(bookRepository, times(1)).save(any(Book.class));
+		verify(publisherRepository, times(1)).findByName(personallyRegisterRequest.getPublisherName());
+		verify(contributorRoleRepository, times(1)).findByName(ContributorRoleEnum.AUTHOR);
+		verify(bookContributorRepository, times(1)).save(any(BookContributor.class));
 		verify(bookTagService, never()).registerTagToBook(anyLong(), any());
+		verify(mockStrategy, times(1)).registerCategory(any(BaseBookRegisterRequest.class), any(Book.class));
 	}
 
 	@Test
@@ -298,11 +318,63 @@ class BooksServiceImplTest {
 		when(bookRepository.save(any(Book.class))).thenReturn(book);
 		when(contributorRoleRepository.findByName(ContributorRoleEnum.AUTHOR))
 			.thenReturn(Optional.of(contributorRole));
-		when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(new Category()));
+
+		BookRegisterStrategy mockStrategy = mock(BookRegisterStrategy.class);
+		when(bookRegisterStrategyProvider.getStrategy(personallyRegisterRequest))
+			.thenReturn(mockStrategy);
+
+		doNothing().when(mockStrategy).registerCategory(personallyRegisterRequest, book);
 
 		bookService.registerBook(personallyRegisterRequest);
 
+		verify(bookRepository, times(1)).save(any(Book.class));
+		verify(publisherRepository, times(1)).findByName(personallyRegisterRequest.getPublisherName());
+		verify(contributorRoleRepository, times(1)).findByName(ContributorRoleEnum.AUTHOR);
+		verify(bookContributorRepository, times(1)).save(any(BookContributor.class));
 		verify(bookTagService, never()).registerTagToBook(anyLong(), any());
+		verify(mockStrategy, times(1)).registerCategory(any(BaseBookRegisterRequest.class), any(Book.class));
+	}
+
+	@Test
+	@DisplayName("registerBook - Contributor 및 ContributorRole이 존재하지 않을 경우 저장")
+	void registerBookWithNewContributorAndRole() {
+		BookStateEnum.fromStringKor(personallyRegisterRequest.getState());
+
+		when(bookRepository.existsByIsbn(personallyRegisterRequest.getIsbn())).thenReturn(false);
+		when(publisherRepository.findByName(personallyRegisterRequest.getPublisherName()))
+			.thenReturn(Optional.of(publisher));
+		when(bookRepository.save(any(Book.class))).thenReturn(book);
+
+		when(contributorRepository.findByName("이정규")).thenReturn(Optional.empty());
+		when(contributorRepository.save(any(Contributor.class))).thenAnswer(invocation -> {
+			Contributor contributor = invocation.getArgument(0);
+			ReflectionTestUtils.setField(contributor, "id", 1L);
+			return contributor;
+		});
+
+		when(contributorRoleRepository.findByName(ContributorRoleEnum.AUTHOR))
+			.thenReturn(Optional.empty());
+		when(contributorRoleRepository.save(any(ContributorRole.class))).thenAnswer(invocation -> {
+			ContributorRole role = invocation.getArgument(0);
+			ReflectionTestUtils.setField(role, "id", 1L);
+			return role;
+		});
+
+		BookRegisterStrategy mockStrategy = mock(BookRegisterStrategy.class);
+		when(bookRegisterStrategyProvider.getStrategy(any(BaseBookRegisterRequest.class)))
+			.thenReturn(mockStrategy);
+		doNothing().when(mockStrategy).registerCategory(any(BaseBookRegisterRequest.class), any(Book.class));
+
+		bookService.registerBook(personallyRegisterRequest);
+
+		verify(bookRepository, times(1)).save(any(Book.class));
+		verify(publisherRepository, times(1)).findByName(personallyRegisterRequest.getPublisherName());
+		verify(contributorRoleRepository, times(1)).findByName(ContributorRoleEnum.AUTHOR);
+		verify(contributorRepository, times(1)).findByName("이정규");
+		verify(contributorRepository, times(1)).save(any(Contributor.class));
+		verify(contributorRoleRepository, times(1)).save(any(ContributorRole.class));
+		verify(bookContributorRepository, times(1)).save(any(BookContributor.class));
+		verify(mockStrategy, times(1)).registerCategory(any(BaseBookRegisterRequest.class), any(Book.class));
 	}
 
 	@Test
@@ -378,26 +450,6 @@ class BooksServiceImplTest {
 		verify(bookRepository, never()).findAllWithPublisher(any(Pageable.class));
 	}
 
-	// @Test
-	// @DisplayName("getBooks - 유효한 페이지 요청 시 빈 리스트 반환")
-	// void getBooksReturnEmptyPage() {
-	// 	Pageable pageable = mock(Pageable.class);
-	// 	when(pageable.getPageNumber()).thenReturn(1);
-	// 	when(pageable.getPageSize()).thenReturn(10);
-	//
-	// 	List<BookListResponse> list = List.of();
-	// 	when(bookRepository.findAllWithPublisher(pageable)).thenReturn(list);
-	//
-	// 	Page<BookContributorsResponse> response = bookService.getBooks(pageable);
-	//
-	// 	assertNotNull(response);
-	// 	assertTrue(response.getContent().isEmpty());
-	// 	assertEquals(1, response.getNumber());
-	// 	assertEquals(10, response.getSize());
-	// 	assertEquals(1, response.getTotalPages());
-	// 	assertEquals(0, response.getTotalElements());
-	// }
-
 	@Test
 	@DisplayName("페이지 반환")
 	void getBooks() {
@@ -438,7 +490,7 @@ class BooksServiceImplTest {
 
 		when(bookContributorRepository.findContributorsAndRolesByBookId(1L)).thenReturn(contributors1);
 		when(bookContributorRepository.findContributorsAndRolesByBookId(2L)).thenReturn(contributors2);
-		when(bookRepository.countBook()).thenReturn(2l);
+		when(bookRepository.countBook()).thenReturn(2L);
 
 		Map<String, List<String>> contributorsByRole1 = Map.of(
 			"지은이", List.of("카트보이")
@@ -483,7 +535,9 @@ class BooksServiceImplTest {
 	@DisplayName("유효한 책 ID로 책 업데이트 성공")
 	void updateBookComplete() {
 		when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
-		when(categoryRepository.findById(any())).thenReturn(Optional.of(new Category()));
+
+		doNothing().when(categoryRegisterService)
+			.registerPersonallyCategories(updateRequest.categoryIds(), book);
 
 		bookService.updateBook(1L, updateRequest);
 
@@ -500,6 +554,7 @@ class BooksServiceImplTest {
 		verify(bookTagService, times(1)).deleteBookTagIds(1L);
 		verify(bookTagService, times(1)).registerTagToBook(1L, updateRequest.tagIds());
 		verify(bookCategoryService, times(1)).deleteBookCategories(1L);
+		verify(categoryRegisterService, times(1)).registerPersonallyCategories(anyList(), any(Book.class));
 	}
 
 	@Test
@@ -564,7 +619,7 @@ class BooksServiceImplTest {
 	}
 
 	@Test
-	@DisplayName("유효한 책 ID로 책 조회")
+	@DisplayName("유효한 책 ID로 책 조회 및 조회수 업데이트")
 	void getBookByIdCompleteAndUpdateCount() {
 		when(bookRepository.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.of(book));
 
@@ -621,6 +676,7 @@ class BooksServiceImplTest {
 
 			assertNotNull(result, "존재하지 않는 도서입니다.");
 			assertEquals(bookResponse, result);
+			assertEquals(1L, book.getViewCount());
 		}
 	}
 
@@ -639,19 +695,6 @@ class BooksServiceImplTest {
 	void deleteBookException() {
 		assertThrows(BookIdNotFoundException.class, () -> bookService.deleteBook(null));
 		verify(bookRepository, never()).findBookByIdAndDeletedAtIsNull(anyLong());
-	}
-
-	@Test
-	@DisplayName("registerAladinCategories 카테고리 저장")
-	void registerAladinCategories() {
-		when(bookRepository.save(any(Book.class))).thenReturn(book);
-		when(categoryRepository.findByNameAndParentCategory(anyString(), any()))
-			.thenReturn(Optional.empty());
-
-		bookService.registerBook(aladinRegisterRequest);
-
-		verify(categoryRepository, times(2)).save(any(Category.class));
-		verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
 	}
 
 	@Test
@@ -698,5 +741,185 @@ class BooksServiceImplTest {
 		});
 
 		assertEquals("입력 마지막에 괄호로 역할이 지정되지 않아 작가-역할 저장에 실패합니다.", exception.getMessage());
+	}
+
+	@Test
+	@DisplayName("getTopBookLikes - Top books by likes 반환")
+	void getTopBookLikesNotNull() {
+		List<TopBookResponse> topLikes = List.of(
+			new TopBookResponse(1L, "thumbnail1.jpg", "Book 1"),
+			new TopBookResponse(2L, "thumbnail2.jpg", "Book 2")
+		);
+		when(bookRepository.findTopBooksByLikes()).thenReturn(topLikes);
+
+		List<TopBookResponse> result = bookService.getTopBookLikes();
+
+		assertNotNull(result);
+		assertEquals(2, result.size());
+		assertEquals(1L, result.getFirst().bookId());
+		assertEquals("thumbnail1.jpg", result.get(0).thumbnailUrl());
+		assertEquals("Book 1", result.get(0).title());
+
+		assertEquals(2L, result.get(1).bookId());
+		assertEquals("thumbnail2.jpg", result.get(1).thumbnailUrl());
+		assertEquals("Book 2", result.get(1).title());
+
+		verify(bookRepository, times(1)).findTopBooksByLikes();
+	}
+
+	@Test
+	@DisplayName("getTopBookLikes - 좋아요가 null일 경우 빈 리스트 반환")
+	void getTopBookLikesNull() {
+		when(bookRepository.findTopBooksByLikes()).thenReturn(null);
+
+		List<TopBookResponse> responses = bookService.getTopBookLikes();
+
+		assertNotNull(responses);
+		assertTrue(responses.isEmpty());
+
+		verify(bookRepository, times(1)).findTopBooksByLikes();
+	}
+
+	@Test
+	@DisplayName("getTopBookScores - Top books by scores 반환")
+	void getTopBookScoresNotNull() {
+		List<TopBookResponse> topScores = List.of(
+			new TopBookResponse(1L, "thumbnail1.jpg", "Book 1"),
+			new TopBookResponse(2L, "thumbnail2.jpg", "Book 2")
+		);
+		when(bookRepository.findTopBooksByScore()).thenReturn(topScores);
+
+		List<TopBookResponse> result = bookService.getTopBookScores();
+
+		assertNotNull(result);
+		assertEquals(2, result.size());
+
+		assertEquals(1L, result.getFirst().bookId());
+		assertEquals("thumbnail1.jpg", result.get(0).thumbnailUrl());
+		assertEquals("Book 1", result.get(0).title());
+
+		assertEquals(2L, result.get(1).bookId());
+		assertEquals("thumbnail2.jpg", result.get(1).thumbnailUrl());
+		assertEquals("Book 2", result.get(1).title());
+
+		verify(bookRepository, times(1)).findTopBooksByScore();
+	}
+
+	@Test
+	@DisplayName("getTopBookScores - 리뷰 평균 점수에 대한 빈 리스트 반환")
+	void getTopBookScoresNull() {
+		when(bookRepository.findTopBooksByScore()).thenReturn(null);
+
+		List<TopBookResponse> responses = bookService.getTopBookScores();
+
+		assertNotNull(responses);
+		assertTrue(responses.isEmpty());
+
+		verify(bookRepository, times(1)).findTopBooksByScore();
+	}
+
+	@Test
+	@DisplayName("getAllBooks - 모든 도서 반환")
+	void getAllBooks() {
+		Book book1 = Book.builder()
+			.title("Book 1")
+			.publisherId(publisher)
+			.thumbnailImageUrl("thumbnail1.jpg")
+			.detailImageUrl("detail1.jpg")
+			.publicationDate(LocalDate.of(2022, 1, 1))
+			.price(BigDecimal.valueOf(20000))
+			.discountRate(10)
+			.description("Description 1")
+			.contents("Contents 1")
+			.isbn("1234567890123")
+			.isPackageable(true)
+			.likeCount(0)
+			.stock(100)
+			.viewCount(0L)
+			.build();
+
+		ReflectionTestUtils.setField(book, "id", 1L);
+
+		Book book2 = Book.builder()
+			.title("Book 2")
+			.publisherId(publisher)
+			.thumbnailImageUrl("thumbnail2.jpg")
+			.detailImageUrl("detail2.jpg")
+			.publicationDate(LocalDate.of(2023, 1, 1))
+			.price(BigDecimal.valueOf(25000))
+			.discountRate(15)
+			.description("Description 2")
+			.contents("Contents 2")
+			.isbn("1234567890124")
+			.isPackageable(true)
+			.likeCount(0)
+			.stock(50)
+			.viewCount(0L)
+			.build();
+
+		ReflectionTestUtils.setField(book, "id", 2L);
+
+		List<Book> books = List.of(book1, book2);
+		when(bookRepository.findAllAndDeletedAtIsNull()).thenReturn(books);
+
+		BookResponse response1 = new BookResponse(
+			1L,
+			"누리북스",
+			"정상",
+			"Book 1",
+			"thumbnail1.jpg",
+			"detail1.jpg",
+			LocalDate.of(2022, 1, 1),
+			BigDecimal.valueOf(20000),
+			10,
+			BigDecimal.valueOf(18000),
+			"Description 1",
+			"Contents 1",
+			"1234567890123",
+			true,
+			0,
+			100,
+			0L,
+			List.of("tag1", "tag2"),
+			Map.of("지은이", List.of("Author1")),
+			List.of(List.of(new SimpleCategoryResponse(1L, "소설"), new SimpleCategoryResponse(2L, "한국소설")))
+		);
+
+		BookResponse response2 = new BookResponse(
+			2L,
+			"누리북스",
+			"정상",
+			"Book 2",
+			"thumbnail2.jpg",
+			"detail2.jpg",
+			LocalDate.of(2023, 1, 1),
+			BigDecimal.valueOf(25000),
+			15,
+			BigDecimal.valueOf(21250),
+			"Description 2",
+			"Contents 2",
+			"1234567890124",
+			true,
+			0,
+			50,
+			0L,
+			List.of("tag3"),
+			Map.of("지은이", List.of("Author2")),
+			List.of(List.of(new SimpleCategoryResponse(1L, "비소설"), new SimpleCategoryResponse(2L, "기타")))
+		);
+
+		when(bookMapper.toBookResponse(book1)).thenReturn(response1);
+		when(bookMapper.toBookResponse(book2)).thenReturn(response2);
+
+		List<BookResponse> result = bookService.getAllBooks();
+
+		assertNotNull(result);
+		assertEquals(2, result.size());
+		assertEquals(response1, result.get(0));
+		assertEquals(response2, result.get(1));
+
+		verify(bookRepository, times(1)).findAllAndDeletedAtIsNull();
+		verify(bookMapper, times(1)).toBookResponse(book1);
+		verify(bookMapper, times(1)).toBookResponse(book2);
 	}
 }
