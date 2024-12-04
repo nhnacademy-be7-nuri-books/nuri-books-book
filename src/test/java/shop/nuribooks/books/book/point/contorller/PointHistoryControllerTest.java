@@ -11,7 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,7 +26,7 @@ import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 
 @WebMvcTest(PointHistoryController.class)
-public class PointHistoryControllerTest {
+class PointHistoryControllerTest {
 	@Autowired
 	MockMvc mockMvc;
 
@@ -40,78 +41,19 @@ public class PointHistoryControllerTest {
 			new PointHistoryResponse(1, BigDecimal.TEN, "descriptoi", LocalDateTime.now()));
 	}
 
-	@Test
-	void getAllTest() throws Exception {
+	@ParameterizedTest
+	@ValueSource(strings = {"ALL", "all", "alla"})
+	void getAllTest(String value) throws Exception {
 		when(pointHistoryService.getPointHistories(anyLong(), any(), any(),
 			any())).thenReturn(
 			new PageImpl<>(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
-		MemberIdContext.setMemberId(1l);
+		MemberIdContext.setMemberId(1L);
 		mockMvc.perform(get("/api/members/point-history")
-				.queryParam("type", "ALL")
+				.queryParam("type", value)
 				.queryParam("page", "0")
 				.queryParam("size", "3")
 				.queryParam("start", LocalDate.now().minusDays(30).toString())
 				.queryParam("end", LocalDate.now().toString()))
 			.andExpect(status().isOk());
 	}
-
-	@Test
-	void getAllLowerCaseTest() throws Exception {
-		when(pointHistoryService.getPointHistories(anyLong(), any(), any(),
-			any())).thenReturn(
-			new PageImpl<>(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
-		MemberIdContext.setMemberId(1l);
-		mockMvc.perform(get("/api/members/point-history")
-				.queryParam("type", "all")
-				.queryParam("page", "0")
-				.queryParam("size", "3")
-				.queryParam("start", LocalDate.now().minusDays(30).toString())
-				.queryParam("end", LocalDate.now().toString()))
-			.andExpect(status().isOk());
-	}
-
-	@Test
-	void getWrongTypeTest() throws Exception {
-		when(pointHistoryService.getPointHistories(anyLong(), any(), any(),
-			any())).thenReturn(
-			new PageImpl<>(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
-		MemberIdContext.setMemberId(1l);
-		mockMvc.perform(get("/api/members/point-history")
-				.queryParam("type", "alla")
-				.queryParam("page", "0")
-				.queryParam("size", "3")
-				.queryParam("start", LocalDate.now().minusDays(30).toString())
-				.queryParam("end", LocalDate.now().toString()))
-			.andExpect(status().isOk());
-	}
-
-	// @Test
-	// void getUsedTest() throws Exception {
-	// 	when(pointHistoryService.getUsedPointHistories(anyLong(), any(), any()
-	// 		any())).thenReturn(
-	// 		new PageImpl<>(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
-	// 	MemberIdContext.setMemberId(1l);
-	// 	mockMvc.perform(get("/api/members/point-history")
-	// 			.queryParam("type", "ALL")
-	// 			.queryParam("page", "0")
-	// 			.queryParam("size", "3")
-	// 			.queryParam("start", LocalDate.now().minusDays(30).toString())
-	// 			.queryParam("end", LocalDate.now().toString()))
-	// 		.andExpect(status().isOk());
-	// }
-	//
-	// @Test
-	// void getSavedTest() throws Exception {
-	// 	when(pointHistoryService.getPointHistories(anyLong(), any(), any()
-	// 		any())).thenReturn(
-	// 		new PageImpl<>(pointHistoryResponses, PageRequest.of(0, 3), pointHistoryResponses.size()));
-	// 	MemberIdContext.setMemberId(1l);
-	// 	mockMvc.perform(get("/api/members/point-history")
-	// 			.queryParam("type", "ALL")
-	// 			.queryParam("page", "0")
-	// 			.queryParam("size", "3")
-	// 			.queryParam("start", LocalDate.now().minusDays(30).toString())
-	// 			.queryParam("end", LocalDate.now().toString()))
-	// 		.andExpect(status().isOk());
-	// }
 }

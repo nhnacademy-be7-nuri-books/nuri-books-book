@@ -57,7 +57,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
 		pageable.getSort().forEach(order -> {
 			SortType type = SortType.convert(order.getProperty());
-			OrderSpecifier orderSpecifier = new OrderSpecifier(type.getOrder(), type.getExpression());
+			OrderSpecifier<?> orderSpecifier = new OrderSpecifier(type.getOrder(), type.getExpression());
 			query.orderBy(orderSpecifier);
 		});
 

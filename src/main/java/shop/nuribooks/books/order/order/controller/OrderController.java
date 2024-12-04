@@ -163,15 +163,15 @@ public class OrderController {
 		Page<OrderListResponse> result = orderService.getOrderList(includeOrdersInPendingStatus, pageable,
 			orderListPeriodRequest, memberId);
 
-		log.debug("주문 목록 조회 성공");
+		log.debug("회원 주문 목록 조회 성공");
 
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
-	@GetMapping("/non-member/{customer-id}")
-	@Operation(summary = "주문 목록 조회", description = "회원의 주문 목록을 조회합니다.")
+	@Operation(summary = "비회원 주문 목록 조회", description = "회원의 주문 목록을 조회합니다.")
 	@ApiResponse(responseCode = "200", description = "성공")
 	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	@GetMapping("/non-member/{customer-id}")
 	public ResponseEntity<Page<OrderListResponse>> getNonMemberOrderList(
 		OrderListPeriodRequest orderListPeriodRequest,
 		boolean includeOrdersInPendingStatus,
@@ -180,7 +180,7 @@ public class OrderController {
 		Page<OrderListResponse> result = orderService.getNonMemberOrderList(includeOrdersInPendingStatus, pageable,
 			orderListPeriodRequest, Optional.of(customerId));
 
-		log.debug("주문 목록 조회 성공");
+		log.debug("비회원 주문 목록 조회 성공");
 
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
@@ -234,6 +234,10 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
+	@Operation(summary = "비회원 주문 상세 조회", description = "특정 주문의 상세 정보를 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	@ApiResponse(responseCode = "500", description = "서버 오류")
 	@GetMapping("/{order-id}/non-member/{customer-id}")
 	public ResponseEntity<OrderDetailResponse> getNonMemberOrderDetail(
 		@PathVariable("order-id") Long orderId,
@@ -250,6 +254,13 @@ public class OrderController {
 	 * @param orderId 주문 아이디
 	 * @return 주문 상세 정보
 	 */
+	@Operation(
+		summary = "주문 취소 폼",
+		description = "주문 아이디에 해당하는 주문의 취소 정보를 가져옵니다."
+	)
+	@ApiResponse(responseCode = "200", description = "주문 취소 폼 정보 조회 성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	@ApiResponse(responseCode = "404", description = "주문을 찾을 수 없음")
 	@GetMapping("/{order-id}/cancel")
 	public ResponseEntity<OrderCancelDto> getOrderCancel(
 		@PathVariable("order-id") Long orderId
@@ -266,21 +277,29 @@ public class OrderController {
 	 * @param orderId 주문 아이디
 	 * @return 주문 상세 정보
 	 */
+	@Operation(
+		summary = "주문 취소",
+		description = "주문 아이디에 해당하는 주문을 취소합니다."
+	)
+	@ApiResponse(responseCode = "200", description = "주문 취소 성공")
+	@ApiResponse(responseCode = "400", description = "잘못된 요청")
+	@ApiResponse(responseCode = "404", description = "주문을 찾을 수 없음")
+	@ApiResponse(responseCode = "401", description = "권한 없음")
 	@PostMapping("/{order-id}/cancel")
 	public ResponseEntity<ResponseMessage> doOrderCancel(
 		@PathVariable("order-id") Long orderId,
 		@RequestBody OrderCancelRequest orderCancelRequest) {
 
 		Long customerId = orderCancelRequest.customerId();
-		// 비회원 일 경우 -
+		// 비회원 일 경우
 		if (customerId > -1) {
 			ResponseMessage result = orderService.doOrderCancel(customerId, orderId, orderCancelRequest);
 			return ResponseEntity.status(HttpStatus.OK).body(result);
 		} else {
 			// 회원일 경우
-			Optional<Long> memberId = Optional.ofNullable(MemberIdContext.getMemberId());
+			Optional<Long> member = Optional.ofNullable(MemberIdContext.getMemberId());
 
-			ResponseMessage result = orderService.doOrderCancel(memberId.get(), orderId, orderCancelRequest);
+			ResponseMessage result = orderService.doOrderCancel(member.get(), orderId, orderCancelRequest);
 			return ResponseEntity.status(HttpStatus.OK).body(result);
 		}
 

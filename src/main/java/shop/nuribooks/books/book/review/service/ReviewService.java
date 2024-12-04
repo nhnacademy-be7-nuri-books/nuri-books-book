@@ -8,7 +8,6 @@ import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewScoreResponse;
-import shop.nuribooks.books.common.message.PagedResponse;
 
 public interface ReviewService {
 	ReviewMemberResponse registerReview(ReviewRequest reviewRegisterRequest);
@@ -33,7 +32,7 @@ public interface ReviewService {
 	 * @param memberId
 	 * @return
 	 */
-	PagedResponse<ReviewBookResponse> getReviewsByMemberId(long memberId, Pageable pageable);
+	Page<ReviewBookResponse> getReviewsByMemberId(long memberId, Pageable pageable);
 
 	ReviewMemberResponse updateReview(ReviewUpdateRequest reviewUpdateRequest, long reviewId);
 }

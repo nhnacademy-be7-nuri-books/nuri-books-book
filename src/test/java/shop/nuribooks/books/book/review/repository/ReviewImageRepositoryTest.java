@@ -31,34 +31,26 @@ import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 
 @DataJpaTest
 @Import({QuerydslConfiguration.class})
-public class ReviewImageRepositoryTest {
+class ReviewImageRepositoryTest {
+	private final List<Review> reviews = new LinkedList<>();
 	@Autowired
 	private MemberRepository memberRepository;
-
 	@Autowired
 	private BookRepository bookRepository;
-
 	@Autowired
 	private ReviewRepository reviewRepository;
-
 	@Autowired
 	private PublisherRepository publisherRepository;
-
 	@Autowired
 	private GradeRepository gradeRepository;
-
 	@Autowired
 	private ReviewImageRepository reviewImageRepository;
-
 	@Autowired
 	private OrderDetailRepository orderDetailRepository;
-
 	@Autowired
 	private OrderRepository orderRepository;
-
 	private Member member;
 	private Book book;
-	private final List<Review> reviews = new LinkedList<>();
 
 	@BeforeEach
 	void setUp() {
@@ -94,7 +86,7 @@ public class ReviewImageRepositoryTest {
 	}
 
 	@Test
-	public void getReviewImageByReviewIdTest() {
+	void getReviewImageByReviewIdTest() {
 		List<ReviewImageDto> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(List.of(
 			reviews.get(0).getId()));
 		System.out.println(reviews.get(0).getReviewImages());
@@ -102,13 +94,13 @@ public class ReviewImageRepositoryTest {
 	}
 
 	@Test
-	public void getReviewImageByReviewIdsZeroTest() {
+	void getReviewImageByReviewIdsZeroTest() {
 		List<ReviewImageDto> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(List.of());
 		assertEquals(0, reviewImages.size());
 	}
 
 	@Test
-	public void getReviewImageByReviewIdsTest() {
+	void getReviewImageByReviewIdsTest() {
 		List<ReviewImageDto> reviewImages = this.reviewImageRepository.findReviewImagesByReviewIds(
 			List.of(reviews.get(0).getId(), reviews.get(1).getId()));
 		assertEquals(4, reviewImages.size());
