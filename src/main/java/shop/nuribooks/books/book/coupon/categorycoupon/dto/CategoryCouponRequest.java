@@ -1,16 +1,12 @@
 package shop.nuribooks.books.book.coupon.categorycoupon.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
-import shop.nuribooks.books.book.point.enums.PolicyType;
 
 public record CategoryCouponRequest(
 	@NotNull(message = "이름은 필수입니다.")
@@ -18,19 +14,7 @@ public record CategoryCouponRequest(
 	String name,
 
 	@NotNull(message = "쿠폰 할인 유형은 필수입니다.")
-	PolicyType policyType,
-
-	@NotNull(message = "할인 할당량은 필수입니다.")
-	@PositiveOrZero
-	int discount,
-
-	@NotNull(message = "최소 주문 금액은 필수입니다.")
-	@Digits(integer = 10, fraction = 0)
-	BigDecimal minimumOrderPrice,
-
-	@NotNull(message = "최대 할인 금액은 필수입니다.")
-	@Digits(integer = 10, fraction = 0)
-	BigDecimal maximumDiscountPrice,
+	Long couponPolicyId,
 
 	@NotNull(message = "시작일시는 필수입니다.")
 	LocalDate createdAt,

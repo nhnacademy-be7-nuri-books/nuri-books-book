@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,9 +18,11 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.dto.BookListResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -163,6 +166,48 @@ class BookCategoryRepositoryTest {
 		assertThat(count).isEqualTo(1);
 	}
 
+	@DisplayName("카테고리 ID 목록으로 책 개수 조회 성공")
+	@Test
+	@Order(8)
+	void countBookByCategoryIdsNull_Success() {
+		// Given
+		List<Long> categoryIds = null;
+
+		// When
+		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
+
+		// Then
+		assertThat(count).isZero();
+	}
+
+	@DisplayName("카테고리 ID 목록으로 책 개수 조회 성공")
+	@Test
+	@Order(8)
+	void countBookByCategoryIdsEmpty_Success() {
+		// Given
+		List<Long> categoryIds = new LinkedList<>();
+
+		// When
+		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
+
+		// Then
+		assertThat(count).isZero();
+	}
+
+	@DisplayName("카테고리 ID 목록으로 책 개수 조회 성공")
+	@Test
+	@Order(8)
+	void countBookByCategoryIdsWrong_Success() {
+		// Given
+		List<Long> categoryIds = List.of(30L);
+
+		// When
+		long count = bookCategoryRepository.countBookByCategoryIds(categoryIds);
+
+		// Then
+		assertThat(count).isZero();
+	}
+
 	@DisplayName("복수의 카테고리 ID로 책 조회 성공")
 	@Test
 	@Order(9)
@@ -250,5 +295,62 @@ class BookCategoryRepositoryTest {
 
 		// Then
 		assertThat(count).isZero();
+	}
+
+	@DisplayName("카테고리 ID 목록으로 책 조회 페이징 성공")
+	@Test
+	@Order(15)
+	void findBooksByCategoryIdWithPaging_Success() {
+		// Given
+		List<Long> categoryIds = Arrays.asList(category.getId(), parentCategory.getId());
+		Pageable pageable = PageRequest.of(0, 1); // 한 페이지당 1개의 결과
+
+		// When
+		Page<BookContributorsResponse> bookPage = bookCategoryRepository.findBooksByCategoryIdWithPaging(categoryIds,
+			pageable);
+
+		// Then
+		assertThat(bookPage)
+			.isNotNull()
+			.hasSize(1); // 페이징 설정에 따라 1개의 결과만 반환
+		assertThat(bookPage.getTotalElements()).isEqualTo(2); // 전체 개수는 2
+	}
+
+	@DisplayName("존재하지 않는 카테고리 ID로 페이징 조회 시 빈 결과 반환")
+	@Test
+	@Order(16)
+	void findBooksByCategoryIdWithPaging_InvalidCategoryId_ReturnsEmpty() {
+		// Given
+		List<Long> categoryIds = List.of(999L);
+		Pageable pageable = PageRequest.of(0, 1);
+
+		// When
+		Page<BookContributorsResponse> bookPage = bookCategoryRepository.findBooksByCategoryIdWithPaging(categoryIds,
+			pageable);
+
+		// Then
+		assertThat(bookPage)
+			.isNotNull()
+			.isEmpty(); // 빈 결과
+		assertThat(bookPage.getTotalElements()).isZero();
+	}
+
+	@DisplayName("카테고리 ID 목록이 비어있을 때 페이징 조회 시 빈 결과 반환")
+	@Test
+	@Order(17)
+	void findBooksByEmptyCategoryIdsWithPaging_ReturnsEmpty() {
+		// Given
+		List<Long> categoryIds = new ArrayList<>();
+		Pageable pageable = PageRequest.of(0, 1);
+
+		// When
+		Page<BookContributorsResponse> bookPage = bookCategoryRepository.findBooksByCategoryIdWithPaging(categoryIds,
+			pageable);
+
+		// Then
+		assertThat(bookPage)
+			.isNotNull()
+			.isEmpty(); // 빈 결과
+		assertThat(bookPage.getTotalElements()).isZero(); // 전체 개수는 0
 	}
 }

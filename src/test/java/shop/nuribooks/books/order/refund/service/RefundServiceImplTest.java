@@ -20,6 +20,7 @@ import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.common.TestUtils;
+import shop.nuribooks.books.exception.refund.RefundNotAllowedException;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.member.entity.Member;
@@ -29,8 +30,9 @@ import shop.nuribooks.books.order.order.repository.OrderRepository;
 import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
-import shop.nuribooks.books.order.orderdetail.service.OrderDetailService;
+import shop.nuribooks.books.order.refund.dto.RefundInfoDto;
 import shop.nuribooks.books.order.refund.dto.request.RefundRequest;
+import shop.nuribooks.books.order.refund.dto.response.RefundInfoResponse;
 import shop.nuribooks.books.order.refund.entity.Refund;
 import shop.nuribooks.books.order.refund.repository.RefundRepository;
 
@@ -47,9 +49,6 @@ class RefundServiceImplTest {
 	private OrderRepository orderRepository;
 
 	@Mock
-	private OrderDetailService orderDetailService;
-
-	@Mock
 	private OrderDetailRepository orderDetailRepository;
 
 	@Mock
@@ -58,21 +57,40 @@ class RefundServiceImplTest {
 	@Mock
 	private PointHistoryService pointHistoryService;
 
-	// @DisplayName("환불 받을 정보를 가져온다")
-	// @Test
-	// void getRefundResponseInfo() {
-	// 	// given
-	// 	Order order = createOrder();
-	// 	BigDecimal paymentPrice = order.getPaymentPrice();
-	// 	when(orderRepository.findById(any())).thenReturn(Optional.of(order));
-	// 	// when
-	// 	when(orderDetailRepository.findOrderDetail(any(), any())).thenReturn(null);
-	// 	PageRequest pageRequest = PageRequest.of(0, 5);
-	// 	RefundInfoResponse refundResponseInfo = refundService.getRefundInfoResponse(order.getId(), pageRequest);
-	// 	// then
-	// 	assertThat(refundResponseInfo.refundInfo().totalRefundAmount())
-	// 		.isEqualTo(paymentPrice.subtract(BigDecimal.valueOf(2500L)));
-	// }
+	@DisplayName("주문 완료되지 않으면 예외를 반환한다")
+	@Test
+	void getRefundResponseInfoNotAllowedException() {
+		// given
+		Long orderId = 1L;
+		OrderDetail orderDetail = mock(OrderDetail.class);
+		when(orderDetail.getOrderState()).thenReturn(OrderState.PAID);
+		when(orderDetailRepository.findAllByOrderId(orderId)).thenReturn(List.of(orderDetail));
+
+		// when then
+		assertThatThrownBy(() -> refundService.getRefundInfoResponse(orderId))
+			.isInstanceOf(RefundNotAllowedException.class);
+
+	}
+
+	@DisplayName("환불 받을 정보를 가져온다")
+	@Test
+	void getRefundResponseInfo() {
+		// given
+		Long orderId = 1L;
+		BigDecimal paymentPrice = BigDecimal.valueOf(20000L);
+		BigDecimal orderSavingPoint = BigDecimal.valueOf(2000L);
+		LocalDateTime shippingAt = LocalDateTime.now();
+
+		RefundInfoDto refundInfoDto = new RefundInfoDto(paymentPrice, orderSavingPoint, shippingAt);
+		when(refundRepository.findRefundInfo(orderId)).thenReturn(refundInfoDto);
+
+		// when
+		RefundInfoResponse refundResponseInfo = refundService.getRefundInfoResponse(orderId);
+
+		// then
+		assertThat(refundResponseInfo.refundInfo().totalRefundAmount())
+			.isEqualTo(paymentPrice.subtract(BigDecimal.valueOf(2500L)).subtract(orderSavingPoint));
+	}
 
 	@DisplayName("환불시 주문상태가 변경되고 금액을 포인트로 반환한다.")
 	@Test

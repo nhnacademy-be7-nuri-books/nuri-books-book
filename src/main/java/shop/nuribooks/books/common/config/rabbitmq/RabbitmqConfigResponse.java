@@ -7,6 +7,7 @@ public record RabbitmqConfigResponse(
 	int port,
 	@JsonProperty("username")
 	String userName,
-	String password
+	String password,
+	String vhost
 ) {
 }

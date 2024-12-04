@@ -20,12 +20,12 @@ import shop.nuribooks.books.book.review.dto.request.ReviewRequest;
 import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewScoreResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.event.ReviewRegisteredEvent;
 import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.ReviewService;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
@@ -85,10 +85,15 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public double getScoreByBookId(long bookId) {
+	public ReviewScoreResponse getScoreByBookId(long bookId) {
 		if (!bookRepository.existsById(bookId))
 			throw new BookIdNotFoundException();
-		return this.reviewRepository.findScoreByBookId(bookId);
+
+		Double avgScore = reviewRepository.findScoreByBookId(bookId);
+
+		double roundAvgScore = avgScore != null ? Math.round(avgScore * 10.0) / 10.0 : 0.0;
+
+		return new ReviewScoreResponse(roundAvgScore);
 	}
 
 	/**
@@ -133,7 +138,7 @@ public class ReviewServiceImpl implements ReviewService {
 	 * @return
 	 */
 	@Override
-	public PagedResponse<ReviewBookResponse> getReviewsByMemberId(long memberId, Pageable pageable) {
+	public Page<ReviewBookResponse> getReviewsByMemberId(long memberId, Pageable pageable) {
 		if (!memberRepository.existsById(memberId))
 			throw new MemberNotFoundException("유저를 찾을 수 없습니다.");
 		// review만 가져오기
@@ -158,7 +163,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		int totalElement = (int)this.reviewRepository.countByMemberId(memberId);
 
-		return PagedResponse.of(reviews, pageable, totalElement);
+		return new PageImpl<>(reviews, pageable, totalElement);
 	}
 
 	@Transactional
@@ -167,7 +172,7 @@ public class ReviewServiceImpl implements ReviewService {
 			.orElseThrow(RequiredHeaderIsNullException::new);
 		// 기존 review update 처리
 		Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
-		if (review.getMember().getId() != ownerId) {
+		if (!review.getMember().getId().equals(ownerId)) {
 			throw new ReviewNotFoundException();
 		}
 		review.update(reviewUpdateRequest);

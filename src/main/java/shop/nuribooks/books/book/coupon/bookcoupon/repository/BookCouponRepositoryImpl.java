@@ -19,7 +19,7 @@ public class BookCouponRepositoryImpl implements BookCouponCustomRepository {
 		BookCoupon result = queryFactory
 			.selectFrom(bookCoupon)
 			.where(bookCoupon.book.id.eq(bookId)
-				.and(bookCoupon.coupon.expiredDate.isNull()))
+				.and(bookCoupon.coupon.deletedAt.isNull()))
 			.fetchOne();
 
 		return Optional.ofNullable(result);

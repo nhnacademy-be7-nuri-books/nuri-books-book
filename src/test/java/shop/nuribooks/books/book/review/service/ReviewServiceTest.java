@@ -27,12 +27,12 @@ import shop.nuribooks.books.book.review.dto.request.ReviewUpdateRequest;
 import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
+import shop.nuribooks.books.book.review.dto.response.ReviewScoreResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.book.review.repository.ReviewImageRepository;
 import shop.nuribooks.books.book.review.repository.ReviewRepository;
 import shop.nuribooks.books.book.review.service.impl.ReviewServiceImpl;
 import shop.nuribooks.books.common.TestUtils;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 import shop.nuribooks.books.exception.book.BookIdNotFoundException;
 import shop.nuribooks.books.exception.common.RequiredHeaderIsNullException;
@@ -134,7 +134,7 @@ class ReviewServiceTest {
 
 	@Test
 	void registerSuccessWithPolicyName() {
-		ReviewRequest newReviewRequest = new ReviewRequest("제에목", "내앵애애애애용", 1, book.getId(), List.of());
+		ReviewRequest newReviewRequest = new ReviewRequest("제에목", "내앵애애애애용", 1, book.getId(), null);
 		Review newReview = newReviewRequest.toEntity(member, book, orderDetail);
 		TestUtils.setIdForEntity(newReview, 1L);
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
@@ -153,7 +153,7 @@ class ReviewServiceTest {
 	void registerSuccess() {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 		Review review1 = reviewRequest.toEntity(member, book, orderDetail);
-		TestUtils.setIdForEntity(review1, 1l);
+		TestUtils.setIdForEntity(review1, 1L);
 		when(reviewRepository.save(any())).thenReturn(review1);
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(orderDetailRepository.findByBookIdAndOrderCustomerIdAndReviewIsNullAndOrderStateIn(anyLong(), anyLong(),
@@ -215,7 +215,10 @@ class ReviewServiceTest {
 		double score = 4.1;
 		when(bookRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findScoreByBookId(1)).thenReturn(score);
-		assertEquals(reviewService.getScoreByBookId(1), score);
+
+		ReviewScoreResponse response = reviewService.getScoreByBookId(1);
+
+		assertEquals(score, response.avgScore());
 	}
 
 	@Test
@@ -261,10 +264,10 @@ class ReviewServiceTest {
 		List<ReviewBookResponse> res = new LinkedList<>();
 		when(memberRepository.existsById(anyLong())).thenReturn(true);
 		when(reviewRepository.findReviewsByMemberId(anyLong(), any())).thenReturn(res);
-		PagedResponse<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
-		assertEquals(0, pageRes.content().size());
-		assertEquals(0, pageRes.page());
-		assertEquals(1, pageRes.size());
+		Page<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
+		assertEquals(0, pageRes.getContent().size());
+		assertEquals(0, pageRes.getNumber());
+		assertEquals(1, pageRes.getSize());
 	}
 
 	@Test
@@ -274,9 +277,9 @@ class ReviewServiceTest {
 		when(reviewRepository.findReviewsByMemberId(anyLong(), any())).thenReturn(res);
 		List<ReviewImageDto> reviewImages = List.of(new ReviewImageDto(1L, reviewImageResponse));
 		when(reviewImageRepository.findReviewImagesByReviewIds(anyList())).thenReturn(reviewImages);
-		PagedResponse<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
-		assertEquals(1, pageRes.content().size());
-		assertEquals(0, pageRes.page());
-		assertEquals(1, pageRes.size());
+		Page<ReviewBookResponse> pageRes = reviewService.getReviewsByMemberId(1, PageRequest.of(0, 1));
+		assertEquals(1, pageRes.getContent().size());
+		assertEquals(0, pageRes.getNumber());
+		assertEquals(1, pageRes.getSize());
 	}
 }

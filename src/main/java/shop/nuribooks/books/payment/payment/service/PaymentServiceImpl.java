@@ -124,6 +124,7 @@ public class PaymentServiceImpl implements PaymentService {
 		return ResponseMessage.builder().message("성공").statusCode(201).build();
 	}
 
+	@Transactional
 	@Override
 	public ResponseMessage cancelPayment(Order order, String reason) {
 
@@ -188,6 +189,21 @@ public class PaymentServiceImpl implements PaymentService {
 
 				paymentCancelRepository.save(paymentCancel);
 
+				// 주문 상태 변경 & 재고 차감
+				List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(order.getId());
+
+				for (OrderDetail orderDetail : orderDetailList) {
+					orderDetail.setOrderState(OrderState.PAID);
+					orderDetail.setCount(-orderDetail.getCount());
+				}
+
+				//재고 업데이트 메시지 발행
+				try {
+					publishInventoryUpdateMessages(orderDetailList);
+				} catch (AmqpRejectAndDontRequeueException e) {
+					log.error("Invalid Message Format : {}", e.getMessage());
+				}
+
 				return ResponseMessage.builder().message("주문 취소 성공").statusCode(200).build();
 			}
 
@@ -208,9 +224,9 @@ public class PaymentServiceImpl implements PaymentService {
 	private void handlePointSaving(Order order) {
 		Optional<Member> member = memberRepository.findById(order.getCustomer().getId());
 
-		member.ifPresent(value -> {
-			publisher.publishEvent(new PointSavedEvent(value, order, order.getBooksPrice()));
-		});
+		member.ifPresent(value ->
+			publisher.publishEvent(new PointSavedEvent(value, order, order.getBooksPrice()))
+		);
 	}
 
 	//재고 업데이트 메시지 발행

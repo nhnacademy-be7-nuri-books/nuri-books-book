@@ -20,7 +20,7 @@ import shop.nuribooks.books.book.book.dto.BookListResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
+import shop.nuribooks.books.book.book.dto.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
@@ -178,8 +178,15 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public List<TopBookLikeResponse> getTopBookLikes() {
-		return bookRepository.findTopBooksByLikes();
+	public List<TopBookResponse> getTopBookLikes() {
+		List<TopBookResponse> likes = bookRepository.findTopBooksByLikes();
+		return likes != null ? likes : List.of();
+	}
+
+	@Override
+	public List<TopBookResponse> getTopBookScores() {
+		List<TopBookResponse> scores = bookRepository.findTopBooksByScore();
+		return scores != null ? scores : List.of();
 	}
 
 	//Contributor 저장 메서드

@@ -9,20 +9,22 @@ import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
+import shop.nuribooks.books.book.book.dto.TopBookResponse;
 
 public interface BookService {
 	void registerBook(BaseBookRegisterRequest reqDto);
 
 	Page<BookContributorsResponse> getBooks(Pageable pageable);
-  
+
 	BookResponse getBookById(Long bookId, boolean updateRecentView);
 
 	void updateBook(Long bookId, BookUpdateRequest bookUpdateReq);
 
 	void deleteBook(Long bookId);
 
-	List<TopBookLikeResponse> getTopBookLikes();
+	List<TopBookResponse> getTopBookLikes();
+
+	List<TopBookResponse> getTopBookScores();
 
 	List<BookResponse> getAllBooks();
 }

@@ -34,14 +34,16 @@ public class CartServiceImpl implements CartService {
 	private final CartDetailRepository cartDetailRepository;
 
 	@Override
-	public void addCustomerCart(String cartId, CartAddRequest request) {
+	public void addCustomerCart(CartAddRequest request) {
+		String cartId = CUSTOMER_KEY.withSuffix(request.cartId());
 		RedisCartDetail redisCartDetail = new RedisCartDetail(request.bookId().toString(), request.quantity());
 		redisCartRepository.addCart(cartId, redisCartDetail);
 		redisCartRepository.setExpire(cartId, 60, TimeUnit.MINUTES);
 	}
 
 	@Override
-	public void addMemberCart(String cartId, CartAddRequest request) {
+	public void addMemberCart(CartAddRequest request) {
+		String cartId = MEMBER_CART.withSuffix(request.cartId());
 		RedisCartDetail redisCartDetail = new RedisCartDetail(request.bookId().toString(), request.quantity());
 		redisCartRepository.addCart(cartId, redisCartDetail);
 		redisCartRepository.setShadowExpireKey(RedisCartKey.SHADOW_KEY.withSuffix(cartId), 60, TimeUnit.MINUTES);
@@ -100,10 +102,9 @@ public class CartServiceImpl implements CartService {
 	private void refreshExpireKey(String cartId) {
 		if (cartId.startsWith(MEMBER_CART.getKey())) {
 			redisCartRepository.setShadowExpireKey(RedisCartKey.SHADOW_KEY.withSuffix(cartId), 60, TimeUnit.MINUTES);
-		} else {
-			redisCartRepository.setExpire(cartId, 60, TimeUnit.MINUTES);
-
+			return;
 		}
+		redisCartRepository.setExpire(cartId, 60, TimeUnit.MINUTES);
 	}
 
 }

@@ -29,16 +29,14 @@ public class CartController {
 
 	@PostMapping("/api/cart")
 	public ResponseEntity<Void> addToCart(@RequestBody @Valid CartAddRequest cartAddRequest) {
-		String cartId;
 		Long memberId = MemberIdContext.getMemberId();
+
 		// 비회원인 경우
 		if (Objects.isNull(memberId)) {
-			cartId = CUSTOMER_KEY.withSuffix(cartAddRequest.cartId());
-			cartService.addCustomerCart(cartId, cartAddRequest);
-		} else {
-			cartId = MEMBER_CART.withSuffix(memberId.toString());
-			cartService.addMemberCart(cartId, cartAddRequest);
+			cartService.addCustomerCart(cartAddRequest);
+			return ResponseEntity.ok().build();
 		}
+		cartService.addMemberCart(cartAddRequest);
 		return ResponseEntity.ok().build();
 	}
 
@@ -58,7 +56,7 @@ public class CartController {
 	@PostMapping("/api/cart/load-to-redis")
 	public ResponseEntity<Void> loadCartToRedis(@RequestBody CartLoadRequest request) {
 		cartService.loadCart(request);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok().build();
 	}
 
 	@DeleteMapping("/api/cart/{cart-id}/book/{book-id}")

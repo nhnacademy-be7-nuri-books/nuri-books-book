@@ -15,6 +15,7 @@ public class ReviewSavingPointRequest extends PointHistoryRequest {
 		this.review = review;
 	}
 
+	@Override
 	public ReviewSavingPoint toEntity(PointPolicy pointPolicy) {
 		return ReviewSavingPoint.builder()
 			.amount(pointPolicy.getAmount())

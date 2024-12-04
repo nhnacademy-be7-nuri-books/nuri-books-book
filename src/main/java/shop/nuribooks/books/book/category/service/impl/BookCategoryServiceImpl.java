@@ -17,8 +17,6 @@ import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
-import shop.nuribooks.books.common.message.PagedResponse;
-import shop.nuribooks.books.exception.InvalidPageRequestException;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 import shop.nuribooks.books.exception.category.BookCategoryAlreadyExistsException;
 import shop.nuribooks.books.exception.category.BookCategoryNotFoundException;
@@ -121,28 +119,16 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	 * @throws CategoryNotFoundException 지정된 카테고리 ID가 존재하지 않을 경우 발생
 	 */
 	@Override
-	public PagedResponse<BookContributorsResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
+	public Page<BookContributorsResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
 		if (!categoryRepository.existsById(categoryId)) {
 			throw new CategoryNotFoundException();
 		}
 
-		if (pageable.getPageNumber() < 0) {
-			throw new InvalidPageRequestException();
-		}
-
 		List<Long> categoryIds = categoryRepository.findAllChildCategoryIds(categoryId);
 
-		Page<BookContributorsResponse> bookContributorsResponsePage = bookCategoryRepository.findBooksByCategoryIdWithPaging(
+		return bookCategoryRepository.findBooksByCategoryIdWithPaging(
 			categoryIds,
 			pageable
-		);
-
-		return new PagedResponse<>(
-			bookContributorsResponsePage.getContent(),
-			bookContributorsResponsePage.getNumber(),
-			bookContributorsResponsePage.getSize(),
-			bookContributorsResponsePage.getTotalPages(),
-			bookContributorsResponsePage.getTotalElements()
 		);
 
 	}

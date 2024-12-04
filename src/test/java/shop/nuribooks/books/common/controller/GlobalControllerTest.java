@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.netflix.appinfo.ApplicationInfoManager;
 
 @WebMvcTest(GlobalController.class)
-public class GlobalControllerTest {
+class GlobalControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -20,7 +20,7 @@ public class GlobalControllerTest {
 	private ApplicationInfoManager applicationInfoManager;
 
 	@Test
-	public void test() throws Exception {
+	void test() throws Exception {
 		mockMvc.perform(post("/actuator/shutdown"))
 			.andExpect(status().isOk());
 	}

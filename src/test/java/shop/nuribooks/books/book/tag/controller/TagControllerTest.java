@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +92,20 @@ class TagControllerTest {
 
 		verify(tagService).getTag(id);
 
+	}
+
+	@DisplayName("전체 태그 조회")
+	@Test
+	void getAllTags_noPageable() throws Exception {
+		Long id = 1L;
+		TagResponse tag = TagResponse.builder().id(id).name("tag1").build();
+		List<TagResponse> tagResponses = List.of(tag);
+		when(tagService.getAllTags()).thenReturn(tagResponses);
+
+		mockMvc.perform(get("/api/books/tags/all", id)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.*", Matchers.hasSize(1)));
 	}
 
 	@DisplayName("특정 태그 수정")

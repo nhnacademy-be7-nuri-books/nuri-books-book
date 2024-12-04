@@ -18,7 +18,6 @@ import shop.nuribooks.books.order.refund.entity.Refund;
 @DiscriminatorValue("refund_returning_point")
 @Table(name = "refund_returning_point")
 public class RefundReturningPoint extends PointHistory {
-	// TODO:: 환불 id 추가
 	@OneToOne
 	@JoinColumn(name = "refund_id")
 	private Refund refund;

@@ -291,4 +291,73 @@ class CategoryServiceImplTest {
 		verify(categoryRepository, never()).save(any(Category.class));
 	}
 
+	@Test
+	void getAllCategoryTree_WhenCategoriesExist_ShouldReturnCategoryTree() {
+		// Given
+		Category rootCategory1 = new Category("Root Category 1", null);
+		Category rootCategory2 = new Category("Root Category 2", null);
+
+		Category subCategory1 = new Category("SubCategory 1", rootCategory1);
+		rootCategory1.getSubCategory().add(subCategory1);
+
+		when(categoryRepository.findAllByParentCategoryIsNull()).thenReturn(List.of(rootCategory1, rootCategory2));
+
+		// When
+		List<CategoryResponse> categoryTree = categoryService.getAllCategoryTree();
+
+		// Then
+		assertThat(categoryTree).hasSize(2);
+		assertThat(categoryTree.getFirst().name()).isEqualTo("Root Category 1");
+		assertThat(categoryTree.getFirst().subCategories()).hasSize(1);
+
+		verify(categoryRepository, times(1)).findAllByParentCategoryIsNull();
+	}
+
+	@Test
+	void buildCategoryTree_ShouldReturnCategoryTree() {
+		// Given
+		Category rootCategory = new Category("Root Category", null);
+		Category subCategory1 = new Category("SubCategory 1", rootCategory);
+		Category subCategory2 = new Category("SubCategory 2", rootCategory);
+		rootCategory.getSubCategory().addAll(List.of(subCategory1, subCategory2));
+
+		// When
+		CategoryResponse categoryTree = categoryService.buildCategoryTree(rootCategory);
+
+		// Then
+		assertThat(categoryTree.name()).isEqualTo("Root Category");
+		assertThat(categoryTree.subCategories()).hasSize(2);
+		assertThat(categoryTree.subCategories().getFirst().name()).isEqualTo("SubCategory 1");
+	}
+
+	@Test
+	void getCategoryNameById_ShouldReturnCategoryName() {
+		// Given
+		Long categoryId = 1L;
+		Category category = new Category("Category Name", null);
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+
+		// When
+		CategoryRequest categoryName = categoryService.getCategoryNameById(categoryId);
+
+		// Then
+		assertThat(categoryName.name()).isEqualTo("Category Name");
+		verify(categoryRepository, times(1)).findById(categoryId);
+	}
+
+	@Test
+	void getCategoryNameById_ShouldThrowException_WhenCategoryNotFound() {
+		// Given
+		Long categoryId = 1L;
+
+		when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> categoryService.getCategoryNameById(categoryId))
+			.isInstanceOf(CategoryNotFoundException.class)
+			.hasMessageContaining("입력한 카테고리ID는 " + categoryId + " 존재하지 않습니다.");
+		verify(categoryRepository, times(1)).findById(categoryId);
+	}
+
 }

@@ -58,6 +58,7 @@ public class OrderDetail {
 	@Comment("연결된 책 정보")
 	private Book book;
 
+	@Setter
 	@Column(nullable = false)
 	@Comment("주문 수량")
 	private int count = 1;

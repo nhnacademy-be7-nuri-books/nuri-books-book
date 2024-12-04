@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,7 +28,8 @@ import shop.nuribooks.books.member.member.entity.Member;
 @Getter
 @NoArgsConstructor
 @SuperBuilder
-@DiscriminatorColumn
+@DiscriminatorColumn(name = "")
+@DiscriminatorValue(value = "몰랑")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "point_histories")
 public class PointHistory {
@@ -59,12 +61,4 @@ public class PointHistory {
 	@ManyToOne
 	@JoinColumn(name = "point_policy_id", nullable = false)
 	private PointPolicy pointPolicy;
-
-	// public PointHistory(BigDecimal amount, String description, Member member, PointPolicy pointPolicy) {
-	// 	this.amount = amount;
-	// 	this.description = description;
-	// 	this.member = member;
-	// 	this.pointPolicy = pointPolicy;
-	// 	this.createdAt = LocalDateTime.now();
-	// }
 }

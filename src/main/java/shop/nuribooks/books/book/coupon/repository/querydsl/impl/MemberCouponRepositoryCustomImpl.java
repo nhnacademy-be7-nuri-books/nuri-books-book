@@ -33,10 +33,10 @@ public class MemberCouponRepositoryCustomImpl implements MemberCouponRepositoryC
 
 		return queryFactory.select(Projections.constructor(MemberCouponResponse.class,
 				memberCoupon.coupon.name,
-				memberCoupon.coupon.policyType,
-				memberCoupon.coupon.discount,
-				memberCoupon.coupon.minimumOrderPrice,
-				memberCoupon.coupon.maximumDiscountPrice,
+				memberCoupon.coupon.couponPolicy.discountType,
+				memberCoupon.coupon.couponPolicy.discount,
+				memberCoupon.coupon.couponPolicy.minimumOrderPrice,
+				memberCoupon.coupon.couponPolicy.maximumDiscountPrice,
 				memberCoupon.isUsed,
 				memberCoupon.createdAt,
 				memberCoupon.expiredAt
@@ -53,10 +53,10 @@ public class MemberCouponRepositoryCustomImpl implements MemberCouponRepositoryC
 				Projections.constructor(
 					MemberCouponResponse.class,
 					memberCoupon.coupon.name,
-					memberCoupon.coupon.policyType,
-					memberCoupon.coupon.discount,
-					memberCoupon.coupon.minimumOrderPrice,
-					memberCoupon.coupon.maximumDiscountPrice,
+					memberCoupon.coupon.couponPolicy.discountType,
+					memberCoupon.coupon.couponPolicy.discount,
+					memberCoupon.coupon.couponPolicy.minimumOrderPrice,
+					memberCoupon.coupon.couponPolicy.maximumDiscountPrice,
 					memberCoupon.isUsed,
 					memberCoupon.createdAt,
 					memberCoupon.expiredAt
@@ -89,10 +89,10 @@ public class MemberCouponRepositoryCustomImpl implements MemberCouponRepositoryC
 				Projections.constructor(
 					MemberCouponResponse.class,
 					memberCoupon.coupon.name,
-					memberCoupon.coupon.policyType,
-					memberCoupon.coupon.discount,
-					memberCoupon.coupon.minimumOrderPrice,
-					memberCoupon.coupon.maximumDiscountPrice,
+					memberCoupon.coupon.couponPolicy.discountType,
+					memberCoupon.coupon.couponPolicy.discount,
+					memberCoupon.coupon.couponPolicy.minimumOrderPrice,
+					memberCoupon.coupon.couponPolicy.maximumDiscountPrice,
 					memberCoupon.isUsed,
 					memberCoupon.createdAt,
 					memberCoupon.expiredAt
@@ -127,10 +127,10 @@ public class MemberCouponRepositoryCustomImpl implements MemberCouponRepositoryC
 					memberCoupon.coupon.id,
 					memberCoupon.id,
 					memberCoupon.coupon.name,
-					memberCoupon.coupon.policyType,
-					memberCoupon.coupon.discount,
-					memberCoupon.coupon.minimumOrderPrice,
-					memberCoupon.coupon.maximumDiscountPrice,
+					memberCoupon.coupon.couponPolicy.discountType,
+					memberCoupon.coupon.couponPolicy.discount,
+					memberCoupon.coupon.couponPolicy.minimumOrderPrice,
+					memberCoupon.coupon.couponPolicy.maximumDiscountPrice,
 					memberCoupon.isUsed,
 					memberCoupon.createdAt,
 					memberCoupon.expiredAt
@@ -141,7 +141,7 @@ public class MemberCouponRepositoryCustomImpl implements MemberCouponRepositoryC
 				.and(memberCoupon.isUsed.eq(false))
 				.and(memberCoupon.expiredAt.after(LocalDate.now()))
 				.and(memberCoupon.coupon.couponType.eq(ALL))
-				.and(memberCoupon.coupon.minimumOrderPrice.lt(orderTotalPrice)))
+				.and(memberCoupon.coupon.couponPolicy.minimumOrderPrice.lt(orderTotalPrice)))
 			.orderBy(memberCoupon.createdAt.desc())
 			.fetch();
 

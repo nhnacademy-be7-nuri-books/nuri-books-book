@@ -27,13 +27,13 @@ import shop.nuribooks.books.book.coupon.dto.CouponAppliedOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.entity.AllAppliedCoupon;
 import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
+import shop.nuribooks.books.book.coupon.enums.DiscountType;
 import shop.nuribooks.books.book.coupon.repository.AllAppliedCouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
 import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.entity.child.OrderSavingPoint;
 import shop.nuribooks.books.book.point.entity.child.OrderUsingPoint;
-import shop.nuribooks.books.book.point.enums.PolicyType;
 import shop.nuribooks.books.book.point.repository.OrderSavingPointRepository;
 import shop.nuribooks.books.book.point.repository.OrderUsingPointRepository;
 import shop.nuribooks.books.book.point.repository.PointHistoryRepository;
@@ -97,7 +97,7 @@ import shop.nuribooks.books.payment.payment.service.PaymentService;
 @Service
 @Transactional(readOnly = true)
 @Slf4j
-public class OrderServiceImpl extends AbstractOrderService implements OrderService {
+public class OrderServiceImpl extends CommonOrderService implements OrderService {
 
 	private final OrderDetailRepository orderDetailRepository;
 	private final ShippingRepository shippingRepository;
@@ -353,7 +353,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		// 배송지 등록
 		shippingService.registerShipping(savedOrder, orderTempRegisterRequest.shippingRegister());
 
-		// todo : 회원 쿠폰 처리
+		// 회원 쿠폰 처리
 
 		// 주문 전체 적용 쿠폰
 		if (Objects.nonNull(orderTempRegisterRequest.allAppliedCoupon())) {
@@ -461,7 +461,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 				pageable, orderListPeriodRequest);
 		}
 
-		return new PageImpl(result.orders(), pageable, result.totalCount());
+		return new PageImpl<>(result.orders(), pageable, result.totalCount());
 	}
 
 	@Override
@@ -473,7 +473,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 				pageable, orderListPeriodRequest);
 		}
 
-		return new PageImpl(result.orders(), pageable, result.totalCount());
+		return new PageImpl<>(result.orders(), pageable, result.totalCount());
 	}
 
 	/**
@@ -494,7 +494,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 				pageable, orderListPeriodRequest);
 		}
 
-		return new PageImpl(result.orders(), pageable, result.totalCount());
+		return new PageImpl<>(result.orders(), pageable, result.totalCount());
 	}
 
 	/**
@@ -513,13 +513,15 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		List<CouponAppliedOrderDto> bookAppliedCouponList = new ArrayList<>();
 		if (allAppliedCoupon.isPresent()) {
 			Optional<MemberCoupon> memberCoupon = memberCouponRepository.findById(allAppliedCoupon.get().getId());
-			CouponAppliedOrderDto couponAppliedOrderDto = CouponAppliedOrderDto.builder()
-				.name(memberCoupon.get().getCoupon().getName())
-				.discountPrice(allAppliedCoupon.get().getDiscount_price())
-				.couponType(memberCoupon.get().getCoupon().getCouponType())
-				.build();
+			if (memberCoupon.isPresent()) {
+				CouponAppliedOrderDto couponAppliedOrderDto = CouponAppliedOrderDto.builder()
+					.name(memberCoupon.get().getCoupon().getName())
+					.discountPrice(allAppliedCoupon.get().getDiscount_price())
+					.couponType(memberCoupon.get().getCoupon().getCouponType())
+					.build();
 
-			bookAppliedCouponList.add(couponAppliedOrderDto);
+				bookAppliedCouponList.add(couponAppliedOrderDto);
+			}
 		}
 
 		// 도서 쿠폰
@@ -549,9 +551,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 	@Override
 	public OrderDetailResponse getOrderDetail(Optional<Long> userId, Long orderId, Pageable pageable) {
 
-		Order order = orderRepository.findById(orderId).orElseThrow(
-			() -> new OrderNotFoundException("해당 주문 정보가 존재하지 않습니다.")
-		);
+		Order order = getOrder(orderId);
 
 		if (!Objects.equals(order.getCustomer().getId(), userId.get())) {
 			log.error("주문 상세 조회 - {} 가 소유한 주문이 아님", userId.get());
@@ -592,7 +592,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		OrderDetailItemPageDto orderDetailItem = orderDetailRepository.findOrderDetail(orderId, pageable);
 
 		Page<OrderDetailItemDto> orderListResponses =
-			new PageImpl(orderDetailItem.orderDetailItem(), pageable, orderDetailItem.totalCount());
+			new PageImpl<>(orderDetailItem.orderDetailItem(), pageable, orderDetailItem.totalCount());
 
 		// 결제 항목
 		PaymentInfoDto paymentInfoDto = orderRepository.findPaymentInfo(orderId);
@@ -607,9 +607,8 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 	@Override
 	public OrderDetailResponse getNonMemberOrderDetail(Optional<Long> customerId, Long orderId,
 		Pageable pageable) {
-		Order order = orderRepository.findById(orderId).orElseThrow(
-			() -> new OrderNotFoundException("해당 주문 정보가 존재하지 않습니다.")
-		);
+
+		Order order = getOrder(orderId);
 
 		if (!Objects.equals(order.getCustomer().getId(), customerId.get())) {
 			log.error("주문 상세 조회 - {} 가 소유한 주문이 아님", customerId.get());
@@ -637,7 +636,7 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 		OrderDetailItemPageDto orderDetailItem = orderDetailRepository.findOrderDetail(orderId, pageable);
 
 		Page<OrderDetailItemDto> orderListResponses =
-			new PageImpl(orderDetailItem.orderDetailItem(), pageable, orderDetailItem.totalCount());
+			new PageImpl<>(orderDetailItem.orderDetailItem(), pageable, orderDetailItem.totalCount());
 
 		// 결제 항목
 		PaymentInfoDto paymentInfoDto = orderRepository.findPaymentInfo(orderId);
@@ -662,7 +661,6 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 
 		// 회원이 맞는 지 확인
 		Customer customer = getCustomerById(customerId);
-		Optional<MemberPointDTO> point = getMemberPoints(customerId);
 
 		// 주문 정보 가져오기
 		Order order = orderRepository.findByIdAndCustomer(orderId, customer).orElseThrow(
@@ -685,10 +683,12 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 			if (allAppliedCoupon.isPresent()) {
 				Optional<MemberCoupon> memberCoupon = memberCouponRepository.findById(
 					allAppliedCoupon.get().getId());
-				memberCoupon.get().setUsed(false);
-				memberCouponRepository.save(memberCoupon.get());
+				if (memberCoupon.isPresent()) {
+					memberCoupon.get().setUsed(false);
+					memberCouponRepository.save(memberCoupon.get());
 
-				allAppliedCouponRepository.delete(allAppliedCoupon.get());
+					allAppliedCouponRepository.delete(allAppliedCoupon.get());
+				}
 			}
 
 			Optional<OrderUsingPoint> orderUsingPoint = orderUsingPointRepository.findByOrder(order);
@@ -866,24 +866,24 @@ public class OrderServiceImpl extends AbstractOrderService implements OrderServi
 	private void handlePointUsage(Long id, Order savedOrder, BigDecimal usedPoint) {
 		Optional<Member> member = memberRepository.findById(id);
 
-		member.ifPresent(value -> {
-			publisher.publishEvent(new PointUsedEvent(value, savedOrder, usedPoint));
-		});
+		member.ifPresent(value ->
+			publisher.publishEvent(new PointUsedEvent(value, savedOrder, usedPoint))
+		);
 	}
 
 	private void processCoupon(OrderRegisterRequest orderTempRegisterRequest, Order savedOrder) {
 		MemberCoupon memberCoupon = memberCouponRepository.findById(orderTempRegisterRequest.allAppliedCoupon())
 			.orElseThrow(MemberCartNotFoundException::new);
 
-		BigDecimal discountPrice = BigDecimal.valueOf(memberCoupon.getCoupon().getDiscount());
+		BigDecimal discountPrice = BigDecimal.valueOf(memberCoupon.getCoupon().getCouponPolicy().getDiscount());
 
 		// 쿠폰 정책에 따라 할인가 적용
-		if (memberCoupon.getCoupon().getPolicyType().compareTo(PolicyType.RATED) == 0) {
+		if (memberCoupon.getCoupon().getCouponPolicy().getDiscountType().compareTo(DiscountType.RATED) == 0) {
 			BigDecimal tempPrice = orderTempRegisterRequest.paymentBooks()
 				.multiply(discountPrice.divide(BigDecimal.valueOf(100), 1, RoundingMode.HALF_UP));
 
-			if (tempPrice.compareTo(memberCoupon.getCoupon().getMaximumDiscountPrice()) >= 0) {
-				discountPrice = memberCoupon.getCoupon().getMaximumDiscountPrice();
+			if (tempPrice.compareTo(memberCoupon.getCoupon().getCouponPolicy().getMaximumDiscountPrice()) >= 0) {
+				discountPrice = memberCoupon.getCoupon().getCouponPolicy().getMaximumDiscountPrice();
 			}
 		}
 

@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.category.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
-import shop.nuribooks.books.common.message.PagedResponse;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/books")
@@ -102,10 +102,10 @@ public class BookCategoryController {
 		@ApiResponse(responseCode = "404", description = "카테고리를 찾을 수 없음")
 	})
 	@GetMapping("/category/{category-id}")
-	public ResponseEntity<PagedResponse<BookContributorsResponse>> getBooksByCategoryId(
+	public ResponseEntity<Page<BookContributorsResponse>> getBooksByCategoryId(
 		@PathVariable(name = "category-id") Long categoryId,
 		Pageable pageable) {
-		PagedResponse<BookContributorsResponse> pagedResponse = bookCategoryService.findBooksByCategoryId(categoryId,
+		Page<BookContributorsResponse> pagedResponse = bookCategoryService.findBooksByCategoryId(categoryId,
 			pageable);
 		return ResponseEntity.ok(pagedResponse);
 	}

@@ -49,32 +49,6 @@ public class ContributorRoleServiceImpl implements ContributorRoleService {
 	}
 
 	@Override
-	public ContributorRoleResponse updateContributorRole(String roleName, ContributorRoleRequest req) {
-		String updatedRoleName = req.getName().toUpperCase();
-
-		ContributorRole existedRole = contributorRolesRepository.findByName(
-				ContributorRoleEnum.valueOf(roleName.toUpperCase()))
-			.orElseThrow(() -> new ContributorRoleNotFoundException("역할이 존재하지 않습니다."));
-
-		ContributorRoleEnum newRoleEnum;
-		try {
-			newRoleEnum = ContributorRoleEnum.valueOf(updatedRoleName);
-
-		} catch (IllegalArgumentException e) {
-			throw new InvalidContributorRoleException();
-		}
-
-		if (contributorRolesRepository.existsByName(newRoleEnum)) {
-			throw new DuplicateEntityException("이미 존재하는 역할입니다.");
-		}
-
-		existedRole.setName(newRoleEnum);
-		contributorRolesRepository.save(existedRole);
-		return new ContributorRoleResponse(existedRole.getName().name());
-
-	}
-
-	@Override
 	public void deleteContributorRole(String roleName) {
 		ContributorRoleEnum roleEnum;
 

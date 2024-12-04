@@ -9,7 +9,7 @@ import shop.nuribooks.books.book.coupon.categorycoupon.entity.CategoryCoupon;
 import shop.nuribooks.books.book.coupon.categorycoupon.entity.QCategoryCoupon;
 
 @RequiredArgsConstructor
-public class CategoryCouponCustomRepositoryImpl implements CategoryCouponCustomRepository{
+public class CategoryCouponCustomRepositoryImpl implements CategoryCouponCustomRepository {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
@@ -19,7 +19,7 @@ public class CategoryCouponCustomRepositoryImpl implements CategoryCouponCustomR
 		CategoryCoupon result = queryFactory
 			.selectFrom(categoryCoupon)
 			.where(categoryCoupon.category.id.eq(categoryId)
-				.and(categoryCoupon.coupon.expiredDate.isNull()))
+				.and(categoryCoupon.coupon.deletedAt.isNull()))
 			.fetchFirst();
 
 		return Optional.ofNullable(result);

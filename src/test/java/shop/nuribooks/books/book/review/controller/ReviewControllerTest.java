@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,7 +24,6 @@ import shop.nuribooks.books.book.review.dto.response.ReviewBookResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewImageResponse;
 import shop.nuribooks.books.book.review.dto.response.ReviewMemberResponse;
 import shop.nuribooks.books.book.review.service.ReviewService;
-import shop.nuribooks.books.common.message.PagedResponse;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 
 @WebMvcTest(ReviewController.class)
@@ -104,11 +104,11 @@ class ReviewControllerTest {
 		);
 
 		when(reviewService.getReviewsByMemberId(anyLong(), any())).thenReturn(
-			new PagedResponse<>(List.of(review), 1, 1, 1, 1));
+			new PageImpl<>(List.of(review), PageRequest.of(1, 1), 2));
 
 		mockMvc.perform(get("/api/members/" + memberId + "/reviews"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.*", Matchers.hasSize(5)));
+			.andExpect(jsonPath("$.*", Matchers.hasSize(11)));
 	}
 
 	@Test

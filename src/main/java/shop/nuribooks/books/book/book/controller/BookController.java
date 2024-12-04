@@ -1,6 +1,7 @@
 package shop.nuribooks.books.book.book.controller;
 
 import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
 import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
 import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
+import shop.nuribooks.books.book.book.dto.TopBookResponse;
 import shop.nuribooks.books.book.book.service.BookService;
 import shop.nuribooks.books.common.annotation.HasRole;
 import shop.nuribooks.books.common.message.ResponseMessage;
@@ -42,6 +43,7 @@ public class BookController {
 		@ApiResponse(responseCode = "201", description = "Book successfully created"),
 		@ApiResponse(responseCode = "400", description = "Invalid input data")
 	})
+	@HasRole(role = AuthorityType.ADMIN)
 	@PostMapping("/register/aladin")
 	public ResponseEntity<ResponseMessage> registerAladinBook(
 		@Valid @RequestBody AladinBookRegisterRequest aladinBookSaveReq) {
@@ -55,6 +57,7 @@ public class BookController {
 		@ApiResponse(responseCode = "201", description = "Book successfully created"),
 		@ApiResponse(responseCode = "400", description = "Invalid input data")
 	})
+	@HasRole(role = AuthorityType.ADMIN)
 	@PostMapping("/register/personal")
 	public ResponseEntity<ResponseMessage> registerPersonallyBook(
 		@Valid @RequestBody PersonallyBookRegisterRequest personallyBookSaveReq) {
@@ -92,6 +95,7 @@ public class BookController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 		@ApiResponse(responseCode = "404", description = "도서 미발견")
 	})
+	@HasRole(role = AuthorityType.ADMIN)
 	@PutMapping("/{book-id}")
 	public ResponseEntity<ResponseMessage> updateBook(@PathVariable(name = "book-id") Long bookId,
 		@Valid @RequestBody BookUpdateRequest bookUpdateReq) {
@@ -113,9 +117,25 @@ public class BookController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@Operation(summary = "도서 좋아요 기준 Top 8 도서 조회",
+		description = "도서의 좋아요 수를 기준으로 상위 8개의 도서를 조회하는 엔드포인트입니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "좋아요 TOP8 도서 조회 성공"),
+	})
 	@GetMapping("/top/book-like")
-	public ResponseEntity<List<TopBookLikeResponse>> getTopBookLike() {
-		List<TopBookLikeResponse> response = bookService.getTopBookLikes();
+	public ResponseEntity<List<TopBookResponse>> getTopBookLike() {
+		List<TopBookResponse> response = bookService.getTopBookLikes();
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	@Operation(summary = "도서 평균 평점 기준 Top 8 도서 조회",
+		description = "도서의 평균 평점을 기준으로 상위 8개의 도서를 조회하는 엔드포인트입니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "평점 TOP8 도서 조회 성공"),
+	})
+	@GetMapping("/top/book-score")
+	public ResponseEntity<List<TopBookResponse>> getTopBookScore() {
+		List<TopBookResponse> response = bookService.getTopBookScores();
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 

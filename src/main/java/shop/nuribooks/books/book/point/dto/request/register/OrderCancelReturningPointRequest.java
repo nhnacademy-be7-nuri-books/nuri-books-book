@@ -19,6 +19,7 @@ public class OrderCancelReturningPointRequest extends PointHistoryRequest {
 		this.amount = amount;
 	}
 
+	@Override
 	public OrderCancelReturningPoint toEntity(PointPolicy pointPolicy) {
 		return OrderCancelReturningPoint.builder()
 			.amount(amount)
