@@ -17,7 +17,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.book.dto.BookListResponse;
-import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
+import shop.nuribooks.books.book.book.dto.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.QBook;
 import shop.nuribooks.books.book.book.enums.SortType;
@@ -77,11 +77,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 	}
 
 	@Override
-	public List<TopBookLikeResponse> findTopBooksByLikes() {
+	public List<TopBookResponse> findTopBooksByLikes() {
 		QBook book = QBook.book;
 
 		return queryFactory.select(Projections.constructor(
-				TopBookLikeResponse.class,
+				TopBookResponse.class,
 				book.id,
 				book.thumbnailImageUrl,
 				book.title
@@ -89,7 +89,25 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 			.from(book)
 			.where(book.deletedAt.isNull())
 			.orderBy(book.likeCount.desc())
-			.limit(10)
+			.limit(8)
+			.fetch();
+	}
+
+	@Override
+	public List<TopBookResponse> findTopBooksByScore() {
+		return queryFactory
+			.select(Projections.constructor(
+				TopBookResponse.class,
+				book.id,
+				book.thumbnailImageUrl,
+				book.title
+			))
+			.from(book)
+			.leftJoin(review).on(review.book.id.eq(book.id))
+			.where(book.deletedAt.isNull())
+			.groupBy(book.id)
+			.orderBy(review.score.avg().desc())
+			.limit(8)
 			.fetch();
 	}
 

@@ -206,14 +206,6 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	/**
-	 * 관리자가 다양한 검색 조건을 이용하여 회원 목록 조회
-	 */
-	@Override
-	public Page<MemberSearchResponse> searchMembersWithPaging(MemberSearchRequest request, Pageable pageable) {
-		return memberRepository.searchMembersWithPaging(request, pageable);
-	}
-
-	/**
 	 * 회원의 최근 로그인 시간을 업데이트
 	 */
 	@Override
@@ -237,6 +229,14 @@ public class MemberServiceImpl implements MemberService {
 			.orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
 		foundMember.reactiveMemberStatus();
+	}
+
+	/**
+	 * 관리자가 다양한 검색 조건을 이용하여 회원 목록 조회
+	 */
+	@Override
+	public Page<MemberSearchResponse> searchMembersWithPaging(MemberSearchRequest request, Pageable pageable) {
+		return memberRepository.searchMembersWithPaging(request, pageable);
 	}
 
 	/**
