@@ -26,10 +26,10 @@ import shop.nuribooks.books.member.address.service.AddressServiceImpl;
 @WebMvcTest(AddressController.class)
 class AddressControllerTest {
 
-	@MockBean
-	protected AddressServiceImpl addressService;
 	@Autowired
 	ObjectMapper objectMapper;
+	@MockBean
+	private AddressServiceImpl addressService;
 	@Autowired
 	private MockMvc mockMvc;
 
