@@ -24,6 +24,7 @@ import shop.nuribooks.books.order.orderdetail.entity.OrderDetail;
 import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 import shop.nuribooks.books.order.shipping.entity.Shipping;
 import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
+import shop.nuribooks.books.order.wrapping.entity.WrappingPaper;
 
 public class TestUtils {
 	public static void setIdForEntity(Object entity, Long id) {
@@ -191,6 +192,12 @@ public class TestUtils {
 			.orderInvoiceNumber("12312341214")
 			.shippingAt(LocalDateTime.now().minusDays(3L))
 			.shippingCompletedAt(LocalDateTime.now())
+      
+	public static WrappingPaper createWrappingPaper() {
+		return WrappingPaper.builder()
+			.title("포장지입미다")
+			.wrappingPrice(BigDecimal.valueOf(1000))
+			.imageUrl("image.com")
 			.build();
 	}
 }

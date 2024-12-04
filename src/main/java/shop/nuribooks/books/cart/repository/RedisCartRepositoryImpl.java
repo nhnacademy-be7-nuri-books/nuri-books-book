@@ -11,8 +11,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Repository;
 
+import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.cart.cartdetail.entity.RedisCartDetail;
 
+@Slf4j
 @Repository
 public class RedisCartRepositoryImpl implements RedisCartRepository {
 
@@ -42,7 +44,7 @@ public class RedisCartRepositoryImpl implements RedisCartRepository {
 				cartItems.put(bookId, quantity);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("장바구니 순회 중 예외가 발생했습니다.");
 		}
 		return cartItems;
 	}
