@@ -189,6 +189,21 @@ public class PaymentServiceImpl implements PaymentService {
 
 				paymentCancelRepository.save(paymentCancel);
 
+				// 주문 상태 변경 & 재고 차감
+				List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(order.getId());
+
+				for (OrderDetail orderDetail : orderDetailList) {
+					orderDetail.setOrderState(OrderState.PAID);
+					orderDetail.setCount(-orderDetail.getCount());
+				}
+
+				//재고 업데이트 메시지 발행
+				try {
+					publishInventoryUpdateMessages(orderDetailList);
+				} catch (AmqpRejectAndDontRequeueException e) {
+					log.error("Invalid Message Format : {}", e.getMessage());
+				}
+
 				return ResponseMessage.builder().message("주문 취소 성공").statusCode(200).build();
 			}
 
