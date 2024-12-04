@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.member.GradeAlreadyExistsException;
 import shop.nuribooks.books.exception.member.GradeInUseException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
@@ -99,6 +100,17 @@ class GradeServiceImplTest {
 		assertThatThrownBy(() -> gradeServiceImpl.getGradeDetails(requiredName))
 			.isInstanceOf(GradeNotFoundException.class)
 			.hasMessage("해당 이름의 등급이 존재하지 않습니다.");
+	}
+
+	@DisplayName("등급명으로 등급 상세 조회 실패 - 존재하지 않는 등급")
+	@Test
+	void getGradeDetails_nameIsNull() {
+		//given
+		String requiredName = null;
+
+		//when / then
+		assertThatThrownBy(() -> gradeServiceImpl.getGradeDetails(requiredName))
+			.isInstanceOf(BadRequestException.class);
 	}
 
 	@DisplayName("등급명으로 등급 수정 성공")

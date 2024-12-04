@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -139,6 +138,23 @@ class TagServiceImplTest {
 
 	}
 
+	@DisplayName("전체 태그 조회")
+	@Test
+	void getAllTag() {
+		//given
+		Tag tag = registerTag();
+
+		//when
+		when(tagRepository.findAll()).thenReturn(List.of(tag));
+
+		List<TagResponse> response = tagService.getAllTags();
+
+		//then
+		assertThat(response).isNotNull();
+		assertThat(response.size()).isOne();
+		assertThat(response.getFirst().name()).isEqualTo("tag1");
+	}
+
 	@DisplayName("특정 태그 수정")
 	@Test
 	void updateTag() {
@@ -175,6 +191,25 @@ class TagServiceImplTest {
 		assertThatThrownBy(() -> tagService.updateTag(id, request))
 			.isInstanceOf(TagNotFoundException.class)
 			.hasMessageContaining("태그가 존재하지 않습니다.");
+
+		verify(tagRepository).findById(id);
+		verify(tagRepository, never()).save(any(Tag.class));
+	}
+
+	@DisplayName("특정 태그 수정 - 실패")
+	@Test
+	void failed_updateTag_alreadyExist() {
+		// given
+		Long id = 999L;
+		TagRequest request = TagRequest.builder().name("nonExistingTag").build();
+
+		// when
+		when(tagRepository.findById(id)).thenReturn(Optional.of(new Tag()));
+		when(tagRepository.existsByName(any())).thenReturn(true);
+
+		// then
+		assertThatThrownBy(() -> tagService.updateTag(id, request))
+			.isInstanceOf(TagAlreadyExistsException.class);
 
 		verify(tagRepository).findById(id);
 		verify(tagRepository, never()).save(any(Tag.class));
