@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.book.dto.BookListResponse;
-import shop.nuribooks.books.book.book.dto.TopBookLikeResponse;
+import shop.nuribooks.books.book.book.dto.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 
 public interface BookCustomRepository {
@@ -18,5 +18,7 @@ public interface BookCustomRepository {
 
 	long countBook();
 
-	List<TopBookLikeResponse> findTopBooksByLikes();
+	List<TopBookResponse> findTopBooksByLikes();
+
+	List<TopBookResponse> findTopBooksByScore();
 }

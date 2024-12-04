@@ -105,7 +105,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 	}
 
 	private void validateDiscountPolicy(DiscountType discountType, Integer discount) {
-		if (discountType == DiscountType.RATE && (discount <= 0 || discount > 100)) {
+		if (discountType == DiscountType.RATED && (discount <= 0 || discount > 100)) {
 			throw new InvalidCouponException("비율은 1~100 사이의 값이어야 합니다.");
 		}
 	}
