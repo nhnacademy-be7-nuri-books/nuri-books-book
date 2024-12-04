@@ -1,6 +1,5 @@
 package shop.nuribooks.books.order.refund.controller;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,10 +22,8 @@ public class RefundController {
 
 	@GetMapping("/api/orders/refunds/{order-id}")
 	public ResponseEntity<RefundInfoResponse> getRefundResponse(
-		@PathVariable(name = "order-id") Long orderId,
-		Pageable pageable
-	) {
-		RefundInfoResponse refundResponseInfo = refundService.getRefundInfoResponse(orderId, pageable);
+		@PathVariable(name = "order-id") Long orderId) {
+		RefundInfoResponse refundResponseInfo = refundService.getRefundInfoResponse(orderId);
 		return ResponseEntity.ok().body(refundResponseInfo);
 	}
 
