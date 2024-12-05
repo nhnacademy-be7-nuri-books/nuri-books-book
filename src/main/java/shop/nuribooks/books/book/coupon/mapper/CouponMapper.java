@@ -10,7 +10,7 @@ import shop.nuribooks.books.book.coupon.enums.CouponType;
 
 @Component
 public class CouponMapper {
-	
+
 	public CouponResponse toDto(Coupon coupon) {
 		if (coupon.getCouponType().equals(CouponType.BOOK)) {
 			return mapBookCoupon((BookCoupon)coupon);

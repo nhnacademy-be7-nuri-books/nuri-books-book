@@ -68,7 +68,8 @@ public class CouponServiceImpl implements CouponService {
 	 */
 	@Override
 	public Page<CouponResponse> getCoupons(CouponType type, Pageable pageable) {
-		return couponRepository.findCouponsByCouponType(pageable, type);
+		Page<Coupon> coupons = couponRepository.findCouponsByCouponType(pageable, type);
+		return coupons.map(couponMapper::toDto);
 	}
 
 	/**
