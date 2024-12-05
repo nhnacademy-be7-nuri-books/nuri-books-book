@@ -42,4 +42,10 @@ class StatusTypeTest {
 	void fromValue_EmptyInput() {
 		assertThat(StatusType.fromValue("  ")).isNull();
 	}
+
+	@DisplayName("유효하지 않은 enum 입력 - null")
+	@Test
+	void fromValue_NullInput() {
+		assertThat(StatusType.fromValue(null)).isNull();
+	}
 }

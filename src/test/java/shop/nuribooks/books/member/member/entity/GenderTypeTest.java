@@ -39,4 +39,10 @@ class GenderTypeTest {
 	void fromValue_EmptyInput() {
 		assertThat(GenderType.fromValue("  ")).isNull();
 	}
+
+	@DisplayName("유효하지 않은 enum 입력 - null")
+	@Test
+	void fromValue_NullInput() {
+		assertThat(GenderType.fromValue(null)).isNull();
+	}
 }
