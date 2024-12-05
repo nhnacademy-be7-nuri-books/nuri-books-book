@@ -1,4 +1,4 @@
-package shop.nuribooks.books.book.book.dto;
+package shop.nuribooks.books.book.book.dto.request;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,7 +22,6 @@ public class AladinBookRegisterRequest extends BaseBookRegisterRequest {
 		int stock,
 		String state,
 		String thumbnailImageUrl,
-		String detailImageUrl,
 		String description,
 		String contents,
 		String isbn,
@@ -31,7 +30,7 @@ public class AladinBookRegisterRequest extends BaseBookRegisterRequest {
 		String categoryName
 	) {
 		super(title, author, publisherName, publicationDate, price, discountRate, stock, state, thumbnailImageUrl,
-			detailImageUrl, description, contents, isbn, isPackageable, tagIds);
+			description, contents, isbn, isPackageable, tagIds);
 		this.categoryName = categoryName;
 	}
 }

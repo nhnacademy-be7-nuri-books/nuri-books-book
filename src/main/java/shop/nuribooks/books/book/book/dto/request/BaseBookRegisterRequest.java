@@ -1,4 +1,4 @@
-package shop.nuribooks.books.book.book.dto;
+package shop.nuribooks.books.book.book.dto.request;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -53,8 +53,6 @@ public abstract class BaseBookRegisterRequest {
 	@NotBlank(message = "썸네일 이미지 URL은 필수입니다.")
 	private final String thumbnailImageUrl;
 
-	private final String detailImageUrl;
-
 	@NotBlank(message = "설명은 필수입니다.")
 	private final String description;
 
@@ -75,7 +73,6 @@ public abstract class BaseBookRegisterRequest {
 			.state(bookStateEnum)
 			.title(this.title)
 			.thumbnailImageUrl(this.thumbnailImageUrl)
-			.detailImageUrl(this.detailImageUrl)
 			.publicationDate(this.publicationDate)
 			.price(this.price)
 			.discountRate(this.discountRate)

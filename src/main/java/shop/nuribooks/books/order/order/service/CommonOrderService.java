@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import lombok.AllArgsConstructor;
-import shop.nuribooks.books.book.book.dto.BookOrderResponse;
+import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;

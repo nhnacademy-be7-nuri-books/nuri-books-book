@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
-import shop.nuribooks.books.book.book.dto.BookResponse;
-import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.book.dto.TopBookResponse;
+import shop.nuribooks.books.book.book.dto.request.BaseBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.request.BookUpdateRequest;
+import shop.nuribooks.books.book.book.dto.response.BookContributorsResponse;
+import shop.nuribooks.books.book.book.dto.response.BookResponse;
+import shop.nuribooks.books.book.book.dto.response.TopBookResponse;
 
 public interface BookService {
 	void registerBook(BaseBookRegisterRequest reqDto);
