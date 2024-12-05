@@ -113,17 +113,10 @@ public class PaymentServiceImpl implements PaymentService {
 
 		// 결제 취소 로직 시작
 		// 결제 취소 API request 생성 데이터 선언
-		String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-
-		Base64.Encoder encoder = Base64.getEncoder();
-		byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
-		String authorizations = "Basic " + new String(encodedBytes);
-
-		String paymentKey = payment.getTossPaymentKey();
-		String cancelUrl = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
+		String authorizations = getAuthorization();
+		String cancelUrl = getCancelUrl(payment);
 
 		HttpHeaders headers = createHeader(authorizations);
-
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 		body.add("cancelReason", reason);
 
@@ -203,6 +196,19 @@ public class PaymentServiceImpl implements PaymentService {
 		} catch (AmqpRejectAndDontRequeueException e) {
 			log.error("Invalid Message Format : {}", e.getMessage());
 		}
+	}
+
+	private String getAuthorization() {
+		String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+
+		Base64.Encoder encoder = Base64.getEncoder();
+		byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+		return "Basic " + new String(encodedBytes);
+	}
+
+	private String getCancelUrl(Payment payment) {
+		String paymentKey = payment.getTossPaymentKey();
+		return "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
 	}
 
 	private HttpHeaders createHeader(String authorizations) {
