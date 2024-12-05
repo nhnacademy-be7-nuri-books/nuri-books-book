@@ -265,6 +265,22 @@ class PaymentServiceTest {
 	}
 
 	@Test
+	void cancelPayment_failureJsonToStringException() throws JsonProcessingException {
+		// Given
+		String reason = "그냥";
+
+		when(paymentRepository.findByOrder(any())).thenReturn(Optional.of(payment));
+
+		when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
+
+		// When & Then
+		Assertions.assertThrows(FailedPaymentCancelException.class, () -> paymentService.cancelPayment(order, reason));
+
+		// Verify interactions
+		verify(paymentRepository, times(1)).findByOrder(eq(order));
+	}
+
+	@Test
 	void cancelPayment_failureNoPayment() {
 		// Given
 		String reason = "그냥";
