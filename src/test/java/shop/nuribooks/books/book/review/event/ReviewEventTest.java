@@ -31,7 +31,6 @@ class ReviewEventTest {
 	PointHistoryService pointHistoryService;
 
 	private ReviewRegisteredEvent reviewRegisteredEvent;
-	private Member member;
 	private Review review;
 
 	@BeforeEach
@@ -43,7 +42,7 @@ class ReviewEventTest {
 		Order order = TestUtils.createOrder(customer);
 		OrderDetail orderDetail = TestUtils.createOrderDetail(order, book);
 
-		member = TestUtils.createMember(customer, grade);
+		Member member = TestUtils.createMember(customer, grade);
 		review = TestUtils.createReview(member, book, orderDetail);
 		reviewRegisteredEvent = new ReviewRegisteredEvent(member, review);
 	}
