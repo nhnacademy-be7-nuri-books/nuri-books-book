@@ -96,6 +96,7 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 
 		// 회원 사용 총금액 반영 및 포인트 적립위한 event
+		// 구매 확정 이후 실행되도록 이동 필요.
 		createPaymentEvent(order);
 
 		log.debug("결제 성공");
