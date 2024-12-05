@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import lombok.extern.slf4j.Slf4j;
+import shop.nuribooks.books.book.book.dto.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
@@ -71,7 +73,7 @@ class BookRepositoryTest {
 			.contents("Test Book Contents")
 			.isbn("1234567890123")
 			.isPackageable(true)
-			.likeCount(0)
+			.likeCount(50)
 			.stock(100)
 			.viewCount(0L)
 			.build();
@@ -81,7 +83,7 @@ class BookRepositoryTest {
 	}
 
 	@Test
-	void testExistsByIsbn_ReturnsTrueWhenBookExists() {
+	void ExistsByIsbnTrueWhenBookExists() {
 		String isbn = "1234567890123";
 
 		boolean exists = bookRepository.existsByIsbn(isbn);
@@ -90,7 +92,7 @@ class BookRepositoryTest {
 	}
 
 	@Test
-	void testExistsByIsbn_ReturnsFalseWhenBookDoesNotExist() {
+	void ExistsByIsbnFalseWhenBookNotExist() {
 		String isbn = "9999999999999";
 
 		boolean exists = bookRepository.existsByIsbn(isbn);
@@ -110,13 +112,6 @@ class BookRepositoryTest {
 			this.bookRepository.findAllWithPublisher(PageRequest.of(0, 5, Sort.by(Sort.Order.desc("title")))).size());
 	}
 
-	// @Test
-	// void testBookListDescReviewCount() {
-	// 	assertEquals(2,
-	// 		this.bookRepository.findAllWithPublisher(PageRequest.of(0, 5, Sort.by(Sort.Order.desc("reviewCount"))))
-	// 			.size());
-	// }
-
 	@Test
 	void testCount() {
 		assertEquals(2, this.bookRepository.countBook());
@@ -125,5 +120,30 @@ class BookRepositoryTest {
 	@Test
 	void testFindBookById() {
 		assertEquals(book, this.bookRepository.findBookByIdAndDeletedAtIsNull(book.getId()).get());
+	}
+
+	@Test
+	void testFindTopBookByLikes() {
+		List<TopBookResponse> topBooks = bookRepository.findTopBooksByLikes();
+
+		assertThat(topBooks).isNotEmpty();
+		assertEquals(2, topBooks.size());
+		assertEquals("Aest Book Title", topBooks.getFirst().title());
+	}
+
+	@Test
+	void findTopBooksByScore() {
+		List<TopBookResponse> topBooks = bookRepository.findTopBooksByScore();
+
+		assertThat(topBooks).isNotEmpty();
+		assertEquals(2, topBooks.size());
+	}
+
+	@Test
+	void findAllAndDeletedAtIsNull() {
+		List<Book> books = bookRepository.findAllAndDeletedAtIsNull();
+
+		assertThat(books).isNotEmpty();
+		assertEquals(2, books.size());
 	}
 }
