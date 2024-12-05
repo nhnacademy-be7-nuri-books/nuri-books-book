@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -182,6 +181,24 @@ class PublisherServiceImplTest {
 		assertThat(response).isNotNull();
 		assertThat(response.name()).isEqualTo("publisher2");
 		verify(publisherRepository, times(1)).findById(publisherId);
+
+	}
+
+	@DisplayName("출판사 수정 실패")
+	@Test
+	void updatePublisher_fail() {
+		// given
+		Long publisherId = 1L;
+		Publisher publisher = new Publisher(publisherId, "publisher1");
+		PublisherRequest editRequest = editPublisherRequest();
+
+		// when
+		when(publisherRepository.findById(publisherId)).thenReturn(Optional.of(publisher));
+		when(publisherRepository.existsByName(any())).thenReturn(true);
+		// then
+		assertThatThrownBy(() -> publisherService.updatePublisher(publisherId, editRequest)
+		).isInstanceOf(PublisherAlreadyExistsException.class)
+			.hasMessage("출판사가 이미 등록되어 있습니다.");
 
 	}
 

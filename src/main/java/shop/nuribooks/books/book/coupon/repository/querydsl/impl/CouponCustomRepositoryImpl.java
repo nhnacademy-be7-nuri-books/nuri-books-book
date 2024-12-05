@@ -6,11 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.entity.QCoupon;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
@@ -32,24 +30,10 @@ public class CouponCustomRepositoryImpl implements CouponCustomRepository {
 	}
 
 	@Override
-	public Page<CouponResponse> findCouponsByCouponId(Pageable pageable, CouponType type) {
+	public Page<Coupon> findCouponsByCouponType(Pageable pageable, CouponType type) {
 		QCoupon coupon = QCoupon.coupon;
 
-		List<CouponResponse> results = queryFactory.select(Projections.constructor(CouponResponse.class,
-				coupon.id,
-				coupon.name,
-				coupon.couponPolicy.discountType,
-				coupon.couponPolicy.discount,
-				coupon.couponPolicy.minimumOrderPrice,
-				coupon.couponPolicy.maximumDiscountPrice,
-				coupon.createdAt,
-				coupon.expiredAt,
-				coupon.period,
-				coupon.expirationType,
-				coupon.deletedAt,
-				coupon.couponType
-			))
-			.from(coupon)
+		List<Coupon> coupons = queryFactory.selectFrom(coupon)
 			.where(coupon.couponType.eq(type))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -60,7 +44,7 @@ public class CouponCustomRepositoryImpl implements CouponCustomRepository {
 			.where(coupon.couponType.eq(type))
 			.fetchOne();
 
-		return new PageImpl<>(results, pageable, total);
+		return new PageImpl<>(coupons, pageable, total);
 	}
 
 }

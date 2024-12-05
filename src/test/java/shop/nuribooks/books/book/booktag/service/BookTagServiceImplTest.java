@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
+import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
@@ -50,6 +53,9 @@ class BookTagServiceImplTest {
 
 	@Mock
 	private TagRepository tagRepository;
+
+	@Mock
+	private BookMapper bookMapper;
 
 	private Book book;
 	private Book book1;
@@ -242,29 +248,22 @@ class BookTagServiceImplTest {
 		verify(bookTagRepository, times(1)).findByBookId(bookId);
 	}
 
-	//TODO: 변경사항으로 인한 추후 수정
-	/*@DisplayName("태그로 도서 조회 성공")
+	@DisplayName("태그로 도서 조회 성공")
 	@Test
 	void getBooksByTagId_Success() {
 		// Given
 		Long tagId = tag1.getId();
-		when(tagRepository.findById(tagId)).thenReturn(Optional.of(tag1));
 		when(bookTagRepository.findBookIdsByTagId(tagId)).thenReturn(List.of(book.getId(), book1.getId()));
 
 		when(bookRepository.findAllById(List.of(book.getId(), book1.getId()))).thenReturn(Arrays.asList(book, book1));
+		when(bookMapper.toBookResponse(any())).thenReturn(null);
 
 		// When
 		List<BookResponse> bookResponses = bookTagService.getBooksByTagId(tagId);
 
 		// Then
 		assertEquals(2, bookResponses.size());
-		assertEquals(book.getTitle(), bookResponses.get(0).title());
-		assertEquals(book1.getTitle(), bookResponses.get(1).title());
-
-		verify(tagRepository, times(1)).findById(tagId);
-		verify(bookTagRepository, times(1)).findBookIdsByTagId(tagId);
-		verify(bookRepository, times(1)).findAllById(anyList());
-	}*/
+	}
 
 	@DisplayName("태그로 도서 조회 실패 - 태그가 존재하지 않음")
 	@Test
@@ -301,5 +300,80 @@ class BookTagServiceImplTest {
 		// When & Then
 		assertThrows(BookTagNotFountException.class, () -> bookTagService.deleteBookTag(bookTagId));
 		verify(bookTagRepository, never()).delete(any(BookTag.class));
+	}
+
+	@DisplayName("도서 태그 삭제 성공")
+	@Test
+	void deleteBookTagIds_Success() {
+		// Given
+		Long bookId = 1L;
+		when(bookTagRepository.findByBookId(bookId)).thenReturn(List.of(bookTag));
+
+		// When
+		bookTagService.deleteBookTagIds(bookId);
+
+		// Then
+		verify(bookTagRepository, times(1)).deleteAll(any());
+	}
+
+	@DisplayName("도서 태그 등록 성공")
+	@Test
+	void registerTagToBook_success() {
+		// Given
+		Long bookId = 1L;
+		List<Long> tagIds = List.of(tag1.getId(), tag2.getId());
+		// When
+		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+		when(tagRepository.findById(anyLong())).thenReturn(Optional.of(tag1)).thenReturn(Optional.of(tag2));
+		when(bookTagRepository.existsByBookIdAndTagId(anyLong(), anyLong())).thenReturn(false).thenReturn(false);
+		when(bookTagRepository.save(any())).thenReturn(bookTag).thenReturn(bookTag);
+
+		// Then
+		bookTagService.registerTagToBook(bookId, tagIds);
+		verify(bookTagRepository, times(2)).existsByBookIdAndTagId(anyLong(), anyLong());
+	}
+
+	@DisplayName("도서 태그 등록 실패")
+	@Test
+	void registerTagToBook_fail() {
+		// Given
+		Long bookId = 1L;
+		List<Long> tagIds = List.of(tag1.getId(), tag2.getId());
+		// When
+		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+		when(tagRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+		// Then
+		Assertions.assertThrows(TagNotFoundException.class,
+			() -> bookTagService.registerTagToBook(bookId, tagIds));
+	}
+
+	@DisplayName("도서 태그 등록 실패")
+	@Test
+	void registerTagToBook_failAlreadyExist() {
+		// Given
+		Long bookId = 1L;
+		List<Long> tagIds = List.of(tag1.getId(), tag2.getId());
+		// When
+		when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+		when(tagRepository.findById(anyLong())).thenReturn(Optional.of(tag1));
+		when(bookTagRepository.existsByBookIdAndTagId(anyLong(), anyLong())).thenReturn(true);
+
+		// Then
+		Assertions.assertThrows(BookTagAlreadyExistsException.class,
+			() -> bookTagService.registerTagToBook(bookId, tagIds));
+	}
+
+	@DisplayName("도서 태그 등록 실패")
+	@Test
+	void registerTagToBook_failBookNotFound() {
+		// Given
+		Long bookId = 1L;
+		List<Long> tagIds = List.of(tag1.getId(), tag2.getId());
+		// When
+		when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+
+		// Then
+		Assertions.assertThrows(BookNotFoundException.class, () -> bookTagService.registerTagToBook(bookId, tagIds));
 	}
 }

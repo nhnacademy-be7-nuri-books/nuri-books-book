@@ -1,11 +1,11 @@
 package shop.nuribooks.books.book.booktag.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,15 +22,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.book.book.entity.Book;
-import shop.nuribooks.books.book.book.entity.BookStateEnum;
+import shop.nuribooks.books.book.book.dto.response.BookResponse;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRequest;
 import shop.nuribooks.books.book.booktag.service.BookTagService;
-import shop.nuribooks.books.book.publisher.entity.Publisher;
-import shop.nuribooks.books.common.TestUtils;
 
 @WebMvcTest(BookTagController.class)
 class BookTagControllerTest {
@@ -44,52 +41,9 @@ class BookTagControllerTest {
 	@Mock
 	private BookRepository bookRepository;
 
-	private Book book;
-	private Book book1;
-
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
-
-		Publisher publisher = new Publisher(1L, "Sample Publisher");
-
-		book = Book.builder()
-			.publisherId(publisher)
-			.state(BookStateEnum.NEW)
-			.title("Sample Book")
-			.thumbnailImageUrl("https://example.com/thumbnail.jpg")
-			.publicationDate(LocalDate.now())
-			.price(BigDecimal.valueOf(29.99))
-			.discountRate(10)
-			.description("Sample description.")
-			.contents("Sample contents.")
-			.isbn("978-3-16-148410-0")
-			.isPackageable(true)
-			.stock(100)
-			.likeCount(0)
-			.viewCount(0L)
-			.build();
-
-		book1 = Book.builder()
-			.publisherId(publisher)
-			.state(BookStateEnum.NEW)
-			.title("Sample Book 1")
-			.thumbnailImageUrl("https://example.com/thumbnail1.jpg")
-			.publicationDate(LocalDate.now())
-			.price(BigDecimal.valueOf(19.99))
-			.discountRate(5)
-			.description("Sample description for book 1.")
-			.contents("Sample contents for book 1.")
-			.isbn("978-3-16-148410-1")
-			.isPackageable(true)
-			.stock(50)
-			.likeCount(0)
-			.viewCount(1L)
-			.build();
-
-		TestUtils.setIdForEntity(book, 1L);
-		TestUtils.setIdForEntity(book1, 2L);
-
 	}
 
 	@DisplayName("도서 태그 등록")
@@ -100,7 +54,7 @@ class BookTagControllerTest {
 		BookTagRegisterResponse response = new BookTagRegisterResponse(1L, 1L, List.of(2L, 3L));
 
 		// Mocking the service call
-		when(bookTagService.registerTagToBook(any(BookTagRequest.class)))
+		when(bookTagService.registerTagToBook(any()))
 			.thenReturn(response);
 
 		// When & Then
@@ -188,47 +142,22 @@ class BookTagControllerTest {
 			.andExpect(jsonPath("$.tagNames[0]").value("Sample Tag")); // tagNames 확인
 	}
 
-	/*@DisplayName("태그에 해당하는 도서 조회 성공")
+	@DisplayName("태그에 해당하는 도서 조회 성공")
 	@Test
 	void getBooksByTagId() throws Exception {
 		// Given
 		Long tagId = 1L;
 
-		BookResponse bookResponse1 = BookResponse.of(book);
-		BookResponse bookResponse2 = BookResponse.of(book1);
-
-		List<BookResponse> responses = List.of(bookResponse1, bookResponse2);
+		List<BookResponse> responses = List.of();
 		when(bookTagService.getBooksByTagId(tagId)).thenReturn(responses);
 
 		// When & Then
 		mockMvc.perform(get("/api/book-tags/tag/{tagId}", tagId)
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$", hasSize(2)))
-				.andExpect(jsonPath("$[0].id").value(book.getId()))
-				.andExpect(jsonPath("$[0].title").value(book.getTitle()))
-				.andExpect(jsonPath("$[0].publisher.id").value(book.getPublisherId().getId()))
-				.andExpect(jsonPath("$[0].publisher.name").value(book.getPublisherId().getName()))
-				.andExpect(jsonPath("$[1].id").value(book1.getId()))
-				.andExpect(jsonPath("$[1].title").value(book1.getTitle()))
-				.andExpect(jsonPath("$[1].publisher.id").value(book1.getPublisherId().getId()))
-				.andExpect(jsonPath("$[1].publisher.name").value(book1.getPublisherId().getName()))
-				.andExpect(jsonPath("$[0].state").value(book.getState().getKorName()))
-				.andExpect(jsonPath("$[0].thumbnailImageUrl").value(book.getThumbnailImageUrl()))
-				.andExpect(jsonPath("$[0].detailImageUrl").value(book.getDetailImageUrl()))
-				.andExpect(jsonPath("$[0].publicationDate").value(book.getPublicationDate().toString()))
-				.andExpect(jsonPath("$[0].price").value(book.getPrice()))
-				.andExpect(jsonPath("$[0].discountRate").value(book.getDiscountRate()))
-				.andExpect(jsonPath("$[0].description").value(book.getDescription()))
-				.andExpect(jsonPath("$[0].contents").value(book.getContents()))
-				.andExpect(jsonPath("$[0].isbn").value(book.getIsbn()))
-				.andExpect(jsonPath("$[0].isPackageable").value(book.isPackageable()))
-				.andExpect(jsonPath("$[0].likeCount").value(book.getLikeCount()))
-				.andExpect(jsonPath("$[0].stock").value(book.getStock()))
-				.andExpect(jsonPath("$[0].viewCount").value(book.getViewCount()));
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.*", hasSize(0)));
 	}
-*/
 
 	@DisplayName("도서 태그 삭제 성공")
 	@Test

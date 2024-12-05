@@ -11,8 +11,6 @@ public interface ContributorRoleService {
 
 	List<ContributorRole> getContributorRoles();
 
-	ContributorRoleResponse updateContributorRole(String roleName, ContributorRoleRequest req);
-
 	void deleteContributorRole(String roleName);
 
 }
