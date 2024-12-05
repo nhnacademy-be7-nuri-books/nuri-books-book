@@ -37,12 +37,14 @@ import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 @WebMvcTest(BookController.class)
 class BookControllerTest {
 
-	@MockBean
-	protected BookService bookService;
 	@Autowired
 	private MockMvc mockMvc;
+
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@MockBean
+	private BookService bookService;
 
 	@Test
 	void registerAladinBook() throws Exception {

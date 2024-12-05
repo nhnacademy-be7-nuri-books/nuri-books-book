@@ -27,7 +27,8 @@ public class AladinBookServiceImpl implements AladinBookService {
 	@Override
 	public List<AladinBookListItemResponse> getNewBooks(String queryType, String searchTarget, int maxResults) {
 		try {
-			AladinBookListResponse response = aladinFeignClient.getNewBooks(ttbKey, queryType, maxResults, 1, "Book",
+			AladinBookListResponse response = aladinFeignClient.getNewBooks(ttbKey, queryType, maxResults, 1,
+				searchTarget,
 				"JS", "20131101");
 			log.info("Received BookList response: {}", response);
 			return response.item();

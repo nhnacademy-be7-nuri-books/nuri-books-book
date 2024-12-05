@@ -31,7 +31,7 @@ public class AladinBookController {
 	@GetMapping
 	public ResponseEntity<List<AladinBookListItemResponse>> getAladinBookList(
 		@RequestParam(defaultValue = "ItemNewAll") String queryType,
-		@RequestParam(defaultValue = "ItemNewAll") String searchTarget,
+		@RequestParam(defaultValue = "Book") String searchTarget,
 		@RequestParam(defaultValue = "10") int maxResults) {
 		List<AladinBookListItemResponse> books = aladinBookService.getNewBooks(queryType, searchTarget, maxResults);
 		return ResponseEntity.ok(books);
