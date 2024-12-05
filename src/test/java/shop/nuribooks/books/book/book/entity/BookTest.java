@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
+import shop.nuribooks.books.book.book.dto.request.BookUpdateRequest;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.exception.book.InvalidStockException;
 
@@ -25,7 +25,6 @@ class BookTest {
 			.publisherId(publisher)
 			.title("테스트 책 제목")
 			.thumbnailImageUrl("thumbnail.jpg")
-			.detailImageUrl("detail.jpg")
 			.publicationDate(LocalDate.now())
 			.price(BigDecimal.valueOf(15000))
 			.discountRate(10)
@@ -53,7 +52,6 @@ class BookTest {
 			.state(null)
 			.title(null)
 			.thumbnailImageUrl(null)
-			.detailImageUrl(null)
 			.publicationDate(null)
 			.price(null)
 			.discountRate(0)
@@ -96,7 +94,6 @@ class BookTest {
 			.discountRate(10)
 			.stock(100)
 			.thumbnailImageUrl("oldThumbnail.jpg")
-			.detailImageUrl("oldDetail.jpg")
 			.description("Old Description")
 			.contents("Old Contents")
 			.isPackageable(false)
@@ -111,7 +108,6 @@ class BookTest {
 			50,
 			"정상판매",
 			"newThumbnail.jpg",
-			"newDetail.jpg",
 			"New Description",
 			"New Contents",
 			true,
@@ -126,7 +122,6 @@ class BookTest {
 		assertEquals(50, book.getStock());
 		assertEquals(BookStateEnum.NORMAL, book.getState());
 		assertEquals("newThumbnail.jpg", book.getThumbnailImageUrl());
-		assertEquals("newDetail.jpg", book.getDetailImageUrl());
 		assertEquals("New Description", book.getDescription());
 		assertEquals("New Contents", book.getContents());
 		assertTrue(book.isPackageable());

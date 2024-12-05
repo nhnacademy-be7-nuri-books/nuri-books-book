@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 
-import shop.nuribooks.books.book.book.dto.BookListResponse;
-import shop.nuribooks.books.book.book.dto.TopBookResponse;
+import shop.nuribooks.books.book.book.dto.response.BookListResponse;
+import shop.nuribooks.books.book.book.dto.response.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 
 public interface BookCustomRepository {

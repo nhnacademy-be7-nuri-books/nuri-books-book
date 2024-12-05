@@ -1,4 +1,4 @@
-package shop.nuribooks.books.book.book.dto;
+package shop.nuribooks.books.book.book.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,7 +15,6 @@ public record BookResponse(
 	String state,
 	String title,
 	String thumbnailImageUrl,
-	String detailImageUrl,
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	LocalDate publicationDate,
 	BigDecimal price,

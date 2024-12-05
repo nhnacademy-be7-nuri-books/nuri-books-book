@@ -15,8 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import shop.nuribooks.books.book.book.dto.AladinBookListItemResponse;
-import shop.nuribooks.books.book.book.dto.AladinBookListResponse;
+import shop.nuribooks.books.book.book.dto.response.AladinBookListItemResponse;
+import shop.nuribooks.books.book.book.dto.response.AladinBookListResponse;
 import shop.nuribooks.books.book.book.service.impl.AladinBookServiceImpl;
 import shop.nuribooks.books.book.client.AladinFeignClient;
 import shop.nuribooks.books.exception.ResourceNotFoundException;

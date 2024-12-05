@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.dto.AladinBookListItemResponse;
+import shop.nuribooks.books.book.book.dto.response.AladinBookListItemResponse;
 import shop.nuribooks.books.book.book.service.AladinBookService;
 
 @RequestMapping("api/books/aladin")
@@ -29,9 +29,10 @@ public class AladinBookController {
 		@ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	@GetMapping
-	public ResponseEntity<List<AladinBookListItemResponse>> getAladinBookList(@RequestParam(defaultValue = "ItemNewAll") String queryType,
-																			@RequestParam(defaultValue = "ItemNewAll") String searchTarget,
-																			@RequestParam(defaultValue = "10") int maxResults) {
+	public ResponseEntity<List<AladinBookListItemResponse>> getAladinBookList(
+		@RequestParam(defaultValue = "ItemNewAll") String queryType,
+		@RequestParam(defaultValue = "ItemNewAll") String searchTarget,
+		@RequestParam(defaultValue = "10") int maxResults) {
 		List<AladinBookListItemResponse> books = aladinBookService.getNewBooks(queryType, searchTarget, maxResults);
 		return ResponseEntity.ok(books);
 	}

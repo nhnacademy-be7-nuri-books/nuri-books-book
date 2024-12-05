@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
-import shop.nuribooks.books.book.book.dto.BookListResponse;
-import shop.nuribooks.books.book.book.dto.BookResponse;
-import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.book.dto.TopBookResponse;
+import shop.nuribooks.books.book.book.dto.request.BaseBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.request.BookUpdateRequest;
+import shop.nuribooks.books.book.book.dto.response.BookContributorsResponse;
+import shop.nuribooks.books.book.book.dto.response.BookListResponse;
+import shop.nuribooks.books.book.book.dto.response.BookResponse;
+import shop.nuribooks.books.book.book.dto.response.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.mapper.BookMapper;

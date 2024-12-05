@@ -22,14 +22,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import shop.nuribooks.books.book.book.dto.AladinBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
-import shop.nuribooks.books.book.book.dto.BookListResponse;
-import shop.nuribooks.books.book.book.dto.BookResponse;
-import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
-import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.TopBookResponse;
+import shop.nuribooks.books.book.book.dto.request.AladinBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.request.BaseBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.request.BookUpdateRequest;
+import shop.nuribooks.books.book.book.dto.request.PersonallyBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.response.BookContributorsResponse;
+import shop.nuribooks.books.book.book.dto.response.BookListResponse;
+import shop.nuribooks.books.book.book.dto.response.BookResponse;
+import shop.nuribooks.books.book.book.dto.response.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
@@ -130,7 +130,6 @@ class BooksServiceImplTest {
 			100,
 			BookStateEnum.NORMAL.getKorName(),
 			"thumbnail.jpg",
-			"detail.jpg",
 			"Sample description",
 			"Sample contents",
 			"1234567890123",
@@ -149,7 +148,6 @@ class BooksServiceImplTest {
 			100,
 			BookStateEnum.NORMAL.getKorName(),
 			"thumbnail.jpg",
-			"detail.jpg",
 			"Sample description",
 			"Sample contents",
 			"1234567890123",
@@ -164,7 +162,6 @@ class BooksServiceImplTest {
 			50,
 			BookStateEnum.NEW.getKorName(),
 			"updated_thumbnail.jpg",
-			"updated_detail.jpg",
 			"Updated Description",
 			"Updated Contents",
 			true,
@@ -179,7 +176,6 @@ class BooksServiceImplTest {
 			.stock(100)
 			.state(BookStateEnum.NORMAL)
 			.thumbnailImageUrl("original_thumbnail.jpg")
-			.detailImageUrl("original_detail.jpg")
 			.description("Original Description")
 			.contents("Original Contents")
 			.isPackageable(true)
@@ -255,7 +251,6 @@ class BooksServiceImplTest {
 			100,
 			BookStateEnum.NORMAL.getKorName(),
 			"thumbnail.jpg",
-			"detail.jpg",
 			"Sample description",
 			"Sample contents",
 			"1234567890123",
@@ -301,7 +296,6 @@ class BooksServiceImplTest {
 			100,
 			BookStateEnum.NORMAL.getKorName(),
 			"thumbnail.jpg",
-			"detail.jpg",
 			"Sample description",
 			"Sample contents",
 			"1234567890123",
@@ -415,7 +409,6 @@ class BooksServiceImplTest {
 			100,
 			"실패",
 			"thumbnail.jpg",
-			"detail.jpg",
 			"Sample description",
 			"Sample contents",
 			"1234567890123",
@@ -460,7 +453,6 @@ class BooksServiceImplTest {
 			.price(BigDecimal.valueOf(15000))
 			.state(BookStateEnum.NORMAL)
 			.thumbnailImageUrl("thumbnail1.jpg")
-			.detailImageUrl("detail1.jpg")
 			.title("Book Title 1")
 			.build();
 
@@ -471,7 +463,6 @@ class BooksServiceImplTest {
 			.price(BigDecimal.valueOf(20000))
 			.state(BookStateEnum.NORMAL)
 			.thumbnailImageUrl("thumbnail2.jpg")
-			.detailImageUrl("detail2.jpg")
 			.title("Book Title 2")
 			.build();
 
@@ -546,7 +537,6 @@ class BooksServiceImplTest {
 		assertEquals(updateRequest.stock(), book.getStock());
 		assertEquals(updateRequest.state(), book.getState().getKorName());
 		assertEquals(updateRequest.thumbnailImageUrl(), book.getThumbnailImageUrl());
-		assertEquals(updateRequest.detailImageUrl(), book.getDetailImageUrl());
 		assertEquals(updateRequest.description(), book.getDescription());
 		assertEquals(updateRequest.contents(), book.getContents());
 		assertEquals(updateRequest.isPackageable(), book.isPackageable());
@@ -593,7 +583,6 @@ class BooksServiceImplTest {
 				book.getState().getKorName(),
 				book.getTitle(),
 				book.getThumbnailImageUrl(),
-				book.getDetailImageUrl(),
 				book.getPublicationDate(),
 				book.getPrice(),
 				book.getDiscountRate(),
@@ -654,7 +643,6 @@ class BooksServiceImplTest {
 				book.getState().getKorName(),
 				book.getTitle(),
 				book.getThumbnailImageUrl(),
-				book.getDetailImageUrl(),
 				book.getPublicationDate(),
 				book.getPrice(),
 				book.getDiscountRate(),
@@ -825,7 +813,6 @@ class BooksServiceImplTest {
 			.title("Book 1")
 			.publisherId(publisher)
 			.thumbnailImageUrl("thumbnail1.jpg")
-			.detailImageUrl("detail1.jpg")
 			.publicationDate(LocalDate.of(2022, 1, 1))
 			.price(BigDecimal.valueOf(20000))
 			.discountRate(10)
@@ -844,7 +831,6 @@ class BooksServiceImplTest {
 			.title("Book 2")
 			.publisherId(publisher)
 			.thumbnailImageUrl("thumbnail2.jpg")
-			.detailImageUrl("detail2.jpg")
 			.publicationDate(LocalDate.of(2023, 1, 1))
 			.price(BigDecimal.valueOf(25000))
 			.discountRate(15)
@@ -868,7 +854,6 @@ class BooksServiceImplTest {
 			"정상",
 			"Book 1",
 			"thumbnail1.jpg",
-			"detail1.jpg",
 			LocalDate.of(2022, 1, 1),
 			BigDecimal.valueOf(20000),
 			10,
@@ -891,7 +876,6 @@ class BooksServiceImplTest {
 			"정상",
 			"Book 2",
 			"thumbnail2.jpg",
-			"detail2.jpg",
 			LocalDate.of(2023, 1, 1),
 			BigDecimal.valueOf(25000),
 			15,

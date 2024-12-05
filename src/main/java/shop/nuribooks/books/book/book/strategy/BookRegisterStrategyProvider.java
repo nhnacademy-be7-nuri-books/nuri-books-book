@@ -6,9 +6,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import shop.nuribooks.books.book.book.dto.AladinBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.request.AladinBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.request.BaseBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.request.PersonallyBookRegisterRequest;
 
 @Component
 public class BookRegisterStrategyProvider {

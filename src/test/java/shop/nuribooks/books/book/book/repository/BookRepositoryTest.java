@@ -16,7 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import lombok.extern.slf4j.Slf4j;
-import shop.nuribooks.books.book.book.dto.TopBookResponse;
+import shop.nuribooks.books.book.book.dto.response.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
@@ -47,7 +47,6 @@ class BookRepositoryTest {
 			.publisherId(publisher)
 			.title("Test Book Title")
 			.thumbnailImageUrl("thumbnail.jpg")
-			.detailImageUrl("detail.jpg")
 			.publicationDate(LocalDate.now())
 			.price(BigDecimal.valueOf(10000))
 			.discountRate(10)
@@ -65,7 +64,6 @@ class BookRepositoryTest {
 			.publisherId(publisher)
 			.title("Aest Book Title")
 			.thumbnailImageUrl("thumbnail.jpg")
-			.detailImageUrl("detail.jpg")
 			.publicationDate(LocalDate.now())
 			.price(BigDecimal.valueOf(10000))
 			.discountRate(10)

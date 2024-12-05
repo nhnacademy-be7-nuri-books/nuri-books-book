@@ -32,7 +32,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
-import shop.nuribooks.books.book.book.dto.BookUpdateRequest;
+import shop.nuribooks.books.book.book.dto.request.BookUpdateRequest;
 import shop.nuribooks.books.book.publisher.entity.Publisher;
 import shop.nuribooks.books.book.review.entity.Review;
 import shop.nuribooks.books.exception.book.InvalidStockException;
@@ -63,8 +63,6 @@ public class Book {
 
 	@NotBlank
 	private String thumbnailImageUrl;
-
-	private String detailImageUrl;
 
 	@NotNull
 	private LocalDate publicationDate;
@@ -115,14 +113,13 @@ public class Book {
 	@Builder
 	@Jacksonized
 	private Book(Publisher publisherId, BookStateEnum state, String title, String thumbnailImageUrl,
-		String detailImageUrl, LocalDate publicationDate, BigDecimal price, int discountRate,
+		LocalDate publicationDate, BigDecimal price, int discountRate,
 		String description, String contents, String isbn, boolean isPackageable, int stock,
 		int likeCount, Long viewCount, int salesCount) {
 		this.state = state;
 		this.publisherId = publisherId;
 		this.title = title;
 		this.thumbnailImageUrl = thumbnailImageUrl;
-		this.detailImageUrl = detailImageUrl;
 		this.publicationDate = publicationDate;
 		this.price = price;
 		this.discountRate = discountRate;
@@ -142,7 +139,6 @@ public class Book {
 		this.stock = request.stock();
 		this.state = BookStateEnum.fromStringKor(request.state());
 		this.thumbnailImageUrl = request.thumbnailImageUrl();
-		this.detailImageUrl = request.detailImageUrl();
 		this.description = request.description();
 		this.contents = request.contents();
 		this.isPackageable = request.isPackageable();

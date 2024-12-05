@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
+import shop.nuribooks.books.book.book.dto.response.BookContributorsResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
@@ -135,7 +135,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			categoryIds,
 			pageable
 		);
-		
+
 	}
 
 }

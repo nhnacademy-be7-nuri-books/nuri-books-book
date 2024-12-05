@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.nuribooks.books.book.book.dto.AladinBookListItemResponse;
-import shop.nuribooks.books.book.book.dto.AladinBookListResponse;
+import shop.nuribooks.books.book.book.dto.response.AladinBookListItemResponse;
+import shop.nuribooks.books.book.book.dto.response.AladinBookListResponse;
 import shop.nuribooks.books.book.book.service.AladinBookService;
 import shop.nuribooks.books.book.client.AladinFeignClient;
 import shop.nuribooks.books.exception.ResourceNotFoundException;

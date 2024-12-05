@@ -3,8 +3,8 @@ package shop.nuribooks.books.book.book.strategy;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.dto.BaseBookRegisterRequest;
-import shop.nuribooks.books.book.book.dto.PersonallyBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.request.BaseBookRegisterRequest;
+import shop.nuribooks.books.book.book.dto.request.PersonallyBookRegisterRequest;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.service.CategoryRegisterService;
 

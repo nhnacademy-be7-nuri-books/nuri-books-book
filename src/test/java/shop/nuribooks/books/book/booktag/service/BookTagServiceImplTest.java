@@ -68,7 +68,6 @@ class BookTagServiceImplTest {
 			.state(BookStateEnum.NEW)
 			.title("Sample Book")
 			.thumbnailImageUrl("https://example.com/thumbnail.jpg")
-			.detailImageUrl("https://example.com/detail.jpg")
 			.publicationDate(LocalDate.now())
 			.price(BigDecimal.valueOf(29.99))
 			.discountRate(10)
@@ -86,7 +85,6 @@ class BookTagServiceImplTest {
 			.state(BookStateEnum.NEW) // state 값 설정
 			.title("Sample Book1")
 			.thumbnailImageUrl("https://example.com/thumbnail.jpg")
-			.detailImageUrl("https://example.com/detail.jpg")
 			.publicationDate(LocalDate.now())
 			.price(BigDecimal.valueOf(29.99))
 			.discountRate(10)
@@ -219,7 +217,6 @@ class BookTagServiceImplTest {
 		// Verify interactions
 		verify(bookTagRepository, never()).findTagNamesByBookId(anyLong());
 	}
-
 
 	@DisplayName("도서에 등록된 태그 조회 실패 - bookTagId는 null")
 	@Test
