@@ -1,29 +1,29 @@
 package shop.nuribooks.books.payment.payment.service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +61,8 @@ public class PaymentServiceImpl implements PaymentService {
 	private final PaymentCancelRepository paymentCancelRepository;
 
 	private final RabbitTemplate rabbitTemplate;
+	private final RestTemplate restTemplate;
+	private final ObjectMapper objectMapper;
 	private final ApplicationEventPublisher publisher;
 
 	/**
@@ -89,10 +91,9 @@ public class PaymentServiceImpl implements PaymentService {
 
 		for (OrderDetail orderDetail : orderDetailList) {
 			orderDetail.setOrderState(OrderState.PAID);
+			//재고 업데이트 메시지 발행
+			publishInventoryUpdateMessages(orderDetail);
 		}
-
-		//재고 업데이트 메시지 발행
-		publishInventoryUpdateMessages(orderDetailList);
 
 		// 회원 사용 총금액 반영 및 포인트 적립위한 event
 		createPaymentEvent(order);
@@ -110,10 +111,8 @@ public class PaymentServiceImpl implements PaymentService {
 			() -> new PaymentNotFoundException("결제 정보가 없습니다.")
 		);
 
-		// 결제 취소
-		JSONObject paymentCancelInfo = new JSONObject();
-		paymentCancelInfo.put("cancelReason", reason);
-
+		// 결제 취소 로직 시작
+		// 결제 취소 API request 생성 데이터 선언
 		String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
 		Base64.Encoder encoder = Base64.getEncoder();
@@ -122,73 +121,54 @@ public class PaymentServiceImpl implements PaymentService {
 
 		String paymentKey = payment.getTossPaymentKey();
 		String cancelUrl = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
-		JSONObject tossResponse;
 
-		boolean isSuccess = false;
-		HttpURLConnection connection = null;
+		HttpHeaders headers = createHeader(authorizations);
 
-		// 결제 취소 API 호출
-		try {
-			URL url = new URL(cancelUrl);
-			connection = (HttpURLConnection)url.openConnection();
-			connection.setRequestProperty("Authorization", authorizations);
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestMethod("POST");
-			connection.setDoOutput(true);
+		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+		body.add("cancelReason", reason);
 
-			OutputStream outputStream = connection.getOutputStream();
-			outputStream.write(paymentCancelInfo.toString().getBytes(StandardCharsets.UTF_8));
+		// request 생성 및 restTemplate 으로 response 요청.
+		HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+		ResponseEntity<String> response = restTemplate.exchange(cancelUrl, HttpMethod.POST, requestEntity,
+			String.class);
 
-			int code = connection.getResponseCode();
-
-			isSuccess = code == 200;
-
-			InputStream responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
-
-			Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
-			JSONParser parser = new JSONParser();
-			tossResponse = (JSONObject)parser.parse(reader);
-			responseStream.close();
-		} catch (IOException | ParseException e) {
-			log.error(e.getMessage());
-			throw new FailedPaymentCancelException("결제 취소 중 오류 발생");
-		} finally {
-			if (Objects.nonNull(connection)) {
-				connection.disconnect();
-			}
-		}
-
-		if (isSuccess) {
-			// 결제 상태 변경 & 취소 사유 작성
+		if (response.getStatusCode().is2xxSuccessful()) {
+			log.info("{}", response.getBody());
+			//JSON 응답 파싱하여 데이터 추출
 			payment.setPaymentState(PaymentState.CANCELED);
+			JsonNode root;
+			try {
+				root = objectMapper.readTree(response.getBody());
+			} catch (JsonProcessingException e) {
+				throw new FailedPaymentCancelException("결제 취소 중 문제가 발생하였습니다." + e.getMessage());
+			}
 
-			JSONArray cancelArray = (JSONArray)tossResponse.get("cancels");
-			JSONObject cancelObject = (JSONObject)cancelArray.getFirst();
-
+			// 주문 취소 객체 생성.
+			JsonNode node = root.path("cancels").get(0);
 			PaymentCancel paymentCancel = PaymentCancel.builder()
 				.payment(payment)
-				.transactionKey((String)cancelObject.get("transactionKey"))
-				.cancelReason((String)cancelObject.get("cancelReason"))
-				.canceledAt(OffsetDateTime.parse((String)cancelObject.get("canceledAt")).toLocalDateTime())
+				.transactionKey(node.path("transactionKey").asText())
+				.cancelReason(node.path("cancelReason").asText())
+				.canceledAt(LocalDateTime.parse(node.path("canceledAt").asText()))
 				.build();
-
 			paymentCancelRepository.save(paymentCancel);
 
 			// 주문 상태 변경 & 재고 차감
 			List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(order.getId());
 
 			for (OrderDetail orderDetail : orderDetailList) {
-				orderDetail.setOrderState(OrderState.PAID);
+				orderDetail.setOrderState(OrderState.CANCELED);
 				orderDetail.setCount(-orderDetail.getCount());
-			}
 
-			//재고 업데이트 메시지 발행
-			publishInventoryUpdateMessages(orderDetailList);
+				//재고 업데이트 메시지 발행
+				publishInventoryUpdateMessages(orderDetail);
+			}
 
 			return ResponseMessage.builder().message("주문 취소 성공").statusCode(200).build();
 		} else {
-			log.error("토스 페이먼츠를 통해 결제 취소를 진행 중 예외 발생");
-			throw new FailedPaymentCancelException((String)tossResponse.get("message"));
+			log.error("Failed... Status: {}, Response: {}", response.getStatusCode(),
+				response.getBody());
+			throw new FailedPaymentCancelException("결제 취소에 실패하였습니다.");
 		}
 	}
 
@@ -207,23 +187,28 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	//재고 업데이트 메시지 발행
-	private void publishInventoryUpdateMessages(List<OrderDetail> orderDetailList) {
-		for (OrderDetail orderDetail : orderDetailList) {
-			InventoryUpdateMessage message = InventoryUpdateMessage
-				.builder()
-				.bookId(orderDetail.getBook().getId())
-				.count(orderDetail.getCount())
-				.messageId("inventory-" + UUID.randomUUID())
-				.build();
-			try {
-				rabbitTemplate.convertAndSend(
-					RabbitmqConfig.INVENTORY_EXCHANGE,
-					RabbitmqConfig.INVENTORY_ROUTING_KEY,
-					message
-				);
-			} catch (AmqpRejectAndDontRequeueException e) {
-				log.error("Invalid Message Format : {}", e.getMessage());
-			}
+	private void publishInventoryUpdateMessages(OrderDetail orderDetail) {
+		InventoryUpdateMessage message = InventoryUpdateMessage
+			.builder()
+			.bookId(orderDetail.getBook().getId())
+			.count(orderDetail.getCount())
+			.messageId("inventory-" + UUID.randomUUID())
+			.build();
+		try {
+			rabbitTemplate.convertAndSend(
+				RabbitmqConfig.INVENTORY_EXCHANGE,
+				RabbitmqConfig.INVENTORY_ROUTING_KEY,
+				message
+			);
+		} catch (AmqpRejectAndDontRequeueException e) {
+			log.error("Invalid Message Format : {}", e.getMessage());
 		}
+	}
+
+	private HttpHeaders createHeader(String authorizations) {
+		HttpHeaders headers = new org.springframework.http.HttpHeaders();
+		headers.set("Authorization", authorizations);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		return headers;
 	}
 }
