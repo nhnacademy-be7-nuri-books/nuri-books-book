@@ -5,13 +5,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,7 +43,6 @@ import shop.nuribooks.books.order.orderdetail.repository.OrderDetailRepository;
 import shop.nuribooks.books.payment.payment.dto.PaymentSuccessRequest;
 import shop.nuribooks.books.payment.payment.entity.Payment;
 import shop.nuribooks.books.payment.payment.entity.PaymentCancel;
-import shop.nuribooks.books.payment.payment.entity.PaymentMethod;
 import shop.nuribooks.books.payment.payment.entity.PaymentState;
 import shop.nuribooks.books.payment.payment.event.PaymentEvent;
 import shop.nuribooks.books.payment.payment.repository.PaymentCancelRepository;
@@ -81,15 +80,7 @@ public class PaymentServiceImpl implements PaymentService {
 		);
 
 		// 결제 정보 저장
-		Payment payment = Payment.builder()
-			.order(order)
-			.tossPaymentKey(paymentSuccessRequest.paymentKey())
-			.paymentMethod(PaymentMethod.fromKoreanName(paymentSuccessRequest.method()))
-			.paymentState(PaymentState.valueOf(paymentSuccessRequest.status()))
-			.unitPrice(BigDecimal.valueOf(paymentSuccessRequest.totalAmount()))
-			.requestedAt(paymentSuccessRequest.requestedAt())
-			.approvedAt(paymentSuccessRequest.approvedAt())
-			.build();
+		Payment payment = paymentSuccessRequest.toEntity(order);
 
 		paymentRepository.save(payment);
 
@@ -101,13 +92,7 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 
 		//재고 업데이트 메시지 발행
-		try {
-			publishInventoryUpdateMessages(orderDetailList);
-		} catch (AmqpRejectAndDontRequeueException e) {
-			log.error("Invalid Message Format : {}", e.getMessage());
-		}
-
-		orderDetailRepository.saveAll(orderDetailList);
+		publishInventoryUpdateMessages(orderDetailList);
 
 		// 회원 사용 총금액 반영 및 포인트 적립위한 event
 		createPaymentEvent(order);
@@ -120,9 +105,6 @@ public class PaymentServiceImpl implements PaymentService {
 	@Transactional
 	@Override
 	public ResponseMessage cancelPayment(Order order, String reason) {
-
-		JSONParser parser = new JSONParser();
-
 		// 결제 정보 가져오기
 		Payment payment = paymentRepository.findByOrder(order).orElseThrow(
 			() -> new PaymentNotFoundException("결제 정보가 없습니다.")
@@ -142,11 +124,13 @@ public class PaymentServiceImpl implements PaymentService {
 		String cancelUrl = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
 		JSONObject tossResponse;
 
-		try {
-			// 결제 취소 API 호출
-			URL url = new URL(cancelUrl);
+		boolean isSuccess = false;
+		HttpURLConnection connection = null;
 
-			HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+		// 결제 취소 API 호출
+		try {
+			URL url = new URL(cancelUrl);
+			connection = (HttpURLConnection)url.openConnection();
 			connection.setRequestProperty("Authorization", authorizations);
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestMethod("POST");
@@ -157,55 +141,55 @@ public class PaymentServiceImpl implements PaymentService {
 
 			int code = connection.getResponseCode();
 
-			boolean isSuccess = code == 200;
+			isSuccess = code == 200;
 
 			InputStream responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
 
 			Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
+			JSONParser parser = new JSONParser();
 			tossResponse = (JSONObject)parser.parse(reader);
 			responseStream.close();
-
-			if (isSuccess) {
-				// 결제 상태 변경 & 취소 사유 작성
-				payment.setPaymentState(PaymentState.CANCELED);
-				paymentRepository.save(payment);
-
-				JSONArray cancelArray = (JSONArray)tossResponse.get("cancels");
-				JSONObject cancelObject = (JSONObject)cancelArray.get(0);
-
-				PaymentCancel paymentCancel = PaymentCancel.builder()
-					.payment(payment)
-					.transactionKey((String)cancelObject.get("transactionKey"))
-					.cancelReason((String)cancelObject.get("cancelReason"))
-					.canceledAt(OffsetDateTime.parse((String)cancelObject.get("canceledAt")).toLocalDateTime())
-					.build();
-
-				paymentCancelRepository.save(paymentCancel);
-
-				// 주문 상태 변경 & 재고 차감
-				List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(order.getId());
-
-				for (OrderDetail orderDetail : orderDetailList) {
-					orderDetail.setOrderState(OrderState.PAID);
-					orderDetail.setCount(-orderDetail.getCount());
-				}
-
-				//재고 업데이트 메시지 발행
-				try {
-					publishInventoryUpdateMessages(orderDetailList);
-				} catch (AmqpRejectAndDontRequeueException e) {
-					log.error("Invalid Message Format : {}", e.getMessage());
-				}
-
-				return ResponseMessage.builder().message("주문 취소 성공").statusCode(200).build();
-			}
-
 		} catch (IOException | ParseException e) {
-			throw new FailedPaymentCancelException("주문 취소 처리 중 IO 예외가 발생하였습니다.");
+			log.error(e.getMessage());
+			throw new FailedPaymentCancelException("결제 취소 중 오류 발생");
+		} finally {
+			if (Objects.nonNull(connection)) {
+				connection.disconnect();
+			}
 		}
 
-		log.error("토스 페이먼츠를 통해 결제 취소를 진행 중 예외 발생");
-		throw new FailedPaymentCancelException((String)tossResponse.get("message"));
+		if (isSuccess) {
+			// 결제 상태 변경 & 취소 사유 작성
+			payment.setPaymentState(PaymentState.CANCELED);
+
+			JSONArray cancelArray = (JSONArray)tossResponse.get("cancels");
+			JSONObject cancelObject = (JSONObject)cancelArray.getFirst();
+
+			PaymentCancel paymentCancel = PaymentCancel.builder()
+				.payment(payment)
+				.transactionKey((String)cancelObject.get("transactionKey"))
+				.cancelReason((String)cancelObject.get("cancelReason"))
+				.canceledAt(OffsetDateTime.parse((String)cancelObject.get("canceledAt")).toLocalDateTime())
+				.build();
+
+			paymentCancelRepository.save(paymentCancel);
+
+			// 주문 상태 변경 & 재고 차감
+			List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(order.getId());
+
+			for (OrderDetail orderDetail : orderDetailList) {
+				orderDetail.setOrderState(OrderState.PAID);
+				orderDetail.setCount(-orderDetail.getCount());
+			}
+
+			//재고 업데이트 메시지 발행
+			publishInventoryUpdateMessages(orderDetailList);
+
+			return ResponseMessage.builder().message("주문 취소 성공").statusCode(200).build();
+		} else {
+			log.error("토스 페이먼츠를 통해 결제 취소를 진행 중 예외 발생");
+			throw new FailedPaymentCancelException((String)tossResponse.get("message"));
+		}
 	}
 
 	// ---------------------------------- private
@@ -231,12 +215,15 @@ public class PaymentServiceImpl implements PaymentService {
 				.count(orderDetail.getCount())
 				.messageId("inventory-" + UUID.randomUUID())
 				.build();
-
-			rabbitTemplate.convertAndSend(
-				RabbitmqConfig.INVENTORY_EXCHANGE,
-				RabbitmqConfig.INVENTORY_ROUTING_KEY,
-				message
-			);
+			try {
+				rabbitTemplate.convertAndSend(
+					RabbitmqConfig.INVENTORY_EXCHANGE,
+					RabbitmqConfig.INVENTORY_ROUTING_KEY,
+					message
+				);
+			} catch (AmqpRejectAndDontRequeueException e) {
+				log.error("Invalid Message Format : {}", e.getMessage());
+			}
 		}
 	}
 }
