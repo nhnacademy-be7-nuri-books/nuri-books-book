@@ -140,26 +140,22 @@ class BookContributorServiceImplTest {
 		verify(bookContributorRepository, never()).save(any(BookContributor.class));
 	}
 
-	//TODO: 변경사항으로 인한 추후 수정
-    /*@DisplayName("도서 기여자 조회 성공")
-    @Test
-    void getAllBooksByContributorId_ShouldReturnBooks_WhenContributorExists() {
-        // Arrange
-        when(contributorRepository.findById(contributor.getId())).thenReturn(Optional.of(contributor));
-        when(bookContributorRepository.findBookIdsByContributorId(contributor.getId())).thenReturn(List.of(book.getId()));
-        when(bookRepository.findAllById(List.of(book.getId()))).thenReturn(List.of(book));
+	@DisplayName("도서 기여자 조회 성공")
+	@Test
+	void getAllBooksByContributorId_ShouldReturnBooks_WhenContributorExists() {
+		// Arrange
+		when(contributorRepository.existsById(contributor.getId())).thenReturn(true);
+		when(bookContributorRepository.findBookIdsByContributorId(contributor.getId())).thenReturn(
+			List.of(book.getId()));
+		when(bookRepository.findAllById(List.of(book.getId()))).thenReturn(List.of(book));
+		// Act
+		List<Book> result = bookContributorService.getAllBooksByContributorId(contributor.getId());
 
-        // Act
-        List<BookResponse> result = bookContributorService.getAllBooksByContributorId(contributor.getId());
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(book.getTitle(), result.get(0).title());
-        verify(contributorRepository).findById(contributor.getId());
-        verify(bookContributorRepository).findBookIdsByContributorId(contributor.getId());
-        verify(bookRepository).findAllById(List.of(book.getId()));
-    }*/
+		// Assert
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		assertEquals(book.getTitle(), result.getFirst().getTitle());
+	}
 
 	@DisplayName("도서 ID로 기여자와 기여자 역할 조회 성공")
 	@Test
@@ -180,10 +176,10 @@ class BookContributorServiceImplTest {
 		// Assert
 		assertNotNull(result);
 		assertEquals(1, result.size());
-		assertEquals(contributorInfoResponse.contributorId(), result.get(0).contributorId());
-		assertEquals(contributorInfoResponse.contributorName(), result.get(0).contributorName());
-		assertEquals(contributorInfoResponse.contributorRoleId(), result.get(0).contributorRoleId());
-		assertEquals(contributorInfoResponse.contributorRoleName(), result.get(0).contributorRoleName());
+		assertEquals(contributorInfoResponse.contributorId(), result.getFirst().contributorId());
+		assertEquals(contributorInfoResponse.contributorName(), result.getFirst().contributorName());
+		assertEquals(contributorInfoResponse.contributorRoleId(), result.getFirst().contributorRoleId());
+		assertEquals(contributorInfoResponse.contributorRoleName(), result.getFirst().contributorRoleName());
 
 		verify(bookContributorRepository).findContributorsAndRolesByBookId(bookId);
 	}

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.nuribooks.books.book.book.dto.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -80,17 +79,13 @@ public class BookContributorServiceImpl implements BookContributorService {
 	 * @return 도서 정보가 포함된 리스트 형식의 BookResponse
 	 */
 	@Override
-	public List<BookResponse> getAllBooksByContributorId(Long contributorId) {
+	public List<Book> getAllBooksByContributorId(Long contributorId) {
 		if (!contributorRepository.existsById(contributorId)) {
 			throw new ContributorNotFoundException();
 		}
 
 		List<Long> bookIds = bookContributorRepository.findBookIdsByContributorId(contributorId);
-		List<Book> books = bookRepository.findAllById(bookIds);
-
-		return books.stream()
-			.map(bookMapper::toBookResponse)
-			.toList();
+		return bookRepository.findAllById(bookIds);
 	}
 
 	/**
@@ -101,16 +96,11 @@ public class BookContributorServiceImpl implements BookContributorService {
 	 */
 	@Override
 	public List<BookContributorInfoResponse> getContributorsAndRolesByBookId(Long bookId) {
-		try {
-			log.info("Fetching contributors for bookId: {}", bookId);
-			List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(
-				bookId);
-			log.info("Contributors fetched: {}", contributors);
-			return contributors;
-		} catch (Exception e) {
-			log.error("Error fetching contributors for bookId: {}", bookId, e);
-			throw e;
-		}
+		log.info("Fetching contributors for bookId: {}", bookId);
+		List<BookContributorInfoResponse> contributors = bookContributorRepository.findContributorsAndRolesByBookId(
+			bookId);
+		log.info("Contributors fetched: {}", contributors);
+		return contributors;
 	}
 
 	/**

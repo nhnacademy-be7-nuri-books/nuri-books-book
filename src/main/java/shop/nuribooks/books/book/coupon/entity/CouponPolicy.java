@@ -13,8 +13,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.nuribooks.books.book.coupon.dto.CouponPolicyRequest;
 import shop.nuribooks.books.book.coupon.enums.DiscountType;
 
 @Entity
@@ -28,8 +30,7 @@ public class CouponPolicy {
 	private Long id;
 
 	@NotNull
-	@
-		Size(min = 2, max = 50)
+	@Size(min = 2, max = 50)
 	private String name;
 
 	@NotNull
@@ -44,4 +45,21 @@ public class CouponPolicy {
 	@NotNull
 	private int discount;
 
+	@Builder
+	public CouponPolicy(String name, DiscountType discountType,
+		BigDecimal minimumOrderPrice, BigDecimal maximumDiscountPrice, int discount) {
+		this.name = name;
+		this.discountType = discountType;
+		this.minimumOrderPrice = minimumOrderPrice;
+		this.maximumDiscountPrice = maximumDiscountPrice;
+		this.discount = discount;
+	}
+
+	public void update(CouponPolicyRequest request) {
+		this.name = request.name();
+		this.discountType = request.discountType();
+		this.minimumOrderPrice = request.minimumOrderPrice();
+		this.maximumDiscountPrice = request.maximumDiscountPrice();
+		this.discount = request.discount();
+	}
 }
