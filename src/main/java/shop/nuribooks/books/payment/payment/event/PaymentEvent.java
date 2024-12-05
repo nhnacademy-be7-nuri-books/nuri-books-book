@@ -7,7 +7,7 @@ import shop.nuribooks.books.member.member.entity.Member;
 import shop.nuribooks.books.order.order.entity.Order;
 
 @AllArgsConstructor
-public class PointSavedEvent {
+public class PaymentEvent {
 	private Member member;
 	private Order order;
 	private BigDecimal amount;

@@ -45,7 +45,7 @@ import shop.nuribooks.books.payment.payment.entity.Payment;
 import shop.nuribooks.books.payment.payment.entity.PaymentCancel;
 import shop.nuribooks.books.payment.payment.entity.PaymentMethod;
 import shop.nuribooks.books.payment.payment.entity.PaymentState;
-import shop.nuribooks.books.payment.payment.event.PointSavedEvent;
+import shop.nuribooks.books.payment.payment.event.PaymentEvent;
 import shop.nuribooks.books.payment.payment.repository.PaymentCancelRepository;
 import shop.nuribooks.books.payment.payment.repository.PaymentRepository;
 
@@ -109,15 +109,8 @@ public class PaymentServiceImpl implements PaymentService {
 
 		orderDetailRepository.saveAll(orderDetailList);
 
-		// 회원 사용 총금액 반영
-		Optional<Member> member = memberRepository.findById(order.getCustomer().getId());
-		member.ifPresent(value -> {
-			member.get().setTotalPaymentAmount(BigDecimal.valueOf(paymentSuccessRequest.totalAmount()));
-			memberRepository.save(member.get());
-		});
-
-		// 포인트 적립
-		handlePointSaving(order);
+		// 회원 사용 총금액 반영 및 포인트 적립위한 event
+		createPaymentEvent(order);
 
 		log.debug("결제 성공");
 
@@ -221,11 +214,11 @@ public class PaymentServiceImpl implements PaymentService {
 	 * 적립금 처리
 	 * @param order 주문 정보
 	 */
-	private void handlePointSaving(Order order) {
+	private void createPaymentEvent(Order order) {
 		Optional<Member> member = memberRepository.findById(order.getCustomer().getId());
 
 		member.ifPresent(value ->
-			publisher.publishEvent(new PointSavedEvent(value, order, order.getBooksPrice()))
+			publisher.publishEvent(new PaymentEvent(value, order, order.getBooksPrice()))
 		);
 	}
 
