@@ -1,4 +1,4 @@
-package shop.nuribooks.books.book.book.dto;
+package shop.nuribooks.books.book.book.dto.request;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,8 +29,6 @@ public record BookUpdateRequest(
 
 	@NotBlank(message = "썸네일 이미지 URL은 필수 입력 항목입니다.")
 	String thumbnailImageUrl,
-
-	String detailImageUrl,
 
 	@NotBlank(message = "도서 설명은 필수 입력 항목입니다.")
 	String description,

@@ -102,7 +102,6 @@ public class TestUtils {
 			.publisherId(publisher)
 			.title("Test Book Title")
 			.thumbnailImageUrl("thumbnail.jpg")
-			.detailImageUrl("detail.jpg")
 			.publicationDate(LocalDate.now())
 			.price(BigDecimal.valueOf(10000))
 			.discountRate(10)

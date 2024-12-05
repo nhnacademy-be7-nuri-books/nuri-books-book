@@ -20,7 +20,6 @@ import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.GradeNotFoundException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
-import shop.nuribooks.books.exception.member.PasswordDuplicateException;
 import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
 import shop.nuribooks.books.exception.member.UsernameAlreadyExistsException;
 import shop.nuribooks.books.member.customer.entity.Customer;
@@ -143,10 +142,6 @@ public class MemberServiceImpl implements MemberService {
 
 		Customer foundCustomer = customerRepository.findById(memberId)
 			.orElseThrow(() -> new CustomerNotFoundException("존재하지 않는 고객입니다."));
-
-		if (request.password().equals(foundCustomer.getPassword())) {
-			throw new PasswordDuplicateException("기존 비밀번호와 다른 비밀번호를 입력해야 합니다.");
-		}
 
 		foundCustomer.changeCustomerPassword(request.password());
 	}

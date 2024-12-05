@@ -1,4 +1,4 @@
-package shop.nuribooks.books.book.book.dto;
+package shop.nuribooks.books.book.book.dto.response;
 
 import lombok.Builder;
 import shop.nuribooks.books.book.book.entity.Book;

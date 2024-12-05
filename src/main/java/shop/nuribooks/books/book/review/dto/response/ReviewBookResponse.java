@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import lombok.Builder;
-import shop.nuribooks.books.book.book.dto.BookBriefResponse;
+import shop.nuribooks.books.book.book.dto.response.BookBriefResponse;
 import shop.nuribooks.books.book.review.entity.Review;
 
 /**

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -76,7 +77,8 @@ public class BookContributorServiceImpl implements BookContributorService {
 	 * getAllBooksByContributorId : 기여자 id 로 모든 도서 조회
 	 *
 	 * @param contributorId 도서 목록 조회할 기여자 id
-	 * @return 도서 정보가 포함된 리스트 형식의 BookResponse
+	 * @return 도서 정보가 포함된 리스트 형식의 
+   
 	 */
 	@Override
 	public List<Book> getAllBooksByContributorId(Long contributorId) {

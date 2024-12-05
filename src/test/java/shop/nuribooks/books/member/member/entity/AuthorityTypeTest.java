@@ -42,4 +42,10 @@ class AuthorityTypeTest {
 	void fromValue_EmptyInput() {
 		assertThat(AuthorityType.fromValue("  ")).isNull();
 	}
+
+	@DisplayName("유효하지 않은 enum 입력 - null")
+	@Test
+	void fromValue_NullInput() {
+		assertThat(AuthorityType.fromValue(null)).isNull();
+	}
 }

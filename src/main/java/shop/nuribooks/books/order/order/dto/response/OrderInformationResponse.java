@@ -3,7 +3,7 @@ package shop.nuribooks.books.order.order.dto.response;
 import java.util.List;
 
 import lombok.Builder;
-import shop.nuribooks.books.book.book.dto.BookOrderResponse;
+import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.member.customer.dto.CustomerDto;
 import shop.nuribooks.books.order.shipping.dto.ShippingPolicyResponse;

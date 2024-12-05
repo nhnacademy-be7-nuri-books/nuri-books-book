@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import shop.nuribooks.books.book.book.dto.BookOrderResponse;
+import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.repository.BookRepository;
@@ -114,7 +114,6 @@ class CommonOrderServiceTest {
 			.stock(100)
 			.state(BookStateEnum.NORMAL)
 			.thumbnailImageUrl("original_thumbnail.jpg")
-			.detailImageUrl("original_detail.jpg")
 			.description("Original Description")
 			.contents("Original Contents")
 			.isPackageable(true)

@@ -34,8 +34,8 @@ class BookTagRepositoryImplTest {
 	@Mock
 	private JPAQueryFactory queryFactory;
 
-	private QBookTag qBookTag = QBookTag.bookTag;
-	private QTag qTag = QTag.tag;
+	private final QBookTag qBookTag = QBookTag.bookTag;
+	private final QTag qTag = QTag.tag;
 
 	private Book book;
 	private Tag tag;
@@ -49,7 +49,6 @@ class BookTagRepositoryImplTest {
 			.state(BookStateEnum.NEW)
 			.title("Sample Book")
 			.thumbnailImageUrl("https://example.com/thumbnail.jpg")
-			.detailImageUrl("https://example.com/detail.jpg")
 			.publicationDate(LocalDate.now())
 			.price(BigDecimal.valueOf(29.99))
 			.discountRate(10)
