@@ -1,9 +1,11 @@
 package shop.nuribooks.books.payment.payment.service;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,8 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -117,11 +117,16 @@ public class PaymentServiceImpl implements PaymentService {
 		String cancelUrl = getCancelUrl(payment);
 
 		HttpHeaders headers = createHeader(authorizations);
-		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-		body.add("cancelReason", reason);
-
+		Map<String, Object> bodyMap = new HashMap<>();
+		bodyMap.put("cancelReason", reason);
+		String body;
+		try {
+			body = objectMapper.writeValueAsString(bodyMap);
+		} catch (JsonProcessingException e) {
+			throw new FailedPaymentCancelException("결제 취소에 실패하였습니다." + e.getMessage());
+		}
 		// request 생성 및 restTemplate 으로 response 요청.
-		HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+		HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
 		ResponseEntity<String> response = restTemplate.exchange(cancelUrl, HttpMethod.POST, requestEntity,
 			String.class);
 
@@ -142,7 +147,7 @@ public class PaymentServiceImpl implements PaymentService {
 				.payment(payment)
 				.transactionKey(node.path("transactionKey").asText())
 				.cancelReason(node.path("cancelReason").asText())
-				.canceledAt(LocalDateTime.parse(node.path("canceledAt").asText()))
+				.canceledAt(OffsetDateTime.parse(node.path("canceledAt").asText()).toLocalDateTime())
 				.build();
 			paymentCancelRepository.save(paymentCancel);
 

@@ -176,7 +176,7 @@ class PaymentServiceTest {
 			    {
 			      "transactionKey": "testTransactionKey",
 			      "cancelReason": "그냥",
-			      "canceledAt": "2023-01-01T12:00:00"
+			      "canceledAt": "2023-01-01T12:00:00+09:00"
 			    }
 			  ]
 			}
