@@ -90,7 +90,7 @@ public class CouponPolicyController {
 	@DeleteMapping("/{coupon-policy-id}")
 	public ResponseEntity<ResponseMessage> deleteCouponPolicy(@PathVariable(name = "coupon-policy-id") Long id) {
 		couponPolicyService.deleteCouponPolicy(id);
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(new ResponseMessage(HttpStatus.CREATED.value(), "쿠폰 정책 삭제 완료"));
+		return ResponseEntity.status(HttpStatus.NO_CONTENT)
+			.body(new ResponseMessage(HttpStatus.NO_CONTENT.value(), "쿠폰 정책 삭제 완료"));
 	}
 }
