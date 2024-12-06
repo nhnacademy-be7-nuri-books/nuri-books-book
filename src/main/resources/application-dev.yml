@@ -5,7 +5,16 @@ spring:
     password: ENC(udeUrEU3cfiVaNkqv4zwgEhifPvD2iRzsL5Jr/E2/u4=)
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: org.apache.commons.dbcp2.BasicDataSource
-
+    dbcp2:
+      initial-size: 5
+      max-total: 10
+      max-idle: 8
+      min-idle: 5
+      validation-query: SELECT 1
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      log-expired-connections: true
   jpa:
     hibernate:
       ddl-auto: update
