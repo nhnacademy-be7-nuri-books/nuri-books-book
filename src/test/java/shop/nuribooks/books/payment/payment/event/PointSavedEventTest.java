@@ -18,18 +18,23 @@ import shop.nuribooks.books.common.TestUtils;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.grade.entity.Grade;
 import shop.nuribooks.books.member.member.entity.Member;
+import shop.nuribooks.books.member.member.repository.MemberRepository;
 import shop.nuribooks.books.order.order.entity.Order;
-import shop.nuribooks.books.payment.payment.event.handler.PointSavedEventHandler;
+import shop.nuribooks.books.payment.payment.event.handler.PaymentEventHandler;
 
 @ExtendWith(MockitoExtension.class)
 class PointSavedEventTest {
 	@InjectMocks
-	PointSavedEventHandler pointSavedEventHandler;
+	PaymentEventHandler pointSavedEventHandler;
 
 	@Mock
 	PointHistoryService pointHistoryService;
 
-	private PointSavedEvent pointSavedEvent;
+	@Mock
+	MemberRepository memberRepository;
+
+	private PaymentEvent pointSavedEvent;
+	private Member member;
 
 	@BeforeEach
 	void setUp() {
@@ -37,8 +42,8 @@ class PointSavedEventTest {
 		Customer customer = TestUtils.createCustomer();
 		Order order = TestUtils.createOrder(customer);
 
-		Member member = TestUtils.createMember(customer, grade);
-		pointSavedEvent = new PointSavedEvent(member, order, BigDecimal.valueOf(10));
+		member = TestUtils.createMember(customer, grade);
+		pointSavedEvent = new PaymentEvent(member, order, BigDecimal.valueOf(10));
 	}
 
 	@Test
@@ -48,5 +53,14 @@ class PointSavedEventTest {
 		pointSavedEventHandler.createPointHistory(pointSavedEvent);
 
 		verify(pointHistoryService).registerPointHistory(any(), any());
+	}
+
+	@Test
+	void updateTotalPaymentAmount() {
+		when(memberRepository.save(any())).thenReturn(member);
+
+		pointSavedEventHandler.updateTotalPaymentAmount(pointSavedEvent);
+
+		verify(memberRepository).save(any());
 	}
 }

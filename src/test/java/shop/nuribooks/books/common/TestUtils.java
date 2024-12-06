@@ -25,6 +25,10 @@ import shop.nuribooks.books.order.orderdetail.entity.OrderState;
 import shop.nuribooks.books.order.shipping.entity.Shipping;
 import shop.nuribooks.books.order.shipping.entity.ShippingPolicy;
 import shop.nuribooks.books.order.wrapping.entity.WrappingPaper;
+import shop.nuribooks.books.payment.payment.dto.PaymentSuccessRequest;
+import shop.nuribooks.books.payment.payment.entity.Payment;
+import shop.nuribooks.books.payment.payment.entity.PaymentMethod;
+import shop.nuribooks.books.payment.payment.entity.PaymentState;
 
 public class TestUtils {
 	public static void setIdForEntity(Object entity, Long id) {
@@ -199,6 +203,30 @@ public class TestUtils {
 			.title("포장지입미다")
 			.wrappingPrice(BigDecimal.valueOf(1000))
 			.imageUrl("image.com")
+			.build();
+	}
+
+	public static Payment createPayment(Order order) {
+		return Payment.builder()
+			.order(order)
+			.approvedAt(LocalDateTime.now())
+			.paymentMethod(PaymentMethod.CARD)
+			.paymentState(PaymentState.DONE)
+			.requestedAt(LocalDateTime.now())
+			.tossPaymentKey("toss-payment-key")
+			.unitPrice(BigDecimal.valueOf(100000))
+			.build();
+	}
+
+	public static Payment createPayment(Order order, PaymentSuccessRequest paymentSuccessRequest) {
+		return Payment.builder()
+			.order(order)
+			.tossPaymentKey(paymentSuccessRequest.paymentKey())
+			.paymentMethod(PaymentMethod.fromKoreanName(paymentSuccessRequest.method()))
+			.paymentState(PaymentState.valueOf(paymentSuccessRequest.status()))
+			.unitPrice(BigDecimal.valueOf(paymentSuccessRequest.totalAmount()))
+			.requestedAt(paymentSuccessRequest.requestedAt())
+			.approvedAt(paymentSuccessRequest.approvedAt())
 			.build();
 	}
 }
