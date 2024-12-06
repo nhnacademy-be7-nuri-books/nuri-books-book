@@ -1,7 +1,6 @@
 package shop.nuribooks.books.book.coupon.service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +9,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
@@ -129,13 +127,13 @@ public class CouponServiceImpl implements CouponService {
 		memberCouponService.registerMemberCoupon(request);
 	}
 
-	@Override
-	public boolean isCouponApplicableToOrder(Coupon coupon, List<BookOrderResponse> bookOrderResponses) {
-
-		CouponStrategy couponStrategy = couponStrategyFactory.getStrategy(coupon.getCouponType());
-
-		return couponStrategy.isCouponApplicableToOrder(coupon, bookOrderResponses);
-	}
+	// @Override
+	// public boolean isCouponApplicableToOrder(Coupon coupon, List<BookOrderResponse> bookOrderResponses) {
+	//
+	// 	CouponStrategy couponStrategy = couponStrategyFactory.getStrategy(coupon.getCouponType());
+	//
+	// 	return couponStrategy.isCouponApplicableToOrder(coupon, bookOrderResponses);
+	// }
 
 	/**
 	 * 쿠폰 비활성화 메서드

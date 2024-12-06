@@ -62,4 +62,16 @@ public class CouponPolicy {
 		this.maximumDiscountPrice = request.maximumDiscountPrice();
 		this.discount = request.discount();
 	}
+
+	public BigDecimal calculateDiscount(BigDecimal price) {
+		if (this.getDiscountType().equals(DiscountType.FIXED)) {
+			return new BigDecimal(discount);
+		} else {
+			BigDecimal discountAmount = price.multiply(BigDecimal.valueOf(discount).divide(BigDecimal.valueOf(100)));
+			if (discountAmount.compareTo(maximumDiscountPrice) > 0) {
+				return maximumDiscountPrice;
+			}
+			return discountAmount;
+		}
+	}
 }

@@ -1,6 +1,7 @@
 package shop.nuribooks.books.book.coupon.strategy;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -12,9 +13,11 @@ import shop.nuribooks.books.book.category.entity.Category;
 import shop.nuribooks.books.book.category.repository.BookCategoryRepository;
 import shop.nuribooks.books.book.category.repository.CategoryRepository;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.entity.CategoryCoupon;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
+import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
 import shop.nuribooks.books.exception.category.CategoryNotFoundException;
 
 @Component
@@ -44,10 +47,12 @@ public class CategoryCouponStrategy implements CouponStrategy {
 	}
 
 	@Override
-	public boolean isCouponApplicableToOrder(Coupon coupon, List<BookOrderResponse> bookOrderResponses) {
+	public MemberCouponOrderDto isCouponApplicableToOrder(MemberCoupon memberCoupon,
+		List<BookOrderResponse> bookOrderResponses) {
 		BigDecimal totalOrderPrice = BigDecimal.ZERO;
 
-		CategoryCoupon categoryCoupon = (CategoryCoupon)coupon;
+		CategoryCoupon categoryCoupon = (CategoryCoupon)memberCoupon.getCoupon();
+		List<Long> bookIds = new ArrayList<>();
 
 		List<Long> applicableCategoryIds = categoryRepository.findAllChildCategoryIds(
 			categoryCoupon.getCategory().getId());
@@ -58,10 +63,14 @@ public class CategoryCouponStrategy implements CouponStrategy {
 			for (BookCategory bookCategory : bookCategories) {
 				if (applicableCategoryIds.contains(bookCategory.getCategory().getId())) {
 					totalOrderPrice = totalOrderPrice.add(bookOrderResponse.bookTotalPrice());
+					bookIds.add(bookOrderResponse.bookId());
 					break;
 				}
 			}
 		}
-		return totalOrderPrice.compareTo(coupon.getCouponPolicy().getMinimumOrderPrice()) >= 0;
+		if (totalOrderPrice.compareTo(categoryCoupon.getCouponPolicy().getMinimumOrderPrice()) >= 0) {
+			return MemberCouponOrderDto.toDto(memberCoupon, totalOrderPrice, bookIds);
+		}
+		return null;
 	}
 }

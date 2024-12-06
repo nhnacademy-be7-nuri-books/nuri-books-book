@@ -5,8 +5,10 @@ import java.util.List;
 
 import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
+import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
 
 public class AllCouponStrategy implements CouponStrategy {
 	@Override
@@ -24,13 +26,17 @@ public class AllCouponStrategy implements CouponStrategy {
 	}
 
 	@Override
-	public boolean isCouponApplicableToOrder(Coupon coupon, List<BookOrderResponse> bookOrderResponses) {
+	public MemberCouponOrderDto isCouponApplicableToOrder(MemberCoupon memberCoupon,
+		List<BookOrderResponse> bookOrderResponses) {
 		BigDecimal totalOrderPrice = BigDecimal.ZERO;
 
 		for (BookOrderResponse bookOrderResponse : bookOrderResponses) {
 			totalOrderPrice = totalOrderPrice.add(bookOrderResponse.bookTotalPrice());
 		}
 
-		return totalOrderPrice.compareTo(coupon.getCouponPolicy().getMinimumOrderPrice()) >= 0;
+		if (totalOrderPrice.compareTo(memberCoupon.getCoupon().getCouponPolicy().getMinimumOrderPrice()) >= 0) {
+			return MemberCouponOrderDto.toDto(memberCoupon, totalOrderPrice);
+		}
+		return null;
 	}
 }

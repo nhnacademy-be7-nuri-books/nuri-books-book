@@ -1,6 +1,7 @@
 package shop.nuribooks.books.book.coupon.strategy;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -10,9 +11,11 @@ import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
+import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.entity.BookCoupon;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
+import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
 import shop.nuribooks.books.exception.book.BookNotFoundException;
 
 @Component
@@ -40,17 +43,23 @@ public class BookCouponStrategy implements CouponStrategy {
 	}
 
 	@Override
-	public boolean isCouponApplicableToOrder(Coupon coupon, List<BookOrderResponse> bookOrderResponses) {
+	public MemberCouponOrderDto isCouponApplicableToOrder(MemberCoupon memberCoupon,
+		List<BookOrderResponse> bookOrderResponses) {
 		BigDecimal totalOrderPrice = BigDecimal.ZERO;
 
-		BookCoupon bookCoupon = (BookCoupon)coupon;
+		BookCoupon bookCoupon = (BookCoupon)memberCoupon.getCoupon();
+		List<Long> bookIds = new ArrayList<>();
 
 		for (BookOrderResponse bookOrderResponse : bookOrderResponses) {
 			if (bookCoupon.getBook().getId().equals(bookOrderResponse.bookId())) {
 				totalOrderPrice = totalOrderPrice.add(bookOrderResponse.bookTotalPrice());
+				bookIds.add(bookOrderResponse.bookId());
 			}
 		}
+		if (totalOrderPrice.compareTo(bookCoupon.getCouponPolicy().getMinimumOrderPrice()) >= 0) {
+			return MemberCouponOrderDto.toDto(memberCoupon, totalOrderPrice, bookIds);
+		}
+		return null;
 
-		return totalOrderPrice.compareTo(coupon.getCouponPolicy().getMinimumOrderPrice()) >= 0;
 	}
 }
