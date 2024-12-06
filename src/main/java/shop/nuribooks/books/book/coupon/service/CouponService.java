@@ -1,8 +1,11 @@
 package shop.nuribooks.books.book.coupon.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
@@ -23,4 +26,6 @@ public interface CouponService {
 	Coupon updateCoupon(Long id, CouponRequest request);
 
 	void issueWelcomeCoupon(Member member);
+
+	boolean isCouponApplicableToOrder(Coupon coupon, List<BookOrderResponse> bookOrderResponses);
 }

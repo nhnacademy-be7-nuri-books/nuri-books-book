@@ -30,6 +30,7 @@ import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
 import shop.nuribooks.books.book.coupon.enums.DiscountType;
 import shop.nuribooks.books.book.coupon.repository.AllAppliedCouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
+import shop.nuribooks.books.book.coupon.service.CouponService;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
 import shop.nuribooks.books.book.point.entity.PointHistory;
 import shop.nuribooks.books.book.point.entity.child.OrderSavingPoint;
@@ -110,6 +111,7 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 	private final ApplicationEventPublisher publisher;
 	private final PaymentService paymentService;
 	private final OrderSavingPointRepository orderSavingPointRepository;
+	private final CouponService couponService;
 
 	public OrderServiceImpl(CustomerRepository customerRepository,
 		BookRepository bookRepository,
@@ -130,7 +132,8 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 		OrderUsingPointRepository orderUsingPointRepository, PointHistoryRepository pointHistoryRepository,
 		ApplicationEventPublisher publisher,
 		PaymentService paymentService,
-		OrderSavingPointRepository orderSavingPointRepository) {
+		OrderSavingPointRepository orderSavingPointRepository,
+		CouponService couponService) {
 		super(customerRepository,
 			bookRepository,
 			addressRepository,
@@ -153,6 +156,7 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 		this.publisher = publisher;
 		this.paymentService = paymentService;
 		this.orderSavingPointRepository = orderSavingPointRepository;
+		this.couponService = couponService;
 	}
 
 	/**

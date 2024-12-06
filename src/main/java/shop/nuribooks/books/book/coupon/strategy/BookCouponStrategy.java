@@ -1,8 +1,12 @@
 package shop.nuribooks.books.book.coupon.strategy;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.repository.BookRepository;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
@@ -33,5 +37,20 @@ public class BookCouponStrategy implements CouponStrategy {
 			.quantity(request.quantity())
 			.book(book)
 			.build();
+	}
+
+	@Override
+	public boolean isCouponApplicableToOrder(Coupon coupon, List<BookOrderResponse> bookOrderResponses) {
+		BigDecimal totalOrderPrice = BigDecimal.ZERO;
+
+		BookCoupon bookCoupon = (BookCoupon)coupon;
+
+		for (BookOrderResponse bookOrderResponse : bookOrderResponses) {
+			if (bookCoupon.getBook().getId().equals(bookOrderResponse.bookId())) {
+				totalOrderPrice = totalOrderPrice.add(bookOrderResponse.bookTotalPrice());
+			}
+		}
+
+		return totalOrderPrice.compareTo(coupon.getCouponPolicy().getMinimumOrderPrice()) >= 0;
 	}
 }
