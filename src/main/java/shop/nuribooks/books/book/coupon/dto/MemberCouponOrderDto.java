@@ -2,6 +2,7 @@ package shop.nuribooks.books.book.coupon.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -18,5 +19,7 @@ public record MemberCouponOrderDto(
 	@NotNull BigDecimal maximumDiscountPrice,
 	@NotNull boolean isUsed,
 	@NotNull LocalDate createdAt,
-	@NotNull LocalDate expiredAt) {
+	@NotNull LocalDate expiredAt,
+	@NotNull BigDecimal couponAppliedPrice,
+	List<Long> bookIds) {
 }
