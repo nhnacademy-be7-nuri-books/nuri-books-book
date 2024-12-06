@@ -2,7 +2,7 @@ package shop.nuribooks.books.book.booktag.service;
 
 import java.util.List;
 
-import shop.nuribooks.books.book.book.dto.BookResponse;
+import shop.nuribooks.books.book.book.dto.response.BookResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagGetResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRegisterResponse;
 import shop.nuribooks.books.book.booktag.dto.BookTagRequest;

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
+import shop.nuribooks.books.book.book.dto.response.BookContributorsResponse;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 
 public interface BookCategoryService {

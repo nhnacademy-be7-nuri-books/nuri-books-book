@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import shop.nuribooks.books.book.book.dto.AladinBookListItemResponse;
-import shop.nuribooks.books.book.book.dto.AladinBookListResponse;
+import shop.nuribooks.books.book.book.dto.response.AladinBookListItemResponse;
+import shop.nuribooks.books.book.book.dto.response.AladinBookListResponse;
 import shop.nuribooks.books.book.book.service.AladinBookService;
 import shop.nuribooks.books.book.client.AladinFeignClient;
 import shop.nuribooks.books.exception.ResourceNotFoundException;
@@ -27,7 +27,8 @@ public class AladinBookServiceImpl implements AladinBookService {
 	@Override
 	public List<AladinBookListItemResponse> getNewBooks(String queryType, String searchTarget, int maxResults) {
 		try {
-			AladinBookListResponse response = aladinFeignClient.getNewBooks(ttbKey, queryType, maxResults, 1, "Book",
+			AladinBookListResponse response = aladinFeignClient.getNewBooks(ttbKey, queryType, maxResults, 1,
+				searchTarget,
 				"JS", "20131101");
 			log.info("Received BookList response: {}", response);
 			return response.item();

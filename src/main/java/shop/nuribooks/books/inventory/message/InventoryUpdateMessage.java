@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 public class InventoryUpdateMessage {
 	private Long bookId;
 	private int count;
-	private String messageId; //멱등성을 위한 고유 ID 추
+	private String messageId; //멱등성을 위한 고유 ID
 
 	@Builder
 	public InventoryUpdateMessage(Long bookId, int count, String messageId) {

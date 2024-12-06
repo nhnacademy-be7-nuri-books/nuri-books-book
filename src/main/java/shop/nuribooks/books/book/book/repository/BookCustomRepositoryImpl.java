@@ -16,8 +16,8 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.dto.BookListResponse;
-import shop.nuribooks.books.book.book.dto.TopBookResponse;
+import shop.nuribooks.books.book.book.dto.response.BookListResponse;
+import shop.nuribooks.books.book.book.dto.response.TopBookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.QBook;
 import shop.nuribooks.books.book.book.enums.SortType;

@@ -21,7 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import shop.nuribooks.books.book.book.dto.BookResponse;
+import shop.nuribooks.books.book.book.dto.response.BookResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.entity.BookStateEnum;
 import shop.nuribooks.books.book.book.mapper.BookMapper;
@@ -74,7 +74,6 @@ class BookTagServiceImplTest {
 			.state(BookStateEnum.NEW)
 			.title("Sample Book")
 			.thumbnailImageUrl("https://example.com/thumbnail.jpg")
-			.detailImageUrl("https://example.com/detail.jpg")
 			.publicationDate(LocalDate.now())
 			.price(BigDecimal.valueOf(29.99))
 			.discountRate(10)
@@ -92,7 +91,6 @@ class BookTagServiceImplTest {
 			.state(BookStateEnum.NEW) // state 값 설정
 			.title("Sample Book1")
 			.thumbnailImageUrl("https://example.com/thumbnail.jpg")
-			.detailImageUrl("https://example.com/detail.jpg")
 			.publicationDate(LocalDate.now())
 			.price(BigDecimal.valueOf(29.99))
 			.discountRate(10)

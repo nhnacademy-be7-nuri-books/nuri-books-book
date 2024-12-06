@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import shop.nuribooks.books.book.book.dto.AladinBookListResponse;
+import shop.nuribooks.books.book.book.dto.response.AladinBookListResponse;
 
 @FeignClient(name = "aladinClient", url = "https://aladin.co.kr")
 public interface AladinFeignClient {

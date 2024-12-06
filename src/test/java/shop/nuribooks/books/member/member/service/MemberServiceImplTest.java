@@ -8,6 +8,7 @@ import static shop.nuribooks.books.member.member.entity.StatusType.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
@@ -20,15 +21,20 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import shop.nuribooks.books.book.coupon.service.CouponService;
 import shop.nuribooks.books.book.point.service.PointHistoryService;
 import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.common.config.QuerydslConfiguration;
 import shop.nuribooks.books.common.threadlocal.MemberIdContext;
+import shop.nuribooks.books.exception.BadRequestException;
 import shop.nuribooks.books.exception.member.CustomerNotFoundException;
 import shop.nuribooks.books.exception.member.EmailAlreadyExistsException;
 import shop.nuribooks.books.exception.member.MemberNotFoundException;
+import shop.nuribooks.books.exception.member.PhoneNumberAlreadyExistsException;
 import shop.nuribooks.books.exception.member.UsernameAlreadyExistsException;
 import shop.nuribooks.books.member.customer.entity.Customer;
 import shop.nuribooks.books.member.customer.repository.CustomerRepository;
@@ -37,9 +43,11 @@ import shop.nuribooks.books.member.grade.repository.GradeRepository;
 import shop.nuribooks.books.member.member.dto.EntityMapper;
 import shop.nuribooks.books.member.member.dto.request.MemberPasswordUpdateRequest;
 import shop.nuribooks.books.member.member.dto.request.MemberRegisterRequest;
+import shop.nuribooks.books.member.member.dto.request.MemberSearchRequest;
 import shop.nuribooks.books.member.member.dto.response.MemberAuthInfoResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberDetailsResponse;
 import shop.nuribooks.books.member.member.dto.response.MemberRegisterResponse;
+import shop.nuribooks.books.member.member.dto.response.MemberSearchResponse;
 import shop.nuribooks.books.member.member.entity.AuthorityType;
 import shop.nuribooks.books.member.member.entity.GenderType;
 import shop.nuribooks.books.member.member.entity.Member;
@@ -144,6 +152,21 @@ class MemberServiceImplTest {
 		assertThat(exception.getMessage()).isEqualTo("이미 존재하는 아이디입니다.");
 	}
 
+	@DisplayName("회원 등록 실패 - 중복된 전화번호")
+	@Test
+	void registerMember_PhoneNumberAlreadyExists() {
+		//given
+		MemberRegisterRequest request = getMemberCreateRequest();
+
+		when(customerRepository.existsByEmail(request.email())).thenReturn(false);
+		when(customerRepository.existsByPhoneNumber(request.phoneNumber())).thenReturn(true);
+
+		//when / then
+		PhoneNumberAlreadyExistsException exception = assertThrows(PhoneNumberAlreadyExistsException.class,
+			() -> memberServiceImpl.registerMember(request));
+		assertThat(exception.getMessage()).isEqualTo("이미 존재하는 전화번호입니다.");
+	}
+
 	@DisplayName("회원 탈퇴 성공")
 	@Test
 	void withdrawMember() {
@@ -176,6 +199,22 @@ class MemberServiceImplTest {
 		MemberNotFoundException exception = assertThrows(MemberNotFoundException.class,
 			() -> memberServiceImpl.withdrawMember(memberId));
 		assertThat(exception.getMessage()).isEqualTo("존재하지 않는 회원입니다.");
+	}
+
+	@DisplayName("회원 탈퇴 실패 - 관리자는 탈퇴할 수 없음")
+	@Test
+	void withdrawMember_AdminCannotWithdraw() {
+		//given
+		Long memberId = MemberIdContext.getMemberId();
+		Customer savedCustomer = getSavedCustomer();
+		Member admin = getAdmin(savedCustomer);
+
+		when(memberRepository.findById(memberId)).thenReturn(Optional.of(admin));
+
+		//when / then
+		BadRequestException exception = assertThrows(BadRequestException.class,
+			() -> memberServiceImpl.withdrawMember(memberId));
+		assertThat(exception.getMessage()).isEqualTo("관리자 등급은 탈퇴할 수 없습니다.");
 	}
 
 	@DisplayName("회원 정보 수정 성공")
@@ -452,6 +491,31 @@ class MemberServiceImplTest {
 			.hasMessage("존재하지 않는 회원입니다.");
 	}
 
+	@DisplayName("관리자가 다양한 검색 조건을 이용하여 회원 목록 조회")
+	@Test
+	void searchMembersWithPaging() {
+		//given
+		MemberSearchRequest searchRequest = MemberSearchRequest.builder()
+			.name("nuri")
+			.build();
+
+		List<MemberSearchResponse> searchList = List.of(MemberSearchResponse.builder()
+			.name("nuri")
+			.build());
+
+		PageRequest pageRequest = PageRequest.of(0, 20);
+		Page<MemberSearchResponse> searchPage = new PageImpl<>(searchList, pageRequest, searchList.size());
+
+		when(memberRepository.searchMembersWithPaging(searchRequest, pageRequest)).thenReturn(searchPage);
+
+		//when
+		Page<MemberSearchResponse> result =
+			memberServiceImpl.searchMembersWithPaging(searchRequest, pageRequest);
+
+		//then
+		assertThat(result.getSize()).isEqualTo(searchPage.getSize());
+	}
+
 	/**
 	 * 테스트를 위한 MemberRegisterRequest 생성
 	 */
@@ -508,6 +572,24 @@ class MemberServiceImplTest {
 		return Member.builder()
 			.customer(savedCustomer)
 			.authority(AuthorityType.MEMBER)
+			.grade(getGrade())
+			.status(ACTIVE)
+			.gender(GenderType.MALE)
+			.username("nuribooks95")
+			.birthday(LocalDate.of(1988, 8, 12))
+			.createdAt(LocalDateTime.now())
+			.point(BigDecimal.ZERO)
+			.totalPaymentAmount(BigDecimal.ZERO)
+			.build();
+	}
+
+	/**
+	 * 테스트를 위한 관리자 생성
+	 */
+	private Member getAdmin(Customer savedCustomer) {
+		return Member.builder()
+			.customer(savedCustomer)
+			.authority(AuthorityType.ADMIN)
 			.grade(getGrade())
 			.status(ACTIVE)
 			.gender(GenderType.MALE)

@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
+import shop.nuribooks.books.book.book.dto.response.BookContributorsResponse;
 import shop.nuribooks.books.book.category.dto.SimpleCategoryResponse;
 import shop.nuribooks.books.book.category.service.BookCategoryService;
 import shop.nuribooks.books.exception.book.BookNotFoundException;

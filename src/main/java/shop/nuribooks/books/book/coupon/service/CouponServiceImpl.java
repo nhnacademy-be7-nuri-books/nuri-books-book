@@ -17,8 +17,11 @@ import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 import shop.nuribooks.books.book.coupon.enums.IssuanceType;
+import shop.nuribooks.books.book.coupon.mapper.CouponMapper;
 import shop.nuribooks.books.book.coupon.repository.CouponPolicyRepository;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
+import shop.nuribooks.books.book.coupon.strategy.CouponStrategy;
+import shop.nuribooks.books.book.coupon.strategy.CouponStrategyFactory;
 import shop.nuribooks.books.exception.coupon.CouponAlreadyExistsException;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
 import shop.nuribooks.books.exception.coupon.InvalidCouponException;
@@ -30,6 +33,8 @@ public class CouponServiceImpl implements CouponService {
 	private final CouponRepository couponRepository;
 	private final MemberCouponService memberCouponService;
 	private final CouponPolicyRepository couponPolicyRepository;
+	private final CouponStrategyFactory couponStrategyFactory;
+	private final CouponMapper couponMapper;
 
 	/**
 	 * 쿠폰 등록하는 메서드
@@ -39,6 +44,8 @@ public class CouponServiceImpl implements CouponService {
 	 */
 	@Override
 	public Coupon registerCoupon(CouponRequest request) {
+		validateCouponRequest(request);
+
 		if (couponRepository.existsByNameIgnoreCaseAndDeletedAtIsNull(request.name())) {
 			throw new CouponAlreadyExistsException();
 		}
@@ -46,16 +53,9 @@ public class CouponServiceImpl implements CouponService {
 		CouponPolicy couponPolicy = couponPolicyRepository.findById(request.couponPolicyId()).orElseThrow(
 			CouponNotFoundException::new);
 
-		Coupon coupon = Coupon.builder()
-			.name(request.name())
-			.couponPolicy(couponPolicy)
-			.couponType(request.couponType())
-			.expirationType(request.expirationType())
-			.period(request.period())
-			.expiredAt(request.expiredAt())
-			.issuanceType(request.issuanceType())
-			.quantity(request.quantity())
-			.build();
+		CouponStrategy couponStrategy = couponStrategyFactory.getStrategy(request.couponType());
+
+		Coupon coupon = couponStrategy.registerCoupon(request, couponPolicy);
 
 		return couponRepository.save(coupon);
 	}
@@ -68,7 +68,8 @@ public class CouponServiceImpl implements CouponService {
 	 */
 	@Override
 	public Page<CouponResponse> getCoupons(CouponType type, Pageable pageable) {
-		return couponRepository.findCouponsByCouponId(pageable, type);
+		Page<Coupon> coupons = couponRepository.findCouponsByCouponType(pageable, type);
+		return coupons.map(couponMapper::toDto);
 	}
 
 	/**
@@ -79,7 +80,7 @@ public class CouponServiceImpl implements CouponService {
 	@Override
 	public Page<CouponResponse> getAllCoupons(Pageable pageable) {
 		Page<Coupon> coupons = couponRepository.findAll(pageable);
-		return coupons.map(CouponResponse::of);
+		return coupons.map(couponMapper::toDto);
 	}
 
 	/**
@@ -92,8 +93,7 @@ public class CouponServiceImpl implements CouponService {
 	public CouponResponse getCouponById(Long id) {
 		Coupon coupon = couponRepository.findById(id)
 			.orElseThrow(CouponNotFoundException::new);
-
-		return CouponResponse.of(coupon);
+		return couponMapper.toDto(coupon);
 	}
 
 	/**
@@ -138,7 +138,7 @@ public class CouponServiceImpl implements CouponService {
 		Coupon coupon = couponRepository.findById(id)
 			.orElseThrow(CouponNotFoundException::new);
 
-		coupon.expire();
+		coupon.setDeletedAt();
 	}
 
 	public void validateCouponRequest(CouponRequest couponRequest) {

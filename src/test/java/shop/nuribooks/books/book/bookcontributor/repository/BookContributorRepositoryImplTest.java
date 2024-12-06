@@ -67,7 +67,6 @@ class BookContributorRepositoryImplTest {
 			.state(BookStateEnum.NEW)
 			.title("Sample Book")
 			.thumbnailImageUrl("https://example.com/thumbnail.jpg")
-			.detailImageUrl("https://example.com/detail.jpg")
 			.publicationDate(LocalDate.now())
 			.price(BigDecimal.valueOf(29.99))
 			.discountRate(10)

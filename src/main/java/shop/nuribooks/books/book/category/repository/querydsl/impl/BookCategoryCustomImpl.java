@@ -16,8 +16,8 @@ import org.springframework.stereotype.Repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-import shop.nuribooks.books.book.book.dto.BookContributorsResponse;
-import shop.nuribooks.books.book.book.dto.BookListResponse;
+import shop.nuribooks.books.book.book.dto.response.BookContributorsResponse;
+import shop.nuribooks.books.book.book.dto.response.BookListResponse;
 import shop.nuribooks.books.book.book.entity.Book;
 import shop.nuribooks.books.book.book.utility.BookUtils;
 import shop.nuribooks.books.book.bookcontributor.dto.BookContributorInfoResponse;
