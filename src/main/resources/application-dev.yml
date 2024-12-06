@@ -24,6 +24,11 @@ spring:
   elasticsearch:
     index: nuribooks
 
+cloud:
+  nhn:
+    rabbitmq:
+      secret-id: 438c2a33bc784910b27ec16502153d96
+
 logging:
   level:
     root: info

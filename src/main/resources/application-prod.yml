@@ -21,6 +21,11 @@ spring:
   elasticsearch:
     index: nuri-books
 
+cloud:
+  nhn:
+    rabbitmq:
+      secret-id: 29fb0406fff74a6f81c66aa639396d69
+
 logging:
   level:
     root: warn
