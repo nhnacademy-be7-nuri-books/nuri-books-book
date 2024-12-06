@@ -48,5 +48,5 @@ cloud:
       url: https://api-image.nhncloudservice.com/image/v2.0/appkeys
       app-key: rUN43QEwj1P6jThk
       secret-id: 6f5396562412430883fbd023ef2c50d9
-    rabbitmq:
-      secret-id: 0df7be9ad37342f288ae1702fcd0a944
+    #rabbitmq:
+    #  secret-id: 0df7be9ad37342f288ae1702fcd0a944

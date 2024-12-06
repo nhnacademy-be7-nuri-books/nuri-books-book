@@ -19,3 +19,8 @@ spring:
 
   elasticsearch:
     index: test
+
+cloud:
+  nhn:
+    rabbitmq:
+      secret-id: e5bf9fef454b476b9dbf7d0e051eb161
