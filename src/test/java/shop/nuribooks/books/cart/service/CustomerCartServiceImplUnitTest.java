@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,7 @@ import shop.nuribooks.books.cart.dto.response.CartBookResponse;
 import shop.nuribooks.books.cart.entity.Cart;
 import shop.nuribooks.books.cart.repository.CartRepository;
 import shop.nuribooks.books.cart.repository.RedisCartRepository;
+import shop.nuribooks.books.exception.cart.CartNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class CustomerCartServiceImplUnitTest {
@@ -101,6 +103,30 @@ class CustomerCartServiceImplUnitTest {
 
 	}
 
+	@DisplayName("cartId에 대한 장바구니를 가져온다.")
+	@Test
+	void getMemberCartList() {
+		// given
+		String cartId = "member:";
+		when(redisCartRepository.getCart(cartId)).thenReturn(Map.of(
+			1L, 3,
+			2L, 4
+		));
+
+		Book book = mock(Book.class);
+		Optional<Book> optionalBook = Optional.of(book);
+		when(book.getPrice()).thenReturn(BigDecimal.valueOf(100));
+		when(book.getDiscountRate()).thenReturn(10);
+		when(bookRepository.findById(anyLong())).thenReturn(optionalBook);
+
+		// when
+		List<CartBookResponse> responseList = cartService.getCart(cartId);
+
+		// then
+		assertThat(responseList).hasSize(2);
+
+	}
+
 	@DisplayName("장바구니를 삭제한다.")
 	@Test
 	void removeCustomerCart() {
@@ -152,4 +178,52 @@ class CustomerCartServiceImplUnitTest {
 		verify(redisCartRepository).setShadowExpireKey(anyString(), anyInt(), any(TimeUnit.class));
 
 	}
+
+	@DisplayName("회원 장바구니를 redis에 올린다.")
+	@Test
+	void loadCart_cartNull() {
+		// given
+		when(cartRepository.findByMember_Id(anyLong())).thenReturn(Optional.empty());
+		CartLoadRequest request = new CartLoadRequest(1L);
+
+		// then
+		Assertions.assertThatThrownBy(() -> cartService.loadCart(request)).isInstanceOf(CartNotFoundException.class);
+	}
+
+	@DisplayName("회원 장바구니를 redis에 올린다.")
+	@Test
+	void loadCart_redisCartExist() {
+		// given
+		Cart cart = mock(Cart.class);
+		Optional<Cart> optionalCart = Optional.of(cart);
+		when(cartRepository.findByMember_Id(anyLong())).thenReturn(optionalCart);
+		when(redisCartRepository.isExist(anyString())).thenReturn(true);
+		CartLoadRequest request = new CartLoadRequest(1L);
+
+		// when
+		cartService.loadCart(request);
+
+		// then
+		verify(redisCartRepository).isExist(anyString());
+	}
+
+	@DisplayName("회원 장바구니를 redis에 올린다.")
+	@Test
+	void loadCart_allEmpty() {
+		// given
+		Cart cart = mock(Cart.class);
+		Optional<Cart> optionalCart = Optional.of(cart);
+		when(cartRepository.findByMember_Id(anyLong())).thenReturn(optionalCart);
+		when(redisCartRepository.isExist(anyString())).thenReturn(false);
+		CartLoadRequest request = new CartLoadRequest(1L);
+
+		when(cartDetailRepository.findAllByCart_Id(anyLong())).thenReturn(Optional.empty());
+
+		// when
+		cartService.loadCart(request);
+
+		// then
+		verify(redisCartRepository).isExist(anyString());
+	}
+
 }

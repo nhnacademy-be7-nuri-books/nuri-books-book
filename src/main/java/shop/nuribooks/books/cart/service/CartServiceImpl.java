@@ -70,9 +70,7 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public void loadCart(CartLoadRequest request) {
 		Cart cart = cartRepository.findByMember_Id(request.userId()).orElseThrow(CartNotFoundException::new);
-		if (Objects.isNull(cart)) {
-			return;
-		}
+
 		String cartId = MEMBER_CART.withSuffix(request.userId().toString());
 		redisCartRepository.setShadowExpireKey(RedisCartKey.SHADOW_KEY.withSuffix(cartId), 60, TimeUnit.SECONDS);
 		if (redisCartRepository.isExist(cartId)) {

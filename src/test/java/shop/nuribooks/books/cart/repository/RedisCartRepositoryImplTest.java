@@ -76,6 +76,23 @@ class RedisCartRepositoryImplTest extends TestRedisContainer {
 
 	}
 
+	@DisplayName("장바구니를 가져온다.")
+	@Test
+	void getCart_fail() {
+		// given
+		String cartId = "cartId";
+
+		hashOperations.put(cartId, "as", 2);
+		hashOperations.put(cartId, "2", 1);
+
+		// when
+		Map<Long, Integer> cart = redisCartRepository.getCart(cartId);
+
+		// then
+		assertThat(cart).isEmpty();
+
+	}
+
 	@DisplayName("카트 전체를 삭제한다.")
 	@Test
 	void removeCart() {
