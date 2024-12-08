@@ -14,13 +14,7 @@ class AddressEditorTest {
 	@Test
 	void test() {
 		// given
-		Address address = Address.builder()
-			.name("name")
-			.zipcode("12345")
-			.address("address")
-			.detailAddress("addressDetail")
-			.isDefault(false)
-			.build();
+		Address address = getAddress();
 
 		AddressEditRequest request = AddressEditRequest.builder()
 			.name("name2")
@@ -45,4 +39,35 @@ class AddressEditorTest {
 			.containsExactly("name2", "12345", "address", "addressDetail", false);
 	}
 
+	@DisplayName("Editor 테스트")
+	@Test
+	void test_null() {
+		// given
+		Address address = getAddress();
+
+		AddressEditorBuilder addressEditorBuilder = address.toEditor();
+		AddressEditor addressEditor = addressEditorBuilder
+			.name(null)
+			.zipcode(null)
+			.address(null)
+			.detailAddress(null)
+			.build();
+
+		// when
+		address.edit(addressEditor);
+
+		// then
+		assertThat(address).extracting("name", "zipcode", "address", "detailAddress", "isDefault")
+			.containsExactly("name", "12345", "address", "addressDetail", false);
+	}
+
+	private Address getAddress() {
+		return Address.builder()
+			.name("name")
+			.zipcode("12345")
+			.address("address")
+			.detailAddress("addressDetail")
+			.isDefault(false)
+			.build();
+	}
 }
