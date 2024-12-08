@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import shop.nuribooks.books.common.TestUtils;
 import shop.nuribooks.books.exception.address.AddressNotFoundException;
+import shop.nuribooks.books.exception.address.AddressOverMaximumSizeException;
 import shop.nuribooks.books.member.address.dto.requset.AddressEditRequest;
 import shop.nuribooks.books.member.address.dto.requset.AddressRegisterRequest;
 import shop.nuribooks.books.member.address.dto.response.AddressResponse;
@@ -76,6 +77,28 @@ class AddressServiceTest {
 
 		// then
 		assertThat(response.name()).isEqualTo("test");
+	}
+
+	@DisplayName("회원의 주소를 생성한다.")
+	@Test
+	@Transactional
+	void addAddress_failed() {
+		// given
+
+		AddressRegisterRequest request = AddressRegisterRequest.builder()
+			.name("test")
+			.address("장말로")
+			.detailAddress("103호")
+			.isDefault(true)
+			.build();
+
+		for (int i = 0; i < 10; i++) {
+			addressService.registerAddress(request, member.getId());
+		}
+
+		// then
+		Assertions.assertThatThrownBy(() -> addressService.registerAddress(request, member.getId())).isInstanceOf(
+			AddressOverMaximumSizeException.class);
 	}
 
 	@DisplayName("회원의 주소 리스트를 조회한다.")

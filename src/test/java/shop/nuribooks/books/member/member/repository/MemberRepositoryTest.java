@@ -138,6 +138,63 @@ class MemberRepositoryTest {
 		assertThat(result.getContent().getFirst().gender()).isEqualTo(savedMember.getGender());
 	}
 
+	@DisplayName("다양한 검색 조건으로 회원 검색")
+	@Test
+	void searchMembersWithPaging_nullRequest() {
+		//given
+		Member savedMember = getSavedMember();
+
+		MemberSearchRequest searchRequest = MemberSearchRequest.builder()
+			.build();
+
+		PageRequest pageRequest = PageRequest.of(0, 50);
+
+		//when
+		Page<MemberSearchResponse> result =
+			memberRepository.searchMembersWithPaging(searchRequest, pageRequest);
+
+		//then
+		assertThat(result).hasSize(1);
+		assertThat(result.getContent().getFirst().gender()).isEqualTo(savedMember.getGender());
+	}
+
+	@DisplayName("다양한 검색 조건으로 회원 검색")
+	@Test
+	void searchMembersWithPaging_manyConditions() {
+		//given
+		Member savedMember = getSavedMember();
+
+		MemberSearchRequest searchRequest = MemberSearchRequest.builder()
+			.name("nuri")
+			.gender(GenderType.MALE)
+			.phoneNumber("01029837822")
+			.email("email@contains.com")
+			.birthdayGoe(LocalDate.now())
+			.birthdayLoe(LocalDate.now())
+			.username("username")
+			.pointGoe(BigDecimal.TEN)
+			.pointLoe(BigDecimal.ONE)
+			.totalPaymentAmountGoe(BigDecimal.ZERO)
+			.totalPaymentAmountLoe(BigDecimal.TEN)
+			.authority(AuthorityType.ADMIN)
+			.gradeName("grade")
+			.status(StatusType.ACTIVE)
+			.createdAtGoe(LocalDateTime.now())
+			.createdAtLoe(LocalDateTime.now())
+			.latestLoginAtGoe(LocalDateTime.now())
+			.latestLoginAtLoe(LocalDateTime.now())
+			.build();
+
+		PageRequest pageRequest = PageRequest.of(0, 50);
+
+		//when
+		Page<MemberSearchResponse> result =
+			memberRepository.searchMembersWithPaging(searchRequest, pageRequest);
+
+		//then
+		assertThat(result).isEmpty();
+	}
+
 	/**
 	 * 테스트를 위해 repository에 grade, customer, member 저장 후 member 반환
 	 */

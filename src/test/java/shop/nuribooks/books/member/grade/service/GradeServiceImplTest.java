@@ -238,6 +238,40 @@ class GradeServiceImplTest {
 		assertThat(response.get(0).gradeId()).isEqualTo(savedGrades.get(1).getId());
 	}
 
+	@DisplayName("회원과 등급 배치 리스트 생성")
+	@Test
+	void getMemberGradeBatchListByRequirement_secondCondition() {
+		//given
+		List<Grade> savedGrades = getSavedGrades();
+		List<Member> savedMembers = List.of(getSavedMember(), getSavedMember());
+		savedMembers.getFirst().setTotalPaymentAmount(BigDecimal.valueOf(100000));
+		savedMembers.get(1).setTotalPaymentAmount(BigDecimal.valueOf(-1));
+		when(gradeRepository.findAll()).thenReturn(savedGrades);
+		when(memberRepository.findAll()).thenReturn(savedMembers);
+
+		//when
+		List<MemberGradeBatchDto> response = gradeServiceImpl.getMemberGradeBatchListByRequirement();
+
+		//then
+		assertThat(response).hasSize(2);
+	}
+
+	@DisplayName("회원과 등급 배치 리스트 생성")
+	@Test
+	void getMemberGradeBatchListByRequirement_noGradeList() {
+		//given
+		List<Member> savedMembers = List.of(getSavedMember());
+
+		when(gradeRepository.findAll()).thenReturn(List.of());
+		when(memberRepository.findAll()).thenReturn(savedMembers);
+
+		//when
+		List<MemberGradeBatchDto> response = gradeServiceImpl.getMemberGradeBatchListByRequirement();
+
+		//then
+		assertThat(response).isEmpty();
+	}
+
 	/**
 	 * 테스트를 위한 GradeRegisterRequest 생성
 	 */
