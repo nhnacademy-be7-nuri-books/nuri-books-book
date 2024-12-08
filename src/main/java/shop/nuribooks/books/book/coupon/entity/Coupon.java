@@ -35,7 +35,7 @@ import shop.nuribooks.books.book.coupon.enums.IssuanceType;
 @Inheritance(strategy = InheritanceType.JOINED)
 @SuperBuilder
 @Table(name = "coupons")
-public class Coupon {
+public abstract class Coupon {
 	@Id
 	@Column(name = "coupon_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
