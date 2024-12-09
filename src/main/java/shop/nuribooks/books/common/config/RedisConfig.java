@@ -16,7 +16,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import shop.nuribooks.books.cart.service.RedisKeyExpirationListener;
 
-@Profile("dev")
+@Profile("prod")
 @Configuration
 @EnableCaching
 public class RedisConfig {
