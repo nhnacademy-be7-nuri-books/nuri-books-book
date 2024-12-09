@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -167,12 +168,14 @@ public class BookServiceImpl implements BookService {
 		log.info("Delete Complete - bookId: {}", book.getId());
 	}
 
+	@Cacheable(cacheNames = "topBookLikeCache", key = "#root.methodName", cacheManager = "redisCacheManager")
 	@Override
 	public List<TopBookResponse> getTopBookLikes() {
 		List<TopBookResponse> likes = bookRepository.findTopBooksByLikes();
 		return likes != null ? likes : List.of();
 	}
 
+	@Cacheable(cacheNames = "topBookScoreCache", key = "#root.methodName", cacheManager = "redisCacheManager")
 	@Override
 	public List<TopBookResponse> getTopBookScores() {
 		List<TopBookResponse> scores = bookRepository.findTopBooksByScore();

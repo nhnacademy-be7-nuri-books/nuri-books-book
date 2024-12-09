@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.category.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,6 +103,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 *
 	 * @return 상위 카테고리가 없는 모든 카테고리의 응답 리스트
 	 */
+	@Cacheable(cacheNames = "bookCategoryCache", key = "#root.methodName", cacheManager = "redisCacheManager")
 	@Override
 	public List<CategoryResponse> getAllCategory() {
 		List<Category> categoryList = categoryRepository.findAllByParentCategoryIsNull();
