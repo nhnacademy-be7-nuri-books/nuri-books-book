@@ -5,7 +5,16 @@ spring:
     password: ENC(udeUrEU3cfiVaNkqv4zwgEhifPvD2iRzsL5Jr/E2/u4=)
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: org.apache.commons.dbcp2.BasicDataSource
-
+    dbcp2:
+      initial-size: 10
+      max-total: 200
+      max-idle: 10
+      min-idle: 10
+      validation-query: SELECT 1
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      log-expired-connections: true
   jpa:
     hibernate:
       ddl-auto: update
@@ -23,6 +32,11 @@ spring:
 
   elasticsearch:
     index: nuribooks
+
+cloud:
+  nhn:
+    rabbitmq:
+      secret-id: 438c2a33bc784910b27ec16502153d96
 
 logging:
   level:
