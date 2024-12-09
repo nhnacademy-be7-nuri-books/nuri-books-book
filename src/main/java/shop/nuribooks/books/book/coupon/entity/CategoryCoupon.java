@@ -1,7 +1,5 @@
 package shop.nuribooks.books.book.coupon.entity;
 
-import java.util.List;
-
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -22,9 +20,4 @@ public class CategoryCoupon extends Coupon {
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
-
-	@Override
-	public boolean isApplicable(List<Long> idList) {
-		return false;
-	}
 }

@@ -1,7 +1,5 @@
 package shop.nuribooks.books.book.coupon.entity;
 
-import java.util.List;
-
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,9 +21,4 @@ public class BookCoupon extends Coupon {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
-
-	@Override
-	public boolean isApplicable(List<Long> idList) {
-		return false;
-	}
 }

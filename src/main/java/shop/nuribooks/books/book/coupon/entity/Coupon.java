@@ -83,7 +83,7 @@ public abstract class Coupon {
 		this.quantity = quantity;
 		this.createdAt = LocalDate.now();
 	}
-	
+
 	public void update(CouponRequest couponRequest) {
 
 	}
