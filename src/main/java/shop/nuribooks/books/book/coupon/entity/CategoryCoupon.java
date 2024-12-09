@@ -17,7 +17,7 @@ import shop.nuribooks.books.book.category.entity.Category;
 @Getter
 @NoArgsConstructor
 @SuperBuilder
-@Table(name = "category_coupon")
+@Table(name = "category_coupons")
 public class CategoryCoupon extends Coupon {
 	@ManyToOne
 	@JoinColumn(name = "category_id")

@@ -4,7 +4,6 @@ import static jakarta.persistence.EnumType.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -16,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -49,6 +49,7 @@ public abstract class Coupon {
 	private CouponType couponType;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "coupon_policy_id")
 	private CouponPolicy couponPolicy;
 
 	@NotNull
@@ -82,11 +83,7 @@ public abstract class Coupon {
 		this.quantity = quantity;
 		this.createdAt = LocalDate.now();
 	}
-
-	public boolean isApplicable(List<Long> idList) {
-		return true;
-	}
-
+	
 	public void update(CouponRequest couponRequest) {
 
 	}
