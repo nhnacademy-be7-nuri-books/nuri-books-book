@@ -22,6 +22,7 @@ import shop.nuribooks.books.cart.dto.request.CartAddRequest;
 import shop.nuribooks.books.cart.dto.request.CartLoadRequest;
 import shop.nuribooks.books.cart.dto.response.CartBookResponse;
 import shop.nuribooks.books.cart.service.CartService;
+import shop.nuribooks.books.common.threadlocal.MemberIdContext;
 
 @WebMvcTest(CartController.class)
 class CartControllerTest {
@@ -38,7 +39,22 @@ class CartControllerTest {
 	void addCustomerCart() throws Exception {
 		// given
 		CartAddRequest request = new CartAddRequest("cartId", 1L, 1);
+		MemberIdContext.setMemberId(null);
 
+		// when then
+		mockMvc.perform(post("/api/cart")
+				.content(objectMapper.writeValueAsString(request))
+				.contentType(MediaType.APPLICATION_JSON)
+			)
+			.andExpect(status().isOk());
+	}
+
+	@DisplayName("비회원 장바구니에 도서를 담는다.")
+	@Test
+	void addMemberCart() throws Exception {
+		// given
+		CartAddRequest request = new CartAddRequest("member:", 1L, 1);
+		MemberIdContext.setMemberId(1L);
 		// when then
 		mockMvc.perform(post("/api/cart")
 				.content(objectMapper.writeValueAsString(request))
@@ -51,6 +67,7 @@ class CartControllerTest {
 	@Test
 	void getCustomerCartList() throws Exception {
 		// given
+		MemberIdContext.setMemberId(null);
 		CartBookResponse cartBookResponse1 = mock(CartBookResponse.class);
 		CartBookResponse cartBookResponse2 = mock(CartBookResponse.class);
 
@@ -63,13 +80,48 @@ class CartControllerTest {
 			.andExpect(jsonPath("$.*", hasSize(2)));
 	}
 
+
+	@DisplayName("비회원 장바구니 리스트를 가져온다")
+	@Test
+	void getMemberCartList() throws Exception {
+		// given
+		MemberIdContext.setMemberId(1L);
+		CartBookResponse cartBookResponse1 = mock(CartBookResponse.class);
+		CartBookResponse cartBookResponse2 = mock(CartBookResponse.class);
+
+		when(cartService.getCart(anyString())).thenReturn(List.of(cartBookResponse1, cartBookResponse2));
+
+		String cartId = "member:";
+		// when then
+		mockMvc.perform(get("/api/cart/{cart-id}", cartId))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.*", hasSize(2)));
+	}
+
 	@DisplayName("비회원 장바구니에서 특정 아이템을 삭제한다")
 	@Test
 	void removeCustomerCartItem() throws Exception {
 		// given
 		String cartId = "cartId";
 		Long bookId = 1L;
+		MemberIdContext.setMemberId(null);
 
+		// when
+		mockMvc.perform(delete("/api/cart/{cart-id}/book/{bookId}", cartId, bookId))
+			.andExpect(status().isNoContent());
+
+		// then
+		verify(cartService).removeCartItem(anyString(), anyLong());
+	}
+
+	@DisplayName("비회원 장바구니에서 특정 아이템을 삭제한다")
+	@Test
+	void removeMemberCartItem() throws Exception {
+		// given
+		String cartId = "member:";
+		Long bookId = 1L;
+
+		MemberIdContext.setMemberId(1L);
 		// when
 		mockMvc.perform(delete("/api/cart/{cart-id}/book/{bookId}", cartId, bookId))
 			.andExpect(status().isNoContent());

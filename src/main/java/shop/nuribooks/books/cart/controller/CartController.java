@@ -34,9 +34,10 @@ public class CartController {
 		// 비회원인 경우
 		if (Objects.isNull(memberId)) {
 			cartService.addCustomerCart(cartAddRequest);
-			return ResponseEntity.ok().build();
 		}
-		cartService.addMemberCart(cartAddRequest);
+		else{
+			cartService.addMemberCart(cartAddRequest);
+		}
 		return ResponseEntity.ok().build();
 	}
 
