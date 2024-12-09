@@ -117,27 +117,28 @@ public class BookController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@Operation(summary = "도서 좋아요 기준 Top 8 도서 조회",
-		description = "도서의 좋아요 수를 기준으로 상위 8개의 도서를 조회하는 엔드포인트입니다.")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "좋아요 TOP8 도서 조회 성공"),
-	})
-	@GetMapping("/top/book-like")
-	public ResponseEntity<List<TopBookResponse>> getTopBookLike() {
-		List<TopBookResponse> response = bookService.getTopBookLikes();
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	@Operation(summary = "도서 평균 평점 기준 Top 8 도서 조회",
-		description = "도서의 평균 평점을 기준으로 상위 8개의 도서를 조회하는 엔드포인트입니다.")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "평점 TOP8 도서 조회 성공"),
-	})
-	@GetMapping("/top/book-score")
-	public ResponseEntity<List<TopBookResponse>> getTopBookScore() {
-		List<TopBookResponse> response = bookService.getTopBookScores();
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
+// TODO : 캐싱 테스트 후 활성화
+//	@Operation(summary = "도서 좋아요 기준 Top 8 도서 조회",
+//		description = "도서의 좋아요 수를 기준으로 상위 8개의 도서를 조회하는 엔드포인트입니다.")
+//	@ApiResponses(value = {
+//		@ApiResponse(responseCode = "200", description = "좋아요 TOP8 도서 조회 성공"),
+//	})
+//	@GetMapping("/top/book-like")
+//	public ResponseEntity<List<TopBookResponse>> getTopBookLike() {
+//		List<TopBookResponse> response = bookService.getTopBookLikes();
+//		return ResponseEntity.status(HttpStatus.OK).body(response);
+//	}
+//
+//	@Operation(summary = "도서 평균 평점 기준 Top 8 도서 조회",
+//		description = "도서의 평균 평점을 기준으로 상위 8개의 도서를 조회하는 엔드포인트입니다.")
+//	@ApiResponses(value = {
+//		@ApiResponse(responseCode = "200", description = "평점 TOP8 도서 조회 성공"),
+//	})
+//	@GetMapping("/top/book-score")
+//	public ResponseEntity<List<TopBookResponse>> getTopBookScore() {
+//		List<TopBookResponse> response = bookService.getTopBookScores();
+//		return ResponseEntity.status(HttpStatus.OK).body(response);
+//	}
 
 	@GetMapping("/all")
 	public ResponseEntity<List<BookResponse>> getAllBooks() {
