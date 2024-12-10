@@ -93,16 +93,17 @@ public class CategoryController {
 	 *
 	 * @return 모든 카테고리의 응답 리스트
 	 */
-	@Operation(summary = "모든 카테고리 조회", description = "모든 카테고리를 조회합니다.")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "성공적으로 모든 카테고리를 조회하였습니다.")
-	})
-
-	@GetMapping
-	public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-		List<CategoryResponse> categoryResponseList = categoryService.getAllCategory();
-		return ResponseEntity.ok(categoryResponseList);
-	}
+// TODO : 캐싱 테스트 후 활성화
+//	@Operation(summary = "모든 카테고리 조회", description = "모든 카테고리를 조회합니다.")
+//	@ApiResponses(value = {
+//		@ApiResponse(responseCode = "200", description = "성공적으로 모든 카테고리를 조회하였습니다.")
+//	})
+//
+//	@GetMapping
+//	public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+//		List<CategoryResponse> categoryResponseList = categoryService.getAllCategory();
+//		return ResponseEntity.ok(categoryResponseList);
+//	}
 
 	/**
 	 * 주어진 ID에 해당하는 카테고리를 조회합니다.

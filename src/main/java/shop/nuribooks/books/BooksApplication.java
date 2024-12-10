@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@EnableFeignClients(basePackages = "shop.nuribooks.books.book.client")
+@EnableFeignClients(basePackages = "shop.nuribooks.books.book")
 public class BooksApplication {
 
 	public static void main(String[] args) {
