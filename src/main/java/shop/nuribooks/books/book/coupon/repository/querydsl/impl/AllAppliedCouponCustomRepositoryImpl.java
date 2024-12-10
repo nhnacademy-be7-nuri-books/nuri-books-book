@@ -25,7 +25,7 @@ public class AllAppliedCouponCustomRepositoryImpl implements AllAppliedCouponCus
 
 		return queryFactory.select(Projections.constructor(CouponAppliedOrderDto.class,
 				coupon.name,
-				allAppliedCoupon.discount_price,
+				allAppliedCoupon.discountPrice,
 				coupon.couponType
 			))
 			.from(allAppliedCoupon)

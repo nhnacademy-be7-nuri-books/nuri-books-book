@@ -177,7 +177,7 @@ public class TestUtils {
 		return ShippingPolicy.builder()
 			.shippingFee(1000)
 			.expiration(null)
-			.minimumOrderPrice(BigDecimal.valueOf(10000))
+			.minimumOrderPrice(BigDecimal.valueOf(0))
 			.build();
 	}
 
