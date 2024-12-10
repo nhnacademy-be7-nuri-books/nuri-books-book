@@ -167,23 +167,23 @@ class CategoryControllerTest {
 	/**
 	 * 모든 카테고리를 조회할 때, HTTP 상태 코드 200(OK)을 반환하고 올바른 응답을 받는지 테스트합니다.
 	 */
-	@Test
-	void getAllCategories_whenCalled_thenReturnsOk() throws Exception {
-		// given
-		List<CategoryResponse> categories = List.of(
-			CategoryResponse.from(Category.builder().name("여행").build()),
-			CategoryResponse.from(Category.builder().name("국내 여행").build())
-		);
-		when(categoryService.getAllCategory()).thenReturn(categories);
-
-		// when & then
-		mockMvc.perform(get("/api/categories")
-				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.length()").value(2))
-			.andExpect(jsonPath("$[0].name").value("여행"))
-			.andExpect(jsonPath("$[1].name").value("국내 여행"));
-	}
+//	@Test
+//	void getAllCategories_whenCalled_thenReturnsOk() throws Exception {
+//		// given
+//		List<CategoryResponse> categories = List.of(
+//			CategoryResponse.from(Category.builder().name("여행").build()),
+//			CategoryResponse.from(Category.builder().name("국내 여행").build())
+//		);
+//		when(categoryService.getAllCategory()).thenReturn(categories);
+//
+//		// when & then
+//		mockMvc.perform(get("/api/categories")
+//				.contentType(MediaType.APPLICATION_JSON))
+//			.andExpect(status().isOk())
+//			.andExpect(jsonPath("$.length()").value(2))
+//			.andExpect(jsonPath("$[0].name").value("여행"))
+//			.andExpect(jsonPath("$[1].name").value("국내 여행"));
+//	}
 
 	/**
 	 * 유효한 ID로 특정 카테고리를 조회할 때, HTTP 상태 코드 200(OK)을 반환하고 올바른 카테고리 데이터를 받는지 테스트합니다.

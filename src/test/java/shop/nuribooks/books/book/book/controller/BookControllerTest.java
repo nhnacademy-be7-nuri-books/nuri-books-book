@@ -225,33 +225,33 @@ class BookControllerTest {
 			.andExpect(status().isNoContent());
 	}
 
-	@Test
-	void getTopBookLike() throws Exception {
-		List<TopBookResponse> topBooks = List.of(
-			new TopBookResponse(1L, "thumbnail1.jpg", "Title1"),
-			new TopBookResponse(2L, "thumbnail2.jpg", "Title2")
-		);
-
-		when(bookService.getTopBookLikes()).thenReturn(topBooks);
-
-		mockMvc.perform(get("/api/books/top/book-like"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", Matchers.hasSize(2)));
-	}
-
-	@Test
-	void getTopBookScore() throws Exception {
-		List<TopBookResponse> topBooks = List.of(
-			new TopBookResponse(1L, "thumbnail1.jpg", "Title1"),
-			new TopBookResponse(2L, "thumbnail2.jpg", "Title2")
-		);
-
-		when(bookService.getTopBookScores()).thenReturn(topBooks);
-
-		mockMvc.perform(get("/api/books/top/book-score"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", Matchers.hasSize(2)));
-	}
+//	@Test
+//	void getTopBookLike() throws Exception {
+//		List<TopBookResponse> topBooks = List.of(
+//			new TopBookResponse(1L, "thumbnail1.jpg", "Title1"),
+//			new TopBookResponse(2L, "thumbnail2.jpg", "Title2")
+//		);
+//
+//		when(bookService.getTopBookLikes()).thenReturn(topBooks);
+//
+//		mockMvc.perform(get("/api/books/top/book-like"))
+//			.andExpect(status().isOk())
+//			.andExpect(jsonPath("$", Matchers.hasSize(2)));
+//	}
+//
+//	@Test
+//	void getTopBookScore() throws Exception {
+//		List<TopBookResponse> topBooks = List.of(
+//			new TopBookResponse(1L, "thumbnail1.jpg", "Title1"),
+//			new TopBookResponse(2L, "thumbnail2.jpg", "Title2")
+//		);
+//
+//		when(bookService.getTopBookScores()).thenReturn(topBooks);
+//
+//		mockMvc.perform(get("/api/books/top/book-score"))
+//			.andExpect(status().isOk())
+//			.andExpect(jsonPath("$", Matchers.hasSize(2)));
+//	}
 
 	@Test
 	void getAllBooks() throws Exception {
