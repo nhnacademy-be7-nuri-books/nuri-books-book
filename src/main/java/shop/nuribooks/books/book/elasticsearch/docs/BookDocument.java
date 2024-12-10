@@ -20,7 +20,7 @@ public class BookDocument {
 	@Id
 	private Long id;
 
-	private String publisherName;
+	private String publisher_name;
 
 	private String state;
 
@@ -30,17 +30,17 @@ public class BookDocument {
 
 	private BigDecimal price;
 
-	private BigDecimal salePrice;
+	private BigDecimal sale_price;
 
-	private int discountRate;
+	private int discount_rate;
 
-	private String thumbnailImageUrl;
+	private String thumbnail_image_url;
 
-	private long viewCount;
+	private long view_count;
 
-	private int reviewCount;
+	private int review_count;
 
-	private BigDecimal totalScore;
+	private BigDecimal total_score;
 
 	// localdatetime -> date로 타입 변경.
 	// jackson이 Localdatetime 변환 지원 x
