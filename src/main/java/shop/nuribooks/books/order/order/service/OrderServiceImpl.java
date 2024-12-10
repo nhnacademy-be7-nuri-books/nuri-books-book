@@ -554,7 +554,6 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 		Order order = getOrder(orderId);
 
 		if (!Objects.equals(order.getCustomer().getId(), userId.get())) {
-			log.error("주문 상세 조회 - {} 가 소유한 주문이 아님", userId.get());
 			throw new OrderNotBelongsToUserException("해당 주문 정보의 소유자가 아닙니다.");
 		}
 
@@ -916,7 +915,7 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 			// 책 ID가 wrappingBookIds에 포함되어 있으면 wrapping을 true로 설정
 			if (wrappingBookIds.contains(bookId)) {
 				OrderDetailRequest updatedOrderDetail = new OrderDetailRequest(
-					bookId, orderDetailRequest.count(), orderDetailRequest.unitPrice(), true, null);
+					bookId, orderDetailRequest.count(), orderDetailRequest.unitPrice(), true);
 				updatedOrderDetails.add(updatedOrderDetail);
 			} else {
 				updatedOrderDetails.add(orderDetailRequest);
