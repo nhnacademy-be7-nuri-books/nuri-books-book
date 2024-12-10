@@ -54,7 +54,7 @@ class OrderDetailServiceImplTest {
 	@Test
 	void registerOrderDetail_success() {
 		OrderDetailRequest orderDetailRequest = new OrderDetailRequest(book.getId(), 10, BigDecimal.valueOf(10000),
-			false, null);
+			false);
 
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 		when(orderDetailRepository.save(any())).thenReturn(orderDetail);
@@ -67,7 +67,7 @@ class OrderDetailServiceImplTest {
 	@Test
 	void registerOrderDetail_failed() {
 		OrderDetailRequest orderDetailRequest = new OrderDetailRequest(book.getId(), 10, BigDecimal.valueOf(10000),
-			false, null);
+			false);
 
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -79,7 +79,7 @@ class OrderDetailServiceImplTest {
 	void registerOrderDetail_failedStockZero() {
 		OrderDetailRequest orderDetailRequest = new OrderDetailRequest(book.getId(), book.getStock() + 1,
 			BigDecimal.valueOf(10000),
-			false, null);
+			false);
 
 		when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
 

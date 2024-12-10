@@ -1,6 +1,5 @@
 package shop.nuribooks.books.order.order.repository;
 
-import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -222,8 +221,8 @@ public class OrderCustomerRepositoryImpl implements OrderCustomerRepository {
 					order.paymentPrice,
 					order.booksPrice,
 					shippingPolicy.shippingFee,
-					allAppliedCoupon.discount_price,
-					allAppliedCoupon.discount_price, // 도서 쿠폰
+					allAppliedCoupon.discountPrice,
+					allAppliedCoupon.discountPrice, // 도서 쿠폰
 					order.wrappingPrice,
 					orderUsingPoint.amount,
 					orderSavingPoint.amount
