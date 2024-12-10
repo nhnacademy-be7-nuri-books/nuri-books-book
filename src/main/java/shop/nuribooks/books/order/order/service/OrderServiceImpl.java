@@ -516,7 +516,7 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 			if (memberCoupon.isPresent()) {
 				CouponAppliedOrderDto couponAppliedOrderDto = CouponAppliedOrderDto.builder()
 					.name(memberCoupon.get().getCoupon().getName())
-					.discountPrice(allAppliedCoupon.get().getDiscount_price())
+					.discountPrice(allAppliedCoupon.get().getDiscountPrice())
 					.couponType(memberCoupon.get().getCoupon().getCouponType())
 					.build();
 
@@ -890,7 +890,7 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 		AllAppliedCoupon allAppliedCoupon = AllAppliedCoupon.builder()
 			.memberCoupon(memberCoupon)
 			.order(savedOrder)
-			.discount_price(discountPrice)
+			.discountPrice(discountPrice)
 			.build();
 
 		allAppliedCouponRepository.save(allAppliedCoupon);
