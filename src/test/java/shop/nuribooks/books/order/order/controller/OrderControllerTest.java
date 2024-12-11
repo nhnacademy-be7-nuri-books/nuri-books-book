@@ -76,8 +76,7 @@ class OrderControllerTest {
 			1L,
 			2,
 			BigDecimal.valueOf(1000),
-			true,
-			null
+			true
 		);
 
 		ShippingRegisterRequest shippingRegisterRequest = new ShippingRegisterRequest(

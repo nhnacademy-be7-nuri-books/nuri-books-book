@@ -38,5 +38,5 @@ public class AllAppliedCoupon {
 
 	@PositiveOrZero
 	@Column(precision = 9, nullable = false)
-	private BigDecimal discount_price;
+	private BigDecimal discountPrice;
 }
