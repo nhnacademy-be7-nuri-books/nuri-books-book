@@ -62,7 +62,7 @@ public abstract class Coupon {
 	@Enumerated(STRING)
 	private IssuanceType issuanceType;
 
-	private int quantity;
+	private Integer quantity;
 
 	@NotNull
 	private LocalDate createdAt;

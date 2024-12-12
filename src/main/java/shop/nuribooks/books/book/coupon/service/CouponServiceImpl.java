@@ -127,14 +127,6 @@ public class CouponServiceImpl implements CouponService {
 		memberCouponService.registerMemberCoupon(request);
 	}
 
-	// @Override
-	// public boolean isCouponApplicableToOrder(Coupon coupon, List<BookOrderResponse> bookOrderResponses) {
-	//
-	// 	CouponStrategy couponStrategy = couponStrategyFactory.getStrategy(coupon.getCouponType());
-	//
-	// 	return couponStrategy.isCouponApplicableToOrder(coupon, bookOrderResponses);
-	// }
-
 	/**
 	 * 쿠폰 비활성화 메서드
 	 *
@@ -156,14 +148,23 @@ public class CouponServiceImpl implements CouponService {
 
 	private void validateExpiration(ExpirationType expirationType, Integer expirationDays, LocalDate expiredAt) {
 		if (expirationType == null) {
-			throw new InvalidCouponException("ExpirationType은 필수 값입니다.");
+			throw new InvalidCouponException("만료 유형은 필수 값 입니다.");
 		}
 
 		switch (expirationType) {
-			case ExpirationType.DATE -> validateDateExpiration(expiredAt);
-			case ExpirationType.DAYS -> validateDaysExpiration(expirationDays);
-			default -> throw new InvalidCouponException("알 수 없는 ExpirationType입니다.");
-
+			case DATE -> {
+				validateDateExpiration(expiredAt);
+				if (expirationDays != null) {
+					throw new InvalidCouponException("DATE 타입 쿠폰은 expirationDays 가 null 이어야 합니다.");
+				}
+			}
+			case DAYS -> {
+				validateDaysExpiration(expirationDays);
+				if (expiredAt != null) {
+					throw new InvalidCouponException("DAYS 타입 쿠폰은 expiredAt이 null 이어야 합니다.");
+				}
+			}
+			default -> throw new InvalidCouponException("알 수 없는 만료 유형 입니다.");
 		}
 	}
 
@@ -184,10 +185,10 @@ public class CouponServiceImpl implements CouponService {
 
 	private void validateIssuanceTypeAndQuantity(IssuanceType issuanceType, Integer quantity) {
 		if (issuanceType == IssuanceType.LIMITED && (quantity == null || quantity <= 0)) {
-			throw new InvalidCouponException("LIMITED 타입 쿠폰은 1 이상의 quantity가 필요합니다.");
+			throw new InvalidCouponException("LIMITED 타입 쿠폰은 1 이상의 quantity 가 필요합니다.");
 		}
 		if (issuanceType == IssuanceType.UNLIMITED && quantity != null) {
-			throw new InvalidCouponException("UNLIMITED 타입 쿠폰은 quantity가 null이어야 합니다.");
+			throw new InvalidCouponException("UNLIMITED 타입 쿠폰은 quantity 가 null 이어야 합니다.");
 		}
 	}
 

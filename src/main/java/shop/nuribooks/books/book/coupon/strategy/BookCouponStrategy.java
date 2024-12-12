@@ -1,6 +1,7 @@
 package shop.nuribooks.books.book.coupon.strategy;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class BookCouponStrategy implements CouponStrategy {
 			.period(request.period())
 			.issuanceType(request.issuanceType())
 			.quantity(request.quantity())
+			.createdAt(LocalDate.now())
 			.book(book)
 			.build();
 	}

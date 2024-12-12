@@ -37,7 +37,7 @@ public class CouponController {
 		@ApiResponse(responseCode = "201", description = "생성 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
-	@HasRole(role = AuthorityType.ADMIN)
+	// @HasRole(role = AuthorityType.ADMIN)
 	@PostMapping
 	public ResponseEntity<ResponseMessage> registerCoupon(
 		@Valid @RequestBody CouponRequest couponRequest) {
@@ -57,7 +57,6 @@ public class CouponController {
 		Page<CouponResponse> couponPolicyResponses = couponService.getCoupons(type, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(couponPolicyResponses);
 	}
-
 
 	@Operation(summary = "쿠폰 전체 목록 조회", description = "쿠폰 전체 목록을 조회합니다.")
 	@ApiResponses(value = {
