@@ -7,28 +7,6 @@
         </encoder>
     </appender>
 
-    <!-- LogNCrashHttpAppender 선언 -->
-    <appender name="logNCrashHttp" class="com.toast.java.logncrash.logback.LogNCrashHttpAppender">
-        <appKey>h98AoVSn5I3rIctz</appKey>
-        <logSource>${spring.profiles.active}</logSource>
-        <version value="1.0.0"/>
-        <logType value="error"/>
-        <category value="book"/>
-        <errorCodeType value="action"/>
-    </appender>
-    <!-- LogNCrashHttpAppender를 포함한 AsyncAppender 선언 -->
-    <appender name="LNCS-APPENDER" class="ch.qos.logback.classic.AsyncAppender">
-        <!-- Logback의 AsyncAppender 옵션 -->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>WARN</level>
-        </filter>
-        <includeCallerData value="false"/>
-        <queueSize value="2048"/>
-        <neverBlock value="true"/>
-        <maxFlushTime value="60000"/>
-        <appender-ref ref="logNCrashHttp"/>
-    </appender>
-
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
@@ -73,6 +51,27 @@
                 <pattern>${LOG_PATTERN}</pattern>
             </encoder>
         </appender>
+
+        <appender name="logNCrashHttp" class="com.toast.java.logncrash.logback.LogNCrashHttpAppender">
+            <appKey>h98AoVSn5I3rIctz</appKey>
+            <logSource>${spring.profiles.active}</logSource>
+            <version value="1.0.0"/>
+            <logType value="error"/>
+            <category value="book"/>
+            <errorCodeType value="action"/>
+        </appender>
+
+        <appender name="LNCS-APPENDER" class="ch.qos.logback.classic.AsyncAppender">
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>WARN</level>
+            </filter>
+            <includeCallerData value="false"/>
+            <queueSize value="2048"/>
+            <neverBlock value="true"/>
+            <maxFlushTime value="60000"/>
+            <appender-ref ref="logNCrashHttp"/>
+        </appender>
+
         <root level="WARN">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="PROD_FILE"/>
