@@ -37,7 +37,7 @@ public class CouponController {
 		@ApiResponse(responseCode = "201", description = "생성 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
-	// @HasRole(role = AuthorityType.ADMIN)
+	@HasRole(role = AuthorityType.ADMIN)
 	@PostMapping
 	public ResponseEntity<ResponseMessage> registerCoupon(
 		@Valid @RequestBody CouponRequest couponRequest) {

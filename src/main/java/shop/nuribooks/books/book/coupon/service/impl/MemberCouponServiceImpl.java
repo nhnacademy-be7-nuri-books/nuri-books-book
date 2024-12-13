@@ -154,7 +154,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 		}
 
 		Coupon coupon = couponRepository.findById(message.getCouponId())
-			.orElseThrow(CouponNotFoundException::new);
+			.orElseThrow(() -> new AmqpRejectAndDontRequeueException("Coupon not found"));
 
 		if (!coupon.getCouponType().equals(CouponType.BOOK)) {
 			throw new AmqpRejectAndDontRequeueException("Invalid Book Coupon");
@@ -165,10 +165,11 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 		}
 
 		Member member = memberRepository.findById(message.getMemberId())
-			.orElseThrow(() -> new MemberNotFoundException("존재하지않는 회원입니다."));
+			.orElseThrow(() -> new AmqpRejectAndDontRequeueException("존재하지않는 회원입니다."));
 
 		boolean alreadyIssued = memberCouponRepository.existsByMemberAndCoupon(member, coupon);
 		if (alreadyIssued) {
+			log.info("Already Issued Member");
 			return;
 		}
 
