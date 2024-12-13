@@ -79,7 +79,7 @@ public class Book {
 
 	@NotBlank
 	@Lob
-	@Column(columnDefinition = "TEXT")
+	@Column(columnDefinition = "MEDIUMTEXT")
 	private String description;
 
 	@NotBlank
