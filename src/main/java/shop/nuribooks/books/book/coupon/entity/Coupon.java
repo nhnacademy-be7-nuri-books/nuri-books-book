@@ -4,7 +4,6 @@ import static jakarta.persistence.EnumType.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -16,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -35,7 +35,7 @@ import shop.nuribooks.books.book.coupon.enums.IssuanceType;
 @Inheritance(strategy = InheritanceType.JOINED)
 @SuperBuilder
 @Table(name = "coupons")
-public class Coupon {
+public abstract class Coupon {
 	@Id
 	@Column(name = "coupon_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +49,7 @@ public class Coupon {
 	private CouponType couponType;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "coupon_policy_id")
 	private CouponPolicy couponPolicy;
 
 	@NotNull
@@ -61,7 +62,7 @@ public class Coupon {
 	@Enumerated(STRING)
 	private IssuanceType issuanceType;
 
-	private int quantity;
+	private Integer quantity;
 
 	@NotNull
 	private LocalDate createdAt;
@@ -81,10 +82,6 @@ public class Coupon {
 		this.issuanceType = issuanceType;
 		this.quantity = quantity;
 		this.createdAt = LocalDate.now();
-	}
-
-	public boolean isApplicable(List<Long> idList) {
-		return true;
 	}
 
 	public void update(CouponRequest couponRequest) {

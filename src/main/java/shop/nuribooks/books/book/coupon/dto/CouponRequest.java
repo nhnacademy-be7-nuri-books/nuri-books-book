@@ -22,7 +22,7 @@ public record CouponRequest(
 
 	@NotNull(message = "만료유형은 필수입니다.") //기간 쿠폰, 만료일 쿠폰
 	ExpirationType expirationType,
-	
+
 	LocalDate expiredAt,
 
 	@Min(value = 1, message = "할인 기간은 1일 이상이어야 합니다.")
@@ -31,7 +31,7 @@ public record CouponRequest(
 	@NotNull(message = "수량 제한 여부는 필수 입니다.")
 	IssuanceType issuanceType,
 
-	int quantity,
+	Integer quantity,
 
 	Long itemId
 ) {
