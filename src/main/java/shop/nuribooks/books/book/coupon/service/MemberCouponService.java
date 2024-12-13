@@ -27,4 +27,6 @@ public interface MemberCouponService {
 	List<MemberCouponOrderDto> getAllTypeAvailableCouponsByMemberId(Long memberId, BigDecimal orderTotalPrice);
 
 	MemberCouponOrderDto getMemberCoupon(Long memberCouponId);
+
+	void publishBookCouponIssue(Long memberId, Long couponId);
 }
