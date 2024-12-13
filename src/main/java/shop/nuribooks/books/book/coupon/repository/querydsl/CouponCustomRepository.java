@@ -10,4 +10,6 @@ public interface CouponCustomRepository {
 	Coupon findCouponsByNameLike(String name);
 
 	Page<Coupon> findCouponsByCouponType(Pageable pageable, CouponType type);
+
+	int decrementCouponQuantity(Long couponId);
 }

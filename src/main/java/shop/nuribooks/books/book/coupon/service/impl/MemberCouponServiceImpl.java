@@ -18,11 +18,14 @@ import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
+import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.message.BookCouponIssueMessage;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
 import shop.nuribooks.books.common.config.rabbitmq.RabbitmqConfig;
+import shop.nuribooks.books.common.entity.ProcessedMessage;
+import shop.nuribooks.books.common.repository.ProcessedMessageRepository;
 import shop.nuribooks.books.exception.coupon.CouponAlreadyIssuedException;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
 import shop.nuribooks.books.exception.member.MemberCartNotFoundException;
@@ -44,6 +47,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	private final MemberCouponRepository memberCouponRepository;
 	private final CouponRepository couponRepository;
 	private final RabbitTemplate rabbitTemplate;
+	private final ProcessedMessageRepository processedMessageRepository;
 
 	/**
 	 * 회원에게 쿠폰을 등록합니다.
@@ -141,6 +145,48 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 			.createdAt(memberCoupon.getCreatedAt())
 			.expiredAt(memberCoupon.getExpiredAt())
 			.build();
+	}
+
+	@Override
+	public void issueBookCoupon(BookCouponIssueMessage message) {
+		if (processedMessageRepository.existsById(message.getMessageId())) {
+			return;
+		}
+
+		Coupon coupon = couponRepository.findById(message.getCouponId())
+			.orElseThrow(CouponNotFoundException::new);
+
+		if (!coupon.getCouponType().equals(CouponType.BOOK)) {
+			throw new AmqpRejectAndDontRequeueException("Invalid Book Coupon");
+		}
+
+		if (coupon.getQuantity() == null || coupon.getQuantity() <= 0) {
+			throw new AmqpRejectAndDontRequeueException("Invalid Stock");
+		}
+
+		Member member = memberRepository.findById(message.getMemberId())
+			.orElseThrow(() -> new MemberNotFoundException("존재하지않는 회원입니다."));
+
+		boolean alreadyIssued = memberCouponRepository.existsByMemberAndCoupon(member, coupon);
+		if (alreadyIssued) {
+			return;
+		}
+
+		int updateQuantity = couponRepository.decrementCouponQuantity(coupon.getId());
+		if (updateQuantity <= 0) {
+			throw new AmqpRejectAndDontRequeueException("Stock is empty");
+		}
+
+		MemberCoupon memberCoupon = MemberCoupon.builder()
+			.coupon(coupon)
+			.member(member)
+			.build();
+		memberCouponRepository.save(memberCoupon);
+
+		processedMessageRepository.save(
+			ProcessedMessage.builder().
+				messageId(message.getMessageId())
+				.build());
 	}
 
 	@Override
