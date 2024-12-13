@@ -51,7 +51,7 @@
         <property name="LOG_PATH" value="log/dev"/>
         <property name="LOG_FILE_NAME" value="book-dev"/>
         <root level="INFO">
-            <appender-ref ref="LNCS-APPENDER"/>
+<!--            <appender-ref ref="LNCS-APPENDER"/>-->
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </root>
