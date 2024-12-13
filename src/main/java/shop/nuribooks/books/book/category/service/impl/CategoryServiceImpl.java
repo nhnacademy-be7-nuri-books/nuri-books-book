@@ -103,7 +103,7 @@ public class CategoryServiceImpl implements CategoryService {
 	 *
 	 * @return 상위 카테고리가 없는 모든 카테고리의 응답 리스트
 	 */
-	@Cacheable(cacheNames = "bookCategoryCache", key = "#root.methodName", cacheManager = "redisCacheManager")
+	@Cacheable(cacheNames = "bookCategoryCache", key = "#root.methodName")
 	@Override
 	public List<CategoryResponse> getAllCategory() {
 		List<Category> categoryList = categoryRepository.findAllByParentCategoryIsNull();
