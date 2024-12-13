@@ -23,4 +23,6 @@ public interface CouponService {
 	Coupon updateCoupon(Long id, CouponRequest request);
 
 	void issueWelcomeCoupon(Member member);
+
+	// boolean isCouponApplicableToOrder(Coupon coupon, List<BookOrderResponse> bookOrderResponses);
 }

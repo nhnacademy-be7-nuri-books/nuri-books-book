@@ -3,6 +3,7 @@ package shop.nuribooks.books.book.coupon.mapper;
 import org.springframework.stereotype.Component;
 
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
+import shop.nuribooks.books.book.coupon.entity.AllCoupon;
 import shop.nuribooks.books.book.coupon.entity.BookCoupon;
 import shop.nuribooks.books.book.coupon.entity.CategoryCoupon;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
@@ -17,27 +18,27 @@ public class CouponMapper {
 		} else if (coupon.getCouponType().equals(CouponType.CATEGORY)) {
 			return mapCategoryCoupon((CategoryCoupon)coupon);
 		} else if (coupon.getCouponType().equals(CouponType.ALL)) {
-			return mapAllCoupon(coupon);
+			return mapAllCoupon((AllCoupon)coupon);
 		}
 		throw new IllegalArgumentException("Unsupported coupon type: " + coupon.getClass().getSimpleName());
 	}
 
-	private CouponResponse mapAllCoupon(Coupon coupon) {
+	private CouponResponse mapAllCoupon(AllCoupon allCoupon) {
 		return CouponResponse.builder()
-			.id(coupon.getId())
-			.name(coupon.getName())
-			.couponType(coupon.getCouponType())
-			.discountType(coupon.getCouponPolicy().getDiscountType())
-			.discount(coupon.getCouponPolicy().getDiscount())
-			.minimumOrderPrice(coupon.getCouponPolicy().getMinimumOrderPrice())
-			.maximumDiscountPrice(coupon.getCouponPolicy().getMaximumDiscountPrice())
-			.expirationType(coupon.getExpirationType())
-			.expiredAt(coupon.getExpiredAt())
-			.period(coupon.getPeriod())
-			.issuanceType(coupon.getIssuanceType())
-			.quantity(coupon.getQuantity())
-			.createdAt(coupon.getCreatedAt())
-			.deletedAt(coupon.getDeletedAt())
+			.id(allCoupon.getId())
+			.name(allCoupon.getName())
+			.couponType(allCoupon.getCouponType())
+			.discountType(allCoupon.getCouponPolicy().getDiscountType())
+			.discount(allCoupon.getCouponPolicy().getDiscount())
+			.minimumOrderPrice(allCoupon.getCouponPolicy().getMinimumOrderPrice())
+			.maximumDiscountPrice(allCoupon.getCouponPolicy().getMaximumDiscountPrice())
+			.expirationType(allCoupon.getExpirationType())
+			.expiredAt(allCoupon.getExpiredAt())
+			.period(allCoupon.getPeriod())
+			.issuanceType(allCoupon.getIssuanceType())
+			.quantity(allCoupon.getQuantity())
+			.createdAt(allCoupon.getCreatedAt())
+			.deletedAt(allCoupon.getDeletedAt())
 			.build();
 	}
 

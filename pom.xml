@@ -48,12 +48,6 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-devtools</artifactId>-->
-        <!--            <scope>runtime</scope>-->
-        <!--            <optional>true</optional>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -203,7 +197,35 @@
             <version>1.1.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20171018</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5</version>
+        </dependency>
+
+        <!-- logncrash JAR 의존성 선언 -->
+        <dependency>
+            <groupId>com.toast.logncrash</groupId>
+            <artifactId>toast-logncrash-logback-sdk</artifactId>
+            <version>3.0.5</version>
+        </dependency>
     </dependencies>
+
+    <repositories>
+    <!-- 로컬 lib 디렉토리를 Maven 리포지토리로 등록 -->
+        <repository>
+            <id>local-lib-repo</id>
+            <name>Local Library Repository</name>
+            <url>file://${project.basedir}/lib</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
 
     <build>
         <finalName>books</finalName>

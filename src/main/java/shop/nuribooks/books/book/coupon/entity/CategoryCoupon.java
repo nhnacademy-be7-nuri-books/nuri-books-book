@@ -1,7 +1,5 @@
 package shop.nuribooks.books.book.coupon.entity;
 
-import java.util.List;
-
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -17,14 +15,9 @@ import shop.nuribooks.books.book.category.entity.Category;
 @Getter
 @NoArgsConstructor
 @SuperBuilder
-@Table(name = "category_coupon")
+@Table(name = "category_coupons")
 public class CategoryCoupon extends Coupon {
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
-
-	@Override
-	public boolean isApplicable(List<Long> idList) {
-		return false;
-	}
 }
