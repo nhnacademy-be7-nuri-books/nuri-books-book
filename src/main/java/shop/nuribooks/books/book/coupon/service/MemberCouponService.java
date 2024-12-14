@@ -10,6 +10,7 @@ import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
+import shop.nuribooks.books.book.coupon.message.BookCouponIssueMessage;
 import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
 
 public interface MemberCouponService {
@@ -34,4 +35,8 @@ public interface MemberCouponService {
 
 	BigDecimal getCouponsApplicableToOrder(MemberCoupon memberCoupon,
 		List<BookOrderResponse> bookOrderResponses);
+
+	void issueBookCoupon(BookCouponIssueMessage message);
+
+	void publishBookCouponIssue(Long memberId, Long couponId);
 }

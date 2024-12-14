@@ -66,6 +66,19 @@ public class MemberCouponController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
+	/**
+	 * 회원에게 도서 쿠폰을 등록합니다.
+	 * 바로 DB에 접근하지 않고 	MQ에 메시지를 발행하도록함.
+	 * 비동기 요청에 대한 응답인 202 accepted 반환
+	 */
+	@HasRole(role = AuthorityType.MEMBER)
+	@PostMapping("/book/{coupon-id}")
+	public ResponseEntity<Void> issueMemberToBookCouponMq(@Valid @PathVariable(name = "coupon-id") Long couponId) {
+		Long memberId = MemberIdContext.getMemberId();
+		memberCouponService.publishBookCouponIssue(memberId, couponId);
+		return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+	}
+
 	@HasRole(role = AuthorityType.MEMBER)
 	@PostMapping("/category/{coupon-id}")
 	public ResponseEntity<Void> issueMemberToCategoryCoupon(@Valid @PathVariable(name = "coupon-id") Long couponId) {

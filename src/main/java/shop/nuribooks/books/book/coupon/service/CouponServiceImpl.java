@@ -9,15 +9,18 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.coupon.dto.BookCouponResponse;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
+import shop.nuribooks.books.book.coupon.entity.BookCoupon;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.entity.CouponPolicy;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
 import shop.nuribooks.books.book.coupon.enums.ExpirationType;
 import shop.nuribooks.books.book.coupon.enums.IssuanceType;
 import shop.nuribooks.books.book.coupon.mapper.CouponMapper;
+import shop.nuribooks.books.book.coupon.repository.BookCouponRepository;
 import shop.nuribooks.books.book.coupon.repository.CouponPolicyRepository;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.book.coupon.strategy.CouponStrategy;
@@ -35,6 +38,7 @@ public class CouponServiceImpl implements CouponService {
 	private final CouponPolicyRepository couponPolicyRepository;
 	private final CouponStrategyFactory couponStrategyFactory;
 	private final CouponMapper couponMapper;
+	private final BookCouponRepository bookCouponRepository;
 
 	/**
 	 * 쿠폰 등록하는 메서드
@@ -125,6 +129,14 @@ public class CouponServiceImpl implements CouponService {
 
 		MemberCouponIssueRequest request = new MemberCouponIssueRequest(member.getId(), welcomeCoupon.getId());
 		memberCouponService.registerMemberCoupon(request);
+	}
+
+	@Override
+	public BookCouponResponse getBookCoupon(Long bookId) {
+		BookCoupon bookCoupon = bookCouponRepository.findByBookId(bookId)
+			.orElseThrow(CouponNotFoundException::new);
+
+		return new BookCouponResponse(bookCoupon.getId());
 	}
 
 	/**

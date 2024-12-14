@@ -4,22 +4,31 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
 import shop.nuribooks.books.book.coupon.entity.Coupon;
 import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
+import shop.nuribooks.books.book.coupon.enums.CouponType;
+import shop.nuribooks.books.book.coupon.message.BookCouponIssueMessage;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
+import shop.nuribooks.books.common.config.rabbitmq.RabbitmqConfig;
+import shop.nuribooks.books.common.entity.ProcessedMessage;
+import shop.nuribooks.books.common.repository.ProcessedMessageRepository;
 import shop.nuribooks.books.book.coupon.strategy.CouponStrategy;
 import shop.nuribooks.books.book.coupon.strategy.CouponStrategyFactory;
 import shop.nuribooks.books.exception.coupon.CouponAlreadyIssuedException;
@@ -34,6 +43,7 @@ import shop.nuribooks.books.member.member.repository.MemberRepository;
  *
  * @author janghyun
  **/
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
@@ -41,6 +51,8 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	private final MemberRepository memberRepository;
 	private final MemberCouponRepository memberCouponRepository;
 	private final CouponRepository couponRepository;
+	private final RabbitTemplate rabbitTemplate;
+	private final ProcessedMessageRepository processedMessageRepository;
 	private final CouponStrategyFactory couponStrategyFactory;
 
 	/**
@@ -141,6 +153,68 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 			.build();
 	}
 
+	@Override
+	public void issueBookCoupon(BookCouponIssueMessage message) {
+		if (processedMessageRepository.existsById(message.getMessageId())) {
+			return;
+		}
+
+		Coupon coupon = couponRepository.findById(message.getCouponId())
+			.orElseThrow(() -> new AmqpRejectAndDontRequeueException("Coupon not found"));
+
+		if (!coupon.getCouponType().equals(CouponType.BOOK)) {
+			throw new AmqpRejectAndDontRequeueException("Invalid Book Coupon");
+		}
+
+		if (coupon.getQuantity() == null || coupon.getQuantity() <= 0) {
+			throw new AmqpRejectAndDontRequeueException("Invalid Stock");
+		}
+
+		Member member = memberRepository.findById(message.getMemberId())
+			.orElseThrow(() -> new AmqpRejectAndDontRequeueException("존재하지않는 회원입니다."));
+
+		boolean alreadyIssued = memberCouponRepository.existsByMemberAndCoupon(member, coupon);
+		if (alreadyIssued) {
+			log.info("Already Issued Member");
+			return;
+		}
+
+		int updateQuantity = couponRepository.decrementCouponQuantity(coupon.getId());
+		if (updateQuantity <= 0) {
+			throw new AmqpRejectAndDontRequeueException("Stock is empty");
+		}
+
+		MemberCoupon memberCoupon = MemberCoupon.builder()
+			.coupon(coupon)
+			.member(member)
+			.build();
+		memberCouponRepository.save(memberCoupon);
+
+		processedMessageRepository.save(
+			ProcessedMessage.builder().
+				messageId(message.getMessageId())
+				.build());
+	}
+
+	@Override
+	public void publishBookCouponIssue(Long memberId, Long couponId) {
+		BookCouponIssueMessage message = BookCouponIssueMessage
+			.builder()
+			.couponId(couponId)
+			.memberId(memberId)
+			.messageId("book-coupon-" + UUID.randomUUID())
+			.build();
+
+		try {
+			rabbitTemplate.convertAndSend(
+				RabbitmqConfig.BOOK_COUPON_ISSUE_EXCHANGE,
+				RabbitmqConfig.BOOK_COUPON_ISSUE_ROUTING_KEY,
+				message
+			);
+		} catch (AmqpRejectAndDontRequeueException e) {
+			log.error("Invalid Message Format : {}", e.getMessage());
+		}
+	}
 	/**
 	 * 주문에 적용 가능한 쿠폰 목록
 	 *
