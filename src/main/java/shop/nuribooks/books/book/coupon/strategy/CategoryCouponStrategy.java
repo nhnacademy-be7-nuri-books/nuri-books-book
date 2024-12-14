@@ -51,11 +51,40 @@ public class CategoryCouponStrategy implements CouponStrategy {
 	@Override
 	public MemberCouponOrderDto isCouponApplicableToOrder(MemberCoupon memberCoupon,
 		List<BookOrderResponse> bookOrderResponses) {
+
+		if (memberCoupon.getCoupon() instanceof CategoryCoupon categoryCoupon) {
+			BigDecimal totalOrderPrice;
+			List<Long> bookIds = new ArrayList<>();
+
+			totalOrderPrice = calculateTotalOrderPrice(categoryCoupon, bookOrderResponses, bookIds);
+
+			if (totalOrderPrice.compareTo(categoryCoupon.getCouponPolicy().getMinimumOrderPrice()) >= 0) {
+				return MemberCouponOrderDto.toDto(memberCoupon, totalOrderPrice, bookIds);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public BigDecimal calculatePrice(MemberCoupon memberCoupon, List<BookOrderResponse> bookOrderResponses) {
+
+		if (memberCoupon.getCoupon() instanceof CategoryCoupon categoryCoupon) {
+			BigDecimal totalOrderPrice;
+			List<Long> bookIds = new ArrayList<>();
+
+			totalOrderPrice = calculateTotalOrderPrice(categoryCoupon, bookOrderResponses, bookIds);
+
+			if (totalOrderPrice.compareTo(categoryCoupon.getCouponPolicy().getMinimumOrderPrice()) >= 0) {
+				return memberCoupon.getCoupon().getCouponPolicy().calculateDiscount(totalOrderPrice);
+			}
+		}
+		return BigDecimal.ZERO;
+	}
+
+	private BigDecimal calculateTotalOrderPrice(CategoryCoupon categoryCoupon,
+		List<BookOrderResponse> bookOrderResponses,
+		List<Long> bookIds) {
 		BigDecimal totalOrderPrice = BigDecimal.ZERO;
-
-		CategoryCoupon categoryCoupon = (CategoryCoupon)memberCoupon.getCoupon();
-		List<Long> bookIds = new ArrayList<>();
-
 		List<Long> applicableCategoryIds = categoryRepository.findAllChildCategoryIds(
 			categoryCoupon.getCategory().getId());
 
@@ -70,9 +99,6 @@ public class CategoryCouponStrategy implements CouponStrategy {
 				}
 			}
 		}
-		if (totalOrderPrice.compareTo(categoryCoupon.getCouponPolicy().getMinimumOrderPrice()) >= 0) {
-			return MemberCouponOrderDto.toDto(memberCoupon, totalOrderPrice, bookIds);
-		}
-		return null;
+		return totalOrderPrice;
 	}
 }

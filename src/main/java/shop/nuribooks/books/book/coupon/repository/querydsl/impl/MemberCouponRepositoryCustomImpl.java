@@ -18,6 +18,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
+import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
 import shop.nuribooks.books.book.coupon.entity.QMemberCoupon;
 import shop.nuribooks.books.book.coupon.repository.querydsl.MemberCouponRepositoryCustom;
 
@@ -145,5 +146,16 @@ public class MemberCouponRepositoryCustomImpl implements MemberCouponRepositoryC
 			.orderBy(memberCoupon.createdAt.desc())
 			.fetch();
 
+	}
+
+	@Override
+	public List<MemberCoupon> findAllUsableCouponsByMemberId(Long memberId) {
+		LocalDate currentDate = LocalDate.now();
+		QMemberCoupon memberCoupon = QMemberCoupon.memberCoupon;
+		return queryFactory.selectFrom(memberCoupon)
+			.where(memberCoupon.member.id.eq(memberId)
+				.and(memberCoupon.isUsed.eq(false))
+				.and(memberCoupon.expiredAt.gt(currentDate)))
+			.fetch();
 	}
 }

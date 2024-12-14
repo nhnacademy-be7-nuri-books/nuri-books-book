@@ -1,7 +1,6 @@
 package shop.nuribooks.books.order.order.service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +26,6 @@ import shop.nuribooks.books.book.coupon.dto.CouponAppliedOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.entity.AllAppliedCoupon;
 import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
-import shop.nuribooks.books.book.coupon.enums.DiscountType;
 import shop.nuribooks.books.book.coupon.repository.AllAppliedCouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.CouponService;
@@ -111,7 +109,6 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 	private final ApplicationEventPublisher publisher;
 	private final PaymentService paymentService;
 	private final OrderSavingPointRepository orderSavingPointRepository;
-	private final CouponService couponService;
 
 	public OrderServiceImpl(CustomerRepository customerRepository,
 		BookRepository bookRepository,
@@ -156,7 +153,6 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 		this.publisher = publisher;
 		this.paymentService = paymentService;
 		this.orderSavingPointRepository = orderSavingPointRepository;
-		this.couponService = couponService;
 	}
 
 	/**
@@ -192,8 +188,8 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 		List<WrappingPaperResponse> paperResponse = wrappingPaperService.getAllWrappingPaper();
 
 		// 쿠폰 목록 가져오기 (ALL 타입)
-		List<MemberCouponOrderDto> allTypeCoupon = memberCouponService.getAllTypeAvailableCouponsByMemberId(memberId,
-			orderTotalPrice);
+		List<MemberCouponOrderDto> allTypeCoupon = memberCouponService.getCouponsApplicableToOrder(memberId,
+			bookOrderResponses);
 
 		if (point.isPresent()) {
 			return OrderInformationResponse.builder()
@@ -269,8 +265,8 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 		List<WrappingPaperResponse> paperResponse = wrappingPaperService.getAllWrappingPaper();
 
 		// 쿠폰 목록 가져오기 (ALL 타입)
-		List<MemberCouponOrderDto> allTypeCoupon = memberCouponService.getAllTypeAvailableCouponsByMemberId(memberId,
-			orderTotalPrice);
+		List<MemberCouponOrderDto> allTypeCoupon = memberCouponService.getCouponsApplicableToOrder(memberId,
+			bookOrderResponses);
 
 		if (point.isPresent()) {
 			return OrderInformationResponse.builder()
@@ -356,8 +352,6 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 
 		// 배송지 등록
 		shippingService.registerShipping(savedOrder, orderTempRegisterRequest.shippingRegister());
-
-		// 회원 쿠폰 처리
 
 		// 주문 전체 적용 쿠폰
 		if (Objects.nonNull(orderTempRegisterRequest.allAppliedCoupon())) {
@@ -527,8 +521,6 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 				bookAppliedCouponList.add(couponAppliedOrderDto);
 			}
 		}
-
-		// 도서 쿠폰
 
 		// 포인트
 		BigDecimal appliedPoint = BigDecimal.ZERO;
@@ -875,20 +867,17 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 	}
 
 	private void processCoupon(OrderRegisterRequest orderTempRegisterRequest, Order savedOrder) {
+
 		MemberCoupon memberCoupon = memberCouponRepository.findById(orderTempRegisterRequest.allAppliedCoupon())
 			.orElseThrow(MemberCartNotFoundException::new);
 
-		BigDecimal discountPrice = BigDecimal.valueOf(memberCoupon.getCoupon().getCouponPolicy().getDiscount());
+		List<BookOrderResponse> bookOrderResponses = new ArrayList<>();
 
-		// 쿠폰 정책에 따라 할인가 적용
-		if (memberCoupon.getCoupon().getCouponPolicy().getDiscountType().compareTo(DiscountType.RATED) == 0) {
-			BigDecimal tempPrice = orderTempRegisterRequest.paymentBooks()
-				.multiply(discountPrice.divide(BigDecimal.valueOf(100), 1, RoundingMode.HALF_UP));
-
-			if (tempPrice.compareTo(memberCoupon.getCoupon().getCouponPolicy().getMaximumDiscountPrice()) >= 0) {
-				discountPrice = memberCoupon.getCoupon().getCouponPolicy().getMaximumDiscountPrice();
-			}
+		for (OrderDetailRequest item : orderTempRegisterRequest.orderDetails()) {
+			bookOrderResponses.add(getBookOrderResponses(item.bookId(), item.count()));
 		}
+
+		BigDecimal discountPrice = memberCouponService.getCouponsApplicableToOrder(memberCoupon, bookOrderResponses);
 
 		// AllAppliedCoupon 생성 및 저장
 		AllAppliedCoupon allAppliedCoupon = AllAppliedCoupon.builder()

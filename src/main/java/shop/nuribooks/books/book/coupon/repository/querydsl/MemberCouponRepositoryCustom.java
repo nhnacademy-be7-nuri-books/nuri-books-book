@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
+import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
 
 public interface MemberCouponRepositoryCustom {
 	List<MemberCouponResponse> findAllByMemberId(Long memberId);
@@ -17,4 +18,6 @@ public interface MemberCouponRepositoryCustom {
 	Page<MemberCouponResponse> findExpiredOrUsedCouponsByMemberId(Long memberId, Pageable pageable);
 
 	List<MemberCouponOrderDto> findAllTypeAvailableCouponsByMemberId(Long memberId, BigDecimal orderTotalPrice);
+
+	List<MemberCoupon> findAllUsableCouponsByMemberId(Long memberId);
 }

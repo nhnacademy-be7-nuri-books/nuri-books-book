@@ -45,4 +45,18 @@ public class AllCouponStrategy implements CouponStrategy {
 		}
 		return null;
 	}
+
+	@Override
+	public BigDecimal calculatePrice(MemberCoupon memberCoupon, List<BookOrderResponse> bookOrderResponses) {
+		BigDecimal totalOrderPrice = BigDecimal.ZERO;
+
+		for (BookOrderResponse bookOrderResponse : bookOrderResponses) {
+			totalOrderPrice = totalOrderPrice.add(bookOrderResponse.bookTotalPrice());
+		}
+
+		if (totalOrderPrice.compareTo(memberCoupon.getCoupon().getCouponPolicy().getMinimumOrderPrice()) >= 0) {
+			return memberCoupon.getCoupon().getCouponPolicy().calculateDiscount(totalOrderPrice);
+		}
+		return BigDecimal.ZERO;
+	}
 }

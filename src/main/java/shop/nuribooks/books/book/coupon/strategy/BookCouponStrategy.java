@@ -47,21 +47,46 @@ public class BookCouponStrategy implements CouponStrategy {
 	@Override
 	public MemberCouponOrderDto isCouponApplicableToOrder(MemberCoupon memberCoupon,
 		List<BookOrderResponse> bookOrderResponses) {
+
+		if (memberCoupon.getCoupon() instanceof BookCoupon bookCoupon) {
+			BigDecimal totalOrderPrice;
+			List<Long> bookIds = new ArrayList<>();
+
+			totalOrderPrice = calculateTotalOrderPrice(bookCoupon, bookOrderResponses, bookIds);
+
+			if (totalOrderPrice.compareTo(bookCoupon.getCouponPolicy().getMinimumOrderPrice()) >= 0) {
+				return MemberCouponOrderDto.toDto(memberCoupon, totalOrderPrice, bookIds);
+			}
+		}
+		return null;
+
+	}
+
+	@Override
+	public BigDecimal calculatePrice(MemberCoupon memberCoupon, List<BookOrderResponse> bookOrderResponses) {
+
+		if (memberCoupon.getCoupon() instanceof BookCoupon bookCoupon) {
+			BigDecimal totalOrderPrice;
+			List<Long> bookIds = new ArrayList<>();
+
+			totalOrderPrice = calculateTotalOrderPrice(bookCoupon, bookOrderResponses, bookIds);
+
+			if (totalOrderPrice.compareTo(bookCoupon.getCouponPolicy().getMinimumOrderPrice()) >= 0) {
+				return memberCoupon.getCoupon().getCouponPolicy().calculateDiscount(totalOrderPrice);
+			}
+		}
+		return BigDecimal.ZERO;
+	}
+
+	private BigDecimal calculateTotalOrderPrice(BookCoupon bookCoupon, List<BookOrderResponse> bookOrderResponses,
+		List<Long> bookIds) {
 		BigDecimal totalOrderPrice = BigDecimal.ZERO;
-
-		BookCoupon bookCoupon = (BookCoupon)memberCoupon.getCoupon();
-		List<Long> bookIds = new ArrayList<>();
-
 		for (BookOrderResponse bookOrderResponse : bookOrderResponses) {
 			if (bookCoupon.getBook().getId().equals(bookOrderResponse.bookId())) {
 				totalOrderPrice = totalOrderPrice.add(bookOrderResponse.bookTotalPrice());
 				bookIds.add(bookOrderResponse.bookId());
 			}
 		}
-		if (totalOrderPrice.compareTo(bookCoupon.getCouponPolicy().getMinimumOrderPrice()) >= 0) {
-			return MemberCouponOrderDto.toDto(memberCoupon, totalOrderPrice, bookIds);
-		}
-		return null;
-
+		return totalOrderPrice;
 	}
 }
