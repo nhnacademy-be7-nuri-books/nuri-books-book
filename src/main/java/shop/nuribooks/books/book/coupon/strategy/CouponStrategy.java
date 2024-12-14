@@ -1,5 +1,6 @@
 package shop.nuribooks.books.book.coupon.strategy;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
@@ -14,5 +15,7 @@ public interface CouponStrategy {
 
 	MemberCouponOrderDto isCouponApplicableToOrder(MemberCoupon memberCoupon,
 		List<BookOrderResponse> bookOrderResponses);
+
+	BigDecimal calculatePrice(MemberCoupon memberCoupon, List<BookOrderResponse> bookOrderResponses);
 }
 

@@ -1,7 +1,9 @@
 package shop.nuribooks.books.book.coupon.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
@@ -17,6 +20,8 @@ import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
 import shop.nuribooks.books.book.coupon.repository.CouponRepository;
 import shop.nuribooks.books.book.coupon.repository.MemberCouponRepository;
 import shop.nuribooks.books.book.coupon.service.MemberCouponService;
+import shop.nuribooks.books.book.coupon.strategy.CouponStrategy;
+import shop.nuribooks.books.book.coupon.strategy.CouponStrategyFactory;
 import shop.nuribooks.books.exception.coupon.CouponAlreadyIssuedException;
 import shop.nuribooks.books.exception.coupon.CouponNotFoundException;
 import shop.nuribooks.books.exception.member.MemberCartNotFoundException;
@@ -36,6 +41,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 	private final MemberRepository memberRepository;
 	private final MemberCouponRepository memberCouponRepository;
 	private final CouponRepository couponRepository;
+	private final CouponStrategyFactory couponStrategyFactory;
 
 	/**
 	 * 회원에게 쿠폰을 등록합니다.
@@ -133,6 +139,43 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 			.createdAt(memberCoupon.getCreatedAt())
 			.expiredAt(memberCoupon.getExpiredAt())
 			.build();
+	}
+
+	/**
+	 * 주문에 적용 가능한 쿠폰 목록
+	 *
+	 * @param memberId 사용자 아이디
+	 * @param bookOrderResponses 주문한 책 정보
+	 * @return 쿠폰 리스트
+	 */
+	@Override
+	public List<MemberCouponOrderDto> getCouponsApplicableToOrder(Long memberId,
+		List<BookOrderResponse> bookOrderResponses) {
+
+		List<MemberCouponOrderDto> memberCouponOrderDtoList = new ArrayList<>();
+		List<MemberCoupon> memberCoupons = memberCouponRepository.findAllUsableCouponsByMemberId(memberId);
+
+		for (MemberCoupon memberCoupon : memberCoupons) {
+			CouponStrategy couponStrategy = couponStrategyFactory.getStrategy(memberCoupon.getCoupon().getCouponType());
+
+			MemberCouponOrderDto memberCouponOrderDto = couponStrategy.isCouponApplicableToOrder(memberCoupon,
+				bookOrderResponses);
+
+			if (Objects.nonNull(memberCouponOrderDto)) {
+				memberCouponOrderDtoList.add(memberCouponOrderDto);
+			}
+		}
+		return memberCouponOrderDtoList;
+	}
+
+	@Override
+	public BigDecimal getCouponsApplicableToOrder(MemberCoupon memberCoupon,
+		List<BookOrderResponse> bookOrderResponses) {
+
+		CouponStrategy couponStrategy = couponStrategyFactory.getStrategy(memberCoupon.getCoupon().getCouponType());
+
+		return couponStrategy.calculatePrice(memberCoupon,
+			bookOrderResponses);
 	}
 
 }
