@@ -6,9 +6,12 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import shop.nuribooks.books.book.book.dto.response.BookOrderResponse;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponIssueRequest;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponOrderDto;
 import shop.nuribooks.books.book.coupon.dto.MemberCouponResponse;
+import shop.nuribooks.books.book.coupon.message.BookCouponIssueMessage;
+import shop.nuribooks.books.book.coupon.entity.MemberCoupon;
 
 public interface MemberCouponService {
 
@@ -27,4 +30,13 @@ public interface MemberCouponService {
 	List<MemberCouponOrderDto> getAllTypeAvailableCouponsByMemberId(Long memberId, BigDecimal orderTotalPrice);
 
 	MemberCouponOrderDto getMemberCoupon(Long memberCouponId);
+
+	List<MemberCouponOrderDto> getCouponsApplicableToOrder(Long memberId, List<BookOrderResponse> bookOrderResponses);
+
+	BigDecimal getCouponsApplicableToOrder(MemberCoupon memberCoupon,
+		List<BookOrderResponse> bookOrderResponses);
+
+	void issueBookCoupon(BookCouponIssueMessage message);
+
+	void publishBookCouponIssue(Long memberId, Long couponId);
 }

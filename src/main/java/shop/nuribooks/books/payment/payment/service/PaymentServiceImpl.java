@@ -147,7 +147,7 @@ public class PaymentServiceImpl implements PaymentService {
 			PaymentCancel paymentCancel = PaymentCancel.builder()
 				.payment(payment)
 				.transactionKey(node.path("transactionKey").asText())
-				.cancelReason(node.path("cancelReason").asText())
+				.cancelReason(reason)
 				.canceledAt(OffsetDateTime.parse(node.path("canceledAt").asText()).toLocalDateTime())
 				.build();
 			paymentCancelRepository.save(paymentCancel);

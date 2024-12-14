@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import shop.nuribooks.books.book.coupon.dto.BookCouponResponse;
 import shop.nuribooks.books.book.coupon.dto.CouponRequest;
 import shop.nuribooks.books.book.coupon.dto.CouponResponse;
 import shop.nuribooks.books.book.coupon.enums.CouponType;
@@ -37,7 +38,7 @@ public class CouponController {
 		@ApiResponse(responseCode = "201", description = "생성 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
 	})
-	// @HasRole(role = AuthorityType.ADMIN)
+	@HasRole(role = AuthorityType.ADMIN)
 	@PostMapping
 	public ResponseEntity<ResponseMessage> registerCoupon(
 		@Valid @RequestBody CouponRequest couponRequest) {
@@ -107,5 +108,11 @@ public class CouponController {
 		couponService.expireCoupon(id);
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(new ResponseMessage(HttpStatus.OK.value(), "쿠폰 삭제 성공"));
+	}
+
+	@GetMapping("/book-coupons/{book-id}")
+	public ResponseEntity<BookCouponResponse> getBookCoupon(@PathVariable(name = "book-id") Long bookId) {
+		BookCouponResponse response = couponService.getBookCoupon(bookId);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 }

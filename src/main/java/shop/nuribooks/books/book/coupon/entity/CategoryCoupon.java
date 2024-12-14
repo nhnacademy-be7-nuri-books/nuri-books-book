@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 import shop.nuribooks.books.book.category.entity.Category;
 
 @Entity
-@DiscriminatorValue("BOOK")
+@DiscriminatorValue("CATEGORY")
 @Getter
 @NoArgsConstructor
 @SuperBuilder
