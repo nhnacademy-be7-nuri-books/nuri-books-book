@@ -32,6 +32,13 @@ public class RabbitmqConfig {
 	public static final String INVENTORY_DLQ = "nuribooks.inventory.update.dlq";
 	public static final String DEAD_LETTER_EXCHANGE = "nuribooks.deadletter.exchange";
 	public static final String INVENTORY_DEAD_LETTER_ROUTING_KEY = "nuribooks.inventory.update.dlq";
+
+	public static final String BOOK_COUPON_ISSUE_QUEUE = "nuribooks.book.coupon.issue.queue";
+	public static final String BOOK_COUPON_ISSUE_EXCHANGE = "nuribooks.book.coupon.issue.exchange";
+	public static final String BOOK_COUPON_ISSUE_ROUTING_KEY = "nuribooks.book.coupon.issue";
+	public static final String BOOK_COUPON_DEAD_LETTER_ROUTING_KEY = "nuribooks.book.coupon.issue.dlq";
+	public static final String BOOK_COUPON_ISSUE_DLQ = "nuribooks.book.coupon.issue.dlq";
+
 	private final KeyManagerConfig keyManagerConfig;
 	@Value("${cloud.nhn.rabbitmq.secret-id}")
 	String rabbitmqSecretId;
@@ -111,6 +118,38 @@ public class RabbitmqConfig {
 		return BindingBuilder.bind(inventoryUpdateDLQ())
 			.to(deadLetterExchange())
 			.with(INVENTORY_DEAD_LETTER_ROUTING_KEY);
+	}
+
+	@Bean
+	public Queue bookCouponIssueQueue() {
+		return QueueBuilder.durable(BOOK_COUPON_ISSUE_QUEUE)
+			.withArgument("x-dead-letter-exchange", DEAD_LETTER_EXCHANGE)
+			.withArgument("x-dead-letter-routing-key", BOOK_COUPON_DEAD_LETTER_ROUTING_KEY)
+			.build();
+	}
+
+	@Bean
+	public Queue bookCouponIssueDLQ() {
+		return new Queue(BOOK_COUPON_ISSUE_DLQ, true);
+	}
+
+	@Bean
+	public DirectExchange bookCouponIssueExchange() {
+		return new DirectExchange(BOOK_COUPON_ISSUE_EXCHANGE);
+	}
+
+	@Bean
+	public Binding bookCouponIssueBinding() {
+		return BindingBuilder.bind(bookCouponIssueQueue())
+			.to(bookCouponIssueExchange())
+			.with(BOOK_COUPON_ISSUE_ROUTING_KEY);
+	}
+
+	@Bean
+	public Binding bookCouponIssueDLQBinding() {
+		return BindingBuilder.bind(bookCouponIssueDLQ())
+			.to(deadLetterExchange())
+			.with(BOOK_COUPON_DEAD_LETTER_ROUTING_KEY);
 	}
 
 	private RabbitmqConfigResponse parseRabbitmqConfig(String rabbitmqConfig) {

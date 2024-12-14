@@ -47,4 +47,15 @@ public class CouponCustomRepositoryImpl implements CouponCustomRepository {
 		return new PageImpl<>(coupons, pageable, total);
 	}
 
+	@Override
+	public int decrementCouponQuantity(Long couponId) {
+		QCoupon coupon = QCoupon.coupon;
+
+		return (int)queryFactory.update(coupon)
+			.set(coupon.quantity, coupon.quantity.subtract(1))
+			.where(coupon.id.eq(couponId)
+				.and(coupon.quantity.gt(0)))
+			.execute();
+	}
+
 }
