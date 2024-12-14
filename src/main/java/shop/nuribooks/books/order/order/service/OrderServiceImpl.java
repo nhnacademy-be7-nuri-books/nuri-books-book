@@ -706,44 +706,44 @@ public class OrderServiceImpl extends CommonOrderService implements OrderService
 
 		} else if (orderState.name().equals("PAID")) {
 
-			//responseMessage = paymentService.cancelPayment(order, orderCancelRequest.reason());
-			//if (responseMessage.statusCode() == 200) {
+			responseMessage = paymentService.cancelPayment(order, orderCancelRequest.reason());
+			if (responseMessage.statusCode() == 200) {
 
-			for (OrderDetail orderDetail : orderDetails) {
-				orderDetail.setOrderState(OrderState.CANCELED);
-				orderDetailRepository.save(orderDetail);
-			}
+				for (OrderDetail orderDetail : orderDetails) {
+					orderDetail.setOrderState(OrderState.CANCELED);
+					orderDetailRepository.save(orderDetail);
+				}
 
-			// 보상 처리
-			Optional<AllAppliedCoupon> allAppliedCoupon = allAppliedCouponRepository.findByOrder(order);
-			if (allAppliedCoupon.isPresent()) {
-				Optional<MemberCoupon> memberCoupon = memberCouponRepository.findById(
-					allAppliedCoupon.get().getId());
-				memberCoupon.get().setUsed(false);
-				memberCouponRepository.save(memberCoupon.get());
+				// 보상 처리
+				Optional<AllAppliedCoupon> allAppliedCoupon = allAppliedCouponRepository.findByOrder(order);
+				if (allAppliedCoupon.isPresent()) {
+					Optional<MemberCoupon> memberCoupon = memberCouponRepository.findById(
+						allAppliedCoupon.get().getId());
+					memberCoupon.get().setUsed(false);
+					memberCouponRepository.save(memberCoupon.get());
 
-				allAppliedCouponRepository.delete(allAppliedCoupon.get());
-			}
+					allAppliedCouponRepository.delete(allAppliedCoupon.get());
+				}
 
-			Optional<OrderSavingPoint> orderSavingPoint = orderSavingPointRepository.findByOrder(order);
-			Optional<OrderUsingPoint> orderUsingPoint = orderUsingPointRepository.findByOrder(order);
+				Optional<OrderSavingPoint> orderSavingPoint = orderSavingPointRepository.findByOrder(order);
+				Optional<OrderUsingPoint> orderUsingPoint = orderUsingPointRepository.findByOrder(order);
 
-			if (orderUsingPoint.isPresent()) {
+				if (orderUsingPoint.isPresent()) {
 
-				Member member = memberRepository.findById(customerId).orElseThrow(
-					() -> new MemberNotFoundException("회원 정보가 없습니다.")
-				);
+					Member member = memberRepository.findById(customerId).orElseThrow(
+						() -> new MemberNotFoundException("회원 정보가 없습니다.")
+					);
 
-				PointHistory pointUsingHistory = pointHistoryRepository.findById(orderUsingPoint.get().getId())
-					.get();
-				PointHistory pointSavingHistory = pointHistoryRepository.findById(orderSavingPoint.get().getId())
-					.get();
+					PointHistory pointUsingHistory = pointHistoryRepository.findById(orderUsingPoint.get().getId())
+						.get();
+					PointHistory pointSavingHistory = pointHistoryRepository.findById(orderSavingPoint.get().getId())
+						.get();
 
-				BigDecimal result = pointUsingHistory.getAmount().abs().subtract(pointSavingHistory.getAmount());
+					BigDecimal result = pointUsingHistory.getAmount().abs().subtract(pointSavingHistory.getAmount());
 
-				publisher.publishEvent(new OrderCancelPointEvent(member, order, result));
+					publisher.publishEvent(new OrderCancelPointEvent(member, order, result));
 
-				//}
+				}
 
 			}
 

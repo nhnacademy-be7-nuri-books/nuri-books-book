@@ -22,7 +22,7 @@ public class PaymentCancel {
 
 	@Column(nullable = false, unique = true)
 	String transactionKey;
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	String cancelReason;
 	@Column(nullable = false)
 	LocalDateTime canceledAt;
